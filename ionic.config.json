@@ -1,0 +1,7 @@
+{
+  "name": "fairground-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
