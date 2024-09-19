@@ -1,56 +1,78 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-title>Blank</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
+  <ion-header :translucent="true">
+    <ion-toolbar>
+      <ion-title>NYSFairgrounds</ion-title>
+    </ion-toolbar>
+  </ion-header>
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
+          <ion-title class="main-title" size="large">New York State Fairgrounds</ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-      </div>
+      <ion-card>
+        <ion-card-header class="info-container">
+          <ion-card-title class="info-container__title">Welcome, Matt!</ion-card-title>
+        </ion-card-header>
+    
+        <ion-card-content>
+          <p class="description">
+            The New York State Fairgrounds is a 375-acre exhibit and entertainment complex located in Syracuse, New York.
+          </p>
+        </ion-card-content>
+      </ion-card>
+
+      
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonContent, IonHeader, IonRouterOutlet, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonFooter, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonGrid, IonRow, IonCol } from '@ionic/vue';
+import Tabs from '@/Tabs.vue';
+
 </script>
 
-<style scoped>
-#container {
-  text-align: center;
-  
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+<style scoped lang="scss">
+
+.main-title {
+  font-size: 26px;
+  font-family: 'Pally', sans-serif;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+p {
+  font-family: 'General Sans', sans-serif; 
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  
-  color: #8c8c8c;
-  
-  margin: 0;
+ion-icon {
+  color: white;
 }
 
-#container a {
-  text-decoration: none;
+.info-container {
+  padding-bottom: 10px;
+
+  &__title {
+    font-size: 22px;
+    font-family: 'General Sans', sans-serif; 
+  }
+}
+
+.description {
+  font-weight: 600;
+}
+
+ion-button {
+  --border-radius: 5px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0px 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
 }
 </style>
