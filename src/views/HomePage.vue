@@ -24,6 +24,13 @@
         </ion-card-content>
       </ion-card>
 
+      <div class="home-content">
+        <div class="home-content__container">
+          <img class="featured-img" src="/src/imgs/featured-fair.png" alt="">
+          <h2 class="img-header">THE FAIR</h2>
+        </div>
+      </div>
+
       
     </ion-content>
   </ion-page>
@@ -40,6 +47,38 @@ import Tabs from '@/Tabs.vue';
 .main-title {
   font-size: 26px;
   font-family: 'Pally', sans-serif;
+}
+
+.home-content {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+
+  &__container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+
+    .featured-img {
+      
+    }
+
+    .img-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 36px;
+      backdrop-filter: blur(1px);
+      color: white;
+      background-color: #1E5EAE;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-family: 'Pally', sans-serif;
+    }
+
+  }
+
 }
 
 p {
