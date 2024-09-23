@@ -61,13 +61,13 @@ import Tabs from '@/Tabs.vue';
     position: relative;
 
     .featured-img {
-      
+      max-height: 250px;
     }
 
     .img-header {
       position: absolute;
       top: 0;
-      left: 0;
+      left: -10px;
       font-size: 36px;
       backdrop-filter: blur(1px);
       color: white;
