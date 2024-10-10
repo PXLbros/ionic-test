@@ -5,7 +5,7 @@ import EventsPage from '@/views/EventsPage.vue';
 import FairPage from '@/views/FairPage.vue';
 import HomePage from '@/views/HomePage.vue';
 import Tabs from '@/Tabs.vue';
-
+import LeafMapPage from '@/views/LeafMapPage.vue';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -34,6 +34,10 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'fair',
         component: FairPage,
+      },
+      {
+        path: 'leaf',
+        component: LeafMapPage,
       }
     ]
   },

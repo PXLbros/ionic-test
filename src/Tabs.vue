@@ -22,6 +22,11 @@
                 <ion-icon :icon="personOutline"></ion-icon>
                 <ion-label>Profile</ion-label>
               </ion-tab-button>
+
+              <ion-tab-button tab="leaf" href="/tabs/leaf">
+                <ion-icon :icon="mapOutline"></ion-icon>
+                <ion-label>Map</ion-label>
+              </ion-tab-button>
             </ion-tab-bar>
           </ion-tabs>
     </ion-page>
