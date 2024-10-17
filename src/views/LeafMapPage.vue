@@ -25,7 +25,7 @@
       const fairgroundsLocation = [43.0731, -76.2230]; // New York State Fairgrounds coordinates
   
       const initMap = () => {
-        map = L.map('map').setView(fairgroundsLocation, 15.4);
+        map = L.map('map').setView(fairgroundsLocation, 15.9);
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -33,7 +33,7 @@
   
         // Add custom marker for fairgrounds
         const customMarker = L.marker(fairgroundsLocation).addTo(map);
-        customMarker.bindPopup('New York State Fairgrounds').openPopup();
+        customMarker.bindPopup('New York State Fairgrounds', { className: 'wider-popup', maxWidth: '250px'}, ).openPopup();
   
         // Add image overlay with adjusted bounds and opacity
         const imageUrl = '/src/imgs/map-image.webp';
@@ -42,7 +42,7 @@
           [43.0671, -76.2130]  // Northeast corner of the image (moved right)
         ];
         L.imageOverlay(imageUrl, imageBounds, {
-          opacity: 0.7, // Add opacity (70% opaque)
+          opacity: 0.9, // Add opacity (70% opaque)
           interactive: false // Prevents the overlay from capturing mouse events
         }).addTo(map);
   
@@ -88,5 +88,9 @@
     border-radius: 10px;
     height: 100%;
     width: 100%;
+  }
+
+  .wider-popup {
+    width: 200px;
   }
   </style>
