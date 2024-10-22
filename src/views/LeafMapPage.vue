@@ -14,14 +14,20 @@
         <div id="progressbar" class="progress-bar"></div>
       </div>
 
-      <!-- Add overlay div that appears with the modal -->
-      <div v-if="selectedLocation" 
-           class="modal-overlay"
-           @click="handleOverlayClick">
-      </div>
+      <div v-if="selectedLocation" class="modal-overlay" :style="overlayStyle" @click="handleOverlayClick" style="opacity: 0"></div>
 
       <transition name="slide">
-        <div v-if="selectedLocation" class="info-panel">
+        <div v-if="selectedLocation" 
+             class="info-panel"
+             :style="panelStyle"
+             @touchstart="handleTouchStart"
+             @touchmove="handleTouchMove"
+             @touchend="handleTouchEnd">
+          <!-- Drag handle indicator -->
+          <div class="drag-handle">
+            <div class="drag-handle-line"></div>
+          </div>
+          
           <div class="info-panel-header">
             <h2>{{ selectedLocation.Title }}</h2>
             <button class="close-button" @click="closeInfoPanel">×</button>
@@ -59,6 +65,13 @@ export default {
     const total = ref(0);
     const isOnline = ref(navigator.onLine); // Check if the user is online
     const selectedLocation = ref(null);
+    const dragStart = ref(null);
+    const currentDrag = ref(0);
+    const panelStyle = ref({});
+    const overlayStyle = ref({});
+    const isDragging = ref(false);
+    const startY = ref(0);
+    const startScrollTop = ref(0);
 
     const updateOnlineStatus = () => {
       isOnline.value = navigator.onLine;
@@ -168,13 +181,98 @@ export default {
       document.getElementById('progressbar').innerText = `${progress.value}/${total.value}`;
     };
 
-    // Info Panel methods
+    // INFO PANEL FUNCTIONS 
+    const handleTouchStart = (event) => {
+      const panel = event.currentTarget;
+      startY.value = event.touches[0].clientY;
+      startScrollTop.value = panel.scrollTop;
+      
+      // Only initiate drag if we're at the top of the scroll
+      isDragging.value = panel.scrollTop <= 0;
+      
+      if (isDragging.value) {
+        dragStart.value = startY.value;
+        currentDrag.value = 0;
+        panelStyle.value = { transition: 'none' };
+      }
+    };
+
+    const handleTouchMove = (event) => {
+      const panel = event.currentTarget;
+      const currentY = event.touches[0].clientY;
+      const deltaY = currentY - startY.value;
+
+      if (isDragging.value) {
+        // Handle dragging down to close
+        if (deltaY > 0) {
+          event.preventDefault();
+          const dragDelta = currentY - dragStart.value;
+          currentDrag.value = dragDelta;
+          
+          panelStyle.value = {
+            transform: `translate(-50%, ${dragDelta}px)`,
+            transition: 'none'
+          };
+
+          const opacity = Math.max(0.2 - (dragDelta / 1000), 0);
+          overlayStyle.value = {
+            opacity: opacity
+          };
+        }
+      } else {
+        // Normal scrolling behavior
+        panel.style.overflow = 'auto';
+      }
+    };
+
+    const handleTouchEnd = (event) => {
+      if (!isDragging.value) return;
+
+      const endY = event.changedTouches[0].clientY;
+      const dragDistance = endY - dragStart.value;
+      const dragTime = event.timeStamp - dragStart.value;
+      const velocity = dragDistance / dragTime;
+
+      dragStart.value = null;
+      isDragging.value = false;
+
+      if (dragDistance > 150 || velocity > 0.5) {
+        closeInfoPanel();
+      } else {
+        // Restore panel position
+        panelStyle.value = {
+          transform: 'translate(-50%, 0)',
+          transition: 'transform 0.3s ease-out'
+        };
+        overlayStyle.value = {
+          opacity: 0.2,
+          transition: 'opacity 0.3s ease-out'
+        };
+      }
+    };
+
     const closeInfoPanel = () => {
-      selectedLocation.value = null;
+      // Animate panel out
+      panelStyle.value = {
+        transform: 'translate(-50%, 100%)',
+        transition: 'transform 0.3s ease-out'
+      };
+      overlayStyle.value = {
+        opacity: 0,
+        transition: 'opacity 0.3s ease-out'
+      };
+      
+      // Actually close the panel after animation
+      setTimeout(() => {
+        selectedLocation.value = null;
+        panelStyle.value = {};
+        overlayStyle.value = {};
+      }, 300);
     };
 
     const handleOverlayClick = (event) => {
       // Close the panel when clicking the overlay
+      console.log('clicked overlay');
       closeInfoPanel();
     };
 
@@ -222,6 +320,22 @@ export default {
           marker.on('click', () => {
             selectedLocation.value = item;
             console.log('clicked item', item);
+            // Initialize panel position below screen and animate up
+            panelStyle.value = {
+              transform: 'translate(-50%, 100%)',
+              transition: 'none'
+            };
+            // Force a reflow to ensure the initial position is set
+            requestAnimationFrame(() => {
+              panelStyle.value = {
+                transform: 'translate(-50%, 0)',
+                transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              };
+              overlayStyle.value = {
+                opacity: 0.2,
+                transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              };
+            });
             // Optional: Pan map slightly up to ensure marker is visible above panel
             map.panTo([item.Locations_latitude - 0.001, item.Locations_longitude]);
           });
@@ -252,7 +366,7 @@ export default {
       }
     });
 
-    return { progress, total, isOnline, selectedLocation, closeInfoPanel, handleOverlayClick };
+    return { progress, total, isOnline, selectedLocation, closeInfoPanel, handleOverlayClick, panelStyle, overlayStyle, handleTouchStart, handleTouchMove, handleTouchEnd };
   }
 };
 </script>
@@ -309,17 +423,20 @@ ion-content {
 
 
  /* Information panel styles */
+.drag-handle {
+  width: 100%;
+  height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
 
- /* Add styles for the overlay */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.2);
-  z-index: 999; /* Just below the modal */
-  backdrop-filter: blur(1px);
+.drag-handle-line {
+  width: 40px;
+  height: 4px;
+  background-color: #666;
+  border-radius: 2px;
 }
 
 .info-panel {
@@ -335,8 +452,24 @@ ion-content {
   z-index: 1000;
   padding: 16px;
   margin-bottom: 20px;
-  max-height: 450px;
-  overflow-y: scroll;
+  max-height: 50vh; /* Changed from 450px to be responsive */
+  overflow-y: auto; /* Changed from scroll */
+  touch-action: pan-y; /* Allow vertical scrolling */
+  user-select: none;
+  -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+}
+
+ /* Add styles for the overlay */
+ .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 999; /* Just below the modal */
+  backdrop-filter: blur(1px);
+  transition: opacity 0.3s ease-out;
 }
 
 .info-panel-header {
@@ -385,34 +518,13 @@ ion-content {
   line-height: 1.5;
 }
 
-/* Animation for panel */
+/* Remove the previous slide animations since we're handling transitions in JS now */
 .slide-enter-active,
-.slide-leave-active {
-  transition: transform 0.3s ease-in-out;
-}
-
-.slide-enter-from,
-.slide-leave-to {
-  transform: translate(-50%, 100%);
-}
-
+.slide-leave-active,
 .slide-enter-to,
+.slide-leave-to,
+.slide-enter-from,
 .slide-leave-from {
-  transform: translate(-50%, 0);
-}
-
-.slide-enter-active .modal-overlay,
-.slide-leave-active .modal-overlay {
-  transition: opacity 0.3s ease-in-out;
-}
-
-.slide-enter-from .modal-overlay,
-.slide-leave-to .modal-overlay {
-  opacity: 0;
-}
-
-.slide-enter-to .modal-overlay,
-.slide-leave-from .modal-overlay {
-  opacity: 1;
+  transition: none;
 }
 </style>
