@@ -64,20 +64,23 @@ export default {
     const progress = ref(0);
     const total = ref(0);
     const isOnline = ref(navigator.onLine); // Check if the user is online
-    const selectedLocation = ref(null);
-    const dragStart = ref(null);
-    const currentDrag = ref(0);
-    const panelStyle = ref({});
-    const overlayStyle = ref({});
-    const isDragging = ref(false);
-    const startY = ref(0);
-    const startScrollTop = ref(0);
+    const selectedLocation = ref(null); // selected location for info panel
+    const dragStart = ref(null); // Track touch start for drag
+    const currentDrag = ref(0); // Track current drag distance
+    const panelStyle = ref({}); // Style object for info panel
+    const overlayStyle = ref({}); // Style object for overlay
+    const isDragging = ref(false); // Track if user is dragging
+    const startY = ref(0); // Track start Y position for drag
+    const startScrollTop = ref(0); // Track start scroll position for drag
+    const activeMarker = ref(null); // Track active marker selected
 
+    // Handle online/offline status
     const updateOnlineStatus = () => {
       isOnline.value = navigator.onLine;
       console.log(`App is ${navigator.onLine ? 'online' : 'offline'}`);
     };
 
+    // Initialize the map
     const initMap = async () => {
       map = L.map('map').setView(fairgroundsLocation, 15.9);
       
@@ -175,6 +178,7 @@ export default {
       }, 100);
     };
 
+    // Update progress bar
     const updateProgressBar = () => {
       const percent = (progress.value / total.value) * 100;
       document.getElementById('progressbar').style.width = `${percent}%`;
@@ -184,8 +188,8 @@ export default {
     // INFO PANEL FUNCTIONS 
     const handleTouchStart = (event) => {
       const panel = event.currentTarget;
-      startY.value = event.touches[0].clientY;
-      startScrollTop.value = panel.scrollTop;
+      startY.value = event.touches[0].clientY; // Track start Y position 
+      startScrollTop.value = panel.scrollTop; // Track start scroll position
       
       // Only initiate drag if we're at the top of the scroll
       isDragging.value = panel.scrollTop <= 0;
@@ -297,10 +301,10 @@ export default {
       const iconMap = {
         clothing: '/icons/shirt.png',
         garden: '/icons/fairgroundsl.png',
-        info: '/icons/shirt.png',
-        icecream: '/icons/shirt.png',
-        drink: '/icons/shirt.png',
-        food: '/icons/shirt.png',
+        info: '/icons/chicken-icon.png',
+        icecream: '/icons/pig.png',
+        drink: '/icons/chicken-icon.png',
+        food: '/icons/pig.png',
         restaurant: '/icons/shirt.png'
       };
 
@@ -385,6 +389,7 @@ ion-content {
   border-radius: 10px;
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 .leaflet-pane {
@@ -406,13 +411,17 @@ ion-content {
 }
 
 .status-bar.online {
-  background-color: #4CAF50;
+  background-color: #4caf4fbd;
   color: white;
+  font-size: 12px;
+  backdrop-filter: blur(5px);
 }
 
 .status-bar.offline {
-  background-color: #f44336;
+  background-color: #f44336c1;
   color: white;
+  font-size: 12px;
+  backdrop-filter: blur(5px);
 }
 
 /* Add styles for Ionicons in Leaflet controls */
