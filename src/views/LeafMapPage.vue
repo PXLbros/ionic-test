@@ -411,14 +411,14 @@ ion-content {
 }
 
 .status-bar.online {
-  background-color: #4caf4fbd;
+  background-color: #4caf4fd1;
   color: white;
   font-size: 12px;
   backdrop-filter: blur(5px);
 }
 
 .status-bar.offline {
-  background-color: #f44336c1;
+  background-color: #f44336d9;
   color: white;
   font-size: 12px;
   backdrop-filter: blur(5px);
