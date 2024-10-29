@@ -91,6 +91,7 @@ export default {
       }).addTo(map);
 
       updateOnlineStatus();
+      // howdy buddy
 
       // Add save control with Ionicons
       saveControl = savetiles(baseLayer, {
