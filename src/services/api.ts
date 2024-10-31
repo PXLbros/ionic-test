@@ -125,7 +125,40 @@ const getFakeData = () => {
         locale: null,
       },
     },
-    nysfairWebsite: null,
+    nysfairWebsite: {
+      events: [
+        {
+          title: "Jamey Johnson",
+          description:
+            "Award-winning country music singer and songwriter Jamey Johnson makes his Great New York State Fair debut Tuesday, August 31 at 7 p.m. with the stage to be announced. Johnson’s song, “In Color,” earned awards from the Academy of Country Music and the Country Music Association. All Chevrolet Music Festival concerts are free with $3 Fair admission.\r\n\r\nJamey Johnson joins a lineup of more than 50 national touring shows presented in the Chevrolet Music Festival, the largest free music festival at any state fair in America.",
+          permalink: "http://nys-fair.test:8001/event/jamey-johnson/",
+          start_time: "August 31, 2021 7:00 PM",
+          start_time_unix: 1630450800,
+          duration: 60,
+          venue: {
+            name: "Chevy Court Concerts",
+            description:
+              '18 Days of free entertainment with two shows daily is scheduled for the Stan Colella Stage at Chevy Court for the 2021 New York State Fair. The lineup provides a wide-ranging mix of musical talent from country to nostalgia to today\'s popular music. Concerts at Chevy Court are sponsored by Chevrolet and are <strong>all free to Fairgoers with your Fair admission!</strong>\r\n\r\nSeating areas in Chevy Court are limited to first come – first seated. Make sure to check out all the rules in our <a href="https://nysfair.ny.gov/your-visit/concert-policy/">Concert Policy</a>.',
+          },
+          created_at: "2021-06-15 11:30:42",
+        },
+        {
+          title: "Grandson",
+          description:
+            "Alt-rocker Grandson will bring his socially-charged music to the Chevy Park stage at the 2021 Great New York State Fair Monday, August 30. The singer and songwriter behind alternative chart hits such as “Blood // Water” and “One Step Closer” says he believes the world needs honest rock and roll. All Chevrolet Music Series concerts are free with $3 Fair admission.\r\n\r\nGrandson joins a lineup of more than 50 national touring shows presented in the Chevrolet Music Festival, the largest free music festival at any state fair in America.",
+          permalink: "http://nys-fair.test:8001/event/grandson/",
+          start_time: "August 30, 2021 7:00 PM",
+          start_time_unix: 1630364400,
+          duration: 60,
+          venue: {
+            name: "Chevy Court Concerts",
+            description:
+              '18 Days of free entertainment with two shows daily is scheduled for the Stan Colella Stage at Chevy Court for the 2021 New York State Fair. The lineup provides a wide-ranging mix of musical talent from country to nostalgia to today\'s popular music. Concerts at Chevy Court are sponsored by Chevrolet and are <strong>all free to Fairgoers with your Fair admission!</strong>\r\n\r\nSeating areas in Chevy Court are limited to first come – first seated. Make sure to check out all the rules in our <a href="https://nysfair.ny.gov/your-visit/concert-policy/">Concert Policy</a>.',
+          },
+          created_at: "2021-06-11 10:34:00",
+        },
+      ],
+    },
     nysfairgroundsWebsite: {
       events: [
         {
