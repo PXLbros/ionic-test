@@ -49,15 +49,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, computed } from 'vue';
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonSearchbar, IonSelect, IonSelectOption } from '@ionic/vue';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default defineComponent({
   name: 'MapPage',
-  components: { 
-    IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, 
+  components: {
+    IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar,
     IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonSearchbar,
     IonSelect, IonSelectOption
   },
@@ -71,33 +70,33 @@ export default defineComponent({
     const markers: mapboxgl.Marker[] = [];
 
     const foodPlaces = [
-      { 
-        name: "Tasty Treats", 
-        types: ["hamburger", "pizza", "dessert"], 
+      {
+        name: "Tasty Treats",
+        types: ["hamburger", "pizza", "dessert"],
         coordinates: [-76.2157, 43.073],
         dietaryOptions: ["vegetarian"]
       },
-      { 
-        name: "Fair Favorites", 
-        types: ["hotdog", "corndog", "fries"], 
+      {
+        name: "Fair Favorites",
+        types: ["hotdog", "corndog", "fries"],
         coordinates: [-76.2170, 43.0745],
         dietaryOptions: ["gluten-free"]
       },
-      { 
-        name: "Sweet & Savory", 
-        types: ["ice cream", "popcorn", "nachos"], 
+      {
+        name: "Sweet & Savory",
+        types: ["ice cream", "popcorn", "nachos"],
         coordinates: [-76.2140, 43.0720],
         dietaryOptions: ["vegetarian", "gluten-free"]
       },
-      { 
-        name: "International Delights", 
-        types: ["tacos", "sushi", "pasta"], 
+      {
+        name: "International Delights",
+        types: ["tacos", "sushi", "pasta"],
         coordinates: [-76.2180, 43.0735],
         dietaryOptions: ["vegetarian", "vegan", "gluten-free"]
       },
-      { 
-        name: "Comfort Food Corner", 
-        types: ["mac and cheese", "fried chicken", "BBQ"], 
+      {
+        name: "Comfort Food Corner",
+        types: ["mac and cheese", "fried chicken", "BBQ"],
         coordinates: [-76.2130, 43.0740],
         dietaryOptions: []
       }
@@ -126,7 +125,7 @@ export default defineComponent({
       markers.forEach(marker => marker.remove());
       markers.length = 0;
 
-      const filteredPlaces = foodPlaces.filter(place => 
+      const filteredPlaces = foodPlaces.filter(place =>
         (place.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         place.types.some(type => type.toLowerCase().includes(searchQuery.value.toLowerCase()))) &&
         (selectedFoodType.value === '' || place.types.includes(selectedFoodType.value)) &&
@@ -160,14 +159,14 @@ export default defineComponent({
       }
     });
 
-    return { 
-      mapContainer, 
-      searchQuery, 
-      selectedFoodType, 
-      selectedDietaryRestriction, 
+    return {
+      mapContainer,
+      searchQuery,
+      selectedFoodType,
+      selectedDietaryRestriction,
       selectedMapStyle,
       uniqueFoodTypes,
-      restrictions, 
+      restrictions,
       handleSearch,
       changeMapStyle
     };

@@ -16,11 +16,9 @@
         <ion-card-header class="info-container">
           <ion-card-title class="info-container__title">Welcome, Matt!</ion-card-title>
         </ion-card-header>
-    
+
         <ion-card-content>
-          <p class="description">
-            The New York State Fairgrounds is a 375-acre exhibit and entertainment complex located in Syracuse, New York.
-          </p>
+          <VNode v-if="VNode" class="description" />
         </ion-card-content>
       </ion-card>
 
@@ -30,8 +28,6 @@
           <h2 class="img-header">THE FAIR</h2>
         </div>
       </div>
-
-      
     </ion-content>
   </ion-page>
 </template>
@@ -39,7 +35,12 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonRouterOutlet, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonFooter, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonGrid, IonRow, IonCol } from '@ionic/vue';
 import Tabs from '@/Tabs.vue';
+import { StrapiBlocks } from 'vue-strapi-blocks-renderer';
+// import { useDataStore } from '@/stores/data';
 
+const dataStore = useDataStore();
+
+const VNode = dataStore?.data?.mobileApp ? StrapiBlocks({ content: dataStore.data.mobileApp.homePage.introText }) : null;
 </script>
 
 <style scoped lang="scss">
@@ -82,7 +83,7 @@ import Tabs from '@/Tabs.vue';
 }
 
 p {
-  font-family: 'General Sans', sans-serif; 
+  font-family: 'General Sans', sans-serif;
 }
 
 ion-icon {
@@ -94,7 +95,7 @@ ion-icon {
 
   &__title {
     font-size: 22px;
-    font-family: 'General Sans', sans-serif; 
+    font-family: 'General Sans', sans-serif;
   }
 }
 
