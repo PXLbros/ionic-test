@@ -1,12 +1,6 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title class="main-title" size="large">New York State Fairgrounds</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
       <div class="home">
         <ion-card>
           <ion-card-header class="info-container">
