@@ -1,10 +1,5 @@
 <template>
   <ion-page>
-  <ion-header :translucent="true">
-    <ion-toolbar>
-      <ion-title>NYSFairgrounds</ion-title>
-    </ion-toolbar>
-  </ion-header>
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
@@ -12,20 +7,27 @@
         </ion-toolbar>
       </ion-header>
 
-      <ion-card>
-        <ion-card-header class="info-container">
-          <ion-card-title class="info-container__title">Welcome, Matt!</ion-card-title>
-        </ion-card-header>
+      <div class="home">
+        <ion-card>
+          <ion-card-header class="info-container">
+            <ion-card-title class="info-container__title">Welcome, Person!</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <VNode v-if="VNode" class="description" />
+          </ion-card-content>
+        </ion-card>
 
-        <ion-card-content>
-          <VNode v-if="VNode" class="description" />
-        </ion-card-content>
-      </ion-card>
-
-      <div class="home-content">
-        <div class="home-content__container">
-          <img class="featured-img" src="/src/imgs/featured-fair.png" alt="">
-          <h2 class="img-header">THE FAIR</h2>
+        <div class="home-content">
+          <ion-button router-link="/fair" class="home-content__container">
+            <img class="featured-img" src="/src/imgs/featured-fair.png" alt="">
+            <h2 class="img-header">THE FAIR</h2>
+          </ion-button>
+        </div>
+        <div class="home-content">
+          <ion-button router-link="/fairgrounds" class="home-content__container">
+            <img class="featured-img" src="/src/imgs/farigrounds-temp.jpg" alt="">
+            <h2 class="img-header">FAIRGROUNDS</h2>
+          </ion-button>
         </div>
       </div>
     </ion-content>
@@ -34,52 +36,64 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonRouterOutlet, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonFooter, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonGrid, IonRow, IonCol } from '@ionic/vue';
-import Tabs from '@/Tabs.vue';
 import { StrapiBlocks } from 'vue-strapi-blocks-renderer';
 import { useDataStore } from '@/stores/data';
 
 const dataStore = useDataStore();
 
 const VNode = dataStore?.data?.mobileApp ? StrapiBlocks({ content: dataStore.data.mobileApp.homePage.introText }) : null;
+
+console.log('data from the store', dataStore.data);
 </script>
 
 <style scoped lang="scss">
+
+ion-button {
+  --background: tranparent;
+}
 
 .main-title {
   font-size: 26px;
   font-family: 'Pally', sans-serif;
 }
 
-.home-content {
+.home {
   display: flex;
-  width: 100%;
-  justify-content: center;
-
-  &__container {
+  flex-direction: column;
+  gap: 40px;
+  padding: 10px;
+  height: 100%;
+  
+  .home-content {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-    position: relative;
-
-    .featured-img {
-      max-height: 250px;
-    }
-
-    .img-header {
-      position: absolute;
-      top: 0;
-      left: -10px;
-      font-size: 36px;
-      backdrop-filter: blur(1px);
-      color: white;
-      background-color: #1E5EAE;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-family: 'Pally', sans-serif;
-    }
-
+    width: 100%;
+    justify-content: center;
+    
+    &__container {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+      
+      .featured-img {
+        max-height: 250px;
+        border-radius: 10px;
+      }
+      
+      .img-header {
+        position: absolute;
+        top: 0;
+        left: -10px;
+        font-size: 36px;
+        backdrop-filter: blur(1px);
+        color: white;
+        background-color: #1E5EAE;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-family: 'Pally', sans-serif;
+      } 
+    }   
   }
-
 }
 
 p {
