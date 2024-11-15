@@ -18,15 +18,15 @@
         </ion-card>
 
         <div class="home-content">
-          <ion-button router-link="/fair" class="home-content__container">
-            <img class="featured-img" src="/src/imgs/featured-fair.png" alt="">
-            <h2 class="img-header">THE FAIR</h2>
-          </ion-button>
-        </div>
-        <div class="home-content">
           <ion-button router-link="/fairgrounds" class="home-content__container">
             <img class="featured-img" src="/src/imgs/farigrounds-temp.jpg" alt="">
             <h2 class="img-header">FAIRGROUNDS</h2>
+          </ion-button>
+        </div>
+        <div class="home-content">
+          <ion-button router-link="/fair" class="home-content__container">
+            <img class="featured-img" src="/src/imgs/featured-fair.png" alt="">
+            <h2 class="img-header">THE FAIR</h2>
           </ion-button>
         </div>
       </div>
