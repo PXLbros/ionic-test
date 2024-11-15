@@ -36,7 +36,7 @@
 import { IonContent, IonHeader, IonRouterOutlet, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonFooter, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonGrid, IonRow, IonCol } from '@ionic/vue';
 import Tabs from '@/Tabs.vue';
 import { StrapiBlocks } from 'vue-strapi-blocks-renderer';
-// import { useDataStore } from '@/stores/data';
+import { useDataStore } from '@/stores/data';
 
 const dataStore = useDataStore();
 
