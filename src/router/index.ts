@@ -13,14 +13,14 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/fairgrounds',
-    component: () => import('@/views/FairPage.vue'),
+    component: () => import('@/views/fairgrounds/FairgroundsPage.vue'),
     meta: {
       title: 'Fairgrounds'
     }
   },
   {
     path: '/fair',
-    component: () => import('@/views/FairPage.vue'),
+    component: () => import('@/views/fair/FairPage.vue'),
     meta: {
       title: 'New York State Fair'
     }

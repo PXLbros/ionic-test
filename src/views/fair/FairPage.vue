@@ -3,7 +3,7 @@
         <ion-header>
             <ion-toolbar>
               <ion-buttons slot="start">
-                <ion-back-button default-href="/home"></ion-back-button>
+                <ion-back-button default-href="/"></ion-back-button>
               </ion-buttons>
               <ion-title>THE FAIR</ion-title>
             </ion-toolbar>
@@ -66,6 +66,12 @@
 
 <script setup lang="ts">
     import { IonContent, IonButtons, IonFooter, IonBackButton, IonHeader, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonGrid, IonRow, IonCol } from '@ionic/vue';
+    import { useDataStore } from '@/stores/data';
+
+    const dataStore = useDataStore();
+    console.log('fair page data store', dataStore.data);
+
+    
 </script>
 
 <style scoped lang="scss">
