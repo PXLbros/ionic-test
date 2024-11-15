@@ -1,93 +1,167 @@
 <template>
-    <ion-page>
+    <!-- Mobile Menu -->
+    <ion-menu side="end" content-id="main-content">
         <ion-header>
             <ion-toolbar>
-              <ion-buttons slot="start">
-                <ion-back-button default-href="/"></ion-back-button>
-              </ion-buttons>
-              <ion-title>THE FAIR</ion-title>
+                <ion-title>THE FAIR</ion-title>
             </ion-toolbar>
-          </ion-header>
-
-        <ion-content :fullscreen="true">
-            <ion-header collapse="condense">
-                <ion-toolbar>
-                    <ion-title class="main-title" size="large">New York State Fair</ion-title>
-                </ion-toolbar>
-            </ion-header>
-
-            <ion-card>
-                <!-- <ion-card-header>
-                    <ion-card-title>The Annual Great New York State Fair</ion-card-title>
-                </ion-card-header> -->
-            
-                <ion-card-content>
-                    The NYSF is a 13-day showcase of agriculture, entertainment, education, and technology. With midway rides, concessionaires, exhibits, and concerts, we are the largest state fair in the country. The New York State Fairgrounds is a 375-acre exhibit and entertainment complex that operates all year. A year-round schedule of events is available here.
-                </ion-card-content>
-            </ion-card>
-            <ion-grid>
-                <ion-header class="section-header">
-                    <ion-title>Gallery</ion-title>
-                </ion-header>
-                <ion-row>
-                    <ion-col class="img-col">
-                        <ion-card class="img-card">
-                            <img src="/src/imgs/News_NYSF.jpg" alt="">
-                        </ion-card>
-                        <ion-card class="img-card">
-                            <img src="/src/imgs/NYSF_2022_GalleryImages_7.jpg" alt="">
-                        </ion-card>
-                        <ion-card class="img-card">
-                            <img src="/src/imgs/NYSF_2022_GalleryImages_6.jpg" alt="">
-                        </ion-card>
-                    </ion-col>
-                    <ion-col class="img-col">
-                        <ion-card class="img-card">
-                            <img src="/src/imgs/NYSF_2022_GalleryImages_2.jpg" alt="">
-                        </ion-card>
-                        <ion-card class="img-card">
-                            <img src="/src/imgs/NYSF_2022_GalleryImages_3.jpg" alt="">
-                        </ion-card>
-                        <ion-card class="img-card">
-                            <img src="/src/imgs/NYSF_Marquee_Image.jpg" alt="">
-                        </ion-card>
-                    </ion-col>
-                </ion-row>
-            </ion-grid>
+        </ion-header>
+        <ion-content class="ion-padding">
+            <ion-button router-link="/" fill="clear" class="menu-button">
+                <ion-icon slot="start" size="large" :icon="homeOutline" ></ion-icon>
+                Home
+            </ion-button>
         </ion-content>
-        <ion-footer>
+    </ion-menu>
+    
+    <ion-page id="main-content" >
+        <!-- Header Nav -->
+        <ion-header id="toolbar-header">
             <ion-toolbar>
-                <ion-title>NYSF</ion-title>
+                <img src="/src/imgs/svg/fair-logo-light.svg" alt="NYSF Logo" class="header-side">
+                <ion-buttons slot="end">
+                    <ion-menu-toggle>
+                        <img src="/src/imgs/svg/menu.svg" alt="menu-open" class="header-side">
+                    </ion-menu-toggle>
+                </ion-buttons>
             </ion-toolbar>
-        </ion-footer>
+        </ion-header>
 
+        <!-- Main Content -->
+        <ion-content :fullscreen="true">
+            <div class="main">
+                <div class="main-logo">
+                    <img src="/src/imgs/svg/fair-main-logo.svg" alt="NYSF Logo">
+                </div>
+                <ion-grid>
+                    <ion-row>
+                        <ion-col>
+                            <div class="main-button">
+                                <img src="/src/imgs/icons/ticket-icon.svg" alt="The Fair" class="main-button__icon">
+                                <h2 class="main-button__text">Buy Tickets</h2>
+                            </div>
+                        </ion-col>
+                        <ion-col>
+                            <div class="main-button">
+                                <img src="/src/imgs/icons/map-icon.svg" alt="The Fair" class="main-button__icon">
+                                <h2 class="main-button__text">Fair Finder Map</h2>
+                            </div>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+            </div>
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-header__text">App Sponsors</h2>
+                </div>
+            </div>
+        </ion-content>
     </ion-page>
 </template>
 
 <script setup lang="ts">
-    import { IonContent, IonButtons, IonFooter, IonBackButton, IonHeader, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonGrid, IonRow, IonCol } from '@ionic/vue';
+    import { IonContent, IonIcon, IonButtons, IonMenu, IonMenuToggle, IonFooter, IonMenuButton, IonBackButton, IonHeader, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonGrid, IonRow, IonCol } from '@ionic/vue';
     import { useDataStore } from '@/stores/data';
+    import { homeOutline } from 'ionicons/icons';
 
     const dataStore = useDataStore();
     console.log('fair page data store', dataStore.data);
 
-    
+
 </script>
 
 <style scoped lang="scss">
 
-    .section-header {
-        margin-bottom: 10px;
+    ion-toolbar {
+        --background: #48027FE5;
+    };
+
+    .header-side {
+        padding: 10px 25px;
     }
 
-    .img-col {
-        padding-left: 0px;
-        padding-right: 0px;
-    }
+    .main {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative; // Add this
+        height: 83vh;
+        background-image: url('/src/imgs/Flags_Pink.png');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    
+        // Create a pseudo-element for the gradient
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(360deg, #EAC5FF 7.51%, #EECEFF 30.63%, #BE7CFF 100%);
+            mix-blend-mode: multiply;
+            z-index: 0;
+        }
+    
+    
+        &-logo {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 38px;
+            position: relative; // Add this
+            z-index: 1; // Add this to ensure logo stays on top
+        }
 
-    .img-card {
-        padding: 0px;
-        margin: 5px;
+        &-button {
+            padding: 10px; 
+            border-radius: 30px;
+            box-shadow: 0px 3px 0px 0px #AC37D0;
+            box-shadow: 0px 2px 0px 0px #DA99FEB2 inset;
+            border: 4px solid #CD5FEF;
+            background: linear-gradient(180deg, #7323B4 0%, #540F8C 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 140px;
+            height: 130px;
+
+            &__icon {
+                max-width: 60px;
+            }
+
+            &__text {
+                font-size: 18px;
+                font-family: 'Pally', sans-serif;
+                color: white;
+                text-transform: uppercase;
+                font-weight: 600;
+                text-align: center;
+                margin: 0px;
+                padding: 0px 5px;
+            }
+        }
+    }   
+
+    .section {
+
+        &-header {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            align-items: center;
+            background-color: #530D8C;
+
+            &__text {
+                font-size: 24px;
+                font-family: 'Pally', sans-serif;
+                color: #FFF1AF;
+                text-transform: uppercase;
+                font-weight: 700;
+            }
+        }
     }
 
 
