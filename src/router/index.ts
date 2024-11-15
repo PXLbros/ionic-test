@@ -1,45 +1,30 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
-import MapPage from '@/views/MapPage.vue';
-import EventsPage from '@/views/EventsPage.vue';
-import FairPage from '@/views/FairPage.vue';
-import HomePage from '@/views/HomePage.vue';
-import Tabs from '@/Tabs.vue';
+
+
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/tabs/home'
+    component: () => import('@/views/HomePage.vue'),
+    meta: {
+      title: 'Home'
+    }
   },
   {
-    path: '/tabs/',
-    component: Tabs,
-    children: [
-      {
-        path: '',
-        redirect: 'home'
-      },
-      {
-        path: 'home',
-        component: HomePage
-      },
-      {
-        path: 'map',
-        component: MapPage,
-      },
-      {
-        path: 'events',
-        component: EventsPage,
-      },
-      {
-        path: 'fair',
-        component: FairPage,
-      },
-      {
-        path: 'leaf',
-        component: FairPage,
-      }
-    ]
+    path: '/fairgrounds',
+    component: () => import('@/views/FairPage.vue'),
+    meta: {
+      title: 'Fairgrounds'
+    }
   },
+  {
+    path: '/fair',
+    component: () => import('@/views/FairPage.vue'),
+    meta: {
+      title: 'New York State Fair'
+    }
+  }
 ]
 
 const router = createRouter({
