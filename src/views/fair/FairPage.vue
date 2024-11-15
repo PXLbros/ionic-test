@@ -1,6 +1,6 @@
 <template>
     <!-- Mobile Menu -->
-    <ion-menu side="end" content-id="main-content">
+    <!-- <ion-menu side="end" content-id="main-content">
         <ion-header>
             <ion-toolbar>
                 <ion-title>THE FAIR</ion-title>
@@ -12,7 +12,7 @@
                 Home
             </ion-button>
         </ion-content>
-    </ion-menu>
+    </ion-menu> -->
     
     <ion-page id="main-content" >
         <!-- Header Nav -->
