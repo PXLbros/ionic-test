@@ -1,33 +1,10 @@
 <template>
-    <!-- Mobile Menu -->
-    <!-- <ion-menu side="end" content-id="main-content">
-        <ion-header>
-            <ion-toolbar>
-                <ion-title>THE FAIR</ion-title>
-            </ion-toolbar>
-        </ion-header>
-        <ion-content class="ion-padding">
-            <ion-button router-link="/" fill="clear" class="menu-button">
-                <ion-icon slot="start" size="large" :icon="homeOutline" ></ion-icon>
-                Home
-            </ion-button>
-        </ion-content>
-    </ion-menu> -->
     
     <ion-page id="main-content" >
         <!-- Header Nav -->
-        <ion-header id="toolbar-header">
-            <ion-toolbar>
-                <img src="/src/imgs/svg/fair-logo-light.svg" alt="NYSF Logo" class="header-side">
-                <ion-buttons slot="end">
-                    <ion-menu-toggle>
-                        <img src="/src/imgs/svg/menu.svg" alt="menu-open" class="header-side">
-                    </ion-menu-toggle>
-                </ion-buttons>
-            </ion-toolbar>
-        </ion-header>
-
+        
         <!-- Main Content -->
+        <NavMenu />
         <ion-content :fullscreen="true">
             <div class="main">
                 <div class="main-logo">
@@ -63,6 +40,7 @@
     import { IonContent, IonIcon, IonButtons, IonMenu, IonMenuToggle, IonFooter, IonMenuButton, IonBackButton, IonHeader, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonGrid, IonRow, IonCol } from '@ionic/vue';
     import { useDataStore } from '@/stores/data';
     import { homeOutline } from 'ionicons/icons';
+    import NavMenu from './NavMenu.vue';
 
     const dataStore = useDataStore();
     console.log('fair page data store', dataStore.data);
@@ -77,7 +55,7 @@
     };
 
     .header-side {
-        padding: 10px 25px;
+        padding: 5px 25px 10px 25px;
     }
 
     .main {
@@ -112,6 +90,7 @@
             margin-top: 38px;
             position: relative; // Add this
             z-index: 1; // Add this to ensure logo stays on top
+            margin-bottom: 15px
         }
 
         &-button {
