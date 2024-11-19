@@ -1,19 +1,12 @@
 <template>
-    <ion-page>
-        <ion-content>
-            <ion-header>
-                <ion-toolbar>
-                  <ion-buttons slot="start">
-                    <ion-back-button default-href="/"></ion-back-button>
-                  </ion-buttons>
-                  <ion-title>FAIRGROUNDS</ion-title>
-                </ion-toolbar>
-              </ion-header>
+    <ion-page id="main-content">
+        <!-- Header Nav -->
+        <FairgroundsNav />
 
+        <ion-content>
             <div class="home">
                 HI from fairgrounds
             </div>
-
         </ion-content>
     </ion-page>
 
@@ -21,7 +14,7 @@
 
 <script setup lang="ts">
     import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
-
+    import FairgroundsNav from '@/components/FairgroundsNav.vue';
 </script>
 
 <style lang="scss" scoped>

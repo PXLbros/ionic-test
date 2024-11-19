@@ -4,7 +4,7 @@
         <!-- Header Nav -->
         
         <!-- Main Content -->
-        <NavMenu />
+        <FairNav />
         <ion-content :fullscreen="true">
             <div class="main">
                 <div class="main-logo">
@@ -12,16 +12,58 @@
                 </div>
                 <ion-grid>
                     <ion-row>
-                        <ion-col>
+                        <ion-col router-link="/fair/tickets">
                             <div class="main-button">
                                 <img src="/src/imgs/icons/ticket-icon.svg" alt="The Fair" class="main-button__icon">
                                 <h2 class="main-button__text">Buy Tickets</h2>
                             </div>
                         </ion-col>
-                        <ion-col>
+                        <ion-col router-link="/fair/map">
                             <div class="main-button">
                                 <img src="/src/imgs/icons/map-icon.svg" alt="The Fair" class="main-button__icon">
                                 <h2 class="main-button__text">Fair Finder Map</h2>
+                            </div>
+                        </ion-col>
+                    </ion-row>
+                    <ion-row>
+                        <ion-col router-link="/fair/schedule">
+                            <div class="main-button">
+                                <img src="/src/imgs/icons/ticket-icon.svg" alt="The Fair" class="main-button__icon">
+                                <h2 class="main-button__text">Daily Schedule</h2>
+                            </div>
+                        </ion-col>
+                        <ion-col router-link="/fair/music">
+                            <div class="main-button">
+                                <img src="/src/imgs/icons/map-icon.svg" alt="The Fair" class="main-button__icon">
+                                <h2 class="main-button__text">Chevrolet Music Series</h2>
+                            </div>
+                        </ion-col>
+                    </ion-row>
+                    <ion-row>
+                        <ion-col router-link="/fair/updates">
+                            <div class="main-button">
+                                <img src="/src/imgs/icons/ticket-icon.svg" alt="The Fair" class="main-button__icon">
+                                <h2 class="main-button__text">Real-Time Updates</h2>
+                            </div>
+                        </ion-col>
+                        <ion-col router-link="/fair/games">
+                            <div class="main-button">
+                                <img src="/src/imgs/icons/map-icon.svg" alt="The Fair" class="main-button__icon">
+                                <h2 class="main-button__text">Games</h2>
+                            </div>
+                        </ion-col>
+                    </ion-row>
+                    <ion-row>
+                        <ion-col router-link="/fair/plan-your-visit">
+                            <div class="main-button">
+                                <img src="/src/imgs/icons/ticket-icon.svg" alt="The Fair" class="main-button__icon">
+                                <h2 class="main-button__text">Plan Your Visit</h2>
+                            </div>
+                        </ion-col>
+                        <ion-col router-link="/fair/news">
+                            <div class="main-button">
+                                <img src="/src/imgs/icons/map-icon.svg" alt="The Fair" class="main-button__icon">
+                                <h2 class="main-button__text">News</h2>
                             </div>
                         </ion-col>
                     </ion-row>
@@ -39,8 +81,7 @@
 <script setup lang="ts">
     import { IonContent, IonIcon, IonButtons, IonMenu, IonMenuToggle, IonFooter, IonMenuButton, IonBackButton, IonHeader, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonButton, IonGrid, IonRow, IonCol } from '@ionic/vue';
     import { useDataStore } from '@/stores/data';
-    import { homeOutline } from 'ionicons/icons';
-    import NavMenu from './NavMenu.vue';
+    import FairNav from '@/components/FairNav.vue';
 
     const dataStore = useDataStore();
     console.log('fair page data store', dataStore.data);
@@ -50,12 +91,8 @@
 
 <style scoped lang="scss">
 
-    ion-toolbar {
-        --background: #48027FE5;
-    };
-
-    .header-side {
-        padding: 5px 25px 10px 25px;
+    ion-col {
+        margin: 0px 0px;
     }
 
     .main {
@@ -63,11 +100,12 @@
         display: flex;
         flex-direction: column;
         position: relative; // Add this
-        height: 83vh;
+        // height: 83vh;
         background-image: url('/src/imgs/Flags_Pink.png');
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
+        padding-bottom: 20px;
     
         // Create a pseudo-element for the gradient
         &::before {
@@ -87,10 +125,10 @@
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-top: 38px;
+            margin-top: 20px;
             position: relative; // Add this
             z-index: 1; // Add this to ensure logo stays on top
-            margin-bottom: 15px
+            margin-bottom: 10px
         }
 
         &-button {
@@ -107,8 +145,19 @@
             width: 140px;
             height: 130px;
 
+            // Smaller screens
+            @media (max-height: 800px) {
+                width: 130px;
+                height: 120px;
+            }
+
             &__icon {
                 max-width: 60px;
+
+                // Smaller screens
+                @media (max-height: 800px) {
+                    max-width: 50px;
+                }
             }
 
             &__text {
@@ -120,6 +169,12 @@
                 text-align: center;
                 margin: 0px;
                 padding: 0px 5px;
+
+                // Smaller screens
+                @media (max-height: 800px) {
+                    font-size: 16px;
+                    padding: 0px;
+                }
             }
         }
     }   

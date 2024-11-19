@@ -2,14 +2,14 @@
   <ion-page>
     <ion-content :fullscreen="true">
       <div class="home">
-        <ion-card>
+        <!-- <ion-card>
           <ion-card-header class="info-container">
             <ion-card-title class="info-container__title">Welcome, Person!</ion-card-title>
           </ion-card-header>
           <ion-card-content>
             <VNode v-if="VNode" class="description" />
           </ion-card-content>
-        </ion-card>
+        </ion-card> -->
 
         <div class="home-content">
           <ion-button router-link="/fairgrounds" class="home-content__container">
@@ -54,6 +54,7 @@ ion-button {
 .home {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 40px;
   padding: 10px;
   height: 100%;

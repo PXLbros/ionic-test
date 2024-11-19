@@ -19,10 +19,73 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/fairgrounds/featured-event',
+    component: () => import('@/views/fairgrounds/FairgroundsPage.vue'),
+    meta: {
+      title: 'Featured Event'
+    }
+  },
+  {
     path: '/fair',
     component: () => import('@/views/fair/FairPage.vue'),
     meta: {
       title: 'New York State Fair'
+    }
+  },
+  {
+    path: '/fair/tickets',
+    component: () => import('@/views/fair/TicketsPage.vue'),
+    meta: {
+      title: 'Tickets'
+    }
+  },
+  {
+    path: '/fair/map',
+    component: () => import('@/views/fair/MapPage.vue'),
+    meta: {
+      title: 'Interactive Map'
+    }
+  },
+  {
+    path: '/fair/schedule',
+    component: () => import('@/views/fair/MapPage.vue'),
+    meta: {
+      title: 'Schedule'
+    }
+  },
+  {
+    path: '/fair/music',
+    component: () => import('@/views/fair/MapPage.vue'),
+    meta: {
+      title: 'Music'
+    }
+  },
+  {
+    path: '/fair/updates',
+    component: () => import('@/views/fair/MapPage.vue'),
+    meta: {
+      title: 'Updates'
+    }
+  },
+  {
+    path: '/fair/games',
+    component: () => import('@/views/fair/MapPage.vue'),
+    meta: {
+      title: 'Games'
+    }
+  },
+  {
+    path: '/fair/plan-your-visit',
+    component: () => import('@/views/fair/MapPage.vue'),
+    meta: {
+      title: 'Plan Your Visit'
+    }
+  },
+  {
+    path: '/fair/news',
+    component: () => import('@/views/fair/MapPage.vue'),
+    meta: {
+      title: 'News'
     }
   }
 ]
