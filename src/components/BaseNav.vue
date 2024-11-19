@@ -106,6 +106,7 @@
   <style scoped lang="scss">
   ion-toolbar {
     --background: #49027fe9;
+    -webkit-backdrop-filter: blur(7px);
     backdrop-filter: blur(7px);
   }
   
@@ -176,7 +177,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    padding-top: 30px;
+    padding-top: 40px;
     background: #48027FE5;
   }
   
