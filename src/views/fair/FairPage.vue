@@ -128,7 +128,11 @@
             margin-top: 20px;
             position: relative; // Add this
             z-index: 1; // Add this to ensure logo stays on top
-            margin-bottom: 10px
+            margin-bottom: 10px;
+
+            @media (max-height: 845px) {
+                max-height: 120px;
+            }
         }
 
         &-button {
@@ -146,7 +150,7 @@
             height: 130px;
 
             // Smaller screens
-            @media (max-height: 800px) {
+            @media (max-height: 845px) {
                 width: 130px;
                 height: 120px;
             }
@@ -155,7 +159,7 @@
                 max-width: 60px;
 
                 // Smaller screens
-                @media (max-height: 800px) {
+                @media (max-height: 845px) {
                     max-width: 50px;
                 }
             }
@@ -171,7 +175,7 @@
                 padding: 0px 5px;
 
                 // Smaller screens
-                @media (max-height: 800px) {
+                @media (max-height: 845px) {
                     font-size: 16px;
                     padding: 0px;
                 }
