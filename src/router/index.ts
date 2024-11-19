@@ -48,42 +48,42 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/fair/schedule',
-    component: () => import('@/views/fair/MapPage.vue'),
+    component: () => import('@/views/fair/DailySchedulePage.vue'),
     meta: {
       title: 'Schedule'
     }
   },
   {
     path: '/fair/music',
-    component: () => import('@/views/fair/MapPage.vue'),
+    component: () => import('@/views/fair/MusicPage.vue'),
     meta: {
       title: 'Music'
     }
   },
   {
     path: '/fair/updates',
-    component: () => import('@/views/fair/MapPage.vue'),
+    component: () => import('@/views/fair/UpdatesPage.vue'),
     meta: {
       title: 'Updates'
     }
   },
   {
     path: '/fair/games',
-    component: () => import('@/views/fair/MapPage.vue'),
+    component: () => import('@/views/fair/GamesPage.vue'),
     meta: {
       title: 'Games'
     }
   },
   {
     path: '/fair/plan-your-visit',
-    component: () => import('@/views/fair/MapPage.vue'),
+    component: () => import('@/views/fair/PlanVisitPage.vue'),
     meta: {
       title: 'Plan Your Visit'
     }
   },
   {
     path: '/fair/news',
-    component: () => import('@/views/fair/MapPage.vue'),
+    component: () => import('@/views/fair/NewsPage.vue'),
     meta: {
       title: 'News'
     }
