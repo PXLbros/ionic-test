@@ -1,14 +1,14 @@
-<!-- NavMenu.vue -->
+<!-- components/base/BaseNavMenu.vue -->
 <template>
     <div>
       <!-- Main Navbar -->
       <ion-header>
-        <ion-toolbar>
+        <ion-toolbar :style="{ '--background': toolbarBackground }">
           <div class="nav-container">
             <img 
-              src="/src/imgs/svg/fair-logo-light.svg" 
-              alt="NYSF Logo" 
-              class="header-side"
+              :src="logoSrc" 
+              :alt="logoAlt" 
+              class="header-side logo"
             >
             <img 
               src="/src/imgs/svg/menu.svg" 
@@ -28,11 +28,11 @@
           @click="closeMenu"
         ></div>
         
-        <div class="nav-menu" :class="{ 'is-open': isMenuOpen }">
-          <div class="nav-header">
+        <div class="nav-menu" :class="{ 'is-open': isMenuOpen }" :style="{ background: menuBackground }">
+          <div class="nav-header" :style="{ background: toolbarBackground }">
             <img 
-              src="/src/imgs/svg/fair-logo-light.svg" 
-              alt="NYSF Logo" 
+              :src="logoSrc" 
+              :alt="logoAlt" 
               class="nav-logo"
             >
             <button class="close-button" @click="closeMenu">
@@ -42,7 +42,7 @@
           
           <nav class="nav-links">
             <router-link 
-              v-for="route in routes" 
+              v-for="route in filteredRoutes" 
               :key="route.path"
               :to="route.path"
               class="nav-link"
@@ -57,13 +57,40 @@
   </template>
   
   <script setup lang="ts">
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
   import { useRouter } from 'vue-router';
   import { IonToolbar, IonHeader } from '@ionic/vue';
   
+  const props = defineProps<{
+    type: 'fair' | 'fairgrounds'
+    toolbarBackground: string
+    menuBackground: string
+    logoSrc: string
+    logoAlt: string
+  }>();
+  
   const router = useRouter();
-  const routes = router.options.routes;
   const isMenuOpen = ref(false);
+  
+  const filteredRoutes = computed(() => {
+    return router.options.routes.filter(route => {
+        // Always include the home route
+        if (route.path === '/') {
+        return true;
+        }
+
+        // Split the path into segments
+        const pathSegments = route.path.split('/').filter(Boolean);
+        
+        if (props.type === 'fair') {
+        // Only include routes where the first segment is exactly 'fair'
+        return pathSegments[0] === 'fair';
+        } else {
+        // Only include routes where the first segment is exactly 'fairgrounds'
+        return pathSegments[0] === 'fairgrounds';
+        }
+    });
+  });
   
   const openMenu = () => {
     isMenuOpen.value = true;
@@ -78,7 +105,8 @@
   
   <style scoped lang="scss">
   ion-toolbar {
-    --background: #48027FE5;
+    --background: #49027fe9;
+    backdrop-filter: blur(7px);
   }
   
   .nav-container {
@@ -88,7 +116,11 @@
   }
   
   .header-side {
-    padding: 5px 25px 10px 25px;
+    padding: 0px 25px 10px 25px;
+  }
+
+  .logo {
+    height: 60px;
   }
   
   .menu-icon {
@@ -144,6 +176,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px;
+    padding-top: 30px;
     background: #48027FE5;
   }
   
