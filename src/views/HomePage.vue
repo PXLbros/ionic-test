@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true">
-      <div class="home">
+      <!-- <div class="home"> -->
         <!-- <ion-card>
           <ion-card-header class="info-container">
             <ion-card-title class="info-container__title">Welcome, Person!</ion-card-title>
@@ -10,8 +10,7 @@
             <VNode v-if="VNode" class="description" />
           </ion-card-content>
         </ion-card> -->
-
-        <div class="home-content">
+        <!-- <div class="home-content">
           <ion-button router-link="/fairgrounds" class="home-content__container">
             <img class="featured-img" src="/src/imgs/farigrounds-temp.jpg" alt="">
             <h2 class="img-header">FAIRGROUNDS</h2>
@@ -23,7 +22,27 @@
             <h2 class="img-header">THE FAIR</h2>
           </ion-button>
         </div>
+      </div> -->
+
+      <div class="main">
+        <div class="main__header">
+          <div class="main__header--icon"></div>
+          <div class="main__header--subtitle">
+            <h2>New York State Fair</h2>
+            <div class="line"></div>
+            <h2>New York State Fairgrounds</h2>
+          </div>
+        </div>
       </div>
+      <div class="navigation">
+        <router-link to="/fair" class="navigation__button">
+          <h2>New York State Fair</h2>
+        </router-link>
+        <router-link to="/fairgrounds" class="navigation__button">
+          <h2>New York State Fairgrounds</h2>
+        </router-link>
+      </div>
+
     </ion-content>
   </ion-page>
 </template>
@@ -42,88 +61,74 @@ console.log('data from the store', dataStore.data);
 
 <style scoped lang="scss">
 
-ion-button {
-  --background: tranparent;
-}
+.main {
+  padding: 40px 20px;
+  width: 100%;
 
-.main-title {
-  font-size: 26px;
-  font-family: 'Pally', sans-serif;
-}
-
-.home {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 40px;
-  padding: 10px;
-  height: 100%;
-  
-  .home-content {
+  &__header {
     display: flex;
-    width: 100%;
-    justify-content: center;
-    
-    &__container {
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+
+    &--icon {
+      width: 50px;
+      height: 50px;
+      background-color: #002F6A;
+      border-radius: 100%;
+    }
+
+    &--subtitle {
       display: flex;
       flex-direction: column;
       gap: 5px;
-      position: relative;
-      
-      .featured-img {
-        max-height: 250px;
-        border-radius: 10px;
+      padding: 5px;
+
+      h2 {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0px;
+        text-align: center;
+        padding: 0px 10px;
       }
-      
-      .img-header {
-        position: absolute;
-        top: 0;
-        left: -10px;
-        font-size: 36px;
-        backdrop-filter: blur(1px);
-        color: white;
-        background-color: #1E5EAE;
-        padding: 2px 8px;
-        border-radius: 10px;
-        font-family: 'Pally', sans-serif;
-      } 
-    }   
+
+      .line {
+        width: 100%;
+        height: 1px;
+        background-color: #E2E2E2;
+        margin: 0px auto;
+      }
+    }
   }
 }
 
-p {
-  font-family: 'General Sans', sans-serif;
-}
+.navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0px 20px 20px 20px;
 
-ion-icon {
-  color: white;
-}
+  &__button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #EFF2F6;
+    color: #343434;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 20px;
+    border-radius: 24px;
+    min-height: 270px;
+    text-decoration: none;
 
-.info-container {
-  padding-bottom: 10px;
-
-  &__title {
-    font-size: 22px;
-    font-family: 'General Sans', sans-serif;
+    h2 {
+      text-align: center;
+      margin: 0px;
+      font-weight: 700;
+    }
   }
 }
 
-.description {
-  font-weight: 600;
-}
-
-ion-button {
-  --border-radius: 5px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 0px 10px;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-}
 </style>
 
 
