@@ -11,9 +11,13 @@
               </ion-header>
 
             <div class="main">
-                <h1 class="main__header">Games</h1>
-                <div v-if="games" v-for="game in games" :key="game.id">
-                    <h2>{{ game.name }}</h2>
+                <div class="main__header">
+                    <h1 class="main__header-text">Interactive <br/> Games</h1>
+                </div>
+                <div v-if="games" class="main__content">
+                    <div class="main__content-item" v-for="game in games" :key="game.id">
+                        <h2>{{ game.name }}</h2>
+                    </div>
                 </div>
             </div>
 
@@ -40,11 +44,54 @@
 <style lang="scss" scoped>
 
 .main {
-    padding: 40px;
+    padding: 30px;
+    height: calc(100vh - 56px); // Subtract header height
+    display: flex;
+    flex-direction: column;
 
     &__header {
-        font-size: 28px;
-        font-weight: bold;
+        display: flex;
+        margin-bottom: 25px;
+
+        &-text {
+            font-size: 24px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: #343434;
+            letter-spacing: 0.5px;
+            line-height: 28px;
+            margin: 0px;
+        }
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        flex: 1;
+        height: 100%;
+
+        &-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 24px;
+            background-color: #EFF2F6;
+            min-height: 0; // Prevents overflow
+            height: calc((100% - 20px) / 2); // Subtracts gap and divides by 2
+
+            h2 {
+                color: #343434;
+                font-style: normal;
+                font-weight: 700;
+                line-height: 40px; /* 125% */
+                letter-spacing: 0.5px;
+                font-size: 32px;
+                max-width: 80%;
+                text-align: center;
+            }
+        }
+
     }
 }
 
