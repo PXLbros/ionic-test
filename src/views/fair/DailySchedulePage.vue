@@ -110,7 +110,7 @@ const convertToEastern = (unixTimestamp: number): Date => {
     return new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
 };
 
-// Update the processEvents function
+// Process the events data
 const processEvents = (): void => {
     // Sort events by unix timestamp
     const sortedEvents = [...eventsData].sort((a, b) => 
@@ -121,6 +121,7 @@ const processEvents = (): void => {
     const uniqueDates = [...new Set(sortedEvents.map(event => {
         const date = convertToEastern(event.start_time_unix);
         return date.toLocaleDateString('en-US', { 
+            weekday: 'short',    // Add weekday
             month: 'short', 
             day: 'numeric' 
         });
@@ -131,13 +132,14 @@ const processEvents = (): void => {
         const event = sortedEvents.find(event => {
             const eventDate = convertToEastern(event.start_time_unix);
             return dateStr === eventDate.toLocaleDateString('en-US', { 
+                weekday: 'short',    // Add weekday
                 month: 'short', 
                 day: 'numeric' 
             });
         });
 
         return {
-            dayName: dateStr,
+            dayName: dateStr,  // This will now include the weekday
             day: index + 1,
             fullDate: convertToEastern(event!.start_time_unix),
             timestamp: event!.start_time_unix
@@ -249,6 +251,7 @@ const toggleSection = (): void => {
     flex: 1;
     min-width: 120px;
     color: #1E5EAE;
+    white-space: nowrap;
 
     &--active {
         background-color: #1E5EAE;
