@@ -3,9 +3,9 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button default-href="/home"></ion-back-button>
+          <ion-back-button default-href="/fair"></ion-back-button>
         </ion-buttons>
-        <ion-title>NY State Fair Food Finder</ion-title>
+        <ion-title>NY State Fair Map</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>

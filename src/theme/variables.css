@@ -7,3 +7,8 @@ font-family: 'Stardom', sans-serif;
 font-family: 'Pally', sans-serif;
 font-family: 'General Sans', sans-serif; 
 */
+
+ion-content {
+    --background: white;
+    --color: black;
+}
