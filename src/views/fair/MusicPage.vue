@@ -29,7 +29,12 @@
 
                 <!-- Events List -->
                 <div class="events-list">
-                    <div v-for="event in chevyCourtEvents" :key="event.id" class="event-card">
+                    <router-link 
+                        v-for="event in chevyCourtEvents" 
+                        :key="event.id" 
+                        :to="`/fair/music/${event.id}`"
+                        class="event-card"
+                    >
                         <div class="event-info">
                             <div class="venue-name">{{ venueInfo?.name || 'Chevy Court' }}</div>
                             <h2 class="event-title">{{ event.title }}</h2>
@@ -40,7 +45,7 @@
                                 <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
                             </svg>
                         </div>
-                    </div>
+                    </router-link>
                 </div>
             </div>
         </ion-content>
@@ -134,7 +139,7 @@ const formatEventDate = (dateString: string): string => {
 
         &-title {
             font-size: 24px;
-            font-weight: 500;
+            font-weight: 600;
             line-height: 28px;
             letter-spacing: 0.5px;
         }
@@ -182,6 +187,8 @@ const formatEventDate = (dateString: string): string => {
     padding: 20px;
     border-bottom: 1px solid #EFF2F6;
     gap: 10px;
+    text-decoration: none;
+    color: #343434;
 }
 
 .event-info {

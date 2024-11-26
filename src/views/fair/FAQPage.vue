@@ -6,13 +6,13 @@
                     <ion-buttons slot="start">
                         <ion-back-button default-href="/fair/plan-your-visit"></ion-back-button>
                     </ion-buttons>
-                    <ion-title>Parking</ion-title>
+                    <ion-title>FAQ</ion-title>
                 </ion-toolbar>
             </ion-header>
 
             <!-- Notification Banner -->
             <div class="notification">
-                Parking Section Brown at Full Capacity...
+                FAQ Section Brown at Full Capacity...
             </div>
 
             <div class="main">
@@ -23,7 +23,7 @@
                 </div>
 
                 <div class="main__content">
-                    <h1 class="main__content-title">Parking</h1>
+                    <h1 class="main__content-title">FAQ</h1>
                     <p class="main__content-text">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                     </p>
@@ -69,13 +69,13 @@ import { ref } from 'vue';
 
 const parkingSections = ref([
     {
-        title: 'Automobile Parking',
-        content: 'Content for automobile parking...',
+        title: 'What are the Dates of the Fair?',
+        content: 'Content for fair dates...',
         isExpanded: false
     },
     {
-        title: 'Parking for other vehicles',
-        content: 'Content for other vehicles...',
+        title: 'Parking for other people',
+        content: 'Content for other people...',
         isExpanded: false
     },
     {
@@ -102,6 +102,7 @@ const toggleSection = (index: number) => {
 
 <style lang="scss" scoped>
 .notification {
+    display: none;
     background-color: #EFF2F6;
     padding: 16px 20px;
     font-size: 16px;
