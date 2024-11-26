@@ -82,6 +82,13 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/fair/directions',
+    component: () => import('@/views/fair/DirectionsPage.vue'),
+    meta: {
+      title: 'Directions'
+    }
+  },
+  {
     path: '/fair/news',
     component: () => import('@/views/fair/NewsPage.vue'),
     meta: {
