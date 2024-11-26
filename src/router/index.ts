@@ -26,6 +26,13 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/fairgrounds/upcoming-events',
+    component: () => import('@/views/fairgrounds/UpcomingEventsPage.vue'),
+    meta: {
+      title: 'Featured Event'
+    }
+  },
+  {
     path: '/fair',
     component: () => import('@/views/fair/FairPage.vue'),
     meta: {
