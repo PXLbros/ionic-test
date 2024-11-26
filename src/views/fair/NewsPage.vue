@@ -100,7 +100,6 @@ a {
     text-decoration: none;
     color: inherit;
 }
-/* Your existing styles remain the same */
 .main {
     padding: 30px;
 

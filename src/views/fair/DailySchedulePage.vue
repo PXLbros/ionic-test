@@ -313,4 +313,9 @@ const toggleSection = (): void => {
         }
     }
 }
+
+// hide the scrollbar 
+.date-selector::-webkit-scrollbar {
+    display: none;
+}
 </style>
