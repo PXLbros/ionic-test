@@ -146,7 +146,7 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            width: 140px;
+            width: 34vw;
             height: 130px;
 
             // Smaller screens

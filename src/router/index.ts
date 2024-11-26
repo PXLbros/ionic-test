@@ -61,6 +61,13 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/fair/music/:id',
+    component: () => import('@/views/fair/MusicDetailPage.vue'),
+    meta: {
+      title: 'Music Detail'
+    }
+  },
+  {
     path: '/fair/updates',
     component: () => import('@/views/fair/UpdatesPage.vue'),
     meta: {
@@ -91,6 +98,13 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/fair/parking',
     component: () => import('@/views/fair/ParkingPage.vue'),
+    meta: {
+      title: 'Directions'
+    }
+  },
+  {
+    path: '/fair/faq',
+    component: () => import('@/views/fair/FAQPage.vue'),
     meta: {
       title: 'Directions'
     }
