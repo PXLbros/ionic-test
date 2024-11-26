@@ -115,6 +115,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: 'News'
     }
+  },
+  {
+    path: '/fair/news/:id',
+    component: () => import('@/views/fair/NewsDetailPage.vue'),
+    meta: {
+      title: 'News Detail'
+    }
   }
 ]
 

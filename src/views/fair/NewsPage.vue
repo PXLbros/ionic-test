@@ -13,45 +13,94 @@
             <div class="main">
                 <h1 class="main__title">Recent News</h1>
 
-                <!-- Featured News Article -->
-                <div class="featured-article">
+                <!-- Featured News Article (Latest News) -->
+                <router-link 
+                    v-if="featuredNews" 
+                    :to="`/fair/news/${encodeURIComponent(featuredNews.permalink)}`" 
+                    class="featured-article"
+                >
                     <div class="featured-article__image">
                         <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
                             <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
                         </svg>
                     </div>
-                    <p class="featured-article__description">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    <p class="featured-article__description" v-html="stripHTML(featuredNews.content.slice(0, 300) + '...')">
                     </p>
-                </div>
+                </router-link>
 
                 <!-- Article List -->
                 <div class="articles-list">
-                    <div v-for="(article, index) in articles" :key="index" class="article-item">
+                    <router-link 
+                        v-for="article in otherNews" 
+                        :key="article.permalink"
+                        :to="`/fair/news/${encodeURIComponent(article.permalink)}`"
+                        class="article-item"
+                    >
                         <div class="article-item__content">
-                            <div class="article-item__date">Wed, Sept 21</div>
-                            <h2 class="article-item__title">Article Name</h2>
+                            <div class="article-item__date">{{ formatDate(article.created_at) }}</div>
+                            <h2 class="article-item__title">{{ article.title }}</h2>
                         </div>
                         <div class="article-item__image">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 62 62" fill="none">
                                 <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
                             </svg>
                         </div>
-                    </div>
+                    </router-link>
                 </div>
             </div>
         </ion-content>
     </ion-page>
 </template>
-
 <script setup lang="ts">
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
+import { useDataStore } from '@/stores/data';
+import { computed } from 'vue';
 
-// Dummy data for articles list
-const articles = Array(4).fill(null);
+interface NewsArticle {
+    title: string;
+    content: string;
+    permalink: string;
+    created_at: string;
+}
+
+const dataStore = useDataStore();
+
+// Get the latest article for the featured section
+const featuredNews = computed(() => {
+    const news = dataStore.data.nysfairWebsite.news;
+    return news[0];
+});
+
+// Get the rest of the articles for the list
+const otherNews = computed(() => {
+    const news = dataStore.data.nysfairWebsite.news;
+    return news.slice(1);
+});
+
+// Format date function
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+    }).format(date);
+};
+
+// Strip HTML tags from content
+const stripHTML = (html: string): string => {
+    const tmp = document.createElement('DIV');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+};
 </script>
 
 <style lang="scss" scoped>
+a {
+    text-decoration: none;
+    color: inherit;
+}
+/* Your existing styles remain the same */
 .main {
     padding: 30px;
 
@@ -91,6 +140,7 @@ const articles = Array(4).fill(null);
     display: flex;
     flex-direction: column;
     gap: 24px;
+    margin-top: 32px;
 }
 
 .article-item {
