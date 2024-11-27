@@ -29,7 +29,28 @@ const routes: Array<RouteRecordRaw> = [
     path: '/fairgrounds/upcoming-events',
     component: () => import('@/views/fairgrounds/UpcomingEventsPage.vue'),
     meta: {
-      title: 'Featured Event'
+      title: 'Upcoming Events'
+    }
+  },
+  {
+    path: '/fairgrounds/venues',
+    component: () => import('@/views/fairgrounds/VenuesPage.vue'),
+    meta: {
+      title: 'Venues'
+    }
+  },
+  {
+    path: '/fairgrounds/venues/:id',
+    component: () => import('@/views/fairgrounds/VenueDetailPage.vue'),
+    meta: {
+      title: 'Venue Detail'
+    }
+  },
+  {
+    path: '/fairgrounds/rental-opportunity',
+    component: () => import('@/views/fairgrounds/RentalOpportunityPage.vue'),
+    meta: {
+      title: 'Rental Opportunity'
     }
   },
   {

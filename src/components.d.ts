@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BaseNav: typeof import('./components/BaseNav.vue')['default']
+    CalendarComponent: typeof import('./components/CalendarComponent.vue')['default']
     FairgroundsNav: typeof import('./components/FairgroundsNav.vue')['default']
     FairNav: typeof import('./components/FairNav.vue')['default']
     Loader: typeof import('./components/Loader.vue')['default']

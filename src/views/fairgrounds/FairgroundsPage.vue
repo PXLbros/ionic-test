@@ -39,7 +39,7 @@
                         </router-link>
                         <div class="main__grid-bottom">
                             <router-link to="/fairgrounds/venues" class="card">Venues</router-link>
-                            <router-link to="/fairgrounds/rental-opportunities" class="card">Rental Opportunities</router-link>
+                            <router-link to="/fairgrounds/rental-opportunity" class="card">Rental Opportunities</router-link>
                         </div>
                     </div>
                 </div>
@@ -138,7 +138,7 @@
                 width: 100%;
                 display: flex;
                 gap: 10px;
-                margin-top: 20px;
+                margin-top: 10px;
 
                 .card {
                     background-color: #EFF2F6;

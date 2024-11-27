@@ -24,6 +24,7 @@
     "@ionic/vue-router": "^8.0.0",
     "@types/mapbox-gl": "^3.1.0",
     "axios": "^1.7.7",
+    "date-fns": "^4.1.0",
     "ionicons": "^7.0.0",
     "leaflet": "^1.9.4",
     "leaflet.offline": "^3.1.0",

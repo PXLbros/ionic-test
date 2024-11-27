@@ -31,13 +31,13 @@ export const fetchData = async () => {
       }
     }
 
-    const mobileAppData = data.mobileApp || null;
+    const mobileAppData = data.strapi || null;
     const nysfairWebsiteData = data.nysfairWebsite || null;
     const nysfairgroundsWebsiteData = data.nysfairgroundsWebsite || null;
 
     dataStore.setData({
       data: {
-        mobileApp: mobileAppData,
+        strapi: mobileAppData,
         nysfairWebsite: nysfairWebsiteData,
         nysfairgroundsWebsite: nysfairgroundsWebsiteData,
       },
