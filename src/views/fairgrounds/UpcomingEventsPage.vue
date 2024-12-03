@@ -37,8 +37,7 @@
                   class="input" 
                   type="text" 
                   placeholder="Search Events"
-                  @input="handleSearch"
-                  :value="searchQuery"
+                  v-model="searchQuery"
                 >
                 <div class="search-icon">
                   <svg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -65,19 +64,21 @@
   
           <!-- Events List -->
           <div class="events-list">
-            <div 
+            <div
               v-for="event in filteredEvents" 
               :key="event.id"
               class="event-card"
             >
-              <div class="event-card__image">
-                <img :src="event.image || '/api/placeholder/400/200'" alt="Event image" />
-              </div>
-              <div class="event-card__content">
-                <div class="event-card__time">{{ format(new Date(event.date), 'h:mm aaa') }}</div>
-                <h3 class="event-card__title">{{ event.title }}</h3>
-                <div class="event-card__location">Location Name</div>
-              </div>
+              <router-link class="cta" :to="`/fairgrounds/upcoming-events/${encodeURIComponent(event.id)}`">
+                <div class="event-card__image">
+                  <img :src="getEventImage(event) || '/api/placeholder/400/200'" alt="Event image" />
+                </div>
+                <div class="event-card__content">
+                  <div class="event-card__time">{{ getEventTime(event) }}</div>
+                  <h3 class="event-card__title">{{ event.title }}</h3>
+                  <div class="event-card__location">{{ event.eventAdmission ? `Admission: ${event.eventAdmission}` : '' }}</div>
+                </div>
+              </router-link>
             </div>
           </div>
         </div>
@@ -89,58 +90,36 @@
 import { ref, computed } from 'vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
-import { format, isSameMonth } from 'date-fns';
+import { format, isSameMonth, parseISO } from 'date-fns';
 
-// Mock Data
-interface Event {
-  id: number;
-  title: string;
-  date: Date;
-  time: string;
-  location: string;
-  image: string;
-  target?: any;
+interface EventDate {
+  date: string;
+  endDate: string;
+  startTime?: string;
+  endTime?: string;
 }
 
-const mockEvents: Event[] = [
-  {
-    id: 1,
-    title: "Summer Concert Series",
-    date: new Date(2024, 10, 28), // June 15, 2024
-    time: "8:00am - 8:00pm",
-    location: "Main Arena",
-    image: "modal-img/News_NYSF.jpg"
-  },
-  {
-    id: 2,
-    title: "Food Truck Festival",
-    date: new Date(2024, 11, 1), // June 20, 2024
-    time: "11:00am - 9:00pm",
-    location: "Outdoor Plaza",
-    image: "modal-img/News_NYSF.jpg"
-  },
-  {
-    id: 3,
-    title: "Craft Beer Showcase",
-    date: new Date(2024, 11, 3), // July 5, 2024
-    time: "2:00pm - 10:00pm",
-    location: "Exhibition Hall",
-    image: "modal-img/News_NYSF.jpg"
-  },
-  {
-    id: 4,
-    title: "Agricultural Fair",
-    date: new Date(2025, 0, 15), // Jan 15, 2025
-    time: "9:00am - 6:00pm",
-    location: "Fairgrounds",
-    image: "modal-img/News_NYSF.jpg"
-  }
-];
+interface EventImage {
+  filename: string;
+  title: string;
+  url: string;
+}
+
+interface Event {
+  id: string;
+  title: string;
+  eventDates: EventDate[];
+  eventImage: EventImage[];
+  eventBody: string;
+  eventAdmission: string;
+  uri: string;
+  enabled: boolean;
+}
 
 // Store and Data
 const dataStore = useDataStore();
-const eventsData = dataStore.data.nysfairgroundsWebsite.events;
-console.log('events data', eventsData);
+const events = computed(() => dataStore.data.nysfairgroundsWebsite.events);
+console.log('events', events.value);
 
 // State
 const selectedDate = ref(new Date());
@@ -152,19 +131,24 @@ const dates = computed(() => {
   const currentDate = new Date();
   
   for (let i = 0; i < 12; i++) {
-    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1); 
+    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
     months.push(date);
   }
   
   return months;
 });
 
-
-// Filter events based on selected date and search query
+// Updated filtered events to work with real data structure
 const filteredEvents = computed(() => {
-  return mockEvents.filter(event => {
-    const matchesDate = isSameMonth(event.date, selectedDate.value);
+  return events.value.filter((event: Event) => {
+    if (!event.enabled) return false;
+    if (!event.eventDates || event.eventDates.length === 0) return false;
+
+    const eventStartDate = parseISO(event.eventDates[0].date);
+    // Only compare months, ignore year
+    const matchesDate = eventStartDate.getMonth() === selectedDate.value.getMonth();
     const matchesSearch = event.title.toLowerCase().includes(searchQuery.value.toLowerCase());
+
     return matchesDate && matchesSearch;
   });
 });
@@ -174,11 +158,19 @@ const handleDateSelect = (date: Date) => {
   selectedDate.value = date;
 };
 
-const handleSearch = (event: Event) => {
-  const input = event.target as HTMLInputElement;
-  searchQuery.value = input.value;
+const getEventTime = (event: Event): string => {
+  if (!event.eventDates?.[0]) return '';
+  const startTime = event.eventDates[0].startTime || '';
+  const endTime = event.eventDates[0].endTime || '';
+  if (startTime && endTime) {
+    return `${format(parseISO(startTime), 'h:mm aaa')} - ${format(parseISO(endTime), 'h:mm aaa')}`;
+  }
+  return startTime ? format(parseISO(startTime), 'h:mm aaa') : '';
 };
 
+const getEventImage = (event: Event): string => {
+  return event.eventImage?.[0]?.url || '/api/placeholder/400/200';
+};
 </script>
 
 <style lang="scss" scoped>
@@ -286,6 +278,9 @@ const handleSearch = (event: Event) => {
       font-weight: 700;
 
     }
+  }
+  .cta {
+    text-decoration: none;
   }
 
   .events-list {

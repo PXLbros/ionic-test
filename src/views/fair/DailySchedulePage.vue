@@ -24,7 +24,7 @@
                 </div>
 
                 <!-- Simple Date Selector -->
-                <div class="date-selector">
+                <div v-if="dates" class="date-selector">
                     <div class="date-selector__container">
                         <button 
                             v-for="(date, index) in dates" 
@@ -33,8 +33,8 @@
                             :class="{ 'date-card--active': selectedDateIndex === index }"
                             @click="selectDate(index)"
                         >
-                            <div class="date-card__day">{{ date.dayName }}</div>
-                            <div class="date-card__date">Day {{ date.day }}</div>
+                            <div class="date-card__day">{{ date.dayName || "Date Name" }}</div>
+                            <div class="date-card__date">Day {{ date.day || "Date Day" }}</div>
                         </button>
                     </div>
                 </div>
@@ -52,8 +52,8 @@
                     
                     <div class="events-list" v-show="isSectionOpen">
                         <div v-for="event in filteredEvents" :key="event.id" class="event-item">
-                            <h3>{{ event.title }}</h3>
-                            <p>{{ event.start_time }}</p>
+                            <h3>{{ event.title || "Event Title" }}</h3>
+                            <p>{{ event.start_time || "Event Start Time" }}</p>
                         </div>
                     </div>
                 </div>
@@ -261,6 +261,7 @@ const toggleSection = (): void => {
     &__day {
         font-size: 14px;
         margin-bottom: 5px;
+        font-weight: 400;
     }
 
     &__date {
@@ -309,6 +310,7 @@ const toggleSection = (): void => {
                 font-size: 14px;
                 color: #666;
                 margin: 0;
+                font-weight: 400;
             }
         }
     }

@@ -40,8 +40,9 @@
                             <h2 class="event-title">{{ event.title }}</h2>
                             <div class="event-date">{{ formatEventDate(event.start_time) }}</div>
                         </div>
-                        <div class="event-image">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 62 62" fill="none">
+                        <div  class="event-image">
+                            <img v-if="event.featured_image" :src="event.featured_image" alt="">
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 62 62" fill="none">
                                 <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
                             </svg>
                         </div>
@@ -93,6 +94,7 @@ import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBa
 import { useDataStore } from '@/stores/data';
 
 const dataStore = useDataStore();
+console.log('data for music page', dataStore.data);
 
 // Get events for accepted venues sorted by date
 const chevyCourtEvents = computed<Event[]>(() => {
@@ -178,6 +180,8 @@ const formatEventDate = (dateString: string): string => {
 .events-list {
     padding: 20px;
     padding-top: 0px;
+    max-height: 50vh;
+    overflow: scroll;
 }
 
 .event-card {
@@ -186,35 +190,59 @@ const formatEventDate = (dateString: string): string => {
     align-items: center;
     padding: 20px;
     border-bottom: 1px solid #EFF2F6;
-    gap: 10px;
+    gap: 20px; // Increased gap for better spacing
     text-decoration: none;
     color: #343434;
-}
-
-.event-info {
+  }
+  
+  .event-info {
+    flex: 1; // This will allow the info to take up remaining space
+    min-width: 0; // This prevents flex child from overflowing
+  
     .venue-name {
-        font-size: 12px;
-        color: #333;
-        margin-bottom: 4px;
-        font-weight: 600;
+      font-size: 12px;
+      color: #333;
+      margin-bottom: 4px;
+      font-weight: 600;
     }
-
+  
     .event-title {
-        font-size: 24px;
-        font-weight: 700;
-        margin: 4px 0;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 4px 0;
+      // Add text truncation for long titles
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-
+  
     .event-date {
-        font-size: 16px;
-        color: #333;
-        font-weight: 700;
+      font-size: 16px;
+      color: #333;
+      font-weight: 700;
     }
-}
-
-.event-image {
+  }
+  
+  .event-image {
+    flex-shrink: 0; // Prevents the image from shrinking
+    width: 80px; // Fixed width
+    height: 80px; // Fixed height (1:1 aspect ratio)
     display: flex;
     align-items: center;
     justify-content: center;
-}
+    background-color: #EFF2F6;
+    border-radius: 12px;
+    overflow: hidden; // Ensures content stays within borders
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  
+    svg {
+      width: 40px;
+      height: 40px;
+    }
+  }
 </style>
