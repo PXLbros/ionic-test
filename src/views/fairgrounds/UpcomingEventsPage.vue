@@ -96,7 +96,7 @@
             </div>
           </div>
 
-          <!-- Events for selected day -->
+          <!-- Events for selected day testing new repo transfer-->
           <div v-if="getEventsForDate(selectedDate).length > 0" class="day-events">
             <div v-for="event in getEventsForDate(selectedDate)" 
                  :key="event.id" 
