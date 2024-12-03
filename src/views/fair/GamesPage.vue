@@ -3,42 +3,84 @@
         <ion-content>
             <ion-header>
                 <ion-toolbar>
-                  <ion-buttons slot="start">
-                    <ion-back-button default-href="/fair"></ion-back-button>
-                  </ion-buttons>
-                  <ion-title>Games</ion-title>
+                    <ion-buttons slot="start">
+                        <ion-back-button default-href="/fair"></ion-back-button>
+                    </ion-buttons>
+                    <ion-title>Games</ion-title>
                 </ion-toolbar>
-              </ion-header>
+            </ion-header>
 
             <div class="main">
                 <div class="main__header">
                     <h1 class="main__header-text">Interactive <br/> Games</h1>
                 </div>
                 <div v-if="games" class="main__content">
-                    <div class="main__content-item" v-for="game in games" :key="game.id">
+                    <div 
+                        class="main__content-item" 
+                        v-for="game in games" 
+                        :key="game.id"
+                        @click="openGame(game.externalUrl)"
+                    >
                         <h2>{{ game.name }}</h2>
                     </div>
                 </div>
             </div>
-
         </ion-content>
     </ion-page>
-
 </template>
-
 <script setup lang="ts">
-    import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
-    import { useDataStore } from '@/stores/data';
+import { ref } from 'vue';
+import { 
+    IonContent, 
+    IonPage, 
+    IonHeader, 
+    IonToolbar, 
+    IonTitle, 
+    IonButtons, 
+    IonBackButton,
+    IonModal,
+    IonButton
+} from '@ionic/vue';
+import { useDataStore } from '@/stores/data';
+import { Browser } from '@capacitor/browser';
 
-    const dataStore = useDataStore();
+// Game Interface Type
+interface Game {
+    id: number;
+    name: string;
+    externalUrl: string;
+    createdAt: string;
+    updatedAt: string;
+    image: null | string;
+}
 
-    // const VNode = dataStore?.data?.mobileApp ? StrapiBlocks({ content: dataStore.data.mobileApp.homePage.introText }) : null;
+const dataStore = useDataStore();
+const games = ref<Game[]>(dataStore?.data?.nysfairWebsite.games);
 
-    console.log('data from the store', dataStore.data);
+// Modal state
+const isGameOpen = ref(false);
+const currentGameUrl = ref('');
+const currentGame = ref<Game | null>(null);
 
-    const games = dataStore?.data?.nysfairWebsite.games;
-    console.log('games', games);
+const openGame = async (url: string) => {
+    try {
+        const game = games.value.find((game: Game) => game.externalUrl === url) || null;
+        currentGame.value = game;
+        await Browser.open({ 
+            url,
+            presentationStyle: 'fullscreen',
+            toolbarColor: '#333333'
+        });
+    } catch (error) {
+        console.error('Failed to open game:', error);
+    }
+};
 
+const closeGame = () => {
+    isGameOpen.value = false;
+    currentGameUrl.value = '';
+    currentGame.value = null;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -79,6 +121,12 @@
             background-color: #EFF2F6;
             min-height: 0; // Prevents overflow
             height: calc((100% - 20px) / 2); // Subtracts gap and divides by 2
+            cursor: pointer;
+            transition: transform 0.2s ease;
+
+            &:hover {
+                transform: scale(1.02);
+            }
 
             h2 {
                 color: #343434;
@@ -91,7 +139,26 @@
                 text-align: center;
             }
         }
+    
+    }
+}
 
+.game-modal {
+    --height: 100%;
+    --width: 100%;
+}
+
+.game-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+// Make modal full screen on mobile
+@media (max-width: 768px) {
+    .game-modal {
+        --height: 100%;
+        --width: 100%;
     }
 }
 

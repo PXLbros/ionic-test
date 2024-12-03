@@ -189,7 +189,7 @@ const toggleSection = (index: number) => {
     }
 
     &__content {
-        padding: 0 0 20px 0;
+        padding: 0 30px 20px 30px;
         color: #666666;
         line-height: 1.5;
     }

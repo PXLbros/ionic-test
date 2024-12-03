@@ -64,6 +64,7 @@ interface NewsArticle {
 }
 
 const dataStore = useDataStore();
+console.log('news page data', dataStore.data.nysfairWebsite.news);
 
 // Get the latest article for the featured section
 const featuredNews = computed(() => {
