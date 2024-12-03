@@ -21,7 +21,8 @@
                         :key="venue.id"
                         class="main__venue-card"
                     >
-                        <img class="image" src="/public/modal-img/News_NYSF.jpg" alt="">
+                        <!-- <img class="image" :src="getVenueImage(venue)" alt="venue image"> add this in when data is there -->
+                        <img class="image" src="/public/modal-img/News_NYSF.jpg" alt="venue image">
                         <div class="content">
                             <div class="content__label">{{ venue.venueNavTitle || 'Venue' }}</div>
                             <div class="content__title">{{ venue.title }}</div>
@@ -54,12 +55,17 @@ interface Venue {
   venueDetailPreheader: string | null;
   venueNavTitle: string | null;
   venueSubheader: string | null;
+  venueMainImage: string | null;
 }
 
 const dataStore = useDataStore();
 const venues = ref<Venue[]>(dataStore.data.nysfairgroundsWebsite.venues);
 
-console.log('venues', venues);
+console.log('venues', venues.value);
+
+const getVenueImage = (venue: Venue) => {
+    return venue.venueMainImage || '/public/modal-img/News_NYSF.jpg';
+}
 
 </script>
 

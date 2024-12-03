@@ -74,31 +74,36 @@ export default defineComponent({
         name: "Tasty Treats",
         types: ["hamburger", "pizza", "dessert"],
         coordinates: [-76.2157, 43.073],
-        dietaryOptions: ["vegetarian"]
+        dietaryOptions: ["vegetarian"],
+        icon: '/icons/pig.png'
       },
       {
         name: "Fair Favorites",
         types: ["hotdog", "corndog", "fries"],
         coordinates: [-76.2170, 43.0745],
-        dietaryOptions: ["gluten-free"]
+        dietaryOptions: ["gluten-free"],
+        icon: '/icons/fairgroundsl.png'
       },
       {
         name: "Sweet & Savory",
         types: ["ice cream", "popcorn", "nachos"],
         coordinates: [-76.2140, 43.0720],
-        dietaryOptions: ["vegetarian", "gluten-free"]
+        dietaryOptions: ["vegetarian", "gluten-free"],
+        icon: '/icons/pig.png'
       },
       {
         name: "International Delights",
         types: ["tacos", "sushi", "pasta"],
         coordinates: [-76.2180, 43.0735],
-        dietaryOptions: ["vegetarian", "vegan", "gluten-free"]
+        dietaryOptions: ["vegetarian", "vegan", "gluten-free"],
+        icon: '/icons/fairgroundsl.png'
       },
       {
         name: "Comfort Food Corner",
         types: ["mac and cheese", "fried chicken", "BBQ"],
         coordinates: [-76.2130, 43.0740],
-        dietaryOptions: []
+        dietaryOptions: [],
+        icon: '/icons/chicken-icon.png'
       }
     ];
 
@@ -109,8 +114,23 @@ export default defineComponent({
       return Array.from(types).sort();
     });
 
+    const createCustomMarkerElement = (iconPath: string) => {
+      const element = document.createElement('div');
+      const image = document.createElement('img');
+      image.src = iconPath;
+      image.style.width = '60px';
+      image.style.height = '60px';
+      element.appendChild(image);
+      return element;
+    };
+
     const addMarker = (place: typeof foodPlaces[0]) => {
-      const marker = new mapboxgl.Marker()
+      const element = createCustomMarkerElement(place.icon);
+      
+      const marker = new mapboxgl.Marker({
+        element: element,
+        anchor: 'bottom'
+      })
         .setLngLat(place.coordinates as [number, number])
         .setPopup(new mapboxgl.Popup().setHTML(`
           <h3>${place.name}</h3>
@@ -145,8 +165,9 @@ export default defineComponent({
         map = new mapboxgl.Map({
           container: mapContainer.value,
           style: selectedMapStyle.value,
+          bearing: 200,
           center: [-76.2157, 43.073],
-          zoom: 14
+          zoom: 15
         });
 
         map.addControl(new mapboxgl.NavigationControl());

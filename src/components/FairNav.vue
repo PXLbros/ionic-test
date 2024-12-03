@@ -2,8 +2,8 @@
 <template>
     <BaseNavMenu
       type="fair"
-      toolbarBackground="#49027fe9"
-      menuBackground="linear-gradient(180deg, #7323B4 0%, #540F8C 100%)"
+      toolbarBackground="#530D8C"
+      menuBackground="linear-gradient(180deg, #ffffff 0%, #ffffff 100%)"
       :logoSrc="fairLogo"
       logoAlt="NYSF Logo"
     />
@@ -12,4 +12,9 @@
   <script setup lang="ts">
   import BaseNavMenu from './BaseNav.vue';
   import fairLogo from '@/imgs/svg/fair-logo-light.svg';
-  </script>
+  </script> 
+
+  <style scoped lang="scss">
+
+  
+</style>
