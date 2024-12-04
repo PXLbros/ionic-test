@@ -171,7 +171,7 @@ interface Event {
 
 const testEvents = [
   {
-    id: 'test-1',
+    id: '2345',
     title: 'Winter Festival 2024',
     enabled: true,
     eventDates: [{
@@ -181,13 +181,13 @@ const testEvents = [
     }],
     eventAdmission: '$10',
     eventImage: [{
-      url: '/api/placeholder/400/200',
+      url: '/modal-img/News_NYSF.jpg',
       title: 'Winter Festival',
       filename: 'winter-fest.jpg'
     }]
   },
   {
-    id: 'test-2',
+    id: '1234',
     title: 'Holiday Market',
     enabled: true,
     eventDates: [{
@@ -197,13 +197,13 @@ const testEvents = [
     }],
     eventAdmission: 'Free',
     eventImage: [{
-      url: '/api/placeholder/400/200',
+      url: '/modal-img/News_NYSF.jpg',
       title: 'Holiday Market',
       filename: 'holiday-market.jpg'
     }]
   },
   {
-    id: 'test-3',
+    id: '4443',
     title: 'New Year Concert',
     enabled: true,
     eventDates: [{
@@ -213,7 +213,7 @@ const testEvents = [
     }],
     eventAdmission: '$25',
     eventImage: [{
-      url: '/api/placeholder/400/200',
+      url: '/modal-img/News_NYSF.jpg',
       title: 'New Year Concert',
       filename: 'nye-concert.jpg'
     }]

@@ -9,7 +9,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-card class="header-card">
+      <!-- <ion-card class="header-card">
         <ion-card-header class="header-card__header">
           <ion-card-title>Food Finder Map</ion-card-title>
           <ion-card-subtitle>Find your favorite fair food</ion-card-subtitle>
@@ -40,10 +40,16 @@
             <ion-select-option value="mapbox://styles/mapbox/satellite-streets-v11">Satellite Streets</ion-select-option>
           </ion-select>
         </ion-card-content>
-      </ion-card>
-      <ion-content class="ion-padding">
-        <div class="map" ref="mapContainer" style="width: 100%; height: 100%"></div>
-      </ion-content>
+      </ion-card> -->
+      <div class="main">
+        <div class="main__header">
+          <h1 class="main__header-text">Interactive <br/>Map</h1>
+          <h1 class="main__header-sponsor">Sponsorship </h1>
+        </div>
+        <ion-content class="ion-padding">
+          <div class="map" ref="mapContainer" style="width: 100%; height: 100%"></div>
+        </ion-content>
+      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -196,6 +202,44 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+
+.main {
+  height: calc(100vh - 56px); // Subtract header height
+  display: flex;
+  flex-direction: column;
+  
+  &__header {
+    padding: 30px;
+    display: flex;
+    margin-bottom: 25px;
+    justify-content: space-between;
+
+    &-text {
+      font-size: 24px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      color: #343434;
+      letter-spacing: 0.5px;
+      line-height: 28px;
+      margin: 0px;
+    }
+    &-sponsor {
+      display: flex;
+      align-items: center;
+      background-color: #cbcbcb4c;
+      border-radius: 5px;
+      padding: 5px 15px;
+      font-size: 24px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      color: #343434;
+      letter-spacing: 0.5px;
+      line-height: 28px;
+      margin: 0px;
+    }
+  }
+}
+
 .header-card {
   padding-bottom: 0px;
   margin-bottom: 0px;

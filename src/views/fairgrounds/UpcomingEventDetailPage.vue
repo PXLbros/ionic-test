@@ -38,6 +38,9 @@
             </div>
           </div>
         </div>
+        <div v-else class="alt">
+          <h2>No Upcoming Events. Check back soon</h2>
+        </div>
       </ion-content>
     </ion-page>
 </template>
@@ -208,6 +211,24 @@ const formatAdditionalDate = (date: EventDate): string => {
     font-size: 16px;
     color: #333333;
     margin-bottom: 8px;
+  }
+}
+
+.alt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  font-size: 24px;
+  color: #333333;
+  padding: 30px;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333333;
+    margin: 0;
+    text-align: center;
   }
 }
 
