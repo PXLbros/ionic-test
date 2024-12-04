@@ -11,7 +11,7 @@ export const fetchData = async () => {
     dataStore.showLoader();
     dataStore.setLoadError({ error: null });
 
-    const useFakeData = true;
+    const useFakeData = false;
 
     let data: any = {};
 

@@ -42,7 +42,9 @@
         
         <nav class="nav-links">
           <div class="primary-links">
-
+            <!-- Cross-section navigation -->
+            
+            <!-- Regular navigation links -->
             <router-link 
             v-for="route in mainNavLinks" 
             :key="route.path"
@@ -52,12 +54,20 @@
             >
             {{ route.meta?.title }}
           </router-link>
+
+          <div class="section-switch">
+            <router-link 
+              :to="oppositeSection.path"
+              class="nav-link"
+              @click="closeMenu"
+            >
+              {{ oppositeSection.title }}
+            </router-link>
+          </div>
+          </div>
           
-          <!-- Separator for Fair Menu -->
-        </div>
-        
-        <!-- Secondary Links for Fair Menu -->
-        <div class="secondary-links">
+          <!-- Secondary Links -->
+          <div class="secondary-links">
             <div class="separator"></div>
             <div class="notifications">
               <span>Notifications</span>
@@ -78,8 +88,8 @@
             <div class="social-links">
               <h3>FOLLOW US</h3>
               <div class="social-icons">
-                <a href="#" class="social-icon"><ion-icon :icon="logoInstagram" size="large"</ion-icon></a>
-                <a href="#" class="social-icon"><ion-icon :icon="logoFacebook"size="large" ></ion-icon></a>
+                <a href="#" class="social-icon"><ion-icon :icon="logoInstagram" size="large"></ion-icon></a>
+                <a href="#" class="social-icon"><ion-icon :icon="logoFacebook" size="large"></ion-icon></a>
                 <a href="#" class="social-icon"><ion-icon :icon="logoX" size="large"></ion-icon></a>
                 <a href="#" class="social-icon"><ion-icon :icon="logoTiktok" size="large"></ion-icon></a>
               </div>
@@ -89,54 +99,68 @@
       </div>
     </div>
   </div>
-  </template>
+</template>
   
   <script setup lang="ts">
   import { ref, computed } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { IonToolbar, IonHeader, IonIcon } from '@ionic/vue';
-  import { logoFacebook, logoInstagram, logoTiktok, logoX } from 'ionicons/icons';
+import { useRouter } from 'vue-router';
+import { IonToolbar, IonHeader, IonIcon } from '@ionic/vue';
+import { logoFacebook, logoInstagram, logoTiktok, logoX } from 'ionicons/icons';
 
-  const props = defineProps<{
-    type: 'fair' | 'fairgrounds'
-    toolbarBackground: string
-    menuBackground: string
-    logoSrc: string
-    logoAlt: string
-  }>();
+const props = defineProps<{
+  type: 'fair' | 'fairgrounds'
+  toolbarBackground: string
+  menuBackground: string
+  logoSrc: string
+  logoAlt: string
+}>();
 
-  const router = useRouter();
-  const isMenuOpen = ref(false);
+const router = useRouter();
+const isMenuOpen = ref(false);
 
-  const mainNavLinks = computed(() => {
-    return router.options.routes.filter(route => {
-      if (!route.meta?.showInMenu) {
-        return false;
-      }
+const oppositeSection = computed(() => {
+  if (props.type === 'fair') {
+    return {
+      path: '/fairgrounds',
+      title: 'Fairgrounds'
+    };
+  } else {
+    return {
+      path: '/fair',
+      title: 'Fair'
+    };
+  }
+});
 
-      if (route.path === '/') {
-        return true;
-      }
+const mainNavLinks = computed(() => {
+  return router.options.routes.filter(route => {
+    if (!route.meta?.showInMenu) {
+      return false;
+    }
 
-      const pathSegments = route.path.split('/').filter(Boolean);
-      
-      if (props.type === 'fair') {
-        return pathSegments[0] === 'fair';
-      } else {
-        return pathSegments[0] === 'fairgrounds';
-      }
-    }).sort((a, b) => (Number(a.meta?.menuOrder) || 99) - (Number(b.meta?.menuOrder) || 99));
-  });
+    if (route.path === '/') {
+      return true;
+    }
 
-  const openMenu = () => {
-    isMenuOpen.value = true;
-    document.body.style.overflow = 'hidden';
-  };
+    const pathSegments = route.path.split('/').filter(Boolean);
+    
+    if (props.type === 'fair') {
+      return pathSegments[0] === 'fair';
+    } else {
+      return pathSegments[0] === 'fairgrounds';
+    }
+  }).sort((a, b) => (Number(a.meta?.menuOrder) || 99) - (Number(b.meta?.menuOrder) || 99));
+});
 
-  const closeMenu = () => {
-    isMenuOpen.value = false;
-    document.body.style.overflow = '';
-  };
+const openMenu = () => {
+  isMenuOpen.value = true;
+  document.body.style.overflow = 'hidden';
+};
+
+const closeMenu = () => {
+  isMenuOpen.value = false;
+  document.body.style.overflow = '';
+};
   </script>
   
   <style scoped lang="scss">
