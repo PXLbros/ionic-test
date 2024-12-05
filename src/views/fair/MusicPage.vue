@@ -170,6 +170,13 @@ const musicEvents = computed<Event[]>(() => {
             const venue = event.venue;
             return venue && Object.values(AcceptedVenueSlugs).includes(venue.slug as AcceptedVenueSlugs);
         })
+        .map((event: Event) => ({
+            ...event,
+            featured_image: event.featured_image?.replace(
+                'http://nys-fair.test:8001/wp-content/uploads/',
+                'https://nysfair.ny.gov/wp-content/uploads/'
+            )
+        }))
         .sort((a: Event, b: Event) => {
             const dateA = parseDateString(a.start_time).getTime();
             const dateB = parseDateString(b.start_time).getTime();

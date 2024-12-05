@@ -86,24 +86,88 @@ const route = useRoute();
 const dataStore = useDataStore();
 const eventId = parseInt(route.params.id as string);
 
-// Get the specific event
+// Parse date string function (same as music list page)
+const parseDateString = (dateString: string): Date => {
+    // Handle unix timestamp if available
+    if (dateString.match(/^\d+$/)) {
+        return new Date(parseInt(dateString) * 1000);
+    }
+
+    // Remove any HTML entities and trim
+    const cleanDateString = dateString.replace(/&nbsp;/g, ' ').trim();
+
+    // Try parsing with built-in Date
+    const parsedDate = new Date(cleanDateString);
+    if (!isNaN(parsedDate.getTime())) {
+        return parsedDate;
+    }
+
+    // Fallback: Manual parsing for "Month DD, YYYY HH:MMam/pm" format
+    const regex = /^(\w+)\s+(\d+),\s+(\d{4})\s+(\d+):(\d+)(?:\s*)([AaPp][Mm])?/;
+    const match = cleanDateString.match(regex);
+    
+    if (match) {
+        const [_, month, day, year, hours, minutes, ampm] = match;
+        let hour = parseInt(hours);
+        
+        // Adjust hours for PM
+        if (ampm && ampm.toLowerCase() === 'pm' && hour < 12) {
+            hour += 12;
+        }
+        // Adjust for AM 12
+        if (ampm && ampm.toLowerCase() === 'am' && hour === 12) {
+            hour = 0;
+        }
+
+        return new Date(
+            parseInt(year),
+            new Date(Date.parse(month + " 1, 2024")).getMonth(),
+            parseInt(day),
+            hour,
+            parseInt(minutes)
+        );
+    }
+
+    // If all parsing fails, return current date
+    console.warn(`Unable to parse date string: ${dateString}`);
+    return new Date();
+};
+
+// Format date function with improved error handling
+const formatEventDate = (dateString: string): string => {
+    try {
+        const date = parseDateString(dateString);
+        return new Intl.DateTimeFormat('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric'
+        }).format(date);
+    } catch (error) {
+        console.error(`Error formatting date: ${dateString}`, error);
+        return dateString; // Return original string if formatting fails
+    }
+};
+
+// Get the specific event with transformed image URL
 const event = computed<Event | undefined>(() => {
-    return dataStore.data.nysfairWebsite.events.find(
+    const foundEvent = dataStore.data.nysfairWebsite.events.find(
         (e: Event) => e.id === eventId
     );
-});
 
-// Format date function
-const formatEventDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric'
-    }).format(date);
-};
+    if (foundEvent) {
+        return {
+            ...foundEvent,
+            featured_image: foundEvent.featured_image?.replace(
+                'http://nys-fair.test:8001/wp-content/uploads/',
+                'https://nysfair.ny.gov/wp-content/uploads/'
+            )
+        };
+    }
+
+    return undefined;
+});
 </script>
 
 <style lang="scss" scoped>

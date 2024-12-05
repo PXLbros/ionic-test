@@ -122,12 +122,12 @@ const oppositeSection = computed(() => {
   if (props.type === 'fair') {
     return {
       path: '/fairgrounds',
-      title: 'Fairgrounds'
+      title: 'New York State Fairgrounds'
     };
   } else {
     return {
       path: '/fair',
-      title: 'Fair'
+      title: 'New York State Fair'
     };
   }
 });
@@ -269,7 +269,7 @@ const closeMenu = () => {
     text-decoration: none;
     font-family: 'Inter', sans-serif;
     font-size: 20px;
-    line-height: 56px;
+    line-height: 52px;
     font-weight: 500;
     display: flex;
     justify-content: space-between;
@@ -297,7 +297,7 @@ const closeMenu = () => {
   .separator {
     height: 1px;
     background: rgba(20, 20, 20, 0.1);
-    margin: 20px 0;
+    margin: 40px 0;
   }
   
   .secondary-links {

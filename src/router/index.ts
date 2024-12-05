@@ -9,7 +9,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/HomePage.vue'),
     meta: {
       title: 'Home',
-      showInMenu: true,
+      showInMenu: false,
       menuOrder: 5
     }
   },
@@ -17,8 +17,9 @@ const routes: Array<RouteRecordRaw> = [
     path: '/fairgrounds',
     component: () => import('@/views/fairgrounds/FairgroundsPage.vue'),
     meta: {
-      title: 'Fairgrounds',
-      showInMenu: false
+      title: 'Home',
+      showInMenu: true,
+      menuOrder: 1
     }
   },
   {
@@ -76,8 +77,9 @@ const routes: Array<RouteRecordRaw> = [
     path: '/fair',
     component: () => import('@/views/fair/FairPage.vue'),
     meta: {
-      title: 'New York State Fair',
-      showInMenu: false
+      title: 'Home',
+      showInMenu: true,
+      menuOrder: 1
     }
   },
   {
@@ -85,15 +87,17 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/TicketsPage.vue'),
     meta: {
       title: 'Buy Tickets',
-      showInMenu: true
+      showInMenu: true,
+      menuOrder: 2
     }
   },
   {
     path: '/fair/map',
     component: () => import('@/views/fair/MapPage.vue'),
     meta: {
-      title: 'Interactive Map',
-      showInMenu: true
+      title: 'Fair Finder Interactive Map',
+      showInMenu: true,
+      menuOrder: 3
     }
   },
   {
@@ -101,7 +105,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/DailySchedulePage.vue'),
     meta: {
       title: 'Daily Schedule',
-      showInMenu: true
+      showInMenu: true,
+      menuOrder: 4
     }
   },
   {
@@ -109,7 +114,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/MusicPage.vue'),
     meta: {
       title: 'Chevrolet Music Series',
-      showInMenu: true
+      showInMenu: true,
+      menuOrder: 5
     }
   },
   {
@@ -117,7 +123,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/MusicDetailPage.vue'),
     meta: {
       title: 'Music Detail',
-      showInMenu: false
+      showInMenu: false,
+      menuOrder: 6
     }
   },
   {
@@ -125,7 +132,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/UpdatesPage.vue'),
     meta: {
       title: 'Real-Time Updates',
-      showInMenu: true
+      showInMenu: true,
+      menuOrder: 6
     }
   },
   {
@@ -133,7 +141,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/GamesPage.vue'),
     meta: {
       title: 'Games',
-      showInMenu: true
+      showInMenu: true,
+      menuOrder: 7
     }
   },
   {
@@ -141,7 +150,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/PlanVisitPage.vue'),
     meta: {
       title: 'Plan Your Visit',
-      showInMenu: true
+      showInMenu: true,
+      menuOrder: 8
     }
   },
   {
@@ -173,7 +183,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/NewsPage.vue'),
     meta: {
       title: 'News',
-      showInMenu: true
+      showInMenu: true,
+      menuOrder: 9
     }
   },
   {
