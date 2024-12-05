@@ -153,18 +153,21 @@ const filteredEvents = computed(() => {
     
     const selectedDate = dates.value[selectedDateIndex.value];
     
-    return eventsData.filter(event => {
-        const eventDate = convertToEastern(event.start_time_unix);
-        const selectedDateTime = convertToEastern(selectedDate.timestamp);
-        return eventDate.toDateString() === selectedDateTime.toDateString();
-    }).map(event => ({
-        ...event,
-        start_time: convertToEastern(event.start_time_unix).toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: true
+    return eventsData
+        .filter(event => {
+            const eventDate = convertToEastern(event.start_time_unix);
+            const selectedDateTime = convertToEastern(selectedDate.timestamp);
+            return eventDate.toDateString() === selectedDateTime.toDateString();
         })
-    }));
+        .sort((a, b) => a.start_time_unix - b.start_time_unix) // Sort by timestamp ascending
+        .map(event => ({
+            ...event,
+            start_time: convertToEastern(event.start_time_unix).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true
+            })
+        }));
 });
 
 // Call the processEvents function
@@ -261,7 +264,7 @@ const toggleSection = (): void => {
     &__day {
         font-size: 14px;
         margin-bottom: 5px;
-        font-weight: 400;
+        font-weight: 500;
     }
 
     &__date {
@@ -310,7 +313,7 @@ const toggleSection = (): void => {
                 font-size: 14px;
                 color: #666;
                 margin: 0;
-                font-weight: 400;
+                font-weight: 500;
             }
         }
     }

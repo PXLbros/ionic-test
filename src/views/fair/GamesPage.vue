@@ -87,7 +87,7 @@ const closeGame = () => {
 
 .main {
     padding: 30px;
-    height: calc(100vh - 56px); // Subtract header height
+    height: calc(100vh - 76px); // Subtract header height
     display: flex;
     flex-direction: column;
 
