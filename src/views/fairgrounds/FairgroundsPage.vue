@@ -23,10 +23,10 @@
                                             <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
                                         </svg>
                                     </div>
-                                    <div class="event-info">
+                                    <!-- <div class="event-info">
                                         <h3>{{ event.title }}</h3>
                                         <p v-if="event.eventAdmission">{{ event.eventAdmission }}</p>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         <div class="main__header-title">
@@ -82,14 +82,34 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                overflow: hidden; // Add this to prevent image from overflowing rounded corners
+                position: relative; 
 
                 .image-container {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    flex-direction: column;
-                    padding: 20px;
-
+                    position: absolute; // Change to absolute positioning
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 100%;
+                    height: 100%;
+                    padding: 0; // Remove padding
+    
+                    .event-image {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover; // This makes the image cover the entire container
+                        object-position: center;
+                    }
+    
+                    .placeholder-image {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+    
                     .event-info {
                         text-align: center;
                     }

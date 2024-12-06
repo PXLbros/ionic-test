@@ -20,17 +20,43 @@
                     </div>
                 </div>
 
+                <ion-modal :is-open="showDateFilter" @didDismiss="showDateFilter = false">
+                    <ion-content>
+                      <div class="filter-modal">
+                        <div v-for="date in uniqueDates" :key="date" @click="selectDate(date)">
+                          {{ formatDate(date) }}
+                        </div>
+                      </div>
+                    </ion-content>
+                  </ion-modal>
+                
+                  <ion-modal :is-open="showVenueFilter" @didDismiss="showVenueFilter = false">
+                    <ion-content>
+                      <div class="filter-modal">
+                        <div v-for="venue in uniqueVenues" :key="venue" @click="selectVenue(venue)">
+                          {{ venue }}
+                        </div>
+                      </div>
+                    </ion-content>
+                  </ion-modal>
+
                 <!-- Filter Section -->
                 <div class="filters">
-                    <button class="filter-btn">Date ▼</button>
-                    <button class="filter-btn">Venue ▼</button>
-                    <button class="filter-btn">Genre ▼</button>
-                </div>
+                    <button class="filter-btn" @click="showDateFilter = true">
+                      {{ selectedDate || 'Date' }} ▼
+                    </button>
+                    <button class="filter-btn" @click="showVenueFilter = true">
+                      {{ selectedVenue || 'Venue' }} ▼
+                    </button>
+                    <button class="filter-btn" @click="showVenueFilter = true">
+                      {{ selectedVenue || 'Genre' }} ▼
+                    </button>
+                  </div>
 
                 <!-- Events List -->
                 <div class="events-list">
                   <router-link 
-                      v-for="event in musicEvents" 
+                      v-for="event in filteredEvents" 
                       :key="event.id" 
                       :to="`/fair/music/${event.id}`"
                       class="event-card"
@@ -90,12 +116,58 @@ interface DataStore {
   };
 }
 
-import { computed } from 'vue';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
+import { IonContent, IonModal, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 
 const dataStore = useDataStore();
 console.log('data for music page', dataStore.data);
+
+import { ref, computed } from 'vue';
+
+const showDateFilter = ref(false);
+const showVenueFilter = ref(false);
+const selectedDate = ref('');
+const selectedVenue = ref('');
+
+const uniqueDates = computed(() => {
+  return [...new Set(musicEvents.value.map(event => 
+    parseDateString(event.start_time).toDateString()
+  ))];
+});
+
+const uniqueVenues = computed(() => {
+  return [...new Set(musicEvents.value.map(event => 
+    event.venue?.name
+  ))];
+});
+
+const filteredEvents = computed(() => {
+  return musicEvents.value.filter(event => {
+    const dateMatch = !selectedDate.value || 
+      parseDateString(event.start_time).toDateString() === selectedDate.value;
+    const venueMatch = !selectedVenue.value || 
+      event.venue?.name === selectedVenue.value;
+    return dateMatch && venueMatch;
+  });
+});
+
+const selectDate = (date: string) => {
+  selectedDate.value = date;
+  showDateFilter.value = false;
+};
+
+const selectVenue = (venue: string) => {
+  selectedVenue.value = venue;
+  showVenueFilter.value = false;
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric'
+  });
+};
 
 
 // Parse date string function

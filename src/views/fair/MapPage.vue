@@ -9,276 +9,264 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <!-- <ion-card class="header-card">
-        <ion-card-header class="header-card__header">
-          <ion-card-title>Food Finder Map</ion-card-title>
-          <ion-card-subtitle>Find your favorite fair food</ion-card-subtitle>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-searchbar
-            v-model="searchQuery"
-            placeholder="Search for food or place"
-            @ionInput="handleSearch"
-          ></ion-searchbar>
-          <ion-select v-model="selectedFoodType" placeholder="Select food type" @ionChange="handleSearch">
-            <ion-select-option value="">Select Food Types</ion-select-option>
-            <ion-select-option v-for="type in uniqueFoodTypes" :key="type" :value="type">
-              {{ type }}
-            </ion-select-option>
-          </ion-select>
-          <ion-select v-model="selectedDietaryRestriction" placeholder="Select food restrictions" @ionChange="handleSearch">
-            <ion-select-option value="">None</ion-select-option>
-            <ion-select-option v-for="restriction in restrictions" :key="restriction" :value="restriction">
-              {{ restriction }}
-            </ion-select-option>
-          </ion-select>
-          <ion-select v-model="selectedMapStyle" placeholder="Select map style" @ionChange="changeMapStyle">
-            <ion-select-option value="mapbox://styles/mapbox/streets-v11">Streets</ion-select-option>
-            <ion-select-option value="mapbox://styles/mapbox/outdoors-v11">Outdoors</ion-select-option>
-            <ion-select-option value="mapbox://styles/mapbox/light-v10">Light</ion-select-option>
-            <ion-select-option value="mapbox://styles/mapbox/dark-v10">Dark</ion-select-option>
-            <ion-select-option value="mapbox://styles/mapbox/satellite-streets-v11">Satellite Streets</ion-select-option>
-          </ion-select>
-        </ion-card-content>
-      </ion-card> -->
       <div class="main">
         <div class="main__header">
-          <h1 class="main__header-text">Interactive <br/>Map</h1>
-          <h1 class="main__header-sponsor">Sponsorship </h1>
+          <div class="main__header-top">
+            <h1 class="main__header-text">Interactive <br/>Map</h1>
+            <h1 class="main__header-sponsor">Sponsorship</h1>
+          </div>
+          
+          <div class="filter-tabs">
+            <button class="filter-tab">
+              <ion-icon :icon="optionsOutline"></ion-icon>
+              Filters
+            </button>
+            <button class="filter-tab">Categories</button>
+            <button class="filter-tab">
+              Exhibitors
+              <ion-icon :icon="chevronDownOutline"></ion-icon>
+            </button>
+          </div>
+
+          <div class="search-container">
+            <input type="text" placeholder="Enter first name here" class="search-input">
+            <ion-icon :icon="searchOutline" class="search-icon"></ion-icon>
+          </div>
         </div>
         <ion-content class="ion-padding">
-          <div class="map" ref="mapContainer" style="width: 100%; height: 100%"></div>
+          <div class="map" ref="mapContainer"></div>
         </ion-content>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
-<script lang="ts">
-import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonSearchbar, IonSelect, IonSelectOption } from '@ionic/vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { IonBackButton, IonButtons, IonIcon, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { searchOutline, chevronDownOutline, optionsOutline } from 'ionicons/icons';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { useDataStore } from '@/stores/data';
 
-export default defineComponent({
-  name: 'MapPage',
-  components: {
-    IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar,
-    IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonSearchbar,
-    IonSelect, IonSelectOption
-  },
-  setup() {
-    const mapContainer = ref<HTMLElement | null>(null);
-    const searchQuery = ref('');
-    const selectedFoodType = ref('');
-    const selectedDietaryRestriction = ref('');
-    const selectedMapStyle = ref('mapbox://styles/mapbox/streets-v11');
-    let map: mapboxgl.Map;
-    const markers: mapboxgl.Marker[] = [];
+const mapContainer = ref<HTMLElement | null>(null);
+const dataStore = useDataStore();
+const vendors = dataStore.data.nysfairWebsite.vendors;
+console.log('vendors', vendors);
 
-    const foodPlaces = [
-      {
-        name: "Tasty Treats",
-        types: ["hamburger", "pizza", "dessert"],
-        coordinates: [-76.2157, 43.073],
-        dietaryOptions: ["vegetarian"],
-        icon: '/icons/pig.png'
-      },
-      {
-        name: "Fair Favorites",
-        types: ["hotdog", "corndog", "fries"],
-        coordinates: [-76.2170, 43.0745],
-        dietaryOptions: ["gluten-free"],
-        icon: '/icons/fairgroundsl.png'
-      },
-      {
-        name: "Sweet & Savory",
-        types: ["ice cream", "popcorn", "nachos"],
-        coordinates: [-76.2140, 43.0720],
-        dietaryOptions: ["vegetarian", "gluten-free"],
-        icon: '/icons/pig.png'
-      },
-      {
-        name: "International Delights",
-        types: ["tacos", "sushi", "pasta"],
-        coordinates: [-76.2180, 43.0735],
-        dietaryOptions: ["vegetarian", "vegan", "gluten-free"],
-        icon: '/icons/fairgroundsl.png'
-      },
-      {
-        name: "Comfort Food Corner",
-        types: ["mac and cheese", "fried chicken", "BBQ"],
-        coordinates: [-76.2130, 43.0740],
-        dietaryOptions: [],
-        icon: '/icons/chicken-icon.png'
-      }
-    ];
 
-    const restrictions = ["vegetarian", "vegan", "gluten-free"];
 
-    const uniqueFoodTypes = computed(() => {
-      const types = new Set(foodPlaces.flatMap(place => place.types));
-      return Array.from(types).sort();
+const createVendorMarkerElement = () => {
+  const element = document.createElement('div');
+  const image = document.createElement('img');
+  image.src = '/icons/fairgroundsl.png';
+  image.style.width = '45px';
+  image.style.height = '45px';
+  element.appendChild(image);
+  return element;
+};
+
+onMounted(() => {
+  if (mapContainer.value) {
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWtldHRlbGthbXAiLCJhIjoiY2xhaXljbjZ3MDQ0NDN2bndzZnJrc3FxMyJ9.LEl_hT5f2QSxqw2LTf03lQ';
+    
+    const map = new mapboxgl.Map({
+      container: mapContainer.value,
+      style: 'mapbox://styles/mkettelkamp/cm4bsp0cm01fq01qr1xyd1woo',
+      bearing: 200,
+      center: [-76.2157, 43.073],
+      zoom: 15
     });
 
-    const createCustomMarkerElement = (iconPath: string) => {
+    map.addControl(new mapboxgl.NavigationControl());
+
+    // Create gate marker element
+    const createGateMarkerElement = () => {
       const element = document.createElement('div');
       const image = document.createElement('img');
-      image.src = iconPath;
-      image.style.width = '60px';
-      image.style.height = '60px';
+      image.src = '/icons/gates.png';
+      image.style.width = '45px';  // Smaller size for gate icon
+      image.style.height = '45px';
       element.appendChild(image);
       return element;
     };
 
-    const addMarker = (place: typeof foodPlaces[0]) => {
-      const element = createCustomMarkerElement(place.icon);
-      
-      const marker = new mapboxgl.Marker({
-        element: element,
-        anchor: 'bottom'
-      })
-        .setLngLat(place.coordinates as [number, number])
-        .setPopup(new mapboxgl.Popup().setHTML(`
-          <h3>${place.name}</h3>
-          <p>Offers: ${place.types.join(', ')}</p>
-          <p>Dietary options: ${place.dietaryOptions.length > 0 ? place.dietaryOptions.join(', ') : 'None'}</p>
-        `))
-        .addTo(map);
-      markers.push(marker);
-    };
+    map.on('load', () => {
+      // Get the features from the nysfair-data layer
+      const features = map.querySourceFeatures('composite', {
+        sourceLayer: 'NYSFair_Data'
+      });
 
-    const handleSearch = () => {
-      markers.forEach(marker => marker.remove());
-      markers.length = 0;
-
-      const filteredPlaces = foodPlaces.filter(place =>
-        (place.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        place.types.some(type => type.toLowerCase().includes(searchQuery.value.toLowerCase()))) &&
-        (selectedFoodType.value === '' || place.types.includes(selectedFoodType.value)) &&
-        (selectedDietaryRestriction.value === '' || place.dietaryOptions.includes(selectedDietaryRestriction.value))
+      // Find the gate feature (assuming it's the one with title "Front Gate")
+      const gateFeature = features.find(feature => 
+        feature.properties?.title === "Front Gate"
       );
+      console.log('gateFeature', gateFeature);
 
-      filteredPlaces.forEach(addMarker);
-    };
-
-    const changeMapStyle = () => {
-      map.setStyle(selectedMapStyle.value);
-    };
-
-    onMounted(() => {
-      if (mapContainer.value) {
-        mapboxgl.accessToken = 'pk.eyJ1IjoibWtldHRlbGthbXAiLCJhIjoiY2xhaXljbjZ3MDQ0NDN2bndzZnJrc3FxMyJ9.LEl_hT5f2QSxqw2LTf03lQ';
-        map = new mapboxgl.Map({
-          container: mapContainer.value,
-          style: selectedMapStyle.value,
-          bearing: 200,
-          center: [-76.2157, 43.073],
-          zoom: 15
-        });
-
-        map.addControl(new mapboxgl.NavigationControl());
-
-        foodPlaces.forEach(addMarker);
-
-        setTimeout(() => {
-          map.resize();
-        }, 100);
+      if (gateFeature?.geometry?.type === 'Point' && Array.isArray(gateFeature.geometry.coordinates)) {
+        const gateMarker = new mapboxgl.Marker({
+          element: createGateMarkerElement(),
+          anchor: 'center'
+        })
+          .setLngLat(gateFeature.geometry.coordinates as [number, number])
+          .addTo(map);
       }
+
+      // Add vendor markers
+      vendors.forEach((vendor: any) => {
+        if (vendor.latitude && vendor.longitude) {
+          const element = createVendorMarkerElement();
+          
+          new mapboxgl.Marker({
+            element: element,
+            anchor: 'center'
+          })
+            .setLngLat([parseFloat(vendor.longitude), parseFloat(vendor.latitude)])
+            .setPopup(
+              new mapboxgl.Popup().setHTML(`
+                <h3>${vendor.name}</h3>
+                ${vendor.description ? `<p>${vendor.description}</p>` : ''}
+              `)
+            )
+            .addTo(map);
+        }
+      });
     });
 
-    return {
-      mapContainer,
-      searchQuery,
-      selectedFoodType,
-      selectedDietaryRestriction,
-      selectedMapStyle,
-      uniqueFoodTypes,
-      restrictions,
-      handleSearch,
-      changeMapStyle
-    };
+    setTimeout(() => {
+      map.resize();
+    }, 100);
   }
 });
 </script>
 
 <style scoped lang="scss">
-
 .main {
-  height: calc(100vh - 56px); // Subtract header height
+  height: calc(100vh - 66px);
   display: flex;
   flex-direction: column;
-  
-  &__header {
-    padding: 30px;
+}
+.main__header {
+  &-top {
+    padding: 20px 30px;
     display: flex;
-    margin-bottom: 25px;
     justify-content: space-between;
+  }
+  
+  &-text {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+  }
 
-    &-text {
-      font-size: 24px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      color: #343434;
-      letter-spacing: 0.5px;
-      line-height: 28px;
-      margin: 0px;
-    }
-    &-sponsor {
-      display: flex;
-      align-items: center;
-      background-color: #cbcbcb4c;
-      border-radius: 5px;
-      padding: 5px 15px;
-      font-size: 24px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      color: #343434;
-      letter-spacing: 0.5px;
-      line-height: 28px;
-      margin: 0px;
-    }
+  &-sponsor {
+    background-color: #f1f1f1;
+    padding: 10px 20px;
+    line-height: 40px;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    border-radius: 5px;
   }
 }
 
-.header-card {
-  padding-bottom: 0px;
-  margin-bottom: 0px;
-
-  &__header {
-    padding-bottom: 0px;
+.search-container {
+  margin: 0 30px;
+  position: relative;
+  
+  .search-input {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 25px;
+    border: 1px solid #eee;
+    background-color: transparent;
+    font-size: 16px;
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
   }
 }
+
+.filter-tabs {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px 30px;
+  
+  .filter-tab {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: #333;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+}
+
 .ion-padding {
   height: 60%;
 }
-.map-section {
-  padding: 15px;
-}
+
 .map {
   width: 100%;
-  height: 50%;
-  padding: 15px;
+  height: 100%;
   border-radius: 10px;
 }
+
 .mapboxgl-canvas {
   width: 100%;
   height: 100%;
   border-radius: 30px;
 }
+
 :deep .mapboxgl-popup-content {
-  background-color: black;
-  padding: 10px;
+  background-color: white;
+  padding: 20px;
   border-radius: 8px;
+  max-height: 30vh;
+  overflow-y: auto;
+  
   h3 {
-    color: white;
+    color: black;
     margin-top: 0px;
     font-size: 18px;
+    text-align: center;
+    font-weight: 600;
   }
+  
   p {
-    color: white;
+    color: black;
   }
-  button {
-    margin: 5px;
+}
+:deep .gate-popup .mapboxgl-popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 300px;
+  
+  h3 {
+    color: black;
+    margin-top: 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    color: black;
+    margin: 0;
+    line-height: 1.4;
   }
 }
 </style>
