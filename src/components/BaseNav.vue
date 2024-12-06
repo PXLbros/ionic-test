@@ -5,11 +5,13 @@
     <ion-header>
       <ion-toolbar :style="{ '--background': toolbarBackground }">
         <div class="nav-container">
-          <img 
-            :src="logoSrc" 
-            :alt="logoAlt" 
-            class="header-side logo"
-          >
+          <router-link :to="`/${type}`">
+            <img 
+              :src="logoSrc" 
+              :alt="logoAlt" 
+              class="header-side logo"
+            >
+          </router-link>
           <img 
             src="/src/imgs/svg/menu.svg" 
             alt="menu-open" 
