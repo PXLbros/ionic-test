@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { useDataStore } from '@/stores/data';
 
-const API_URL = `${import.meta.env.VITE_STRAPI_API_URL}/data`;
+
+const API_URL = `${import.meta.env.VITE_STRAPI_API_URL}/data${import.meta.env.VITE_NODE_ENV === 'local' ? '?cache=0' : ''}`;
 const API_TOKEN = import.meta.env.VITE_STRAPI_API_TOKEN;
 
 export const fetchData = async () => {
@@ -23,6 +24,7 @@ export const fetchData = async () => {
           Authorization: `Bearer ${API_TOKEN}`
         }
       });
+      console.log('Response data:', response.data);
 
       data = response.data?.data;
 
@@ -31,9 +33,16 @@ export const fetchData = async () => {
       }
     }
 
-    const mobileAppData = data.strapi || null;
-    const nysfairWebsiteData = data.nysfairWebsite || null;
-    const nysfairgroundsWebsiteData = data.nysfairgroundsWebsite || null;
+    const mobileAppData = data.strapi?.error ? null : data.strapi?.data || null;
+    const nysfairWebsiteData = data.nysfairWebsite?.error ? null : data.nysfairWebsite?.data || null;
+    const nysfairgroundsWebsiteData = data.nysfairgroundsWebsite?.error ? null : data.nysfairgroundsWebsite?.data || null;
+
+    const errors = {
+      strapi: data.strapi?.error || null,
+      nysfairWebsite: data.nysfairWebsite?.error || null,
+      nysfairgroundsWebsite: data.nysfairgroundsWebsite?.error || null
+    };
+
 
     dataStore.setData({
       data: {
@@ -41,6 +50,7 @@ export const fetchData = async () => {
         nysfairWebsite: nysfairWebsiteData,
         nysfairgroundsWebsite: nysfairgroundsWebsiteData,
       },
+      errors
     });
   } catch (error) {
     console.error('Error fetching data:', error);

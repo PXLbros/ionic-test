@@ -1,9 +1,16 @@
 import { defineStore } from 'pinia';
 
+interface DataErrors {
+  strapi: string | null;
+  nysfairWebsite: string | null;
+  nysfairgroundsWebsite: string | null;
+}
+
 interface DataStoreState {
   isLoading: boolean;
   loadError: Error | null;
   data: any | null;
+  errors: DataErrors | null;
 }
 
 export const useDataStore = defineStore('data', {
@@ -11,6 +18,7 @@ export const useDataStore = defineStore('data', {
     isLoading: false,
     loadError: null,
     data: null,
+    errors: null,
   }),
 
   actions: {
@@ -26,8 +34,9 @@ export const useDataStore = defineStore('data', {
       this.loadError = error;
     },
 
-    setData({ data }: { data: any }) {
+    setData({ data, errors }: { data: any, errors: DataErrors }) {
       this.data = data;
+      this.errors = errors;
     },
   },
 });
