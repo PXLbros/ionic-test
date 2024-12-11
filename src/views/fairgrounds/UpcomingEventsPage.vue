@@ -49,10 +49,11 @@
         </div>
 
         <!-- Scrollable Dates only for List View -->
-        <div v-if="viewMode !== 'calendar'" class="date-scroll">
+        <div ref="dateScrollRef" class="date-scroll">
           <div 
-            v-for="date in dates" 
+            v-for="(date, index) in dates" 
             :key="date.toISOString()"
+            :ref="el => { if (isSameMonth(date, new Date())) currentMonthRef = el as HTMLElement }"
             class="date-item"
             :class="{ 'date-item--active': isSameMonth(date, selectedDate) }"
             @click="handleDateSelect(date)"
@@ -140,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import { format, isSameMonth, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from 'date-fns';
@@ -227,13 +228,52 @@ const dataStore = useDataStore();
 const selectedDate = ref(new Date());
 const searchQuery = ref('');
 const viewMode = ref<'list' | 'calendar'>('list');
+const dateScrollRef = ref<HTMLElement | null>(null);
+const currentMonthRef = ref<HTMLElement | null>(null);
+
+onMounted(async () => {
+  // Wait for the next DOM update
+  await nextTick();
+  
+  const scrollContainer = dateScrollRef.value;
+  const currentElement = currentMonthRef.value;
+  
+  if (scrollContainer && currentElement) {
+    // Get the current scroll container's dimensions
+    const containerWidth = scrollContainer.offsetWidth;
+    
+    // Calculate scroll position
+    const elementLeft = currentElement.offsetLeft;
+    const elementWidth = currentElement.offsetWidth;
+    
+    // Calculate position that will center the current month
+    const scrollPosition = Math.max(0, elementLeft - (containerWidth / 2) + (elementWidth / 2));
+    
+    // Scroll to position
+    scrollContainer.scrollTo({
+      left: scrollPosition,
+      behavior: 'instant' // Use 'instant' initially to prevent visible scrolling on load
+    });
+  }
+});
+
 
 // Generate next 12 months for the date scroll
 const dates = computed(() => {
   const months: Date[] = [];
   const currentDate = new Date();
   
-  for (let i = 0; i < 12; i++) {
+  // Add past 12 months
+  for (let i = -12; i < 0; i++) {
+    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+    months.push(date);
+  }
+  
+  // Add current month
+  months.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+  
+  // Add future 12 months
+  for (let i = 1; i <= 12; i++) {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
     months.push(date);
   }
@@ -331,9 +371,18 @@ const toggleView = () => {
 };
 
 const navigateMonth = (direction: number) => {
-  selectedDate.value = direction > 0 
+  const newDate = direction > 0 
     ? addMonths(selectedDate.value, 1)
     : subMonths(selectedDate.value, 1);
+    
+  // Check if the new date is within bounds
+  const currentDate = new Date();
+  const minDate = subMonths(currentDate, 12);
+  const maxDate = addMonths(currentDate, 12);
+  
+  if (newDate >= minDate && newDate <= maxDate) {
+    selectedDate.value = newDate;
+  }
 };
 
 
@@ -423,6 +472,7 @@ const getEventImage = (event: Event): string => {
     gap: 10px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    scroll-behavior: smooth;
     &::-webkit-scrollbar {
       display: none;
     }
