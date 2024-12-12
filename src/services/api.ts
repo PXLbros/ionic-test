@@ -19,11 +19,7 @@ export const fetchData = async () => {
     if (useFakeData) {
       data = getFakeData();
     } else {
-      const response = await axios.get(API_URL, {
-        headers: {
-          Authorization: `Bearer ${API_TOKEN}`
-        }
-      });
+      const response = await axios.get(API_URL);
 
       console.log('Response data:', response.data);
 
