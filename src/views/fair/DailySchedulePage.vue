@@ -264,7 +264,7 @@ const toggleSection = (): void => {
     &__day {
         font-size: 14px;
         margin-bottom: 5px;
-        font-weight: 500;
+        font-weight: 600;
     }
 
     &__date {
@@ -313,7 +313,7 @@ const toggleSection = (): void => {
                 font-size: 14px;
                 color: #666;
                 margin: 0;
-                font-weight: 500;
+                font-weight: 600;
             }
         }
     }

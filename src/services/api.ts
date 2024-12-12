@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useDataStore } from '@/stores/data';
 
 
-const API_URL = `${import.meta.env.VITE_STRAPI_API_URL}/data${import.meta.env.VITE_NODE_ENV === 'local' ? '?cache=0' : ''}`;
+const API_URL = `${import.meta.env.VITE_STRAPI_API_URL}/data?force-recache=1`
 const API_TOKEN = import.meta.env.VITE_STRAPI_API_TOKEN;
 
 export const fetchData = async () => {
@@ -19,11 +19,7 @@ export const fetchData = async () => {
     if (useFakeData) {
       data = getFakeData();
     } else {
-      const response = await axios.get(API_URL, {
-        headers: {
-          Authorization: `Bearer ${API_TOKEN}`
-        }
-      });
+      const response = await axios.get(API_URL);
       console.log('Response data:', response.data);
 
       data = response.data?.data;
