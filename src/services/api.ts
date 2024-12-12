@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useDataStore } from '@/stores/data';
-
+import * as Sentry from '@sentry/capacitor';
 
 const API_URL = `${import.meta.env.VITE_STRAPI_API_URL}/data${import.meta.env.VITE_NODE_ENV === 'local' ? '?cache=0' : ''}`;
 const API_TOKEN = import.meta.env.VITE_STRAPI_API_TOKEN;
@@ -24,6 +24,7 @@ export const fetchData = async () => {
           Authorization: `Bearer ${API_TOKEN}`
         }
       });
+
       console.log('Response data:', response.data);
 
       data = response.data?.data;
@@ -56,6 +57,11 @@ export const fetchData = async () => {
     console.error('Error fetching data:', error);
 
     dataStore.setLoadError({ error });
+
+    // Report error to Sentry
+    if (Sentry && typeof Sentry.captureException === 'function') {
+      Sentry.captureException(error);
+    }
   } finally {
     dataStore.hideLoader();
   }
