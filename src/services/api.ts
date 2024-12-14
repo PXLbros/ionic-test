@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useDataStore } from '@/stores/data';
 import * as Sentry from '@sentry/capacitor';
+import { Preferences } from '@capacitor/preferences';
 
 const API_URL = `${import.meta.env.VITE_STRAPI_API_URL}/data${import.meta.env.VITE_NODE_ENV === 'local' ? '?cache=0' : ''}`;
 const API_TOKEN = import.meta.env.VITE_STRAPI_API_TOKEN;
@@ -39,7 +40,6 @@ export const fetchData = async () => {
       nysfairWebsite: data.nysfairWebsite?.error || null,
       nysfairgroundsWebsite: data.nysfairgroundsWebsite?.error || null
     };
-
 
     dataStore.setData({
       data: {
@@ -186,3 +186,19 @@ const getFakeData = () => {
     },
   };
 };
+
+// const formatNYSFairWebsiteData = async (data: any) => {
+//   const { value } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+
+//   // console.log('getFavoriteEvents', value);
+
+//   if (data.events) {
+//     data.events = data.events.map((event: any) => {
+//       event.isFavorite = false;
+
+//       return event;
+//     });
+//   }
+
+//   return data;
+// };

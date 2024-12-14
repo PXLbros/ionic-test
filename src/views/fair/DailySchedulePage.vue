@@ -26,8 +26,8 @@
                 <!-- Simple Date Selector -->
                 <div v-if="dates" class="date-selector">
                     <div class="date-selector__container">
-                        <button 
-                            v-for="(date, index) in dates" 
+                        <button
+                            v-for="(date, index) in dates"
                             :key="index"
                             class="date-card"
                             :class="{ 'date-card--active': selectedDateIndex === index }"
@@ -43,17 +43,22 @@
                 <div class="schedule-content">
                     <div class="section-title" @click="toggleSection">
                         <h2>Grounds Entertainment</h2>
-                        <ion-icon 
+                        <ion-icon
                             :icon="isSectionOpen ? chevronUp : chevronDown"
                             class="section-icon"
                             :class="{ 'section-icon--open': isSectionOpen }"
                         ></ion-icon>
                     </div>
-                    
+
                     <div class="events-list" v-show="isSectionOpen">
                         <div v-for="event in filteredEvents" :key="event.id" class="event-item">
                             <h3>{{ event.title || "Event Title" }}</h3>
                             <p>{{ event.start_time || "Event Start Time" }}</p>
+
+                            event.isFavorite: {{ event.isFavorite }}
+
+                            <a v-if="event.isFavorite">Remove From Favorites</a>
+                            <a v-else @click="addEventToFavorites(event)">Add To Favorites</a>
                         </div>
                     </div>
                 </div>
@@ -67,9 +72,13 @@ import { ref, computed } from 'vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon } from '@ionic/vue';
 import { chevronDown, chevronUp } from 'ionicons/icons';
 import { useDataStore } from '@/stores/data';
+import { Preferences } from '@capacitor/preferences';
 
 const dataStore = useDataStore();
-const eventsData = dataStore.data.nysfairWebsite.events as Event[];
+const eventsData = reactive(dataStore.data.nysfairWebsite.events.map(event => ({
+  ...event,
+  isFavorite: event.isFavorite ?? false,
+})));
 
 console.log('events data', eventsData);
 
@@ -90,6 +99,7 @@ interface Event {
     created_at: string;
     featured_image: string;
     venue: Venue;
+    isFavorite?: boolean;
 }
 
 interface DateObject {
@@ -100,7 +110,7 @@ interface DateObject {
 }
 
 // In your script section:
-const dates = ref<DateObject[]>([]);
+// const dates = ref<DateObject[]>([]);
 const selectedDateIndex = ref(0);
 const isSectionOpen = ref(true);
 
@@ -110,49 +120,42 @@ const convertToEastern = (unixTimestamp: number): Date => {
     return new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
 };
 
-// Process the events data
-const processEvents = (): void => {
-    // Sort events by unix timestamp
-    const sortedEvents = [...eventsData].sort((a, b) => 
-        a.start_time_unix - b.start_time_unix
-    );
+const dates = computed(() => {
+    if (!eventsData || !eventsData.length) return [];
 
-    // Extract unique dates using unix timestamps with Eastern timezone
+    // Sort events by start_time_unix
+    const sortedEvents = [...eventsData].sort((a, b) => a.start_time_unix - b.start_time_unix);
+
+    // Extract unique dates
     const uniqueDates = [...new Set(sortedEvents.map(event => {
         const date = convertToEastern(event.start_time_unix);
-        return date.toLocaleDateString('en-US', { 
-            weekday: 'short',    // Add weekday
-            month: 'short', 
-            day: 'numeric' 
-        });
+        return date.toDateString(); // Unique date string
     }))];
 
-    // Create formatted date objects
-    dates.value = uniqueDates.map((dateStr, index) => {
-        const event = sortedEvents.find(event => {
-            const eventDate = convertToEastern(event.start_time_unix);
-            return dateStr === eventDate.toLocaleDateString('en-US', { 
-                weekday: 'short',    // Add weekday
-                month: 'short', 
-                day: 'numeric' 
-            });
+    // Create date objects
+    return uniqueDates.map((dateStr, index) => {
+        const matchingEvent = sortedEvents.find(event => {
+            const eventDate = convertToEastern(event.start_time_unix).toDateString();
+            return eventDate === dateStr;
         });
 
         return {
-            dayName: dateStr,  // This will now include the weekday
+            dayName: new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short' }), // Day name
             day: index + 1,
-            fullDate: convertToEastern(event!.start_time_unix),
-            timestamp: event!.start_time_unix
+            fullDate: matchingEvent ? convertToEastern(matchingEvent.start_time_unix) : new Date(dateStr),
+            timestamp: matchingEvent ? matchingEvent.start_time_unix : 0
         };
     });
-};
+});
 
 // Update the filteredEvents computed property
 const filteredEvents = computed(() => {
+  console.log('filteredEvents calculation.......');
+
     if (!dates.value.length) return [];
-    
+
     const selectedDate = dates.value[selectedDateIndex.value];
-    
+
     return eventsData
         .filter(event => {
             const eventDate = convertToEastern(event.start_time_unix);
@@ -171,7 +174,7 @@ const filteredEvents = computed(() => {
 });
 
 // Call the processEvents function
-processEvents();
+// processEvents();
 
 const selectDate = (index: number): void => {
     selectedDateIndex.value = index;
@@ -180,12 +183,42 @@ const selectDate = (index: number): void => {
 const toggleSection = (): void => {
     isSectionOpen.value = !isSectionOpen.value;
 };
+
+const addEventToFavorites = async (event: Event): Promise<void> => {
+  // Get current favorites
+  let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+
+  if (!favoriteNYSFairEventIds) {
+    favoriteNYSFairEventIds = '[]';
+  }
+
+  // Parse the favorites as an array of strings
+  const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
+
+  // Add the event ID to the favorites if it's not already included
+  if (!favoriteIdsArray.includes(event.id)) {
+    favoriteIdsArray.push(event.id);
+  }
+
+  // // Save the updated favorites back to preferences
+  // await Preferences.set({
+  //   key: 'favoriteNYSFairEvents',
+  //   value: JSON.stringify(favoriteIdsArray)
+  // });
+
+  // Update the reactive array
+  const index = eventsData.findIndex(e => e.id === event.id);
+
+  if (index !== -1) {
+    eventsData[index] = { ...eventsData[index], isFavorite: true };
+  }
+};
 </script>
 
 <style lang="scss" scoped>
 .main {
     font-family: "Inter", sans-serif;
-    
+
     &__header {
         padding: 25px;
         display: flex;
@@ -319,7 +352,7 @@ const toggleSection = (): void => {
     }
 }
 
-// hide the scrollbar 
+// hide the scrollbar
 .date-selector::-webkit-scrollbar {
     display: none;
 }
