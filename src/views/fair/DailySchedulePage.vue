@@ -139,7 +139,7 @@ const dates = computed<DateObject[]>(() => {
         });
 
         return {
-            dayName: new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short' }), // Day name
+            dayName: new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
             day: index + 1,
             fullDate: matchingEvent ? convertToEastern(matchingEvent.start_time_unix) : new Date(dateStr),
             timestamp: matchingEvent ? matchingEvent.start_time_unix : 0
