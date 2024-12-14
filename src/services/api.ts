@@ -32,7 +32,7 @@ export const fetchData = async () => {
     }
 
     const mobileAppData = data.strapi?.error ? null : data.strapi?.data || null;
-    const nysfairWebsiteData = data.nysfairWebsite?.error ? null : data.nysfairWebsite?.data || null;
+    const nysfairWebsiteData = data.nysfairWebsite?.error ? null : await formatNYSFairWebsiteData(data.nysfairWebsite?.data) || null;
     const nysfairgroundsWebsiteData = data.nysfairgroundsWebsite?.error ? null : data.nysfairgroundsWebsite?.data || null;
 
     const errors = {
@@ -187,18 +187,22 @@ const getFakeData = () => {
   };
 };
 
-// const formatNYSFairWebsiteData = async (data: any) => {
-//   const { value } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+const formatNYSFairWebsiteData = async (data: any) => {
+  let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
 
-//   // console.log('getFavoriteEvents', value);
+  if (!favoriteNYSFairEventIds) {
+    favoriteNYSFairEventIds = '[]';
+  }
 
-//   if (data.events) {
-//     data.events = data.events.map((event: any) => {
-//       event.isFavorite = false;
+  favoriteNYSFairEventIds = favoriteNYSFairEventIds ? JSON.parse(favoriteNYSFairEventIds) : [];
 
-//       return event;
-//     });
-//   }
+  if (data.events) {
+    data.events = data.events.map((event: any) => {
+      event.isFavorite = favoriteNYSFairEventIds?.includes(event.id);
 
-//   return data;
-// };
+      return event;
+    });
+  }
+
+  return data;
+};

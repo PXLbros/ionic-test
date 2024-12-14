@@ -55,10 +55,13 @@
                             <h3>{{ event.title || "Event Title" }}</h3>
                             <p>{{ event.start_time || "Event Start Time" }}</p>
 
-                            event.isFavorite: {{ event.isFavorite }}
+                            <a v-if="event.isFavorite" @click="removeEventFromFavorites(event)">
+                              {{ event.isRemovingFromFavorites ? 'Removing From Favorites...' : 'Remove From Favorites' }}
+                            </a>
 
-                            <a v-if="event.isFavorite">Remove From Favorites</a>
-                            <a v-else @click="addEventToFavorites(event)">Add To Favorites</a>
+                            <a v-else @click="addEventToFavorites(event)">
+                              {{ event.isAddingToFavorites ? 'Adding To Favorites...' : 'Add To Favorites' }}
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -75,10 +78,7 @@ import { useDataStore } from '@/stores/data';
 import { Preferences } from '@capacitor/preferences';
 
 const dataStore = useDataStore();
-const eventsData = reactive(dataStore.data.nysfairWebsite.events.map(event => ({
-  ...event,
-  isFavorite: event.isFavorite ?? false,
-})));
+const eventsData: Event[] = dataStore.data.nysfairWebsite.events ?? [];
 
 console.log('events data', eventsData);
 
@@ -100,6 +100,8 @@ interface Event {
     featured_image: string;
     venue: Venue;
     isFavorite?: boolean;
+    isAddingToFavorites? : boolean;
+    isRemovingFromFavorites? : boolean;
 }
 
 interface DateObject {
@@ -109,18 +111,15 @@ interface DateObject {
     timestamp: number;
 }
 
-// In your script section:
-// const dates = ref<DateObject[]>([]);
 const selectedDateIndex = ref(0);
 const isSectionOpen = ref(true);
 
-// Add this helper function to handle timezone conversion
 const convertToEastern = (unixTimestamp: number): Date => {
     const date = new Date(unixTimestamp * 1000);
     return new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
 };
 
-const dates = computed(() => {
+const dates = computed<DateObject[]>(() => {
     if (!eventsData || !eventsData.length) return [];
 
     // Sort events by start_time_unix
@@ -150,8 +149,6 @@ const dates = computed(() => {
 
 // Update the filteredEvents computed property
 const filteredEvents = computed(() => {
-  console.log('filteredEvents calculation.......');
-
     if (!dates.value.length) return [];
 
     const selectedDate = dates.value[selectedDateIndex.value];
@@ -173,9 +170,6 @@ const filteredEvents = computed(() => {
         }));
 });
 
-// Call the processEvents function
-// processEvents();
-
 const selectDate = (index: number): void => {
     selectedDateIndex.value = index;
 };
@@ -185,6 +179,27 @@ const toggleSection = (): void => {
 };
 
 const addEventToFavorites = async (event: Event): Promise<void> => {
+  if (event.isFavorite === true) {
+    console.warn('Event is already a favorite');
+
+    return;
+  }
+
+  // Update the reactive array
+  const eventIndex = eventsData.findIndex(eventsDataEvent => eventsDataEvent.id === event.id);
+
+  if (eventIndex === -1) {
+    console.warn('Event not found in data');
+
+    return;
+  }
+
+  // set isAddingToFavorites to true
+  eventsData[eventIndex].isAddingToFavorites = true;
+
+  // Sleep for a bit to simulate loading
+  await new Promise(resolve => setTimeout(resolve, 250));
+
   // Get current favorites
   let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
 
@@ -200,18 +215,60 @@ const addEventToFavorites = async (event: Event): Promise<void> => {
     favoriteIdsArray.push(event.id);
   }
 
-  // // Save the updated favorites back to preferences
-  // await Preferences.set({
-  //   key: 'favoriteNYSFairEvents',
-  //   value: JSON.stringify(favoriteIdsArray)
-  // });
+  // Save the updated favorites back to preferences
+  await Preferences.set({
+    key: 'favoriteNYSFairEvents',
+    value: JSON.stringify(favoriteIdsArray)
+  });
+
+  eventsData[eventIndex].isFavorite = true;
+};
+
+const removeEventFromFavorites = async (event: Event): Promise<void> => {
+  if (event.isFavorite !== true) {
+    console.warn('Event is not a favorite');
+
+    return;
+  }
+
+  const eventIndexInData = eventsData.findIndex(eventsDataEvent => eventsDataEvent.id === event.id);
+
+  if (eventIndexInData === -1) {
+    console.warn('Event not found in data');
+
+    return;
+  }
+
+  eventsData[eventIndexInData].isRemovingFromFavorites = true;
+
+  // Sleep for a bit to simulate loading
+  await new Promise(resolve => setTimeout(resolve, 250));
+
+  // Get current favorites
+  let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+
+  if (!favoriteNYSFairEventIds) {
+    favoriteNYSFairEventIds = '[]';
+  }
+
+  // Parse the favorites as an array of strings
+  const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
+
+  // Remove the event ID from the favorites if it's included
+  const eventIndex = favoriteIdsArray.findIndex(favoriteId => favoriteId === event.id);
+
+  if (eventIndex !== -1) {
+    favoriteIdsArray.splice(eventIndex, 1);
+  }
+
+  // Save the updated favorites back to preferences
+  await Preferences.set({
+    key: 'favoriteNYSFairEvents',
+    value: JSON.stringify(favoriteIdsArray)
+  });
 
   // Update the reactive array
-  const index = eventsData.findIndex(e => e.id === event.id);
-
-  if (index !== -1) {
-    eventsData[index] = { ...eventsData[index], isFavorite: true };
-  }
+  eventsData[eventIndexInData].isFavorite = false;
 };
 </script>
 
