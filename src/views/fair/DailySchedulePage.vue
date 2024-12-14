@@ -107,7 +107,7 @@ interface Event {
 interface DateObject {
     dayName: string;
     day: number;
-    fullDate: Date;
+    // fullDate: Date;
     timestamp: number;
 }
 
@@ -141,7 +141,7 @@ const dates = computed<DateObject[]>(() => {
         return {
             dayName: new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
             day: index + 1,
-            fullDate: matchingEvent ? convertToEastern(matchingEvent.start_time_unix) : new Date(dateStr),
+            // fullDate: matchingEvent ? convertToEastern(matchingEvent.start_time_unix) : new Date(dateStr),
             timestamp: matchingEvent ? matchingEvent.start_time_unix : 0
         };
     });
