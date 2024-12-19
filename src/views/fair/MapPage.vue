@@ -73,9 +73,9 @@ onMounted(() => {
     const map = new mapboxgl.Map({
       container: mapContainer.value,
       style: 'mapbox://styles/mkettelkamp/cm4bsp0cm01fq01qr1xyd1woo',
-      bearing: 200,
-      center: [-76.2157, 43.073],
-      zoom: 15
+      bearing: 222,
+      center: [-76.2197, 43.073],
+      zoom: 14
     });
 
     map.addControl(new mapboxgl.NavigationControl());
@@ -85,6 +85,17 @@ onMounted(() => {
       const element = document.createElement('div');
       const image = document.createElement('img');
       image.src = '/icons/gates.png';
+      image.style.width = '45px';  // Smaller size for gate icon
+      image.style.height = '45px';
+      element.appendChild(image);
+      return element;
+    };
+
+    // Create gate marker element
+    const createStageMarkerElement = () => {
+      const element = document.createElement('div');
+      const image = document.createElement('img');
+      image.src = '/icons/nysf-stage.png';
       image.style.width = '45px';  // Smaller size for gate icon
       image.style.height = '45px';
       element.appendChild(image);
@@ -111,6 +122,27 @@ onMounted(() => {
           .setLngLat(gateFeature.geometry.coordinates as [number, number])
           .addTo(map);
       }
+
+      // Add stage feature just through normal coordinates
+      const stageFeature = {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [-76.2157, 43.073]
+        },
+        properties: {
+          title: 'Chevy Court'
+        }
+      };
+
+      const stageMarker = new mapboxgl.Marker({
+        element: createStageMarkerElement(),
+        anchor: 'center'
+      })
+        .setLngLat(stageFeature.geometry.coordinates as [number, number])
+        .addTo(map);
+
+
 
       // Add vendor markers
       vendors.forEach((vendor: any) => {
