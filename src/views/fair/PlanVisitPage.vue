@@ -74,7 +74,6 @@ import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBa
     &__content {
         padding: 30px;
 
-        margin-bottom: 32px;
         flex-grow: 1;
 
         h1 {
@@ -100,6 +99,7 @@ import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBa
         flex-direction: column;
         background-color: #EFF2F6;
         overflow: hidden;
+        margin-bottom: 5px;
     }
 
     .link-item {

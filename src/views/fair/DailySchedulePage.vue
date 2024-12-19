@@ -11,6 +11,7 @@
             </ion-header>
 
             <div class="main">
+                <!-- Previous header content remains the same -->
                 <div class="main__header">
                     <div class="main__header-img">
                         <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
@@ -23,7 +24,7 @@
                     </div>
                 </div>
 
-                <!-- Simple Date Selector -->
+                <!-- Date selector remains the same -->
                 <div v-if="dates" class="date-selector">
                     <div class="date-selector__container">
                         <button
@@ -39,7 +40,7 @@
                     </div>
                 </div>
 
-                <!-- Schedule Content -->
+                <!-- Schedule content with modified favorite button -->
                 <div class="schedule-content">
                     <div class="section-title" @click="toggleSection">
                         <h2>Grounds Entertainment</h2>
@@ -52,16 +53,24 @@
 
                     <div class="events-list" v-show="isSectionOpen">
                         <div v-for="event in filteredEvents" :key="event.id" class="event-item">
-                            <h3>{{ event.title || "Event Title" }}</h3>
-                            <p>{{ event.start_time || "Event Start Time" }}</p>
-
-                            <a v-if="event.isFavorite" @click="removeEventFromFavorites(event)">
-                              {{ event.isRemovingFromFavorites ? 'Removing From Favorites...' : 'Remove From Favorites' }}
-                            </a>
-
-                            <a v-else @click="addEventToFavorites(event)">
-                              {{ event.isAddingToFavorites ? 'Adding To Favorites...' : 'Add To Favorites' }}
-                            </a>
+                            <div class="content">
+                                <h3>{{ event.title || "Event Title" }}</h3>
+                                <p>{{ event.start_time || "Event Start Time" }}</p>
+                            </div>
+                                
+                            <div class="favorite">
+                                <button 
+                                    class="favorite-button"
+                                    :class="{ 'is-favorite': event.isFavorite }"
+                                    @click="event.isFavorite ? removeEventFromFavorites(event) : addEventToFavorites(event)"
+                                    :disabled="event.isAddingToFavorites || event.isRemovingFromFavorites"
+                                >
+                                    <ion-icon 
+                                        :icon="event.isFavorite ? heart : heartOutline"
+                                        :class="{ 'loading': event.isAddingToFavorites || event.isRemovingFromFavorites }"
+                                    ></ion-icon>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -73,7 +82,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon } from '@ionic/vue';
-import { chevronDown, chevronUp } from 'ionicons/icons';
+import { chevronDown, chevronUp, heart, heartOutline } from 'ionicons/icons';
 import { useDataStore } from '@/stores/data';
 import { Preferences } from '@capacitor/preferences';
 
@@ -181,7 +190,6 @@ const toggleSection = (): void => {
 const addEventToFavorites = async (event: Event): Promise<void> => {
   if (event.isFavorite === true) {
     console.warn('Event is already a favorite');
-
     return;
   }
 
@@ -190,44 +198,47 @@ const addEventToFavorites = async (event: Event): Promise<void> => {
 
   if (eventIndex === -1) {
     console.warn('Event not found in data');
-
     return;
   }
 
   // set isAddingToFavorites to true
   eventsData[eventIndex].isAddingToFavorites = true;
 
-  // Sleep for a bit to simulate loading
-  await new Promise(resolve => setTimeout(resolve, 250));
+  try {
+    // Sleep for a bit to simulate loading
+    await new Promise(resolve => setTimeout(resolve, 250));
 
-  // Get current favorites
-  let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+    // Get current favorites
+    let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
 
-  if (!favoriteNYSFairEventIds) {
-    favoriteNYSFairEventIds = '[]';
+    if (!favoriteNYSFairEventIds) {
+      favoriteNYSFairEventIds = '[]';
+    }
+
+    // Parse the favorites as an array of strings
+    const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
+
+    // Add the event ID to the favorites if it's not already included
+    if (!favoriteIdsArray.includes(event.id)) {
+      favoriteIdsArray.push(event.id);
+    }
+
+    // Save the updated favorites back to preferences
+    await Preferences.set({
+      key: 'favoriteNYSFairEvents',
+      value: JSON.stringify(favoriteIdsArray)
+    });
+
+    eventsData[eventIndex].isFavorite = true;
+  } finally {
+    // Reset loading state regardless of success or failure
+    eventsData[eventIndex].isAddingToFavorites = false;
   }
-
-  // Parse the favorites as an array of strings
-  const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
-
-  // Add the event ID to the favorites if it's not already included
-  if (!favoriteIdsArray.includes(event.id)) {
-    favoriteIdsArray.push(event.id);
-  }
-
-  // Save the updated favorites back to preferences
-  await Preferences.set({
-    key: 'favoriteNYSFairEvents',
-    value: JSON.stringify(favoriteIdsArray)
-  });
-
-  eventsData[eventIndex].isFavorite = true;
 };
 
 const removeEventFromFavorites = async (event: Event): Promise<void> => {
   if (event.isFavorite !== true) {
     console.warn('Event is not a favorite');
-
     return;
   }
 
@@ -235,40 +246,44 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
 
   if (eventIndexInData === -1) {
     console.warn('Event not found in data');
-
     return;
   }
 
   eventsData[eventIndexInData].isRemovingFromFavorites = true;
 
-  // Sleep for a bit to simulate loading
-  await new Promise(resolve => setTimeout(resolve, 250));
+  try {
+    // Sleep for a bit to simulate loading
+    await new Promise(resolve => setTimeout(resolve, 250));
 
-  // Get current favorites
-  let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+    // Get current favorites
+    let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
 
-  if (!favoriteNYSFairEventIds) {
-    favoriteNYSFairEventIds = '[]';
+    if (!favoriteNYSFairEventIds) {
+      favoriteNYSFairEventIds = '[]';
+    }
+
+    // Parse the favorites as an array of strings
+    const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
+
+    // Remove the event ID from the favorites if it's included
+    const eventIndex = favoriteIdsArray.findIndex(favoriteId => favoriteId === event.id);
+
+    if (eventIndex !== -1) {
+      favoriteIdsArray.splice(eventIndex, 1);
+    }
+
+    // Save the updated favorites back to preferences
+    await Preferences.set({
+      key: 'favoriteNYSFairEvents',
+      value: JSON.stringify(favoriteIdsArray)
+    });
+
+    // Update the reactive array
+    eventsData[eventIndexInData].isFavorite = false;
+  } finally {
+    // Reset loading state regardless of success or failure
+    eventsData[eventIndexInData].isRemovingFromFavorites = false;
   }
-
-  // Parse the favorites as an array of strings
-  const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
-
-  // Remove the event ID from the favorites if it's included
-  const eventIndex = favoriteIdsArray.findIndex(favoriteId => favoriteId === event.id);
-
-  if (eventIndex !== -1) {
-    favoriteIdsArray.splice(eventIndex, 1);
-  }
-
-  // Save the updated favorites back to preferences
-  await Preferences.set({
-    key: 'favoriteNYSFairEvents',
-    value: JSON.stringify(favoriteIdsArray)
-  });
-
-  // Update the reactive array
-  eventsData[eventIndexInData].isFavorite = false;
 };
 </script>
 
@@ -393,6 +408,8 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
         .event-item {
             padding: 15px 0;
             border-bottom: 1px solid #EFF2F6;
+            display: flex; 
+            justify-content: space-between;
 
             h3 {
                 font-size: 16px;
@@ -405,7 +422,61 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
                 margin: 0;
                 font-weight: 500;
             }
+            .favorite {
+                margin-top: 10px;
+            }
         }
+    }
+}
+
+.favorite {
+
+    .favorite-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+
+        &:active {
+            transform: scale(0.95);
+        }
+
+        &.is-favorite {
+            ion-icon {
+                color: #e31b23;
+                fill: #e31b23;
+            }
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        ion-icon {
+            font-size: 24px;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .loading {
+            animation: pulse 1s infinite;
+        }
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
     }
 }
 
