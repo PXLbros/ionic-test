@@ -102,15 +102,17 @@ interface Event {
     title: string;
     description: string;
     permalink: string;
-    start_time: string;
-    start_time_unix: number;
+    dates: {
+        start_time_date: string;
+        start_time_unix: number;
+    }[];
     duration: number;
     created_at: string;
     featured_image: string;
     venue: Venue;
     isFavorite?: boolean;
-    isAddingToFavorites? : boolean;
-    isRemovingFromFavorites? : boolean;
+    isAddingToFavorites?: boolean;
+    isRemovingFromFavorites?: boolean;
 }
 
 interface DateObject {
@@ -128,30 +130,40 @@ const convertToEastern = (unixTimestamp: number): Date => {
     return new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
 };
 
+
 const dates = computed<DateObject[]>(() => {
     if (!eventsData || !eventsData.length) return [];
 
-    // Sort events by start_time_unix
-    const sortedEvents = [...eventsData].sort((a, b) => a.start_time_unix - b.start_time_unix);
+    // Map events to their dates, considering the new data structure
+    const allDates = eventsData.flatMap(event => 
+        event.dates.map(date => ({
+            timestamp: date.start_time_unix,
+            originalDate: date.start_time_date
+        }))
+    );
 
-    // Extract unique dates
-    const uniqueDates = [...new Set(sortedEvents.map(event => {
-        const date = convertToEastern(event.start_time_unix);
-        return date.toDateString(); // Unique date string
-    }))];
+    // Sort dates by timestamp
+    const sortedDates = [...allDates].sort((a, b) => a.timestamp - b.timestamp);
+
+    // Get unique dates by converting timestamps to date strings
+    const uniqueDates = [...new Set(sortedDates.map(date => 
+        convertToEastern(date.timestamp).toDateString()
+    ))];
 
     // Create date objects
     return uniqueDates.map((dateStr, index) => {
-        const matchingEvent = sortedEvents.find(event => {
-            const eventDate = convertToEastern(event.start_time_unix).toDateString();
-            return eventDate === dateStr;
-        });
+        const matchingDate = sortedDates.find(date => 
+            convertToEastern(date.timestamp).toDateString() === dateStr
+        );
 
         return {
-            dayName: new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+            dayName: new Date(dateStr).toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric' 
+            }),
             day: index + 1,
-            // fullDate: matchingEvent ? convertToEastern(matchingEvent.start_time_unix) : new Date(dateStr),
-            timestamp: matchingEvent ? matchingEvent.start_time_unix : 0
+            timestamp: matchingDate ? matchingDate.timestamp : 0
         };
     });
 });
@@ -161,22 +173,35 @@ const filteredEvents = computed(() => {
     if (!dates.value.length) return [];
 
     const selectedDate = dates.value[selectedDateIndex.value];
+    const selectedDateStr = convertToEastern(selectedDate.timestamp).toDateString();
 
     return eventsData
-        .filter(event => {
-            const eventDate = convertToEastern(event.start_time_unix);
-            const selectedDateTime = convertToEastern(selectedDate.timestamp);
-            return eventDate.toDateString() === selectedDateTime.toDateString();
+        .filter(event => 
+            event.dates.some(date => 
+                convertToEastern(date.start_time_unix).toDateString() === selectedDateStr
+            )
+        )
+        .map(event => {
+            // Find the matching date for this event
+            const matchingDate = event.dates.find(date => 
+                convertToEastern(date.start_time_unix).toDateString() === selectedDateStr
+            );
+
+            return {
+                ...event,
+                start_time: matchingDate ? convertToEastern(matchingDate.start_time_unix)
+                    .toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                    }) : 'Time TBD'
+            };
         })
-        .sort((a, b) => a.start_time_unix - b.start_time_unix) // Sort by timestamp ascending
-        .map(event => ({
-            ...event,
-            start_time: convertToEastern(event.start_time_unix).toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true
-            })
-        }));
+        .sort((a, b) => {
+            const aDate = a.dates[0].start_time_unix;
+            const bDate = b.dates[0].start_time_unix;
+            return aDate - bDate;
+        });
 });
 
 const selectDate = (index: number): void => {
@@ -410,6 +435,7 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
             border-bottom: 1px solid #EFF2F6;
             display: flex; 
             justify-content: space-between;
+            gap: 20px;
 
             h3 {
                 font-size: 16px;
