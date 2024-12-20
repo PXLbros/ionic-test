@@ -11,7 +11,6 @@
             </ion-header>
 
             <div class="main">
-                <!-- Previous header content remains the same -->
                 <div class="main__header">
                     <div class="main__header-img">
                         <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
@@ -24,7 +23,6 @@
                     </div>
                 </div>
 
-                <!-- Date selector remains the same -->
                 <div v-if="dates" class="date-selector">
                     <div class="date-selector__container">
                         <button
@@ -40,36 +38,43 @@
                     </div>
                 </div>
 
-                <!-- Schedule content with modified favorite button -->
-                <div class="schedule-content">
-                    <div class="section-title" @click="toggleSection">
-                        <h2>Grounds Entertainment</h2>
-                        <ion-icon
-                            :icon="isSectionOpen ? chevronUp : chevronDown"
-                            class="section-icon"
-                            :class="{ 'section-icon--open': isSectionOpen }"
-                        ></ion-icon>
-                    </div>
+                <div class="loader-container" v-if="isLoading || isDateChanging">
+                      <div class="spinner"></div>
+                      <p>Loading Schedule...</p>
+                </div>
 
-                    <div class="events-list" v-show="isSectionOpen">
-                        <div v-for="event in filteredEvents" :key="event.id" class="event-item">
-                            <div class="content">
-                                <h3>{{ event.title || "Event Title" }}</h3>
-                                <p>{{ event.start_time || "Event Start Time" }}</p>
-                            </div>
-                                
-                            <div class="favorite">
-                                <button 
-                                    class="favorite-button"
-                                    :class="{ 'is-favorite': event.isFavorite }"
-                                    @click="event.isFavorite ? removeEventFromFavorites(event) : addEventToFavorites(event)"
-                                    :disabled="event.isAddingToFavorites || event.isRemovingFromFavorites"
-                                >
-                                    <ion-icon 
-                                        :icon="event.isFavorite ? heart : heartOutline"
-                                        :class="{ 'loading': event.isAddingToFavorites || event.isRemovingFromFavorites }"
-                                    ></ion-icon>
-                                </button>
+                <div v-else class="schedule-content">
+                   <div v-for="category in filteredCategories" :key="category.id" class="category-section">
+                         <div class="section-title" @click="toggleCategory(category.id)">
+                            <h2>{{ category.name }}</h2>
+                                <ion-icon
+                                :icon="isCategoryOpen(category.id) ? chevronUp : chevronDown"
+                                class="section-icon"
+                                :class="{ 'section-icon--open': isCategoryOpen(category.id) }"
+                            ></ion-icon>
+                         </div>
+
+                        <div class="events-list" v-show="isCategoryOpen(category.id)">
+                            <div v-for="event in getFilteredEvents(category.id)" :key="event.id" class="event-item">
+                                <div class="content">
+                                    <h3>{{ event.title || "Event Title" }}</h3>
+                                    <p>{{ event.start_time || "Event Start Time" }} </p>
+                                    <p>{{ event.venue.name || "Event Venue N/A" }}</p>
+                                </div>
+
+                                <div class="favorite">
+                                    <button
+                                        class="favorite-button"
+                                        :class="{ 'is-favorite': event.isFavorite }"
+                                        @click="toggleFavorite(event)"
+                                        :disabled="event.isAddingToFavorites || event.isRemovingFromFavorites"
+                                    >
+                                        <ion-icon
+                                            :icon="event.isFavorite ? heart : heartOutline"
+                                            :class="{ 'loading': event.isAddingToFavorites || event.isRemovingFromFavorites }"
+                                        ></ion-icon>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -80,16 +85,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon } from '@ionic/vue';
 import { chevronDown, chevronUp, heart, heartOutline } from 'ionicons/icons';
 import { useDataStore } from '@/stores/data';
 import { Preferences } from '@capacitor/preferences';
+import { storeToRefs } from 'pinia';
 
 const dataStore = useDataStore();
-const eventsData: Event[] = dataStore.data.nysfairWebsite.events ?? [];
-
-console.log('events data', eventsData);
+const { data, isLoading } = storeToRefs(dataStore);
+const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
+const categoriesData = computed(() => data.value?.nysfairWebsite?.eventCategories ?? []);
 
 // Types for the event data
 interface Venue {
@@ -97,15 +103,19 @@ interface Venue {
     description: string;
 }
 
+interface EventDate {
+    start_time_date: string;
+    start_time_unix: number;
+}
+
 interface Event {
     id: number;
     title: string;
     description: string;
     permalink: string;
-    dates: {
-        start_time_date: string;
-        start_time_unix: number;
-    }[];
+    categories: number[];
+     start_time: string;
+    dates: EventDate[];
     duration: number;
     created_at: string;
     featured_image: string;
@@ -115,52 +125,53 @@ interface Event {
     isRemovingFromFavorites?: boolean;
 }
 
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+}
+
 interface DateObject {
     dayName: string;
     day: number;
-    // fullDate: Date;
     timestamp: number;
 }
 
 const selectedDateIndex = ref(0);
-const isSectionOpen = ref(true);
+const openCategoryIds = ref<number[]>([]);
+const cachedFilteredEvents = ref<{ [categoryId: number]: Event[] }>({});
+const isDateChanging = ref(false);
 
 const convertToEastern = (unixTimestamp: number): Date => {
     const date = new Date(unixTimestamp * 1000);
     return new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
 };
 
-
 const dates = computed<DateObject[]>(() => {
-    if (!eventsData || !eventsData.length) return [];
+    if (!eventsData.value || !eventsData.value.length) return [];
 
-    // Map events to their dates, considering the new data structure
-    const allDates = eventsData.flatMap(event => 
+    const allDates = eventsData.value.flatMap((event: Event) =>
         event.dates.map(date => ({
             timestamp: date.start_time_unix,
             originalDate: date.start_time_date
         }))
     );
 
-    // Sort dates by timestamp
     const sortedDates = [...allDates].sort((a, b) => a.timestamp - b.timestamp);
-
-    // Get unique dates by converting timestamps to date strings
-    const uniqueDates = [...new Set(sortedDates.map(date => 
+    const uniqueDates = [...new Set(sortedDates.map(date =>
         convertToEastern(date.timestamp).toDateString()
     ))];
 
-    // Create date objects
     return uniqueDates.map((dateStr, index) => {
-        const matchingDate = sortedDates.find(date => 
+        const matchingDate = sortedDates.find(date =>
             convertToEastern(date.timestamp).toDateString() === dateStr
         );
 
         return {
-            dayName: new Date(dateStr).toLocaleDateString('en-US', { 
-                weekday: 'short', 
-                month: 'short', 
-                day: 'numeric' 
+            dayName: new Date(dateStr).toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
             }),
             day: index + 1,
             timestamp: matchingDate ? matchingDate.timestamp : 0
@@ -168,28 +179,49 @@ const dates = computed<DateObject[]>(() => {
     });
 });
 
-// Update the filteredEvents computed property
-const filteredEvents = computed(() => {
+const categories = computed<Category[]>(() => {
+    return categoriesData.value || [];
+});
+
+
+const filteredCategories = computed(() => {
+  if (!eventsData.value || !eventsData.value.length) return [];
+
+    const selectedDate = dates.value[selectedDateIndex.value];
+    const selectedDateStr = convertToEastern(selectedDate.timestamp).toDateString();
+
+    const categoriesWithEvents = new Set<number>();
+     eventsData.value.forEach((event: Event) => {
+      if (event.dates.some(date => convertToEastern(date.start_time_unix).toDateString() === selectedDateStr)) {
+            event.categories.forEach(catId => categoriesWithEvents.add(catId));
+      }
+    });
+
+    return categories.value.filter(category => categoriesWithEvents.has(category.id));
+});
+
+
+
+const filterEvents = (categoryId: number): Event[] => {
     if (!dates.value.length) return [];
 
     const selectedDate = dates.value[selectedDateIndex.value];
     const selectedDateStr = convertToEastern(selectedDate.timestamp).toDateString();
 
-    return eventsData
-        .filter(event => 
-            event.dates.some(date => 
+    return eventsData.value
+        ?.filter((event: Event) =>
+            event.dates.some(date =>
                 convertToEastern(date.start_time_unix).toDateString() === selectedDateStr
-            )
+            ) && event.categories.includes(categoryId)
         )
-        .map(event => {
-            // Find the matching date for this event
-            const matchingDate = event.dates.find(date => 
+        .map((event: Event) => {
+            const matchingDate = event.dates.find(date =>
                 convertToEastern(date.start_time_unix).toDateString() === selectedDateStr
             );
 
             return {
                 ...event,
-                start_time: matchingDate ? convertToEastern(matchingDate.start_time_unix)
+                 start_time: matchingDate ? convertToEastern(matchingDate.start_time_unix)
                     .toLocaleTimeString('en-US', {
                         hour: 'numeric',
                         minute: 'numeric',
@@ -197,119 +229,255 @@ const filteredEvents = computed(() => {
                     }) : 'Time TBD'
             };
         })
-        .sort((a, b) => {
+        .sort((a: any, b: any) => {
             const aDate = a.dates[0].start_time_unix;
             const bDate = b.dates[0].start_time_unix;
             return aDate - bDate;
-        });
-});
+        }) ?? [];
+};
+
+const getFilteredEvents = (categoryId: number): Event[] => {
+    if (cachedFilteredEvents.value[categoryId]) {
+        return cachedFilteredEvents.value[categoryId];
+    }
+
+    const filtered = filterEvents(categoryId);
+      cachedFilteredEvents.value = {
+        ...cachedFilteredEvents.value,
+        [categoryId]: filtered,
+    };
+
+    return filtered;
+};
 
 const selectDate = (index: number): void => {
-    selectedDateIndex.value = index;
+    isDateChanging.value = true;
+
+     setTimeout(() => {
+            selectedDateIndex.value = index;
+                // Clear cached events when the date changes
+            cachedFilteredEvents.value = {};
+            // Open all categories when the date changes
+            openCategoryIds.value = categories.value.map(category => category.id);
+            isDateChanging.value = false;
+     }, 0)
+
 };
 
-const toggleSection = (): void => {
-    isSectionOpen.value = !isSectionOpen.value;
+const toggleCategory = (categoryId: number): void => {
+    if (openCategoryIds.value.includes(categoryId)) {
+        openCategoryIds.value = openCategoryIds.value.filter(id => id !== categoryId);
+    } else {
+        openCategoryIds.value.push(categoryId);
+    }
 };
+
+const isCategoryOpen = (categoryId: number): boolean => {
+    return openCategoryIds.value.includes(categoryId);
+};
+
+const toggleFavorite = async (event: Event): Promise<void> => {
+    if(event.isFavorite) {
+        await removeEventFromFavorites(event);
+    } else {
+        await addEventToFavorites(event);
+    }
+
+};
+
 
 const addEventToFavorites = async (event: Event): Promise<void> => {
-  if (event.isFavorite === true) {
-    console.warn('Event is already a favorite');
-    return;
-  }
+    if (event.isFavorite === true) {
+        console.warn('Event is already a favorite');
+        return;
+    }
+  
+    const eventIndex = eventsData.value.findIndex((eventsDataEvent: any) => eventsDataEvent.id === event.id);
 
-  // Update the reactive array
-  const eventIndex = eventsData.findIndex(eventsDataEvent => eventsDataEvent.id === event.id);
-
-  if (eventIndex === -1) {
-    console.warn('Event not found in data');
-    return;
-  }
-
-  // set isAddingToFavorites to true
-  eventsData[eventIndex].isAddingToFavorites = true;
-
-  try {
-    // Sleep for a bit to simulate loading
-    await new Promise(resolve => setTimeout(resolve, 250));
-
-    // Get current favorites
-    let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
-
-    if (!favoriteNYSFairEventIds) {
-      favoriteNYSFairEventIds = '[]';
+    if (eventIndex === -1) {
+        console.warn('Event not found in data');
+        return;
     }
 
-    // Parse the favorites as an array of strings
-    const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
+     // Optimistically update the UI
+     const updatedEvents = [...eventsData.value];
+     const eventToUpdate = {...updatedEvents[eventIndex]}
+        eventToUpdate.isAddingToFavorites = true;
+        updatedEvents[eventIndex] = eventToUpdate;
 
-    // Add the event ID to the favorites if it's not already included
-    if (!favoriteIdsArray.includes(event.id)) {
-      favoriteIdsArray.push(event.id);
+     // Update the cache to reflect this change
+    for (const key in cachedFilteredEvents.value) {
+            if(cachedFilteredEvents.value.hasOwnProperty(key)){
+                const categoryEvents = cachedFilteredEvents.value[key];
+                 const eventIndexToUpdate = categoryEvents.findIndex(cachedEvent => cachedEvent.id === event.id)
+
+                if(eventIndexToUpdate !== -1) {
+                    const updatedEventsInCategory = [...categoryEvents];
+                    const eventToUpdateInCategory = {...updatedEventsInCategory[eventIndexToUpdate]};
+                        eventToUpdateInCategory.isAddingToFavorites = true;
+                        updatedEventsInCategory[eventIndexToUpdate] = eventToUpdateInCategory
+                    cachedFilteredEvents.value = {
+                           ...cachedFilteredEvents.value,
+                          [key]: updatedEventsInCategory
+                     };
+                }
+            }
+        }
+
+  // Update in the reactive array
+    data.value!.nysfairWebsite.events = updatedEvents;
+    try {
+        await new Promise(resolve => setTimeout(resolve, 250));
+        let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+
+        if (!favoriteNYSFairEventIds) {
+            favoriteNYSFairEventIds = '[]';
+        }
+
+        const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
+
+        if (!favoriteIdsArray.includes(event.id)) {
+            favoriteIdsArray.push(event.id);
+        }
+
+        await Preferences.set({
+            key: 'favoriteNYSFairEvents',
+            value: JSON.stringify(favoriteIdsArray)
+        });
+
+        // Optimistically update the UI
+            const updatedEventsAfterChange = [...eventsData.value];
+            const eventToUpdateAfterChange = {...updatedEventsAfterChange[eventIndex]}
+                eventToUpdateAfterChange.isFavorite = true;
+                eventToUpdateAfterChange.isAddingToFavorites = false;
+
+            updatedEventsAfterChange[eventIndex] = eventToUpdateAfterChange;
+
+                for (const key in cachedFilteredEvents.value) {
+                    if(cachedFilteredEvents.value.hasOwnProperty(key)){
+                         const categoryEvents = cachedFilteredEvents.value[key];
+                         const eventIndexToUpdate = categoryEvents.findIndex(cachedEvent => cachedEvent.id === event.id)
+
+                            if(eventIndexToUpdate !== -1) {
+                                    const updatedEventsInCategory = [...categoryEvents];
+                                    const eventToUpdateInCategory = {...updatedEventsInCategory[eventIndexToUpdate]};
+                                        eventToUpdateInCategory.isFavorite = true;
+                                        eventToUpdateInCategory.isAddingToFavorites = false;
+                                    updatedEventsInCategory[eventIndexToUpdate] = eventToUpdateInCategory
+                                    cachedFilteredEvents.value = {
+                                        ...cachedFilteredEvents.value,
+                                        [key]: updatedEventsInCategory
+                                     };
+                            }
+                        }
+                 }
+
+            // Update in the reactive array
+            data.value!.nysfairWebsite.events = updatedEventsAfterChange;
+
+    } finally {
+         // Reset loading state regardless of success or failure
     }
-
-    // Save the updated favorites back to preferences
-    await Preferences.set({
-      key: 'favoriteNYSFairEvents',
-      value: JSON.stringify(favoriteIdsArray)
-    });
-
-    eventsData[eventIndex].isFavorite = true;
-  } finally {
-    // Reset loading state regardless of success or failure
-    eventsData[eventIndex].isAddingToFavorites = false;
-  }
 };
 
 const removeEventFromFavorites = async (event: Event): Promise<void> => {
-  if (event.isFavorite !== true) {
-    console.warn('Event is not a favorite');
-    return;
-  }
-
-  const eventIndexInData = eventsData.findIndex(eventsDataEvent => eventsDataEvent.id === event.id);
-
-  if (eventIndexInData === -1) {
-    console.warn('Event not found in data');
-    return;
-  }
-
-  eventsData[eventIndexInData].isRemovingFromFavorites = true;
-
-  try {
-    // Sleep for a bit to simulate loading
-    await new Promise(resolve => setTimeout(resolve, 250));
-
-    // Get current favorites
-    let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
-
-    if (!favoriteNYSFairEventIds) {
-      favoriteNYSFairEventIds = '[]';
+    if (event.isFavorite !== true) {
+        console.warn('Event is not a favorite');
+        return;
     }
 
-    // Parse the favorites as an array of strings
-    const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
+    const eventIndexInData = eventsData.value.findIndex((eventsDataEvent : any) => eventsDataEvent.id === event.id);
 
-    // Remove the event ID from the favorites if it's included
-    const eventIndex = favoriteIdsArray.findIndex(favoriteId => favoriteId === event.id);
-
-    if (eventIndex !== -1) {
-      favoriteIdsArray.splice(eventIndex, 1);
+    if (eventIndexInData === -1) {
+        console.warn('Event not found in data');
+        return;
     }
 
-    // Save the updated favorites back to preferences
-    await Preferences.set({
-      key: 'favoriteNYSFairEvents',
-      value: JSON.stringify(favoriteIdsArray)
-    });
+      // Optimistically update the UI
+        const updatedEvents = [...eventsData.value];
+        const eventToUpdate = {...updatedEvents[eventIndexInData]}
+            eventToUpdate.isRemovingFromFavorites = true;
+            updatedEvents[eventIndexInData] = eventToUpdate;
 
-    // Update the reactive array
-    eventsData[eventIndexInData].isFavorite = false;
-  } finally {
-    // Reset loading state regardless of success or failure
-    eventsData[eventIndexInData].isRemovingFromFavorites = false;
-  }
+       // Update the cache to reflect this change
+        for (const key in cachedFilteredEvents.value) {
+            if(cachedFilteredEvents.value.hasOwnProperty(key)){
+                const categoryEvents = cachedFilteredEvents.value[key];
+                const eventIndexToUpdate = categoryEvents.findIndex(cachedEvent => cachedEvent.id === event.id)
+
+                if(eventIndexToUpdate !== -1) {
+                    const updatedEventsInCategory = [...categoryEvents];
+                    const eventToUpdateInCategory = {...updatedEventsInCategory[eventIndexToUpdate]};
+                        eventToUpdateInCategory.isRemovingFromFavorites = true;
+                        updatedEventsInCategory[eventIndexToUpdate] = eventToUpdateInCategory
+                     cachedFilteredEvents.value = {
+                           ...cachedFilteredEvents.value,
+                           [key]: updatedEventsInCategory
+                    };
+                }
+            }
+        }
+       // Update in the reactive array
+        data.value!.nysfairWebsite.events = updatedEvents;
+
+    try {
+        await new Promise(resolve => setTimeout(resolve, 250));
+
+        let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+
+        if (!favoriteNYSFairEventIds) {
+            favoriteNYSFairEventIds = '[]';
+        }
+
+        const favoriteIdsArray: number[] = JSON.parse(favoriteNYSFairEventIds);
+        const eventIndex = favoriteIdsArray.findIndex(favoriteId => favoriteId === event.id);
+
+        if (eventIndex !== -1) {
+            favoriteIdsArray.splice(eventIndex, 1);
+        }
+
+        await Preferences.set({
+            key: 'favoriteNYSFairEvents',
+            value: JSON.stringify(favoriteIdsArray)
+        });
+
+        // Optimistically update the UI
+           const updatedEventsAfterChange = [...eventsData.value];
+           const eventToUpdateAfterChange = {...updatedEventsAfterChange[eventIndexInData]}
+               eventToUpdateAfterChange.isFavorite = false;
+               eventToUpdateAfterChange.isRemovingFromFavorites = false;
+
+           updatedEventsAfterChange[eventIndexInData] = eventToUpdateAfterChange;
+
+              for (const key in cachedFilteredEvents.value) {
+                if(cachedFilteredEvents.value.hasOwnProperty(key)){
+                         const categoryEvents = cachedFilteredEvents.value[key];
+                         const eventIndexToUpdate = categoryEvents.findIndex(cachedEvent => cachedEvent.id === event.id)
+
+                    if(eventIndexToUpdate !== -1) {
+                            const updatedEventsInCategory = [...categoryEvents];
+                            const eventToUpdateInCategory = {...updatedEventsInCategory[eventIndexToUpdate]};
+                                eventToUpdateInCategory.isFavorite = false;
+                                eventToUpdateInCategory.isRemovingFromFavorites = false;
+                                updatedEventsInCategory[eventIndexToUpdate] = eventToUpdateInCategory
+                        cachedFilteredEvents.value = {
+                              ...cachedFilteredEvents.value,
+                              [key]: updatedEventsInCategory
+                      };
+                   }
+                }
+             }
+           // Update in the reactive array
+            data.value!.nysfairWebsite.events = updatedEventsAfterChange;
+    } finally {
+      // Reset loading state regardless of success or failure
+    }
 };
+
+onMounted(() => {
+    // Open all categories by default
+    openCategoryIds.value = categories.value.map(category => category.id)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -407,6 +575,10 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
 .schedule-content {
     padding: 0 25px;
 
+    .category-section {
+        margin-bottom: 20px;
+    }
+
     .section-title {
         display: flex;
         justify-content: space-between;
@@ -433,7 +605,7 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
         .event-item {
             padding: 15px 0;
             border-bottom: 1px solid #EFF2F6;
-            display: flex; 
+            display: flex;
             justify-content: space-between;
             gap: 20px;
 
@@ -448,6 +620,10 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
                 margin: 0;
                 font-weight: 500;
             }
+            p:last-child {
+                margin-top: 2px;
+            }
+
             .favorite {
                 margin-top: 10px;
             }
@@ -494,13 +670,46 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
     }
 }
 
+.loader-container {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     padding: 20px;
+     min-height: 200px;
+    
+     p {
+         margin-top: 10px;
+     }
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #1E5EAE;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes pulse {
     0% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.5;
     }
+
     100% {
         opacity: 1;
     }
