@@ -61,7 +61,7 @@
                                 <svg class="main-button__icon" width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M50.5 44.4444V5.55556C50.5 2.5 48 0 44.9444 0H6.05556C3 0 0.5 2.5 0.5 5.55556V44.4444C0.5 47.5 3 50 6.05556 50H44.9444C48 50 50.5 47.5 50.5 44.4444ZM15.7778 29.1667L22.7222 37.5278L32.4444 25L44.9444 41.6667H6.05556L15.7778 29.1667Z" fill="#1E5EAE"/>
                                 </svg>  
-                                <h2 class="main-button__text">Games</h2>
+                                <h2 class="main-button__text">In-App Activities</h2>
                             </div>
                         </ion-col>
                     </ion-row>

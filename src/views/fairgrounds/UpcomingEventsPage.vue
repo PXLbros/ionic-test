@@ -25,9 +25,10 @@
               Filters
             </div>
             <div class="calendar" @click="toggleView">
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg v-if="viewMode !== 'calendar'" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M28.6449 28.4545H24.1159V23.9091H28.6449V28.4545ZM21.8514 17.0909H17.3225V21.6364H21.8514V17.0909ZM28.6449 17.0909H24.1159V21.6364H28.6449V17.0909ZM15.058 23.9091H10.529V28.4545H15.058V23.9091ZM33.1739 8V33H6V8H33.1739ZM30.9094 14.8182H8.26449V30.7273H30.9094V14.8182ZM21.8514 23.9091H17.3225V28.4545H21.8514V23.9091ZM15.058 17.0909H10.529V21.6364H15.058V17.0909Z" fill="#343434"/>
               </svg>
+              <ion-icon v-else :icon="listOutline" size="large" class="search-icon"></ion-icon>
             </div>
           </div>
 
@@ -49,7 +50,7 @@
         </div>
 
         <!-- Scrollable Dates only for List View -->
-        <div ref="dateScrollRef" class="date-scroll">
+        <div v-if="viewMode !== 'calendar'" ref="dateScrollRef" class="date-scroll">
           <div 
             v-for="(date, index) in dates" 
             :key="date.toISOString()"
@@ -144,6 +145,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
+import { listOutline } from 'ionicons/icons';
 import { format, isSameMonth, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from 'date-fns';
 
 interface EventDate {

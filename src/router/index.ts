@@ -140,7 +140,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/fair/games',
     component: () => import('@/views/fair/GamesPage.vue'),
     meta: {
-      title: 'Games',
+      title: 'In-App Activities',
       showInMenu: true,
       menuOrder: 7
     }
