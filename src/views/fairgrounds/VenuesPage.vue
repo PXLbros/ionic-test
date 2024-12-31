@@ -21,8 +21,8 @@
                         :key="venue.id"
                         class="main__venue-card"
                     >
-                        <!-- <img class="image" :src="getVenueImage(venue)" alt="venue image"> add this in when data is there -->
-                        <img class="image" src="/public/modal-img/News_NYSF.jpg" alt="venue image">
+                        <img v-if="venue.venueMainImage" class="image" :src="getVenueImage(venue)" alt="venue image"> 
+                        <img v-else class="image" src="/public/modal-img/News_NYSF.jpg" alt="venue image">
                         <div class="content">
                             <div class="content__label">{{ venue.venueNavTitle || 'Venue' }}</div>
                             <div class="content__title">{{ venue.title }}</div>

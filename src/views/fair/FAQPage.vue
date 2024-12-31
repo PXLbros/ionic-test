@@ -1,14 +1,14 @@
 <template>
     <ion-page>
-        <ion-content>
-            <ion-header>
-                <ion-toolbar>
-                    <ion-buttons slot="start">
+        <ion-header>
+            <ion-toolbar :translucent="true">
+                <ion-buttons slot="start">
                         <ion-back-button default-href="/fair/plan-your-visit"></ion-back-button>
                     </ion-buttons>
                     <ion-title>FAQ</ion-title>
                 </ion-toolbar>
             </ion-header>
+            <ion-content :fullscreen="true">
 
             <!-- Notification Banner -->
             <div class="notification">
