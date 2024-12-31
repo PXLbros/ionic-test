@@ -1,19 +1,25 @@
 PODS:
-  - Capacitor (6.1.1):
+  - Capacitor (6.2.0):
     - CapacitorCordova
   - CapacitorApp (6.0.0):
     - Capacitor
   - CapacitorBrowser (6.0.4):
     - Capacitor
-  - CapacitorCordova (6.1.1)
-  - CapacitorGeolocation (6.0.0):
+  - CapacitorCordova (6.2.0)
+  - CapacitorGeolocation (6.1.0):
     - Capacitor
   - CapacitorHaptics (6.0.0):
     - Capacitor
   - CapacitorKeyboard (6.0.1):
     - Capacitor
+  - CapacitorPreferences (6.0.3):
+    - Capacitor
   - CapacitorStatusBar (6.0.0):
     - Capacitor
+  - Sentry/HybridSDK (8.36.0)
+  - SentryCapacitor (1.0.2):
+    - Capacitor
+    - Sentry/HybridSDK (= 8.36.0)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
@@ -23,7 +29,13 @@ DEPENDENCIES:
   - "CapacitorGeolocation (from `../../node_modules/@capacitor/geolocation`)"
   - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
+  - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - "SentryCapacitor (from `../../node_modules/@sentry/capacitor`)"
+
+SPEC REPOS:
+  trunk:
+    - Sentry
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -40,19 +52,26 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/haptics"
   CapacitorKeyboard:
     :path: "../../node_modules/@capacitor/keyboard"
+  CapacitorPreferences:
+    :path: "../../node_modules/@capacitor/preferences"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  SentryCapacitor:
+    :path: "../../node_modules/@sentry/capacitor"
 
 SPEC CHECKSUMS:
-  Capacitor: 8941aba4364ba9d1b22188569001f2ce45cc2b00
+  Capacitor: 1f3c7b9802d958cd8c4eb63895fff85dff2e1eea
   CapacitorApp: 9d53aec7101f7b030a950c5bdc4df8612576b279
   CapacitorBrowser: ef0529d16cd8839281050c350e7bbee4f5c6d65f
-  CapacitorCordova: 8f2cc8d8d3619c566e9418fe8772064a94266106
-  CapacitorGeolocation: 1f12bbe372b65116e851bd8e3a94cf0ef9bacebb
+  CapacitorCordova: b33e7f4aa4ed105dd43283acdd940964374a87d9
+  CapacitorGeolocation: d994ee64ee41909e2089e575c9d3a976007c2812
   CapacitorHaptics: 9ebc9363f0e9b8eb4295088a0b474530acf1859b
   CapacitorKeyboard: 5f32a712adf41e07a61caafb82cf29fb6d8ba123
+  CapacitorPreferences: 9f9935bce493977183511362131a93f7b260191a
   CapacitorStatusBar: 2e4369f99166125435641b1908d05f561eaba6f6
+  Sentry: f8374b5415bc38dfb5645941b3ae31230fbeae57
+  SentryCapacitor: 808a63a267d5053af12c25e6125c13f79b32debc
 
-PODFILE CHECKSUM: 25fbddb5552924a76f9ce7fbbccced4e0ad7998d
+PODFILE CHECKSUM: e02ab73407a88996cb0ed1d4186aca10aca27a1b
 
 COCOAPODS: 1.15.2

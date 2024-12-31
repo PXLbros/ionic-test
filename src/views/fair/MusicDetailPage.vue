@@ -22,7 +22,7 @@
                     <div class="group">
                         <div class="main__venue">{{ event.venue?.name }}</div>
                         <h1 class="main__title">{{ event.title }}</h1>
-                        <div class="main__date">{{ formatEventDate(event.start_time) }}</div>
+                        <div class="main__date" v-if="event.dates && event.dates.length > 0">{{ formatEventDate(event.dates) }} ({{event.duration}} min)</div>
                     </div>
                     
                     <div class="main__description" v-html="event.description"></div>
@@ -68,7 +68,11 @@ interface Event {
     title: string;
     description: string;
     permalink: string;
-    start_time: string;
+    dates: {
+        start_time_date: string;
+        start_time_time: string;
+        start_time_unix: number;
+    }[];
     venue: Venue;
     featured_image?: string;
     duration?: number;
@@ -94,7 +98,7 @@ const parseDateString = (dateString: string): Date => {
     }
 
     // Remove any HTML entities and trim
-    const cleanDateString = dateString.replace(/&nbsp;/g, ' ').trim();
+    const cleanDateString = dateString.replace(/ /g, ' ').trim();
 
     // Try parsing with built-in Date
     const parsedDate = new Date(cleanDateString);
@@ -134,8 +138,20 @@ const parseDateString = (dateString: string): Date => {
 };
 
 // Format date function with improved error handling
-const formatEventDate = (dateString: string): string => {
+const formatEventDate = (dates: { start_time_date: string; start_time_time: string; start_time_unix: number; }[] | undefined): string => {
+    if (!dates || dates.length === 0) {
+        console.warn("No start_time provided, cannot be formatted");
+        return "TBD";
+    }
+
+    const {start_time_date, start_time_time} = dates[0];
+    if (!start_time_date || !start_time_time) {
+        console.warn("Incomplete start_time data, cannot be formatted");
+        return "TBD"
+    }
+
     try {
+        const dateString = `${start_time_date} ${start_time_time}`;
         const date = parseDateString(dateString);
         return new Intl.DateTimeFormat('en-US', {
             weekday: 'short',
@@ -145,28 +161,30 @@ const formatEventDate = (dateString: string): string => {
             minute: 'numeric'
         }).format(date);
     } catch (error) {
-        console.error(`Error formatting date: ${dateString}`, error);
-        return dateString; // Return original string if formatting fails
+        console.error(`Error formatting date: ${start_time_date} ${start_time_time}`, error);
+        return `${start_time_date} ${start_time_time}`;
     }
 };
 
 // Get the specific event with transformed image URL
 const event = computed<Event | undefined>(() => {
-    const foundEvent = dataStore.data.nysfairWebsite.events.find(
-        (e: Event) => e.id === eventId
-    );
+        const foundEvent = dataStore.data.nysfairWebsite.events.find(
+            (e: Event) => e.id === eventId
+        );
 
-    if (foundEvent) {
-        return {
-            ...foundEvent,
-            featured_image: foundEvent.featured_image?.replace(
-                'http://nys-fair.test:8001/wp-content/uploads/',
-                'https://nysfair.ny.gov/wp-content/uploads/'
-            )
-        };
-    }
+        console.log("computed event", foundEvent);
 
-    return undefined;
+        if (foundEvent) {
+            return {
+                ...foundEvent,
+                featured_image: foundEvent.featured_image?.replace(
+                    'http://nys-fair.test:8001/wp-content/uploads/',
+                    'https://nysfair.ny.gov/wp-content/uploads/'
+                )
+            };
+        }
+
+        return undefined;
 });
 </script>
 
@@ -224,6 +242,7 @@ ion-back-button {
         color: #343434;
         font-weight: 700;
         line-height: 24px;
+        margin-top: 5px;
     }
 
     &__description {

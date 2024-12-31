@@ -1,14 +1,14 @@
 <template>
     <ion-page>
-        <ion-content>
-            <ion-header>
-                <ion-toolbar>
-                    <ion-buttons slot="start">
-                        <ion-back-button default-href="/fair"></ion-back-button>
-                    </ion-buttons>
-                    <ion-title>Schedule</ion-title>
-                </ion-toolbar>
-            </ion-header>
+        <ion-header :translucent="true">
+            <ion-toolbar>
+                <ion-buttons slot="start">
+                    <ion-back-button default-href="/fair"></ion-back-button>
+                </ion-buttons>
+                <ion-title>Schedule</ion-title>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content :fullscreen="true">
 
             <div class="main">
                 <div class="main__header">
@@ -23,20 +23,32 @@
                     </div>
                 </div>
 
+                
+                
                 <div v-if="dates" class="date-selector">
                     <div class="date-selector__container">
                         <button
-                            v-for="(date, index) in dates"
-                            :key="index"
-                            class="date-card"
-                            :class="{ 'date-card--active': selectedDateIndex === index }"
-                            @click="selectDate(index)"
+                        v-for="(date, index) in dates"
+                        :key="index"
+                        class="date-card"
+                        :class="{ 'date-card--active': selectedDateIndex === index }"
+                        @click="selectDate(index)"
                         >
-                            <div class="date-card__day">{{ date.dayName || "Date Name" }}</div>
-                            <div class="date-card__date">Day {{ date.day || "Date Day" }}</div>
-                        </button>
-                    </div>
+                        <div class="date-card__day">{{ date.dayName || "Date Name" }}</div>
+                        <div class="date-card__date">Day {{ date.day || "Date Day" }}</div>
+                    </button>
                 </div>
+            </div>
+            <div class="filter-section">
+                   <div class="category-filter">
+                        <select class="category-select"  v-model="selectedCategory" @change="onCategoryChange">
+                            <option value="all">All Categories</option>
+                           <option v-for="category in categories" :key="category.id" :value="category.id">
+                             {{ category.name }}
+                           </option>
+                        </select>
+                   </div>
+            </div>
 
                 <div class="loader-container" v-if="isLoading || isDateChanging">
                       <div class="spinner"></div>
@@ -44,37 +56,32 @@
                 </div>
 
                 <div v-else class="schedule-content">
-                   <div v-for="category in filteredCategories" :key="category.id" class="category-section">
-                         <div class="section-title" @click="toggleCategory(category.id)">
-                            <h2>{{ category.name }}</h2>
-                                <ion-icon
-                                :icon="isCategoryOpen(category.id) ? chevronUp : chevronDown"
-                                class="section-icon"
-                                :class="{ 'section-icon--open': isCategoryOpen(category.id) }"
-                            ></ion-icon>
-                         </div>
+                     <div v-if="filteredEvents.length === 0" class="no-events">
+                        <p>No events scheduled for this day</p>
+                     </div>
+                    <div v-else class="events-list">
+                        <div v-for="event in filteredEvents" :key="event.id" class="event-item">
+                            <div class="content">
+                                <h3>{{ event.title || "Event Title" }}</h3>
+                                <p>{{ event.start_time || "Event Start Time" }} </p>
+                                <p>{{ event.venue.name || "Event Venue N/A" }}</p>
+                                <p v-if="event.categories.length > 0">
+                                    Categories: {{ event.categories.map(catId => getCategoryName(catId)).join(', ') }}
+                                </p>
+                            </div>
 
-                        <div class="events-list" v-show="isCategoryOpen(category.id)">
-                            <div v-for="event in getFilteredEvents(category.id)" :key="event.id" class="event-item">
-                                <div class="content">
-                                    <h3>{{ event.title || "Event Title" }}</h3>
-                                    <p>{{ event.start_time || "Event Start Time" }} </p>
-                                    <p>{{ event.venue.name || "Event Venue N/A" }}</p>
-                                </div>
-
-                                <div class="favorite">
-                                    <button
-                                        class="favorite-button"
-                                        :class="{ 'is-favorite': event.isFavorite }"
-                                        @click="toggleFavorite(event)"
-                                        :disabled="event.isAddingToFavorites || event.isRemovingFromFavorites"
-                                    >
-                                        <ion-icon
-                                            :icon="event.isFavorite ? heart : heartOutline"
-                                            :class="{ 'loading': event.isAddingToFavorites || event.isRemovingFromFavorites }"
-                                        ></ion-icon>
-                                    </button>
-                                </div>
+                            <div class="favorite">
+                                <button
+                                    class="favorite-button"
+                                    :class="{ 'is-favorite': event.isFavorite }"
+                                    @click="toggleFavorite(event)"
+                                    :disabled="event.isAddingToFavorites || event.isRemovingFromFavorites"
+                                >
+                                    <ion-icon
+                                        :icon="event.isFavorite ? heart : heartOutline"
+                                        :class="{ 'loading': event.isAddingToFavorites || event.isRemovingFromFavorites }"
+                                    ></ion-icon>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -138,9 +145,8 @@ interface DateObject {
 }
 
 const selectedDateIndex = ref(0);
-const openCategoryIds = ref<number[]>([]);
-const cachedFilteredEvents = ref<{ [categoryId: number]: Event[] }>({});
 const isDateChanging = ref(false);
+const selectedCategory = ref<string | number>('all');
 
 const convertToEastern = (unixTimestamp: number): Date => {
     const date = new Date(unixTimestamp * 1000);
@@ -184,44 +190,26 @@ const categories = computed<Category[]>(() => {
 });
 
 
-const filteredCategories = computed(() => {
-  if (!eventsData.value || !eventsData.value.length) return [];
+const filteredEvents = computed((): Event[] => {
+    if (!eventsData.value || !eventsData.value.length || !dates.value.length) return [];
 
     const selectedDate = dates.value[selectedDateIndex.value];
     const selectedDateStr = convertToEastern(selectedDate.timestamp).toDateString();
 
-    const categoriesWithEvents = new Set<number>();
-     eventsData.value.forEach((event: Event) => {
-      if (event.dates.some(date => convertToEastern(date.start_time_unix).toDateString() === selectedDateStr)) {
-            event.categories.forEach(catId => categoriesWithEvents.add(catId));
-      }
-    });
-
-    return categories.value.filter(category => categoriesWithEvents.has(category.id));
-});
-
-
-
-const filterEvents = (categoryId: number): Event[] => {
-    if (!dates.value.length) return [];
-
-    const selectedDate = dates.value[selectedDateIndex.value];
-    const selectedDateStr = convertToEastern(selectedDate.timestamp).toDateString();
-
-    return eventsData.value
-        ?.filter((event: Event) =>
+    let filtered = eventsData.value
+        .filter((event: Event) =>
             event.dates.some(date =>
                 convertToEastern(date.start_time_unix).toDateString() === selectedDateStr
-            ) && event.categories.includes(categoryId)
+            )
         )
         .map((event: Event) => {
-            const matchingDate = event.dates.find(date =>
+             const matchingDate = event.dates.find(date =>
                 convertToEastern(date.start_time_unix).toDateString() === selectedDateStr
             );
 
             return {
                 ...event,
-                 start_time: matchingDate ? convertToEastern(matchingDate.start_time_unix)
+                start_time: matchingDate ? convertToEastern(matchingDate.start_time_unix)
                     .toLocaleTimeString('en-US', {
                         hour: 'numeric',
                         minute: 'numeric',
@@ -229,52 +217,40 @@ const filterEvents = (categoryId: number): Event[] => {
                     }) : 'Time TBD'
             };
         })
-        .sort((a: any, b: any) => {
-            const aDate = a.dates[0].start_time_unix;
-            const bDate = b.dates[0].start_time_unix;
-            return aDate - bDate;
-        }) ?? [];
-};
 
-const getFilteredEvents = (categoryId: number): Event[] => {
-    if (cachedFilteredEvents.value[categoryId]) {
-        return cachedFilteredEvents.value[categoryId];
-    }
+     // Apply Category Filter
+     if(selectedCategory.value !== 'all') {
+         filtered = filtered.filter((event: any) => event.categories.includes(Number(selectedCategory.value)))
+     }
 
-    const filtered = filterEvents(categoryId);
-      cachedFilteredEvents.value = {
-        ...cachedFilteredEvents.value,
-        [categoryId]: filtered,
-    };
+     //Sort events
+    return filtered.sort((a: any, b: any) => {
+              const aDate = a.dates[0].start_time_unix;
+              const bDate = b.dates[0].start_time_unix;
+              return aDate - bDate;
+            });
+});
 
-    return filtered;
-};
+const onCategoryChange = () => {
+
+}
+
+
+const getCategoryName = (categoryId: number) => {
+   const category = categories.value.find(cat => cat.id === categoryId)
+   return category ? category.name : 'Unknown Category'
+}
 
 const selectDate = (index: number): void => {
     isDateChanging.value = true;
 
      setTimeout(() => {
             selectedDateIndex.value = index;
-                // Clear cached events when the date changes
-            cachedFilteredEvents.value = {};
-            // Open all categories when the date changes
-            openCategoryIds.value = categories.value.map(category => category.id);
             isDateChanging.value = false;
      }, 0)
 
 };
 
-const toggleCategory = (categoryId: number): void => {
-    if (openCategoryIds.value.includes(categoryId)) {
-        openCategoryIds.value = openCategoryIds.value.filter(id => id !== categoryId);
-    } else {
-        openCategoryIds.value.push(categoryId);
-    }
-};
-
-const isCategoryOpen = (categoryId: number): boolean => {
-    return openCategoryIds.value.includes(categoryId);
-};
 
 const toggleFavorite = async (event: Event): Promise<void> => {
     if(event.isFavorite) {
@@ -304,26 +280,6 @@ const addEventToFavorites = async (event: Event): Promise<void> => {
      const eventToUpdate = {...updatedEvents[eventIndex]}
         eventToUpdate.isAddingToFavorites = true;
         updatedEvents[eventIndex] = eventToUpdate;
-
-     // Update the cache to reflect this change
-    for (const key in cachedFilteredEvents.value) {
-            if(cachedFilteredEvents.value.hasOwnProperty(key)){
-                const categoryEvents = cachedFilteredEvents.value[key];
-                 const eventIndexToUpdate = categoryEvents.findIndex(cachedEvent => cachedEvent.id === event.id)
-
-                if(eventIndexToUpdate !== -1) {
-                    const updatedEventsInCategory = [...categoryEvents];
-                    const eventToUpdateInCategory = {...updatedEventsInCategory[eventIndexToUpdate]};
-                        eventToUpdateInCategory.isAddingToFavorites = true;
-                        updatedEventsInCategory[eventIndexToUpdate] = eventToUpdateInCategory
-                    cachedFilteredEvents.value = {
-                           ...cachedFilteredEvents.value,
-                          [key]: updatedEventsInCategory
-                     };
-                }
-            }
-        }
-
   // Update in the reactive array
     data.value!.nysfairWebsite.events = updatedEvents;
     try {
@@ -353,25 +309,6 @@ const addEventToFavorites = async (event: Event): Promise<void> => {
 
             updatedEventsAfterChange[eventIndex] = eventToUpdateAfterChange;
 
-                for (const key in cachedFilteredEvents.value) {
-                    if(cachedFilteredEvents.value.hasOwnProperty(key)){
-                         const categoryEvents = cachedFilteredEvents.value[key];
-                         const eventIndexToUpdate = categoryEvents.findIndex(cachedEvent => cachedEvent.id === event.id)
-
-                            if(eventIndexToUpdate !== -1) {
-                                    const updatedEventsInCategory = [...categoryEvents];
-                                    const eventToUpdateInCategory = {...updatedEventsInCategory[eventIndexToUpdate]};
-                                        eventToUpdateInCategory.isFavorite = true;
-                                        eventToUpdateInCategory.isAddingToFavorites = false;
-                                    updatedEventsInCategory[eventIndexToUpdate] = eventToUpdateInCategory
-                                    cachedFilteredEvents.value = {
-                                        ...cachedFilteredEvents.value,
-                                        [key]: updatedEventsInCategory
-                                     };
-                            }
-                        }
-                 }
-
             // Update in the reactive array
             data.value!.nysfairWebsite.events = updatedEventsAfterChange;
 
@@ -399,24 +336,6 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
             eventToUpdate.isRemovingFromFavorites = true;
             updatedEvents[eventIndexInData] = eventToUpdate;
 
-       // Update the cache to reflect this change
-        for (const key in cachedFilteredEvents.value) {
-            if(cachedFilteredEvents.value.hasOwnProperty(key)){
-                const categoryEvents = cachedFilteredEvents.value[key];
-                const eventIndexToUpdate = categoryEvents.findIndex(cachedEvent => cachedEvent.id === event.id)
-
-                if(eventIndexToUpdate !== -1) {
-                    const updatedEventsInCategory = [...categoryEvents];
-                    const eventToUpdateInCategory = {...updatedEventsInCategory[eventIndexToUpdate]};
-                        eventToUpdateInCategory.isRemovingFromFavorites = true;
-                        updatedEventsInCategory[eventIndexToUpdate] = eventToUpdateInCategory
-                     cachedFilteredEvents.value = {
-                           ...cachedFilteredEvents.value,
-                           [key]: updatedEventsInCategory
-                    };
-                }
-            }
-        }
        // Update in the reactive array
         data.value!.nysfairWebsite.events = updatedEvents;
 
@@ -449,24 +368,6 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
 
            updatedEventsAfterChange[eventIndexInData] = eventToUpdateAfterChange;
 
-              for (const key in cachedFilteredEvents.value) {
-                if(cachedFilteredEvents.value.hasOwnProperty(key)){
-                         const categoryEvents = cachedFilteredEvents.value[key];
-                         const eventIndexToUpdate = categoryEvents.findIndex(cachedEvent => cachedEvent.id === event.id)
-
-                    if(eventIndexToUpdate !== -1) {
-                            const updatedEventsInCategory = [...categoryEvents];
-                            const eventToUpdateInCategory = {...updatedEventsInCategory[eventIndexToUpdate]};
-                                eventToUpdateInCategory.isFavorite = false;
-                                eventToUpdateInCategory.isRemovingFromFavorites = false;
-                                updatedEventsInCategory[eventIndexToUpdate] = eventToUpdateInCategory
-                        cachedFilteredEvents.value = {
-                              ...cachedFilteredEvents.value,
-                              [key]: updatedEventsInCategory
-                      };
-                   }
-                }
-             }
            // Update in the reactive array
             data.value!.nysfairWebsite.events = updatedEventsAfterChange;
     } finally {
@@ -475,8 +376,7 @@ const removeEventFromFavorites = async (event: Event): Promise<void> => {
 };
 
 onMounted(() => {
-    // Open all categories by default
-    openCategoryIds.value = categories.value.map(category => category.id)
+
 })
 </script>
 
@@ -516,7 +416,7 @@ onMounted(() => {
 
             .subtitle {
                 font-size: 16px;
-                font-weight: 300;
+                font-weight: 500;
                 line-height: 28px;
                 letter-spacing: 0.5px;
                 color: #343434;
@@ -529,7 +429,7 @@ onMounted(() => {
 
 .date-selector {
     padding: 0 25px;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 
@@ -572,6 +472,30 @@ onMounted(() => {
     }
 }
 
+
+.filter-section {
+    padding: 0px 25px 10px 25px;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+
+    .category-filter {
+        width: 100%;
+
+        .category-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: white;
+            color: #333;
+            transition: border-color 0.3s ease;
+        }
+    }
+}
+
 .schedule-content {
     padding: 0 25px;
 
@@ -583,9 +507,12 @@ onMounted(() => {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 15px 0;
+        padding: 15px 10px;
+        border-radius: 5px;
         border-bottom: 1px solid #EFF2F6;
         cursor: pointer;
+        background-color: #F5F7FA;
+        
 
         h2 {
             font-size: 18px;
@@ -620,7 +547,7 @@ onMounted(() => {
                 margin: 0;
                 font-weight: 500;
             }
-            p:last-child {
+             p:last-child {
                 margin-top: 2px;
             }
 
@@ -681,6 +608,15 @@ onMounted(() => {
      p {
          margin-top: 10px;
      }
+}
+
+.no-events {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+     min-height: 200px;
+     font-size: 18px;
+    color: #666;
 }
 
 .spinner {
