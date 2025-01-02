@@ -54,7 +54,7 @@
           <div 
             v-for="(date, index) in dates" 
             :key="date.toISOString()"
-            :ref="el => { if (isSameMonth(date, new Date())) currentMonthRef = el as HTMLElement }"
+            :ref="el => { if (isSameMonth(date, selectedDate)) currentMonthRef = el as HTMLElement }"
             class="date-item"
             :class="{ 'date-item--active': isSameMonth(date, selectedDate) }"
             @click="handleDateSelect(date)"
@@ -172,6 +172,7 @@ interface Event {
   enabled: boolean;
 }
 
+// Test Events for now
 const testEvents = [
   {
     id: '2345',
@@ -233,32 +234,44 @@ const viewMode = ref<'list' | 'calendar'>('list');
 const dateScrollRef = ref<HTMLElement | null>(null);
 const currentMonthRef = ref<HTMLElement | null>(null);
 
-onMounted(async () => {
-  // Wait for the next DOM update
+const scrollToSelectedMonth = async () => {
   await nextTick();
-  
+
   const scrollContainer = dateScrollRef.value;
   const currentElement = currentMonthRef.value;
-  
+
   if (scrollContainer && currentElement) {
-    // Get the current scroll container's dimensions
     const containerWidth = scrollContainer.offsetWidth;
-    
-    // Calculate scroll position
     const elementLeft = currentElement.offsetLeft;
     const elementWidth = currentElement.offsetWidth;
-    
-    // Calculate position that will center the current month
+
     const scrollPosition = Math.max(0, elementLeft - (containerWidth / 2) + (elementWidth / 2));
-    
-    // Scroll to position
+
     scrollContainer.scrollTo({
       left: scrollPosition,
-      behavior: 'instant' // Use 'instant' initially to prevent visible scrolling on load
+      behavior: 'smooth'
     });
+  }
+};
+
+onMounted(async () => {
+  // Use a slight delay to ensure everything is rendered and measured
+  setTimeout(scrollToSelectedMonth, 100);
+});
+
+
+// Switching from Calendar to List will center the selected date value
+watch(viewMode, async (newMode) => {
+  if (newMode === 'list') {
+    await scrollToSelectedMonth();
   }
 });
 
+watch(selectedDate, async () => {
+  if (viewMode.value === 'list') {
+    await scrollToSelectedMonth();
+  }
+});
 
 // Generate next 12 months for the date scroll
 const dates = computed(() => {
@@ -283,16 +296,16 @@ const dates = computed(() => {
   return months;
 });
 
-// Update your events computed property to combine real and test data
+// Update events computed property to combine real and test data
 const combinedEvents = computed(() => {
   const historicalEvents = dataStore.data.nysfairgroundsWebsite.events;
   return [...historicalEvents, ...testEvents];
 });
 
-// Update your existing events computed reference to use combinedEvents
+// Update existing events computed reference to use combinedEvents
 const events = combinedEvents;
 
-// Update your calendar computations to handle the full date properly
+// Update calendar computations to handle the full date properly
 const calendarDays = computed(() => {
   const start = new Date(selectedDate.value.getFullYear(), selectedDate.value.getMonth(), 1);
   const end = new Date(selectedDate.value.getFullYear(), selectedDate.value.getMonth() + 1, 0);
@@ -346,6 +359,7 @@ const eventsByDate = computed(() => {
 // Handlers
 const handleDateSelect = (date: Date) => {
   selectedDate.value = date;
+  // The watch on selectedDate will handle the scrolling
 };
 
 const hasEvents = (date: Date) => {
