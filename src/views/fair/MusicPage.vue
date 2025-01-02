@@ -59,7 +59,7 @@
 
 
         <!-- Events List -->
-        <div v-if="data.value?.nysfairWebsite?.events" class="events-list">
+        <div class="events-list">
           <router-link
             v-for="event in filteredEvents"
             :key="event.id"
@@ -82,9 +82,7 @@
             </div>
           </router-link>
         </div>
-        <div v-else class="backup">
-          <p>No Music Events Today</p>
-        </div>
+        
       </div>
     </ion-content>
   </ion-page>
