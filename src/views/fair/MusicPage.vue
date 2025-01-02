@@ -59,7 +59,7 @@
 
 
         <!-- Events List -->
-        <div class="events-list">
+        <div v-if="data.value?.nysfairWebsite?.events" class="events-list">
           <router-link
             v-for="event in filteredEvents"
             :key="event.id"
@@ -81,6 +81,9 @@
               </svg>
             </div>
           </router-link>
+        </div>
+        <div v-else class="backup">
+          <p>No Music Events Today</p>
         </div>
       </div>
     </ion-content>
@@ -433,6 +436,17 @@ const venueInfo = computed(() => {
   padding-top: 0px;
   max-height: 50vh;
   overflow: scroll;
+}
+
+.backup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30vh;
+
+  p {
+    color: rgba(0, 0, 0, 0.82);
+  }
 }
 
 .event-card {
