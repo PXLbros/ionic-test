@@ -289,129 +289,62 @@ const toggleFavorite = async (event: Event): Promise<void> => {
 
 
 const addEventToFavorites = async (event: Event, selectedStartTimeUnix: number): Promise<void> => {
-  if (event.isFavorite === true) {
-    console.warn('Event is already a favorite');
+  const matchingDate = event.dates.find(date => date.start_time_unix === selectedStartTimeUnix);
+
+  if (!matchingDate) {
+    console.warn('No matching date found for the selected start time.');
     return;
   }
 
-  const eventIndex = eventsData.value.findIndex((eventsDataEvent: any) => eventsDataEvent.id === event.id);
-
-  if (eventIndex === -1) {
-    console.warn('Event not found in data');
-    return;
-  }
-
-  // Optimistically update the UI
-  const updatedEvents = [...eventsData.value];
-  const eventToUpdate = { ...updatedEvents[eventIndex] }
-
-  eventToUpdate.isAddingToFavorites = true;
-
-  updatedEvents[eventIndex] = eventToUpdate;
-
-  // Update in the reactive array
-  data.value!.nysfairWebsite.events = updatedEvents;
+  matchingDate.isAddingToFavorites = true; // Set loading state
 
   try {
-    await new Promise(resolve => setTimeout(resolve, 250));
+    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
 
-    let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+    const favoriteIdsArray: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds || '[]');
 
-    if (!favoriteNYSFairEventIds) {
-      favoriteNYSFairEventIds = '[]';
-    }
-
-    const favoriteIdsArray: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds);
-
-    if (!favoriteIdsArray.some(fav => fav.id === event.id && fav.start_time_unix === selectedStartTimeUnix)) {
+    if (!favoriteIdsArray.some(favoritedEvent => favoritedEvent.id === event.id && favoritedEvent.start_time_unix === selectedStartTimeUnix)) {
       favoriteIdsArray.push({ id: event.id, start_time_unix: selectedStartTimeUnix });
     }
 
-    console.log('favoriteIdsArray', favoriteIdsArray);
-
     await Preferences.set({
       key: 'favoriteNYSFairEvents',
-      value: JSON.stringify(favoriteIdsArray)
+      value: JSON.stringify(favoriteIdsArray),
     });
 
-    // Optimistically update the UI
-    const updatedEventsAfterChange = [...eventsData.value];
-    const eventToUpdateAfterChange = { ...updatedEventsAfterChange[eventIndex] }
-
-    eventToUpdateAfterChange.isFavorite = true;
-    eventToUpdateAfterChange.isAddingToFavorites = false;
-
-    updatedEventsAfterChange[eventIndex] = eventToUpdateAfterChange;
-
-    // Update in the reactive array
-    data.value!.nysfairWebsite.events = updatedEventsAfterChange;
+    matchingDate.isFavorite = true;
   } finally {
-    // Reset loading state regardless of success or failure
+    matchingDate.isAddingToFavorites = false;
   }
 };
 
 const removeEventFromFavorites = async (event: Event, selectedStartTimeUnix: number): Promise<void> => {
-  if (event.isFavorite !== true) {
-    console.warn('Event is not a favorite');
-
+  const matchingDate = event.dates.find(date => date.start_time_unix === selectedStartTimeUnix);
+  if (!matchingDate) {
+    console.warn('No matching date found for the selected start time.');
     return;
   }
 
-  const eventIndexInData = eventsData.value.findIndex((eventsDataEvent: any) => eventsDataEvent.id === event.id);
-
-  if (eventIndexInData === -1) {
-    console.warn('Event not found in data');
-
-    return;
-  }
-
-  // Optimistically update the UI
-  const updatedEvents = [...eventsData.value];
-  const eventToUpdate = { ...updatedEvents[eventIndexInData] }
-  eventToUpdate.isRemovingFromFavorites = true;
-  updatedEvents[eventIndexInData] = eventToUpdate;
-
-  // Update in the reactive array
-  data.value!.nysfairWebsite.events = updatedEvents;
+  matchingDate.isRemovingFromFavorites = true;
 
   try {
-    await new Promise(resolve => setTimeout(resolve, 250));
+    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
 
-    let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+    const favoriteIdsArray: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds || '[]');
 
-    if (!favoriteNYSFairEventIds) {
-      favoriteNYSFairEventIds = '[]';
+    const index = favoriteIdsArray.findIndex(favoritedEvent => favoritedEvent.id === event.id && favoritedEvent.start_time_unix === selectedStartTimeUnix);
+    if (index !== -1) {
+      favoriteIdsArray.splice(index, 1);
     }
-
-    const favoriteIdsArray: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds);
-
-    const eventIndex = favoriteIdsArray.findIndex(favorite => {
-      return favorite.id === event.id && favorite.start_time_unix === selectedStartTimeUnix;
-    });
-
-    if (eventIndex !== -1) {
-      favoriteIdsArray.splice(eventIndex, 1);
-    }
-
-    console.log('favoriteIdsArray', favoriteIdsArray);
 
     await Preferences.set({
       key: 'favoriteNYSFairEvents',
-      value: JSON.stringify(favoriteIdsArray)
+      value: JSON.stringify(favoriteIdsArray),
     });
 
-    // Optimistically update the UI
-    const updatedEventsAfterChange = [...eventsData.value];
-    const eventToUpdateAfterChange = { ...updatedEventsAfterChange[eventIndexInData] }
-    eventToUpdateAfterChange.isFavorite = false;
-    eventToUpdateAfterChange.isRemovingFromFavorites = false;
-
-    updatedEventsAfterChange[eventIndexInData] = eventToUpdateAfterChange;
-
-    // Update in the reactive array
-    data.value!.nysfairWebsite.events = updatedEventsAfterChange;
+    matchingDate.isFavorite = false;
   } finally {
-    // Reset loading state regardless of success or failure
+    matchingDate.isRemovingFromFavorites = false;
   }
 };
 
