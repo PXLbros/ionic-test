@@ -97,6 +97,8 @@ import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBa
 import { heart, heartOutline } from 'ionicons/icons';
 import { useDataStore } from '@/stores/data';
 import { Preferences } from '@capacitor/preferences';
+import { PushNotifications } from '@capacitor/push-notifications';
+import { Capacitor } from '@capacitor/core';
 import { storeToRefs } from 'pinia';
 
 const dataStore = useDataStore();
@@ -221,7 +223,7 @@ const filteredEvents = computed((): Event[] => {
               hour12: true,
             })
           : 'Time TBD',
-        isFavorite: matchingDate ? matchingDate.isFavorite : false, // Add `isFavorite` at the event level
+        isFavorite: matchingDate ? matchingDate.isFavorite : false,
         isAddingToFavorites: matchingDate ? matchingDate.isAddingToFavorites : false,
         isRemovingFromFavorites: matchingDate ? matchingDate.isRemovingFromFavorites : false,
       };
@@ -287,6 +289,9 @@ const toggleFavorite = async (event: Event): Promise<void> => {
   }
 };
 
+const saveUserEventFavorite = async ({ eventId, startTimeUnix, deviceId, isFavorite }: { eventId: number; startTimeUnix: number; deviceId: string; isFavorite: boolean }): Promise<void> => {
+  console.log('saveUserEventFavorite', { eventId, startTimeUnix, deviceId, isFavorite });
+};
 
 const addEventToFavorites = async (event: Event, selectedStartTimeUnix: number): Promise<void> => {
   const matchingDate = event.dates.find(date => date.start_time_unix === selectedStartTimeUnix);
@@ -294,6 +299,17 @@ const addEventToFavorites = async (event: Event, selectedStartTimeUnix: number):
   if (!matchingDate) {
     console.warn('No matching date found for the selected start time.');
     return;
+  }
+
+  const isNativePlatform = Capacitor.isNativePlatform();
+
+  if (isNativePlatform) {
+    const permissions = await PushNotifications.requestPermissions();
+
+    if (permissions.receive !== 'granted') {
+      console.error('Push notification permissions not granted');
+      return;
+    }
   }
 
   matchingDate.isAddingToFavorites = true; // Set loading state
@@ -311,6 +327,32 @@ const addEventToFavorites = async (event: Event, selectedStartTimeUnix: number):
       key: 'favoriteNYSFairEvents',
       value: JSON.stringify(favoriteIdsArray),
     });
+
+    const saveUserEventFavoriteData = {
+      eventId: event.id,
+      startTimeUnix: selectedStartTimeUnix,
+      isFavorite: true,
+    };
+
+    // Send to API
+    if (isNativePlatform) {
+      // Fetch the token
+      PushNotifications.addListener('registration', async (token) => {
+        console.log('Device token:', token.value);
+
+        saveUserEventFavoriteData.deviceId = token.value;
+
+        // Send the event ID and token to the backend
+        await saveUserEventFavorite(saveUserEventFavoriteData);
+      });
+
+      // Trigger registration if not already done
+      PushNotifications.register();
+    } else {
+      saveUserEventFavoriteData.deviceId = 'web';
+
+      await saveUserEventFavorite(saveUserEventFavoriteData);
+    }
 
     matchingDate.isFavorite = true;
   } finally {
