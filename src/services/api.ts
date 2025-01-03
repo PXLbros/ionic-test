@@ -4,7 +4,6 @@ import * as Sentry from '@sentry/capacitor';
 import { Preferences } from '@capacitor/preferences';
 
 const API_URL = `${import.meta.env.VITE_STRAPI_API_URL}/data${import.meta.env.VITE_NODE_ENV === 'local' ? '?cache=0' : ''}`;
-const API_TOKEN = import.meta.env.VITE_STRAPI_API_TOKEN;
 
 export const fetchData = async () => {
   const dataStore = useDataStore();
@@ -194,11 +193,14 @@ const formatNYSFairWebsiteData = async (data: any) => {
     favoriteNYSFairEventIds = '[]';
   }
 
-  favoriteNYSFairEventIds = favoriteNYSFairEventIds ? JSON.parse(favoriteNYSFairEventIds) : [];
+  const favoriteNYSFairEvents: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds);
 
   if (data.events) {
     data.events = data.events.map((event: any) => {
-      event.isFavorite = favoriteNYSFairEventIds?.includes(event.id);
+      event.dates = event.dates.map((date: any) => ({
+        ...date,
+        isFavorite: favoriteNYSFairEvents.some((favoritedEvent) => favoritedEvent.id === event.id && favoritedEvent.start_time_unix === date.start_time_unix),
+      }));
 
       return event;
     });
