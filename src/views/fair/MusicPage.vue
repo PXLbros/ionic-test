@@ -25,37 +25,47 @@
 
         <!-- Filter Section -->
         <div class="filters">
-            <div class="filter-dropdown">
-                <button class="filter-btn" @click="toggleDateDropdown">
-                  {{ selectedDate || 'Date' }} ▼
-                </button>
-                <div v-if="showDateDropdown" class="dropdown-content">
-                  <div v-for="date in uniqueDates" :key="date" @click="selectDate(date || '')">
-                    {{ formatDate(date || '') }}
-                  </div>
+          <div class="filter-dropdown">
+              <button class="filter-btn" @click="toggleDateDropdown">
+                {{ selectedDate || 'Date' }} ▼
+              </button>
+              <div v-if="showDateDropdown" class="dropdown-content">
+                <div @click="selectDate('')">All Dates</div>
+                <div v-for="date in uniqueDates" :key="date" @click="selectDate(date || '')">
+                  {{ formatDate(date || '') }}
                 </div>
-            </div>
-             <div class="filter-dropdown">
-                <button class="filter-btn" @click="toggleVenueDropdown">
-                  {{ selectedVenue || 'Venue' }} ▼
-                </button>
-                <div v-if="showVenueDropdown" class="dropdown-content">
-                  <div v-for="venue in uniqueVenues" :key="venue" @click="selectVenue(venue || '')">
-                    {{ venue }}
-                  </div>
-                </div>
-            </div>
-            <div class="filter-dropdown">
-                <button class="filter-btn" @click="toggleGenreDropdown">
-                    {{ selectedGenre || 'Genre' }} ▼
-                </button>
-                <div v-if="showGenreDropdown" class="dropdown-content">
-                  <div v-for="genre in uniqueGenres" :key="genre" @click="selectGenre(genre)">
-                    {{ genre }}
-                  </div>
-                </div>
-            </div>
+              </div>
           </div>
+          <div class="filter-dropdown">
+              <button class="filter-btn" @click="toggleVenueDropdown">
+                {{ selectedVenue || 'Venue' }} ▼
+              </button>
+              <div v-if="showVenueDropdown" class="dropdown-content">
+                <div @click="selectVenue('')">All Venues</div>
+                <div v-for="venue in uniqueVenues" :key="venue" @click="selectVenue(venue || '')">
+                  {{ venue }}
+                </div>
+              </div>
+          </div>
+          <div class="filter-dropdown">
+              <button class="filter-btn" @click="toggleGenreDropdown">
+                  {{ selectedGenre || 'Genre' }} ▼
+              </button>
+              <div v-if="showGenreDropdown" class="dropdown-content">
+                <div @click="selectGenre('')">All Genres</div>
+                <div v-for="genre in uniqueGenres" :key="genre" @click="selectGenre(genre)">
+                  {{ genre }}
+                </div>
+              </div>
+          </div>
+          <button 
+            v-if="hasActiveFilters" 
+            @click="clearFilters" 
+            class="clear-filters-btn"
+          >
+            Clear Filters
+          </button>
+      </div>
 
 
         <!-- Events List -->
@@ -209,6 +219,21 @@ const filteredEvents = computed(() => {
     return dateMatch && venueMatch && genreMatch;
   });
 });
+
+const hasActiveFilters = computed(() => {
+  return selectedDate.value !== '' || 
+         selectedVenue.value !== '' || 
+         selectedGenre.value !== '';
+});
+
+const clearFilters = () => {
+  selectedDate.value = '';
+  selectedVenue.value = '';
+  selectedGenre.value = '';
+  showDateDropdown.value = false;
+  showVenueDropdown.value = false;
+  showGenreDropdown.value = false;
+};
 
 const selectDate = (date: string) => {
   selectedDate.value = date;
@@ -379,6 +404,25 @@ const venueInfo = computed(() => {
     gap: 10px;
     padding: 10px 20px 20px 20px;
     justify-content: space-between;
+    position: relative;
+}
+
+.clear-filters-btn {
+  position: absolute;
+  bottom: -30px;
+  right: 20px;
+  background-color: #1E5EAE;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  
+  &:hover {
+    background-color: #174a8a;
+  }
 }
 
 .filter-dropdown {
