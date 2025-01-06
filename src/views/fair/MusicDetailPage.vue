@@ -23,6 +23,7 @@
                         <div class="main__venue">{{ event.venue?.name }}</div>
                         <h1 class="main__title">{{ event.title }}</h1>
                         <div class="main__date" v-if="event.dates && event.dates.length > 0">{{ formatEventDate(event.dates) }} ({{event.duration}} min)</div>
+                        <div class="main__price" v-if="event.price">Price: ${{event.price || 'price not available'}}</div>
                     </div>
                     
                     <div class="main__description" v-html="event.description"></div>
@@ -76,6 +77,7 @@ interface Event {
     venue: Venue;
     featured_image?: string;
     duration?: number;
+    price?: number;
 }
 
 interface Venue {
@@ -243,6 +245,12 @@ ion-back-button {
         font-weight: 700;
         line-height: 24px;
         margin-top: 5px;
+    }
+
+    &__price {
+        margin-top: 5px;
+        font-weight: 600;
+        color: #343434;
     }
 
     &__description {
