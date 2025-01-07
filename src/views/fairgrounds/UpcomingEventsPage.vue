@@ -13,7 +13,7 @@
       <div class="main">
         <div class="main__header">
           <h1 class="main__header-title">Upcoming Events</h1>
-          
+
           <div class="main__header-toggles">
             <div class="filter">
               <span>
@@ -21,7 +21,7 @@
                   <path d="M23.1441 10.7915H18.1461C17.9558 10.0783 17.5363 9.44756 16.9523 8.99658C16.3683 8.5456 15.6523 8.29945 14.9146 8.29611C14.1774 8.30005 13.462 8.54648 12.8786 8.99741C12.2951 9.44834 11.8761 10.0788 11.6859 10.7915H0.861355C0.748601 10.7912 0.636879 10.813 0.532569 10.8559C0.428259 10.8987 0.333402 10.9617 0.253418 11.0413C0.173433 11.1208 0.109889 11.2153 0.0664069 11.3194C0.0229249 11.4235 0.000359663 11.5352 0 11.6481C0.000726013 11.8747 0.0912149 12.0919 0.251643 12.2519C0.412071 12.412 0.629352 12.5018 0.855868 12.5018H11.6887C11.8778 13.2149 12.2961 13.8458 12.8791 14.2973C13.4621 14.7488 14.1774 14.9957 14.9146 15C15.6522 14.9959 16.3678 14.7491 16.9513 14.2976C17.5348 13.8461 17.9537 13.2151 18.1433 12.5018H23.1441C23.2569 12.5022 23.3685 12.4802 23.4727 12.4371C23.5769 12.394 23.6715 12.3307 23.7511 12.2508C23.8307 12.1709 23.8937 12.076 23.9364 11.9716C23.9791 11.8672 24.0007 11.7554 24 11.6426C24.0003 11.5301 23.9781 11.4188 23.9348 11.3151C23.8915 11.2113 23.8278 11.1173 23.7476 11.0386C23.5871 10.8795 23.3701 10.7907 23.1441 10.7915Z" fill="#333333"/>
                   <path d="M0.861355 4.18098H2.57035C2.75701 4.88585 3.17026 5.50966 3.74633 5.95618C4.3224 6.4027 5.02928 6.64711 5.75791 6.6517C6.47728 6.64684 7.17564 6.40841 7.74799 5.97227C8.32034 5.53612 8.73575 4.92583 8.93176 4.23314L23.1441 4.18922C23.2569 4.18958 23.3685 4.16759 23.4727 4.1245C23.5769 4.08141 23.6715 4.01809 23.7511 3.93819C23.8307 3.85829 23.8937 3.7634 23.9364 3.65901C23.9791 3.55461 24.0007 3.44277 24 3.32996C24.0003 3.21753 23.9781 3.10618 23.9348 3.00246C23.8915 2.89874 23.8278 2.80474 23.7476 2.72601C23.6686 2.64624 23.5746 2.58288 23.471 2.53954C23.3675 2.4962 23.2564 2.47374 23.1441 2.47344L8.95645 2.51737C8.7735 1.80633 8.36049 1.17591 7.78187 0.724489C7.20325 0.273064 6.49158 0.026031 5.75791 0.0219421C5.03274 0.026587 4.32903 0.268777 3.7544 0.711483C3.17976 1.15419 2.76581 1.77305 2.57584 2.47344H0.861355C0.748601 2.47308 0.636879 2.49495 0.532569 2.5378C0.428259 2.58065 0.333402 2.64364 0.253418 2.72317C0.173433 2.80271 0.109889 2.89723 0.0664069 3.00134C0.0229249 3.10545 0.000359663 3.21712 0 3.32996C0.000356495 3.44254 0.0229583 3.55394 0.0665073 3.65775C0.110056 3.76156 0.173691 3.85572 0.253748 3.93482C0.333806 4.01391 0.428705 4.07638 0.532984 4.11863C0.637262 4.16088 0.748861 4.18207 0.861355 4.18098Z" fill="#333333"/>
                 </svg>
-              </span> 
+              </span>
               Filters
             </div>
             <div class="calendar" @click="toggleView">
@@ -34,9 +34,9 @@
 
           <div class="main__header-search">
             <div class="search-container">
-              <input 
-                class="input" 
-                type="text" 
+              <input
+                class="input"
+                type="text"
                 placeholder="Search Events"
                 v-model="searchQuery"
               >
@@ -50,9 +50,9 @@
         </div>
 
         <!-- Scrollable Dates only for List View -->
-        <div v-if="viewMode !== 'calendar'" ref="dateScrollRef" class="date-scroll">
-          <div 
-            v-for="(date, index) in dates" 
+        <div v-if="!isSearching" ref="dateScrollRef" class="date-scroll">
+          <div
+            v-for="(date, index) in dates"
             :key="date.toISOString()"
             :ref="el => { if (isSameMonth(date, selectedDate)) currentMonthRef = el as HTMLElement }"
             class="date-item"
@@ -64,6 +64,19 @@
           </div>
         </div>
 
+        <!-- Search results heading when searching -->
+        <div v-if="isSearching" class="search-results-header">
+          <h2 class="search-results-title">
+            Search Results {{ filteredEvents.length ? `(${filteredEvents.length})` : '' }}
+          </h2>
+          <button
+            class="clear-search-btn"
+            @click="clearSearch"
+          >
+            Clear Search
+          </button>
+        </div>
+
         <!-- Calendar View -->
         <div v-if="viewMode === 'calendar'" class="calendar-view">
           <div class="calendar-header">
@@ -73,18 +86,18 @@
               <button @click="navigateMonth(1)">›</button>
             </div>
           </div>
-          
+
           <div class="calendar-grid">
             <div class="calendar-weekdays">
-              <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat']" 
-                   :key="day" 
+              <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat']"
+                   :key="day"
                    class="weekday">
                 {{ day }}
               </div>
             </div>
-            
+
             <div v-if="calendarDays" class="calendar-days">
-              <div v-for="day in calendarDays" 
+              <div v-for="day in calendarDays"
                   :key="day ? day.toISOString() : ''"
                    class="day"
                    :class="{
@@ -98,19 +111,27 @@
             </div>
           </div>
 
-          <!-- Events for selected day testing new repo transfer-->
+          <!-- Events for selected day-->
           <div v-if="getEventsForDate(selectedDate).length > 0" class="day-events">
-            <div v-for="event in getEventsForDate(selectedDate)" 
-                 :key="event.id" 
+            <div v-for="event in getEventsForDate(selectedDate)"
+                 :key="event.id"
                  class="day-event">
                  <router-link class="cta" :to="`/fairgrounds/upcoming-events/${encodeURIComponent(event.id)}`">
                   <div class="event-card__image">
                     <img :src="getEventImage(event) || '/api/placeholder/400/200'" alt="Event image" />
                   </div>
                   <div class="event-card__content">
-                    <div class="event-card__time">{{ getEventTime(event) }}</div>
+                    <div class="event-card__meta">
+                      <div class="event-card__date">
+                        {{ format(parseISO(event.eventDates[0].date), 'EEE, MMM d, yyyy') }}
+                      </div>
+                      <span class="event-card__separator">•</span>
+                      <div class="event-card__time">{{ getEventTime(event) }}</div>
+                    </div>
                     <h3 class="event-card__title">{{ event.title }}</h3>
-                    <div class="event-card__location">{{ event.eventAdmission ? `Admission: ${event.eventAdmission}` : '' }}</div>
+                    <div class="event-card__location">
+                      {{ event.eventAdmission ? `Admission: ${event.eventAdmission}` : '' }}
+                    </div>
                   </div>
                 </router-link>
             </div>
@@ -120,7 +141,7 @@
         <!-- List View -->
         <div v-else class="events-list">
           <div
-            v-for="event in filteredEvents" 
+            v-for="event in filteredEvents"
             :key="event.id"
             class="event-card"
           >
@@ -129,9 +150,17 @@
                 <img :src="getEventImage(event) || '/api/placeholder/400/200'" alt="Event image" />
               </div>
               <div class="event-card__content">
-                <div class="event-card__time">{{ getEventTime(event) }}</div>
+                <div class="event-card__meta">
+                  <div class="event-card__date">
+                    {{ format(parseISO(event.eventDates[0].date), 'EEE, MMM d, yyyy') }}
+                  </div>
+                  <span class="event-card__separator">•</span>
+                  <div class="event-card__time">{{ getEventTime(event) }}</div>
+                </div>
                 <h3 class="event-card__title">{{ event.title }}</h3>
-                <div class="event-card__location">{{ event.eventAdmission ? `Admission: ${event.eventAdmission}` : '' }}</div>
+                <div class="event-card__location">
+                  {{ event.eventAdmission ? `Admission: ${event.eventAdmission}` : '' }}
+                </div>
               </div>
             </router-link>
           </div>
@@ -259,7 +288,6 @@ onMounted(async () => {
   setTimeout(scrollToSelectedMonth, 100);
 });
 
-
 // Switching from Calendar to List will center the selected date value
 watch(viewMode, async (newMode) => {
   if (newMode === 'list') {
@@ -277,22 +305,22 @@ watch(selectedDate, async () => {
 const dates = computed(() => {
   const months: Date[] = [];
   const currentDate = new Date();
-  
+
   // Add past 12 months
   for (let i = -12; i < 0; i++) {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
     months.push(date);
   }
-  
+
   // Add current month
   months.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
-  
+
   // Add future 12 months
   for (let i = 1; i <= 12; i++) {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
     months.push(date);
   }
-  
+
   return months;
 });
 
@@ -309,20 +337,20 @@ const events = combinedEvents;
 const calendarDays = computed(() => {
   const start = new Date(selectedDate.value.getFullYear(), selectedDate.value.getMonth(), 1);
   const end = new Date(selectedDate.value.getFullYear(), selectedDate.value.getMonth() + 1, 0);
-  
+
   const firstDayOfMonth = start.getDay();
   const days = [];
-  
+
   // Add padding for days before the first of the month
   for (let i = 0; i < firstDayOfMonth; i++) {
     days.push(null);
   }
-  
+
   // Add all days of the month
   for (let day = 1; day <= end.getDate(); day++) {
     days.push(new Date(selectedDate.value.getFullYear(), selectedDate.value.getMonth(), day));
   }
-  
+
   return days;
 });
 
@@ -331,18 +359,41 @@ const filteredEvents = computed(() => {
     if (!event.enabled) return false;
     if (!event.eventDates || event.eventDates.length === 0) return false;
 
-    const eventStartDate = parseISO(event.eventDates[0].date);
-    const matchesDate = isSameMonth(eventStartDate, selectedDate.value) && 
-                       eventStartDate.getFullYear() === selectedDate.value.getFullYear();
-    const matchesSearch = event.title.toLowerCase().includes(searchQuery.value.toLowerCase());
+    // If there's a search query, ignore date filtering
+    if (searchQuery.value) {
+      return event.title.toLowerCase().includes(searchQuery.value.toLowerCase());
+    }
 
-    return matchesDate && matchesSearch;
+    // Otherwise filter by selected month/date
+    const eventStartDate = parseISO(event.eventDates[0].date);
+    const matchesDate = isSameMonth(eventStartDate, selectedDate.value) &&
+                eventStartDate.getFullYear() === selectedDate.value.getFullYear();
+
+    return matchesDate;
   });
+});
+
+const isSearching = computed(() => {
+  return searchQuery.value.length > 0;
+});
+
+const clearSearch = () => {
+  searchQuery.value = '';
+};
+
+watch(isSearching, async (newValue, oldValue) => {
+  // Only trigger scroll when switching from searching to not searching
+  if (!newValue && oldValue) {
+    // Wait for the next tick to ensure the date scroll is rendered
+    await nextTick();
+    // Add a small delay to ensure smooth transition
+    setTimeout(scrollToSelectedMonth, 100);
+  }
 });
 
 const eventsByDate = computed(() => {
   const eventMap = new Map<string, Event[]>();
-  
+
   events.value.forEach(event => {
     if (event.eventDates?.[0]) {
       const dateKey = format(parseISO(event.eventDates[0].date), 'yyyy-MM-dd');
@@ -352,7 +403,7 @@ const eventsByDate = computed(() => {
       eventMap.get(dateKey)?.push(event);
     }
   });
-  
+
   return eventMap;
 });
 
@@ -364,7 +415,7 @@ const handleDateSelect = (date: Date) => {
 
 const hasEvents = (date: Date) => {
   if (!date) return false;
-  
+
   return events.value.some(event => {
     if (!event.enabled || !event.eventDates?.[0]) return false;
     const eventDate = parseISO(event.eventDates[0].date);
@@ -374,7 +425,7 @@ const hasEvents = (date: Date) => {
 
 const getEventsForDate = (date: Date) => {
   if (!date) return [];
-  
+
   return events.value.filter(event => {
     if (!event.enabled || !event.eventDates?.[0]) return false;
     const eventDate = parseISO(event.eventDates[0].date);
@@ -387,15 +438,15 @@ const toggleView = () => {
 };
 
 const navigateMonth = (direction: number) => {
-  const newDate = direction > 0 
+  const newDate = direction > 0
     ? addMonths(selectedDate.value, 1)
     : subMonths(selectedDate.value, 1);
-    
+
   // Check if the new date is within bounds
   const currentDate = new Date();
   const minDate = subMonths(currentDate, 12);
   const maxDate = addMonths(currentDate, 12);
-  
+
   if (newDate >= minDate && newDate <= maxDate) {
     selectedDate.value = newDate;
   }
@@ -423,7 +474,7 @@ const getEventImage = (event: Event): string => {
     &__header {
       display: flex;
       flex-direction: column;
-  
+
       &-title {
         padding: 30px;
         color: #343434;
@@ -433,14 +484,14 @@ const getEventImage = (event: Event): string => {
         line-height: 28px;
         letter-spacing: 0.5px;
       }
-  
+
       &-toggles {
         padding: 0 30px;
         display: flex;
         width: 100%;
         justify-content: space-between;
         align-items: center;
-  
+
         .filter {
           font-size: 14px;
           font-weight: 700;
@@ -449,15 +500,15 @@ const getEventImage = (event: Event): string => {
           gap: 5px;
         }
       }
-  
+
       &-search {
         padding: 0 30px;
         margin-top: 20px;
-        
+
         .search-container {
           position: relative;
           width: 100%;
-          
+
           input {
             width: 100%;
             padding: 15px 55px 15px 27px;
@@ -468,7 +519,7 @@ const getEventImage = (event: Event): string => {
             color: #333;
             background-color: #FAFDFF;
           }
-          
+
           .search-icon {
             position: absolute;
             right: 15px;
@@ -480,7 +531,7 @@ const getEventImage = (event: Event): string => {
       }
     }
   }
-  
+
   .date-scroll {
     display: flex;
     overflow-x: auto;
@@ -493,7 +544,7 @@ const getEventImage = (event: Event): string => {
       display: none;
     }
   }
-  
+
   .date-item {
     min-width: 100px;
     padding: 12px 25px;
@@ -502,12 +553,12 @@ const getEventImage = (event: Event): string => {
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-  
+
     &--active {
       background-color: #3B71CA;
       color: #F1F1F1;
     }
-  
+
     &__year {
       font-size: 12px;
       line-height: 15px;
@@ -515,7 +566,7 @@ const getEventImage = (event: Event): string => {
       font-weight: 600;
       opacity: 0.8;
     }
-  
+
     &__month {
       font-size: 24px;
       line-height: 24px;
@@ -537,7 +588,7 @@ const getEventImage = (event: Event): string => {
       display: flex;
       flex-direction: column;
       margin-bottom: 30px;
-      
+
       &__image {
           background-color: #EFF2F6;
           border-radius: 24px;
@@ -553,6 +604,25 @@ const getEventImage = (event: Event): string => {
               height: 100%;
               object-fit: cover;
           }
+      }
+
+      &__meta {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+
+      &__date {
+        font-size: 12px;
+        color: #343434;
+        font-weight: 600;
+      }
+
+      &__time {
+        font-size: 12px;
+        color: #343434;
+        font-weight: 600;
       }
 
       &__content {
@@ -585,26 +655,57 @@ const getEventImage = (event: Event): string => {
       }
   }
 
+  .search-results-header {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #EFF2F6;
+
+    .search-results-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #343434;
+      margin: 0;
+    }
+
+    .clear-search-btn {
+      padding: 8px 16px;
+      background-color: #F5F7FA;
+      border: none;
+      border-radius: 20px;
+      color: #3B71CA;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #E3EBF0;
+      }
+    }
+  }
+
   .calendar-view {
     padding: 20px;
-  
+
     .calendar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-  
+
       h2 {
         font-size: 24px;
         font-weight: 600;
         margin: 0;
         color: #343434;
       }
-  
+
       .calendar-nav {
         display: flex;
         gap: 10px;
-        
+
         button {
           background: none;
           border: none;
@@ -615,13 +716,13 @@ const getEventImage = (event: Event): string => {
         }
       }
     }
-  
+
     .calendar-grid {
       .calendar-weekdays {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
         margin-bottom: 10px;
-  
+
         .weekday {
           text-align: center;
           font-size: 12px;
@@ -630,14 +731,14 @@ const getEventImage = (event: Event): string => {
           padding: 8px 0;
         }
       }
-  
+
       .calendar-days {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
         gap: 5px;
         background-color: #F5F7FA;
         border-radius: 10px;
-  
+
         .day {
           aspect-ratio: 1;
           display: flex;
@@ -648,12 +749,12 @@ const getEventImage = (event: Event): string => {
           border-radius: 12px;
           cursor: pointer;
           background-color: #F5F7FA;
-          
+
           &.active {
             background-color: #3B71CA;
             color: white;
           }
-  
+
           &.has-events {
             .event-indicator {
               width: 6px;
@@ -664,7 +765,7 @@ const getEventImage = (event: Event): string => {
               bottom: 4px;
             }
           }
-  
+
           .date {
             font-size: 16px;
             font-weight: 500;
@@ -672,32 +773,32 @@ const getEventImage = (event: Event): string => {
         }
       }
     }
-  
+
     .day-events {
       margin-top: 20px;
-      
+
       .day-event {
         border-bottom: 1px solid #EFF2F6;
-  
+
         &-link {
           padding: 15px;
           display: block;
           text-decoration: none;
           color: #343434;
-  
+
           .event-time {
             font-size: 12px;
             color: #666;
             margin-bottom: 4px;
             font-weight: 600;
           }
-  
+
           .event-title {
             font-size: 16px;
             font-weight: 500;
           }
         }
-  
+
         &:last-child {
           border-bottom: none;
         }
