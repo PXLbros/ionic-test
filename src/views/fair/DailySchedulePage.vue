@@ -131,6 +131,7 @@ interface Event {
   created_at: string;
   featured_image: string;
   venue: Venue;
+  dateDetails: EventDate;
   isFavorite?: boolean;
   isAddingToFavorites?: boolean;
   isRemovingFromFavorites?: boolean;
@@ -218,7 +219,7 @@ const filteredEvents = computed((): Event[] => {
       isFavorite: matchingDate.isFavorite || false,
       isAddingToFavorites: matchingDate.isAddingToFavorites || false,
       isRemovingFromFavorites: matchingDate.isRemovingFromFavorites || false,
-      dateDetails: matchingDate, // Keep reference to the specific date details
+      dateDetails: matchingDate,
     }));
   });
 
