@@ -60,21 +60,25 @@
           </div>
 
           <div v-else class="events-list">
-            <div v-for="event in filteredEvents" :key="event.id" class="event-item">
+            <div v-for="event in filteredEvents"
+              :key="event.id"
+              class="event-item"
+              @click="openEventModal(event)"
+              >
               <div class="content">
                 <h3>{{ event.title || "Event Title" }}</h3>
                 <p>{{ event.start_time || "Event Start Time" }} </p>
                 <p>{{ event.venue.name || "Event Venue N/A" }}</p>
-                <p v-if="event.categories.length > 0">
+                <!-- <p v-if="event.categories.length > 0">
                   Categories: {{ event.categories.map(catId => getCategoryName(catId)).join(', ') }}
-                </p>
+                </p> -->
               </div>
 
               <div class="favorite">
                 <button
                   class="favorite-button"
                   :class="{ 'is-favorite': event.dateDetails.isFavorite }"
-                  @click="toggleFavorite(event.id, event.dateDetails)"
+                  @click.stop="toggleFavorite(event.id, event.dateDetails)"
                   :disabled="event.dateDetails.isAddingToFavorites || event.dateDetails.isRemovingFromFavorites"
                 >
                   <ion-icon
@@ -88,6 +92,12 @@
         </div>
       </div>
     </ion-content>
+    <EventModal
+      :is-open="isModalOpen"
+      :event="selectedEvent"
+      :categories="categories"
+      @close="closeEventModal"
+    />
   </ion-page>
 </template>
 
@@ -98,6 +108,7 @@ import { heart, heartOutline } from 'ionicons/icons';
 import { useDataStore } from '@/stores/data';
 import { Preferences } from '@capacitor/preferences';
 import { storeToRefs } from 'pinia';
+import EventModal from '@/components/EventModal.vue';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
@@ -134,6 +145,7 @@ interface Event {
   isFavorite?: boolean;
   isAddingToFavorites?: boolean;
   isRemovingFromFavorites?: boolean;
+  price: string;
 }
 
 interface Category {
@@ -151,6 +163,20 @@ interface DateObject {
 const selectedDateIndex = ref(0);
 const isDateChanging = ref(false);
 const selectedCategory = ref<string | number>('all');
+
+// Modal for Events
+const isModalOpen = ref(false);
+const selectedEvent = ref<Event | null>(null);
+
+const openEventModal = (event: Event) => {
+  selectedEvent.value = event;
+  isModalOpen.value = true;
+};
+
+const closeEventModal = () => {
+  isModalOpen.value = false;
+  selectedEvent.value = null;
+};
 
 const convertToEastern = (unixTimestamp: number): Date => {
   const date = new Date(unixTimestamp * 1000);
