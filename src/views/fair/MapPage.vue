@@ -15,7 +15,7 @@
             <h1 class="main__header-text">Interactive <br/>Map</h1>
             <h1 class="main__header-sponsor">Sponsorship</h1>
           </div>
-          
+
           <div class="filter-tabs">
             <button class="filter-tab">
               <ion-icon :icon="optionsOutline"></ion-icon>
@@ -68,11 +68,11 @@ const createVendorMarkerElement = () => {
 
 onMounted(() => {
   if (mapContainer.value) {
-    mapboxgl.accessToken = 'pk.eyJ1IjoibWtldHRlbGthbXAiLCJhIjoiY2xhaXljbjZ3MDQ0NDN2bndzZnJrc3FxMyJ9.LEl_hT5f2QSxqw2LTf03lQ';
-    
+    mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
+
     const map = new mapboxgl.Map({
       container: mapContainer.value,
-      style: 'mapbox://styles/mkettelkamp/cm4bsp0cm01fq01qr1xyd1woo',
+      style: 'mapbox://styles/pxldevops/cm4uef2wm005401sm7ebof1mh',
       bearing: 222,
       center: [-76.2197, 43.073],
       zoom: 14
@@ -109,7 +109,7 @@ onMounted(() => {
       });
 
       // Find the gate feature (assuming it's the one with title "Front Gate")
-      const gateFeature = features.find(feature => 
+      const gateFeature = features.find(feature =>
         feature.properties?.title === "Front Gate"
       );
       console.log('gateFeature', gateFeature);
@@ -148,7 +148,7 @@ onMounted(() => {
       vendors.forEach((vendor: any) => {
         if (vendor.latitude && vendor.longitude) {
           const element = createVendorMarkerElement();
-          
+
           new mapboxgl.Marker({
             element: element,
             anchor: 'center'
@@ -184,7 +184,7 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
   }
-  
+
   &-text {
     font-size: 24px;
     font-weight: 600;
@@ -205,7 +205,7 @@ onMounted(() => {
 .search-container {
   margin: 0 30px;
   position: relative;
-  
+
   .search-input {
     width: 100%;
     padding: 15px 20px;
@@ -214,7 +214,7 @@ onMounted(() => {
     background-color: transparent;
     font-size: 16px;
   }
-  
+
   .search-icon {
     position: absolute;
     right: 20px;
@@ -229,7 +229,7 @@ onMounted(() => {
   justify-content: flex-start;
   align-items: center;
   padding: 10px 30px;
-  
+
   .filter-tab {
     padding: 10px 20px;
     border: none;
@@ -267,7 +267,7 @@ onMounted(() => {
   border-radius: 8px;
   max-height: 30vh;
   overflow-y: auto;
-  
+
   h3 {
     color: black;
     margin-top: 0px;
@@ -275,7 +275,7 @@ onMounted(() => {
     text-align: center;
     font-weight: 600;
   }
-  
+
   p {
     color: black;
   }
@@ -285,7 +285,7 @@ onMounted(() => {
   padding: 20px;
   border-radius: 8px;
   max-width: 300px;
-  
+
   h3 {
     color: black;
     margin-top: 0;
@@ -294,7 +294,7 @@ onMounted(() => {
     text-align: center;
     margin-bottom: 10px;
   }
-  
+
   p {
     color: black;
     margin: 0;
