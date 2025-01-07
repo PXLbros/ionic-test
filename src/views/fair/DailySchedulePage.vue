@@ -73,13 +73,13 @@
                             <div class="favorite">
                               <button
                                 class="favorite-button"
-                                :class="{ 'is-favorite': event.isFavorite }"
-                                @click="toggleFavorite(event)"
-                                :disabled="event.isAddingToFavorites || event.isRemovingFromFavorites"
+                                :class="{ 'is-favorite': event.dateDetails.isFavorite }"
+                                @click="toggleFavorite(event.id, event.dateDetails)"
+                                :disabled="event.dateDetails.isAddingToFavorites || event.dateDetails.isRemovingFromFavorites"
                               >
                                 <ion-icon
-                                  :icon="event.isFavorite ? heart : heartOutline"
-                                  :class="{ 'loading': event.isAddingToFavorites || event.isRemovingFromFavorites }"
+                                  :icon="event.dateDetails.isFavorite ? heart : heartOutline"
+                                  :class="{ 'loading': event.dateDetails.isAddingToFavorites || event.dateDetails.isRemovingFromFavorites }"
                                 ></ion-icon>
                               </button>
                             </div>
@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon } from '@ionic/vue';
 import { heart, heartOutline } from 'ionicons/icons';
 import { useDataStore } from '@/stores/data';
@@ -106,45 +106,46 @@ const categoriesData = computed(() => data.value?.nysfairWebsite?.eventCategorie
 
 // Types for the event data
 interface Venue {
-    name: string;
-    description: string;
+  name: string;
+  description: string;
 }
 
 interface EventDate {
   start_time_date: string;
   start_time_unix: number;
+  start_time_date_ymd: string;
   isFavorite?: boolean;
   isAddingToFavorites?: boolean;
   isRemovingFromFavorites?: boolean;
 }
 
 interface Event {
-    id: number;
-    title: string;
-    description: string;
-    permalink: string;
-    categories: number[];
-     start_time: string;
-    dates: EventDate[];
-    duration: number;
-    created_at: string;
-    featured_image: string;
-    venue: Venue;
-    isFavorite?: boolean;
-    isAddingToFavorites?: boolean;
-    isRemovingFromFavorites?: boolean;
+  id: number;
+  title: string;
+  description: string;
+  permalink: string;
+  categories: number[];
+  start_time: string;
+  dates: EventDate[];
+  duration: number;
+  created_at: string;
+  featured_image: string;
+  venue: Venue;
+  isFavorite?: boolean;
+  isAddingToFavorites?: boolean;
+  isRemovingFromFavorites?: boolean;
 }
 
 interface Category {
-    id: number;
-    name: string;
-    slug: string;
+  id: number;
+  name: string;
+  slug: string;
 }
 
 interface DateObject {
-    dayName: string;
-    day: number;
-    timestamp: number;
+  dayName: string;
+  day: number;
+  timestamp: number;
 }
 
 const selectedDateIndex = ref(0);
@@ -152,46 +153,47 @@ const isDateChanging = ref(false);
 const selectedCategory = ref<string | number>('all');
 
 const convertToEastern = (unixTimestamp: number): Date => {
-    const date = new Date(unixTimestamp * 1000);
-    return new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const date = new Date(unixTimestamp * 1000);
+  return new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
 };
 
 const dates = computed<DateObject[]>(() => {
-    if (!eventsData.value || !eventsData.value.length) return [];
+  if (!eventsData.value || !eventsData.value.length) return [];
 
-    const allDates = eventsData.value.flatMap((event: Event) =>
-        event.dates.map(date => ({
-            timestamp: date.start_time_unix,
-            originalDate: date.start_time_date
-        }))
+  const allDates = eventsData.value.flatMap((event: Event) =>
+    event.dates.map(date => ({
+      timestamp: date.start_time_unix,
+      originalDate: date.start_time_date,
+      dateFormatted: date.start_time_date_ymd,
+    }))
+  );
+
+  const sortedDates = [...allDates].sort((a, b) => a.timestamp - b.timestamp);
+  const uniqueDates = [...new Set(sortedDates.map(date =>
+    convertToEastern(date.timestamp).toDateString()
+  ))];
+
+  return uniqueDates.map((dateStr, index) => {
+    const matchingDate = sortedDates.find(date =>
+      convertToEastern(date.timestamp).toDateString() === dateStr
     );
 
-    const sortedDates = [...allDates].sort((a, b) => a.timestamp - b.timestamp);
-    const uniqueDates = [...new Set(sortedDates.map(date =>
-        convertToEastern(date.timestamp).toDateString()
-    ))];
-
-    return uniqueDates.map((dateStr, index) => {
-        const matchingDate = sortedDates.find(date =>
-            convertToEastern(date.timestamp).toDateString() === dateStr
-        );
-
-        return {
-            dayName: new Date(dateStr).toLocaleDateString('en-US', {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric'
-            }),
-            day: index + 1,
-            timestamp: matchingDate ? matchingDate.timestamp : 0
-        };
-    });
+    return {
+      dayName: new Date(dateStr).toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      }),
+      day: index + 1,
+      timestamp: matchingDate ? matchingDate.timestamp : 0,
+      dateFormatted: matchingDate ? matchingDate.dateFormatted : '',
+    };
+  });
 });
 
 const categories = computed<Category[]>(() => {
-    return categoriesData.value || [];
+  return categoriesData.value || [];
 });
-
 
 const filteredEvents = computed((): Event[] => {
   if (!eventsData.value || !eventsData.value.length || !dates.value.length) return [];
@@ -201,95 +203,75 @@ const filteredEvents = computed((): Event[] => {
 
   const selectedDateUnix = selectedDate.timestamp;
 
-  let filtered = [...eventsData.value] // Make a shallow copy to ensure reactivity
-    .filter((event: Event) =>
-      event.dates.some(date =>
-        convertToEastern(date.start_time_unix).toDateString() === convertToEastern(selectedDateUnix).toDateString()
-      )
-    )
-    .map((event: Event) => {
-      const matchingDate = event.dates.find(date =>
-        convertToEastern(date.start_time_unix).toDateString() === convertToEastern(selectedDateUnix).toDateString()
-      );
+  let filtered = eventsData.value.flatMap((event: Event) => {
+    const matchingDates = event.dates.filter(date =>
+      convertToEastern(date.start_time_unix).toDateString() === convertToEastern(selectedDateUnix).toDateString()
+    );
 
-      return {
-        ...event,
-        start_time: matchingDate
-          ? convertToEastern(matchingDate.start_time_unix).toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: true,
-            })
-          : 'Time TBD',
-        isFavorite: matchingDate ? matchingDate.isFavorite : false, // Add `isFavorite` at the event level
-        isAddingToFavorites: matchingDate ? matchingDate.isAddingToFavorites : false,
-        isRemovingFromFavorites: matchingDate ? matchingDate.isRemovingFromFavorites : false,
-      };
-    });
+    return matchingDates.map(matchingDate => ({
+      ...event,
+      start_time: convertToEastern(matchingDate.start_time_unix).toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+      }),
+      isFavorite: matchingDate.isFavorite || false,
+      isAddingToFavorites: matchingDate.isAddingToFavorites || false,
+      isRemovingFromFavorites: matchingDate.isRemovingFromFavorites || false,
+      dateDetails: matchingDate, // Keep reference to the specific date details
+    }));
+  });
 
   // Apply category filter
   if (selectedCategory.value !== 'all') {
-    filtered = filtered.filter(event => event.categories.includes(Number(selectedCategory.value)));
+    filtered = filtered.filter((event: Event) => event.categories.includes(Number(selectedCategory.value)));
   }
 
-  // Sort events
-  return filtered.sort((a: any, b: any) => {
-    const aDate = a.dates[0].start_time_unix;
-    const bDate = b.dates[0].start_time_unix;
-    return aDate - bDate;
+  // Sort events by start time
+  return filtered.sort((a: Event, b: Event) => {
+    const aTime = a.dateDetails.start_time_unix;
+    const bTime = b.dateDetails.start_time_unix;
+
+    return aTime - bTime;
   });
 });
-
-
 
 const onCategoryChange = () => {
 
 }
 
-
 const getCategoryName = (categoryId: number) => {
-   const category = categories.value.find(cat => cat.id === categoryId)
-   return category ? category.name : 'Unknown Category'
+  const category = categories.value.find(cat => cat.id === categoryId)
+  return category ? category.name : 'Unknown Category'
 }
 
 const selectDate = (index: number): void => {
-    isDateChanging.value = true;
+  isDateChanging.value = true;
 
-     setTimeout(() => {
-            selectedDateIndex.value = index;
-            isDateChanging.value = false;
-     }, 0)
+  setTimeout(() => {
+    selectedDateIndex.value = index;
+    isDateChanging.value = false;
+  }, 0)
 
 };
 
-
-const toggleFavorite = async (event: Event): Promise<void> => {
-  const selectedDate = dates.value[selectedDateIndex.value];
-
-  if (!selectedDate) {
-    console.warn('No selected date available');
-
+const toggleFavorite = async (eventId: number, dateDetails: EventDate): Promise<void> => {
+  if (!dateDetails) {
+    console.warn('No date details provided for the event');
     return;
   }
 
-  const selectedDateUnix = selectedDate.timestamp;
-  const matchingDate = event.dates.find(date => date.start_time_unix === selectedDateUnix);
+  const selectedStartTimeUnix = dateDetails.start_time_unix;
 
-  if (!matchingDate) {
-    console.warn('No matching date found for the selected date');
-    return;
-  }
-
-  if (matchingDate.isFavorite) {
-    await removeEventFromFavorites(event, selectedDateUnix);
+  if (dateDetails.isFavorite) {
+    await removeEventFromFavorites(eventId, selectedStartTimeUnix);
   } else {
-    await addEventToFavorites(event, selectedDateUnix);
+    await addEventToFavorites(eventId, selectedStartTimeUnix);
   }
 };
 
-
-const addEventToFavorites = async (event: Event, selectedStartTimeUnix: number): Promise<void> => {
-  const matchingDate = event.dates.find(date => date.start_time_unix === selectedStartTimeUnix);
+const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: number): Promise<void> => {
+  const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
 
   if (!matchingDate) {
     console.warn('No matching date found for the selected start time.');
@@ -303,8 +285,8 @@ const addEventToFavorites = async (event: Event, selectedStartTimeUnix: number):
 
     const favoriteIdsArray: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds || '[]');
 
-    if (!favoriteIdsArray.some(favoritedEvent => favoritedEvent.id === event.id && favoritedEvent.start_time_unix === selectedStartTimeUnix)) {
-      favoriteIdsArray.push({ id: event.id, start_time_unix: selectedStartTimeUnix });
+    if (!favoriteIdsArray.some(favoritedEvent => favoritedEvent.id === eventId && favoritedEvent.start_time_unix === selectedStartTimeUnix)) {
+      favoriteIdsArray.push({ id: eventId, start_time_unix: selectedStartTimeUnix });
     }
 
     await Preferences.set({
@@ -318,8 +300,9 @@ const addEventToFavorites = async (event: Event, selectedStartTimeUnix: number):
   }
 };
 
-const removeEventFromFavorites = async (event: Event, selectedStartTimeUnix: number): Promise<void> => {
-  const matchingDate = event.dates.find(date => date.start_time_unix === selectedStartTimeUnix);
+const removeEventFromFavorites = async (eventId: number, selectedStartTimeUnix: number): Promise<void> => {
+  const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
+
   if (!matchingDate) {
     console.warn('No matching date found for the selected start time.');
     return;
@@ -332,7 +315,7 @@ const removeEventFromFavorites = async (event: Event, selectedStartTimeUnix: num
 
     const favoriteIdsArray: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds || '[]');
 
-    const index = favoriteIdsArray.findIndex(favoritedEvent => favoritedEvent.id === event.id && favoritedEvent.start_time_unix === selectedStartTimeUnix);
+    const index = favoriteIdsArray.findIndex(favoritedEvent => favoritedEvent.id === eventId && favoritedEvent.start_time_unix === selectedStartTimeUnix);
     if (index !== -1) {
       favoriteIdsArray.splice(index, 1);
     }
@@ -348,9 +331,10 @@ const removeEventFromFavorites = async (event: Event, selectedStartTimeUnix: num
   }
 };
 
-onMounted(() => {
-
-})
+const findEventDate = (eventId: number, startTimeUnix: number): EventDate | undefined => {
+  const event = eventsData.value.find((event: Event) => event.id === eventId);
+  return event?.dates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
+};
 </script>
 
 <style lang="scss" scoped>
