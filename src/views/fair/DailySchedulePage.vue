@@ -270,6 +270,10 @@ const toggleFavorite = async (eventId: number, dateDetails: EventDate): Promise<
   }
 };
 
+const saveUserEventFavorite = async ({ eventId, startTimeUnix, deviceId, isFavorite }: { eventId: number; startTimeUnix: number; deviceId: string; isFavorite: boolean }): Promise<void> => {
+  console.log('saveUserEventFavorite', { eventId, startTimeUnix, deviceId, isFavorite });
+};
+
 const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: number): Promise<void> => {
   const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
 
