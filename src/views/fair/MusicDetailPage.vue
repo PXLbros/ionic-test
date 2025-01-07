@@ -1,14 +1,14 @@
 <template>
     <ion-page>
-        <ion-content>
-            <ion-header>
-                <ion-toolbar>
-                    <ion-buttons slot="start">
-                        <ion-back-button default-href="/fair/music"></ion-back-button>
-                    </ion-buttons>
-                    <ion-title>Chevrolet Music Series</ion-title>
-                </ion-toolbar>
-            </ion-header>
+      <ion-header>
+        <ion-toolbar :translucent="true">
+          <ion-buttons slot="start">
+            <ion-back-button default-href="/fair/music"></ion-back-button>
+          </ion-buttons>
+          <ion-title>Artist</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content :fullscreen="true">
 
             <div v-if="event" class="main">
                 <div class="main__image">
@@ -25,7 +25,7 @@
                         <div class="main__date" v-if="event.dates && event.dates.length > 0">{{ formatEventDate(event.dates) }} ({{event.duration}} min)</div>
                         <div class="main__price" v-if="event.price">Price: ${{event.price || 'price not available'}}</div>
                     </div>
-                    
+
                     <div class="main__description" v-html="event.description"></div>
 
                     <!-- Facts Sections -->
@@ -111,11 +111,11 @@ const parseDateString = (dateString: string): Date => {
     // Fallback: Manual parsing for "Month DD, YYYY HH:MMam/pm" format
     const regex = /^(\w+)\s+(\d+),\s+(\d{4})\s+(\d+):(\d+)(?:\s*)([AaPp][Mm])?/;
     const match = cleanDateString.match(regex);
-    
+
     if (match) {
         const [_, month, day, year, hours, minutes, ampm] = match;
         let hour = parseInt(hours);
-        
+
         // Adjust hours for PM
         if (ampm && ampm.toLowerCase() === 'pm' && hour < 12) {
             hour += 12;

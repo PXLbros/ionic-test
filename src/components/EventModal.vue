@@ -3,7 +3,14 @@
 <template>
   <transition name="modal">
     <div v-if="isOpen" class="modal-overlay" @click="closeModal">
-      <div class="modal-container" @click.stop>
+      <div
+        class="modal-container"
+        @click.stop
+        @touchstart="startDrag"
+        @touchmove="onDrag"
+        @touchend="endDrag"
+        :style="containerStyle"
+      >
         <div class="modal-handle"></div>
 
         <div class="modal-content">
@@ -12,6 +19,10 @@
             <button class="close-button" @click="closeModal">
               <ion-icon :icon="close"></ion-icon>
             </button>
+          </div>
+
+          <div class="event-image">
+            <img :src="event?.featured_image" alt="">
           </div>
 
           <div class="event-details">
@@ -47,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+import { defineProps, defineEmits, ref, computed } from 'vue';
 import { IonIcon } from '@ionic/vue';
 import { close, timeOutline, locationOutline, pricetagOutline, cashOutline } from 'ionicons/icons';
 
@@ -56,6 +67,7 @@ interface Event {
   title: string;
   description: string;
   start_time: string;
+  featured_image: string;
   price: string;
   venue: {
     name: string;
@@ -76,7 +88,55 @@ const props = defineProps<{
 
 const emit = defineEmits(['close']);
 
+// Drag state management
+const dragStartY = ref(0);
+const dragOffset = ref(0);
+const isDragging = ref(false);
+
+// Computed styles for smooth dragging
+const containerStyle = computed(() => {
+  if (!isDragging.value && dragOffset.value === 0) return {};
+
+  return {
+    transform: `translateY(${dragOffset.value}px)`,
+    transition: isDragging.value ? 'none' : 'transform 0.3s ease'
+  };
+});
+
+// Touch event handlers
+const startDrag = (event: TouchEvent) => {
+  isDragging.value = true;
+  dragStartY.value = event.touches[0].clientY;
+};
+
+const onDrag = (event: TouchEvent) => {
+  if (!isDragging.value) return;
+
+  const currentY = event.touches[0].clientY;
+  const difference = currentY - dragStartY.value;
+
+  // Only allow dragging downwards
+  if (difference < 0) {
+    dragOffset.value = 0;
+  } else {
+    dragOffset.value = difference;
+  }
+};
+
+const endDrag = () => {
+  isDragging.value = false;
+
+  // Close modal if dragged down more than 150px
+  if (dragOffset.value > 150) {
+    closeModal();
+  } else {
+    // Reset position if not dragged far enough
+    dragOffset.value = 0;
+  }
+};
+
 const closeModal = () => {
+  dragOffset.value = 0;
   emit('close');
 };
 
@@ -108,6 +168,8 @@ const getCategoryNames = (categoryIds: number[]) => {
   padding: 16px;
   max-height: 90vh;
   overflow-y: auto;
+  touch-action: pan-y;
+  will-change: transform;
 }
 
 .modal-handle {
@@ -142,6 +204,13 @@ const getCategoryNames = (categoryIds: number[]) => {
       font-size: 24px;
       color: #666;
     }
+  }
+}
+
+.event-image {
+  margin-bottom: 10px;
+  img {
+    border-radius: 10px;
   }
 }
 
