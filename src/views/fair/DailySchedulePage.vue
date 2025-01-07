@@ -309,10 +309,11 @@ const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: numbe
       value: JSON.stringify(favoriteIdsArray),
     });
 
-    const saveUserEventFavoriteData = {
-      eventId: event.id,
+    const saveUserEventFavoriteData: { eventId: number; startTimeUnix: number; deviceId: string; isFavorite: boolean } = {
+      eventId: eventId,
       startTimeUnix: selectedStartTimeUnix,
       isFavorite: true,
+      deviceId: '',
     };
 
     // Send to API
