@@ -113,7 +113,6 @@ interface Venue {
 interface EventDate {
   start_time_date: string;
   start_time_unix: number;
-  start_time_date_ymd: string;
   isFavorite?: boolean;
   isAddingToFavorites?: boolean;
   isRemovingFromFavorites?: boolean;
@@ -165,7 +164,6 @@ const dates = computed<DateObject[]>(() => {
     event.dates.map(date => ({
       timestamp: date.start_time_unix,
       originalDate: date.start_time_date,
-      dateFormatted: date.start_time_date_ymd,
     }))
   );
 
@@ -187,7 +185,6 @@ const dates = computed<DateObject[]>(() => {
       }),
       day: index + 1,
       timestamp: matchingDate ? matchingDate.timestamp : 0,
-      dateFormatted: matchingDate ? matchingDate.dateFormatted : '',
     };
   });
 });
