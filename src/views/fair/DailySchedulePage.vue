@@ -39,6 +39,8 @@
         </div>
       </div>
 
+      <router-link :to="{ name: 'event-favorites' }">View All Favorites</router-link>
+
       <div class="loader-container" v-if="isLoading || isDateChanging">
         <div class="spinner"></div>
         <p>Loading Schedule...</p>
@@ -98,6 +100,7 @@ const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
 const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 const categoriesData = computed(() => data.value?.nysfairWebsite?.eventCategories ?? []);
+const router = useRouter();
 
 // Types for the event data
 interface Venue {
