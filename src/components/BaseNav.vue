@@ -1,54 +1,54 @@
 <!-- components/base/BaseNavMenu.vue -->
 <template>
-  <div>
+  <div class="base-nav">
     <!-- Main Navbar -->
     <ion-header>
       <ion-toolbar :style="{ '--background': toolbarBackground }">
         <div class="nav-container">
           <router-link :to="`/${type}`">
-            <img 
-              :src="logoSrc" 
-              :alt="logoAlt" 
+            <img
+              :src="logoSrc"
+              :alt="logoAlt"
               class="header-side logo"
             >
           </router-link>
-          <img 
-            src="/src/imgs/svg/menu.svg" 
-            alt="menu-open" 
+          <img
+            src="/src/imgs/svg/menu.svg"
+            alt="menu-open"
             class="header-side menu-icon"
             @click="openMenu"
           >
         </div>
       </ion-toolbar>
     </ion-header>
-    
+
     <!-- Slide-out Menu -->
     <div class="nav-wrapper" :class="{ 'is-open': isMenuOpen }">
-      <div 
-        class="nav-overlay" 
+      <div
+        class="nav-overlay"
         :class="{ 'is-visible': isMenuOpen }"
         @click="closeMenu"
       ></div>
-      
+
       <div class="nav-menu" :class="{ 'is-open': isMenuOpen }" :style="{ background: menuBackground }">
         <div class="nav-header" :style="{ background: toolbarBackground }">
-          <img 
-            :src="logoSrc" 
-            :alt="logoAlt" 
+          <img
+            :src="logoSrc"
+            :alt="logoAlt"
             class="nav-logo"
           >
           <button class="close-button" @click="closeMenu">
             <span>×</span>
           </button>
         </div>
-        
+
         <nav class="nav-links">
           <div class="primary-links">
             <!-- Cross-section navigation -->
-            
+
             <!-- Regular navigation links -->
-            <router-link 
-            v-for="route in mainNavLinks" 
+            <router-link
+            v-for="route in mainNavLinks"
             :key="route.path"
             :to="route.path"
             class="nav-link"
@@ -58,7 +58,7 @@
           </router-link>
 
           <div class="section-switch">
-            <router-link 
+            <router-link
               :to="oppositeSection.path"
               class="nav-link"
               @click="closeMenu"
@@ -67,7 +67,7 @@
             </router-link>
           </div>
           </div>
-          
+
           <!-- Secondary Links -->
           <div class="secondary-links">
             <div class="separator"></div>
@@ -75,7 +75,7 @@
               <span>Notifications</span>
               <button class="enable-btn">Enable</button>
             </div>
-            
+
             <a href="#" class="nav-link secondary">Contact Us <span class="arrow">›</span></a>
             <a href="#" class="nav-link secondary">
               Terms of Service
@@ -89,12 +89,8 @@
             <!-- Social Links -->
             <div class="social-links">
               <h3>FOLLOW US</h3>
-              <div class="social-icons">
-                <a href="#" class="social-icon"><ion-icon :icon="logoInstagram" size="large"></ion-icon></a>
-                <a href="#" class="social-icon"><ion-icon :icon="logoFacebook" size="large"></ion-icon></a>
-                <a href="#" class="social-icon"><ion-icon :icon="logoX" size="large"></ion-icon></a>
-                <a href="#" class="social-icon"><ion-icon :icon="logoTiktok" size="large"></ion-icon></a>
-              </div>
+
+              <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
             </div>
           </div>
         </nav>
@@ -102,12 +98,11 @@
     </div>
   </div>
 </template>
-  
+
   <script setup lang="ts">
   import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { IonToolbar, IonHeader, IonIcon } from '@ionic/vue';
-import { logoFacebook, logoInstagram, logoTiktok, logoX } from 'ionicons/icons';
+import { IonToolbar, IonHeader } from '@ionic/vue';
 
 const props = defineProps<{
   type: 'fair' | 'fairgrounds'
@@ -117,6 +112,7 @@ const props = defineProps<{
   logoAlt: string
 }>();
 
+const dataStore = useDataStore();
 const router = useRouter();
 const isMenuOpen = ref(false);
 
@@ -145,7 +141,7 @@ const mainNavLinks = computed(() => {
     }
 
     const pathSegments = route.path.split('/').filter(Boolean);
-    
+
     if (props.type === 'fair') {
       return pathSegments[0] === 'fair';
     } else {
@@ -164,34 +160,34 @@ const closeMenu = () => {
   document.body.style.overflow = '';
 };
   </script>
-  
+
   <style scoped lang="scss">
   ion-toolbar {
     --background: #49027fe9;
     -webkit-backdrop-filter: blur(7px);
     backdrop-filter: blur(7px);
   }
-  
+
   .nav-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
   }
-  
+
   .header-side {
     padding: 0px 25px 10px 25px;
   }
 
   .logo {
     height: 60px;
-    
+
   }
-  
+
   .menu-icon {
     cursor: pointer;
   }
-  
+
   .nav-wrapper {
     position: fixed;
     top: 0;
@@ -201,7 +197,7 @@ const closeMenu = () => {
     pointer-events: none;
     z-index: 9999; // Increased z-index to ensure it's above everything
   }
-  
+
   .nav-overlay {
     position: fixed;
     top: 0;
@@ -212,13 +208,13 @@ const closeMenu = () => {
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
-  
+
     &.is-visible {
       opacity: 1;
       pointer-events: auto;
     }
   }
-  
+
   .nav-menu {
     position: fixed;
     top: 0;
@@ -230,12 +226,12 @@ const closeMenu = () => {
     pointer-events: auto;
     overflow-y: auto;
     z-index: 10000; // Ensure menu is above overlay
-    
+
     &.is-open {
       transform: translateX(-100%);
     }
   }
-  
+
   .nav-header {
     display: flex;
     justify-content: space-between;
@@ -244,11 +240,11 @@ const closeMenu = () => {
     padding-top: 40px;
     background: #48027FE5;
   }
-  
+
   .nav-logo {
     height: 40px;
   }
-  
+
   .close-button {
     background: none;
     border: none;
@@ -257,7 +253,7 @@ const closeMenu = () => {
     padding: 0px 0px;
     cursor: pointer;
   }
-  
+
   .nav-links {
     display: flex;
     flex-direction: column;
@@ -265,7 +261,7 @@ const closeMenu = () => {
     min-height: calc(100vh - 100px); // Changed to viewport height
     justify-content: space-between;
   }
-  
+
   .nav-link {
     color: #343434;
     text-decoration: none;
@@ -276,32 +272,32 @@ const closeMenu = () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  
+
     &.secondary {
       font-size: 18px;
       line-height: 40px;
     }
-    
+
     &:last-child {
       border-bottom: none;
     }
-  
+
     &.router-link-active {
       color: #000000;
       font-weight: 500;
     }
-  
+
     .arrow {
       font-size: 24px;
     }
   }
-  
+
   .separator {
     height: 1px;
     background: rgba(20, 20, 20, 0.1);
     margin: 40px 0;
   }
-  
+
   .secondary-links {
     .notifications {
       display: flex;
@@ -311,7 +307,7 @@ const closeMenu = () => {
       color: black;
       font-weight: 500;
       font-size: 20px;
-  
+
       .enable-btn {
         background: none;
         border: none;
@@ -322,23 +318,26 @@ const closeMenu = () => {
       }
     }
   }
-  
+  </style>
+
+<style lang="scss">
+.base-nav {
   .social-links {
     margin-top: 40px;
     text-align: center;
-  
+
     h3 {
       color: #343434;
       font-size: 16px;
       font-weight: 500;
       margin-bottom: 20px;
     }
-  
+
     .social-icons {
       display: flex;
       justify-content: center;
       gap: 20px;
-  
+
       .social-icon {
         background: transparent;
         border-radius: 50%;
@@ -350,4 +349,5 @@ const closeMenu = () => {
       }
     }
   }
-  </style>
+}
+</style>

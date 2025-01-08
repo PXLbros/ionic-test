@@ -14,5 +14,6 @@ declare module 'vue' {
     Loader: typeof import('./components/Loader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SocialIcons: typeof import('./components/SocialIcons.vue')['default']
   }
 }
