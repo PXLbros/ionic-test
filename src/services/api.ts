@@ -1,9 +1,7 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useDataStore } from '@/stores/data';
 import * as Sentry from '@sentry/capacitor';
 import { Preferences } from '@capacitor/preferences';
-
-const API_URL = `${import.meta.env.VITE_STRAPI_API_URL}/data${import.meta.env.VITE_NODE_ENV === 'local' ? '?cache=0' : ''}`;
 
 export const fetchData = async () => {
   const dataStore = useDataStore();
@@ -19,7 +17,7 @@ export const fetchData = async () => {
     if (useFakeData) {
       data = getFakeData();
     } else {
-      const response = await axios.get(API_URL);
+      const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data${import.meta.env.VITE_NODE_ENV === 'local' ? '?cache=0' : ''}`);
 
       console.log('Response data:', response.data);
 
@@ -214,3 +212,41 @@ const formatNYSFairWebsiteData = async (data: any) => {
 
   return data;
 };
+
+export const saveUserEventFavorite = async ({
+  deviceId,
+  eventId,
+  startTime,
+  isFavorite
+}: {
+  deviceId: string;
+  eventId: number;
+  startTime: number;
+  isFavorite: boolean
+}) => {
+  try {
+    const response = await axios[isFavorite ? 'post' : 'delete'](`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites`, {
+      deviceId,
+      eventId,
+      startTime,
+      isFavorite,
+    });
+
+    console.log('response', response);
+
+    const responseStatusCode = response.status;
+
+    console.log('responseStatusCode', responseStatusCode);
+
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      if (error.response?.status === 409) {
+        console.warn('User event favorite already exists');
+
+        return;
+      }
+    }
+
+    console.error(error);
+  }
+}

@@ -93,6 +93,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon } from '@ionic/vue';
 import { heart, heartOutline } from 'ionicons/icons';
 import { useDataStore } from '@/stores/data';
@@ -100,6 +101,7 @@ import { Preferences } from '@capacitor/preferences';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { storeToRefs } from 'pinia';
+import { saveUserEventFavorite } from '@/services/api';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
@@ -270,10 +272,6 @@ const toggleFavorite = async (eventId: number, dateDetails: EventDate): Promise<
   }
 };
 
-const saveUserEventFavorite = async ({ eventId, startTimeUnix, deviceId, isFavorite }: { eventId: number; startTimeUnix: number; deviceId: string; isFavorite: boolean }): Promise<void> => {
-  console.log('saveUserEventFavorite', { eventId, startTimeUnix, deviceId, isFavorite });
-};
-
 const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: number): Promise<void> => {
   const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
 
@@ -309,9 +307,9 @@ const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: numbe
       value: JSON.stringify(favoriteIdsArray),
     });
 
-    const saveUserEventFavoriteData: { eventId: number; startTimeUnix: number; deviceId: string; isFavorite: boolean } = {
+    const saveUserEventFavoriteData: { eventId: number; startTime: number; deviceId: string; isFavorite: boolean } = {
       eventId: eventId,
-      startTimeUnix: selectedStartTimeUnix,
+      startTime: selectedStartTimeUnix,
       isFavorite: true,
       deviceId: '',
     };
@@ -331,7 +329,7 @@ const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: numbe
       // Trigger registration if not already done
       PushNotifications.register();
     } else {
-      saveUserEventFavoriteData.deviceId = 'web';
+      saveUserEventFavoriteData.deviceId = getPersistentWebDeviceId();
 
       await saveUserEventFavorite(saveUserEventFavoriteData);
     }
@@ -376,6 +374,20 @@ const removeEventFromFavorites = async (eventId: number, selectedStartTimeUnix: 
 const findEventDate = (eventId: number, startTimeUnix: number): EventDate | undefined => {
   const event = eventsData.value.find((event: Event) => event.id === eventId);
   return event?.dates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
+};
+
+const getPersistentWebDeviceId = (): string => {
+  const storedDeviceId = localStorage.getItem('webDeviceId');
+
+  if (storedDeviceId) {
+    return storedDeviceId;
+  }
+
+  const newDeviceId = uuidv4();
+
+  localStorage.setItem('webDeviceId', newDeviceId);
+
+  return newDeviceId;
 };
 </script>
 
