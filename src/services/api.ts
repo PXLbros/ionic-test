@@ -223,30 +223,30 @@ export const saveUserEventFavorite = async ({
   eventId: number;
   startTime: number;
   isFavorite: boolean
-}) => {
+}): Promise<boolean> => {
   try {
-    const response = await axios[isFavorite ? 'post' : 'delete'](`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites`, {
+    const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/${isFavorite ? 'create' : 'delete'}`, {
       deviceId,
       eventId,
       startTime,
-      isFavorite,
     });
 
-    console.log('response', response);
+    if (response.data?.success !== true) {
+      throw new Error();
+    }
 
-    const responseStatusCode = response.status;
-
-    console.log('responseStatusCode', responseStatusCode);
-
+    return true;
   } catch (error) {
     if (error instanceof AxiosError) {
       if (error.response?.status === 409) {
         console.warn('User event favorite already exists');
 
-        return;
+        return true;
       }
     }
 
     console.error(error);
+
+    return false;
   }
 }
