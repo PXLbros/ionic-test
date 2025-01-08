@@ -1,15 +1,5 @@
 <template>
-  <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-            <ion-back-button default-href="/fair"></ion-back-button>
-        </ion-buttons>
-        <ion-title>Schedule</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content :fullscreen="true">
-
+  <DefaultLayout title="Schedule">
     <div class="main">
       <div class="main__header">
         <div class="main__header-img">
@@ -54,55 +44,56 @@
         <p>Loading Schedule...</p>
       </div>
 
-        <div v-else class="schedule-content">
-          <div v-if="filteredEvents.length === 0" class="no-events">
-            <p>No events scheduled for this day</p>
-          </div>
+      <div v-else class="schedule-content">
+        <div v-if="filteredEvents.length === 0" class="no-events">
+          <p>No events scheduled for this day</p>
+        </div>
 
-          <div v-else class="events-list">
-            <div v-for="event in filteredEvents" :key="event.id" class="event-item">
-              <div class="content">
-                <h3>{{ event.title || "Event Title" }}</h3>
-                <p>{{ event.start_time || "Event Start Time" }} </p>
-                <p>{{ event.venue.name || "Event Venue N/A" }}</p>
-                <p v-if="event.categories.length > 0">
-                  Categories: {{ event.categories.map(catId => getCategoryName(catId)).join(', ') }}
-                </p>
-              </div>
+        <div v-else class="events-list">
+          <div v-for="event in filteredEvents" :key="event.id" class="event-item">
+            <div class="content">
+              <h3>{{ event.title || "Event Title" }}</h3>
+              <p>{{ event.start_time || "Event Start Time" }} </p>
+              <p>{{ event.venue.name || "Event Venue N/A" }}</p>
+              <p v-if="event.categories.length > 0">
+                Categories: {{ event.categories.map(catId => getCategoryName(catId)).join(', ') }}
+              </p>
+            </div>
 
-              <div class="favorite">
-                <button
-                  class="favorite-button"
-                  :class="{ 'is-favorite': event.dateDetails.isFavorite }"
-                  @click="toggleFavorite(event.id, event.dateDetails)"
-                  :disabled="event.dateDetails.isAddingToFavorites || event.dateDetails.isRemovingFromFavorites"
-                >
-                  <ion-icon
-                    :icon="event.dateDetails.isFavorite ? heart : heartOutline"
-                    :class="{ 'loading': event.dateDetails.isAddingToFavorites || event.dateDetails.isRemovingFromFavorites }"
-                  ></ion-icon>
-                </button>
-              </div>
+            <div class="favorite">
+              <button
+                class="favorite-button"
+                :class="{ 'is-favorite': event.dateDetails.isFavorite }"
+                @click="toggleFavorite(event.id, event.dateDetails)"
+                :disabled="event.dateDetails.isAddingToFavorites || event.dateDetails.isRemovingFromFavorites"
+              >
+                <ion-icon
+                  :icon="event.dateDetails.isFavorite ? heart : heartOutline"
+                  :class="{ 'loading': event.dateDetails.isAddingToFavorites || event.dateDetails.isRemovingFromFavorites }"
+                ></ion-icon>
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </ion-content>
-  </ion-page>
+    </div>
+  </DefaultLayout>
 </template>
 
 <script setup lang="ts">
+import { PushNotifications } from '@capacitor/push-notifications';
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon } from '@ionic/vue';
+import DefaultLayout from '../../layouts/default.vue';
+import { IonIcon } from '@ionic/vue';
 import { heart, heartOutline } from 'ionicons/icons';
 import { useDataStore } from '@/stores/data';
 import { Preferences } from '@capacitor/preferences';
-import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { storeToRefs } from 'pinia';
 import { saveUserEventFavorite } from '@/services/api';
 
+const appStore = useAppStore();
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
 const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
@@ -314,16 +305,28 @@ const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: numbe
       deviceId: '',
     };
 
+    const handleSaveUserEventFavoriting = ({ result, matchingDate }: { result: boolean; matchingDate: EventDate }) => {
+      if (result) {
+        appStore.openToast({ message: 'Event added to favorites', duration: 2000 });
+
+        matchingDate.isFavorite = true;
+      }
+
+      matchingDate.isAddingToFavorites = false;
+    };
+
     // Send to API
     if (isNativePlatform) {
       // Fetch the token
-      PushNotifications.addListener('registration', async (token) => {
+      PushNotifications.addListener('registration', async (token: { value: string }) => {
         console.log('Device token:', token.value);
 
         saveUserEventFavoriteData.deviceId = token.value;
 
         // Send the event ID and token to the backend
-        await saveUserEventFavorite(saveUserEventFavoriteData);
+        const saveUserEventFavoriteSuccess = await saveUserEventFavorite(saveUserEventFavoriteData);
+
+        handleSaveUserEventFavoriting({ result: saveUserEventFavoriteSuccess, matchingDate });
       });
 
       // Trigger registration if not already done
@@ -331,12 +334,16 @@ const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: numbe
     } else {
       saveUserEventFavoriteData.deviceId = getPersistentWebDeviceId();
 
-      await saveUserEventFavorite(saveUserEventFavoriteData);
+      const saveUserEventFavoriteSuccess = await saveUserEventFavorite(saveUserEventFavoriteData);
+
+      handleSaveUserEventFavoriting({ result: saveUserEventFavoriteSuccess, matchingDate });
     }
 
-    matchingDate.isFavorite = true;
+    // appStore.openToast({ message: 'Event added to favorites', duration: 2000 });
+
+    // matchingDate.isFavorite = true;
   } finally {
-    matchingDate.isAddingToFavorites = false;
+    // matchingDate.isAddingToFavorites = false;
   }
 };
 
@@ -355,6 +362,7 @@ const removeEventFromFavorites = async (eventId: number, selectedStartTimeUnix: 
 
     const favoriteIdsArray: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds || '[]');
 
+    // Find and remove the event from local storage
     const index = favoriteIdsArray.findIndex(favoritedEvent => favoritedEvent.id === eventId && favoritedEvent.start_time_unix === selectedStartTimeUnix);
     if (index !== -1) {
       favoriteIdsArray.splice(index, 1);
@@ -365,9 +373,49 @@ const removeEventFromFavorites = async (eventId: number, selectedStartTimeUnix: 
       value: JSON.stringify(favoriteIdsArray),
     });
 
-    matchingDate.isFavorite = false;
+    const saveUserEventFavoriteData: { eventId: number; startTime: number; deviceId: string; isFavorite: boolean } = {
+      eventId: eventId,
+      startTime: selectedStartTimeUnix,
+      isFavorite: false, // Set isFavorite to false
+      deviceId: '',
+    };
+
+    const handleSaveUserEventUnfavoriting = ({ result, matchingDate }: { result: boolean; matchingDate: EventDate }) => {
+      if (result) {
+        appStore.openToast({ message: 'Event removed from favorites', duration: 2000 });
+
+        matchingDate.isFavorite = false;
+      }
+
+      matchingDate.isRemovingFromFavorites = false;
+    };
+
+    const isNativePlatform = Capacitor.isNativePlatform();
+
+    if (isNativePlatform) {
+      // Fetch the token
+      PushNotifications.addListener('registration', async (token: { value: string }) => {
+        saveUserEventFavoriteData.deviceId = token.value;
+
+        // Send the event ID and token to the backend
+        const saveUserEventFavoriteResult = await saveUserEventFavorite(saveUserEventFavoriteData);
+
+        handleSaveUserEventUnfavoriting({ result: saveUserEventFavoriteResult, matchingDate });
+      });
+
+      // Trigger registration if not already done
+      PushNotifications.register();
+    } else {
+      saveUserEventFavoriteData.deviceId = getPersistentWebDeviceId();
+
+      const saveUserEventFavoriteResult = await saveUserEventFavorite(saveUserEventFavoriteData);
+
+      handleSaveUserEventUnfavoriting({ result: saveUserEventFavoriteResult, matchingDate });
+    }
+
+    // matchingDate.isFavorite = false;
   } finally {
-    matchingDate.isRemovingFromFavorites = false;
+    // matchingDate.isRemovingFromFavorites = false;
   }
 };
 

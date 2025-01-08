@@ -19,20 +19,20 @@
 
                 <div class="main__content">
                     <h1 class="main__content-title">Directions</h1>
-                    
+
                     <p class="main__content-text">
                         The New York State Fairgrounds is immediately adjacent to Route 690 just West of Syracuse. It is easily accessible from the New York State Thruway (Rt. 90) from the West and East, and from Route 81, North and South. Just follow the signs to the Fairgrounds once you enter the Syracuse area.
                     </p>
 
                     <p class="main__content-text">
-                        Our street address is: 
+                        Our street address is:
                         <a href="https://maps.google.com/?q=581+State+Fair+Blvd,+Syracuse,+New+York+13209" class="main__content-link">
                             581 State Fair Blvd., Syracuse, New York 13209
                         </a>
                     </p>
 
                     <p class="main__content-text">
-                        Our GPS coordinates are: 
+                        Our GPS coordinates are:
                         <a href="https://maps.google.com/?q=43.073857,-76.215708" class="main__content-link">
                             43.073857,-76.215708
                         </a>
