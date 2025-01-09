@@ -58,7 +58,7 @@
               <p>{{ event.start_time || "Event Start Time" }} </p>
               <p>{{ event.venue.name || "Event Venue N/A" }}</p>
               <p v-if="event.categories.length > 0">
-                Categories: {{ event.categories.map(catId => getCategoryName(catId)).join(', ') }}
+                Categories: {{ event.categories.map((eventCategoryId: number) => getCategoryName(eventCategoryId)).join(', ') }}
               </p>
             </div>
 
@@ -100,7 +100,6 @@ const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
 const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 const categoriesData = computed(() => data.value?.nysfairWebsite?.eventCategories ?? []);
-const router = useRouter();
 
 // Types for the event data
 interface Venue {
@@ -443,52 +442,6 @@ const getPersistentWebDeviceId = (): string => {
 </script>
 
 <style lang="scss" scoped>
-.main {
-    font-family: "Inter", sans-serif;
-
-    &__header {
-        padding: 25px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-
-        &-img {
-            width: 100%;
-            height: 20vh;
-            background-color: #EFF2F6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 24px;
-        }
-
-        &-content {
-            display: flex;
-            flex-direction: column;
-
-            .title {
-                font-size: 24px;
-                font-weight: 700;
-                line-height: 28px;
-                letter-spacing: 0.5px;
-                color: #343434;
-            }
-
-            .subtitle {
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 28px;
-                letter-spacing: 0.5px;
-                color: #343434;
-                margin: 0px;
-                width: 90%;
-            }
-        }
-    }
-}
-
 .date-selector {
     padding: 0 25px;
     margin-bottom: 5px;
