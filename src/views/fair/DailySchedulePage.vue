@@ -51,7 +51,7 @@
           <p>No events scheduled for this day</p>
         </div>
 
-        <div v-else class="events-list">
+        <!-- <div v-else class="events-list">
           <div v-for="event in filteredEvents" :key="event.id" class="event-item">
             <div class="content">
               <h3>{{ event.title || "Event Title" }}</h3>
@@ -76,7 +76,9 @@
               </button>
             </div>
           </div>
-        </div>
+        </div> -->
+
+        <EventsList :events="filteredEvents" v-else />
       </div>
     </div>
   </DefaultLayout>
@@ -86,7 +88,8 @@
 import { PushNotifications } from '@capacitor/push-notifications';
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import DefaultLayout from '../../layouts/default.vue';
+import DefaultLayout from '@/layouts/default.vue';
+import EventsList from '@/components/EventsList.vue';
 import { IonIcon } from '@ionic/vue';
 import { heart, heartOutline } from 'ionicons/icons';
 import { useDataStore } from '@/stores/data';
@@ -94,56 +97,13 @@ import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
 import { storeToRefs } from 'pinia';
 import { saveUserEventFavorite } from '@/services/api';
+import { Category, DateObject, Event, EventDate } from '@/types';
 
 const appStore = useAppStore();
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
 const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 const categoriesData = computed(() => data.value?.nysfairWebsite?.eventCategories ?? []);
-
-// Types for the event data
-interface Venue {
-  name: string;
-  description: string;
-}
-
-interface EventDate {
-  start_time_date: string;
-  start_time_unix: number;
-  isFavorite?: boolean;
-  isAddingToFavorites?: boolean;
-  isRemovingFromFavorites?: boolean;
-}
-
-interface Event {
-  id: number;
-  title: string;
-  description: string;
-  permalink: string;
-  categories: number[];
-  start_time: string;
-  dates: EventDate[];
-  duration: number;
-  created_at: string;
-  featured_image: string;
-  venue: Venue;
-  dateDetails: EventDate;
-  isFavorite?: boolean;
-  isAddingToFavorites?: boolean;
-  isRemovingFromFavorites?: boolean;
-}
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-interface DateObject {
-  dayName: string;
-  day: number;
-  timestamp: number;
-}
 
 const selectedDateIndex = ref(0);
 const isDateChanging = ref(false);
@@ -540,35 +500,6 @@ const getPersistentWebDeviceId = (): string => {
 
         &--open {
             transform: rotate(180deg);
-        }
-    }
-
-    .events-list {
-        .event-item {
-            padding: 15px 0;
-            border-bottom: 1px solid #EFF2F6;
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-
-            h3 {
-                font-size: 16px;
-                margin: 0 0 5px 0;
-            }
-
-            p {
-                font-size: 14px;
-                color: #666;
-                margin: 0;
-                font-weight: 500;
-            }
-             p:last-child {
-                margin-top: 2px;
-            }
-
-            .favorite {
-                margin-top: 10px;
-            }
         }
     }
 }
