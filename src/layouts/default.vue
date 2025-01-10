@@ -84,5 +84,9 @@ const appStore = useAppStore();
       }
     }
   }
+
+  &__content {
+    padding: 0 25px;
+  }
 }
 </style>

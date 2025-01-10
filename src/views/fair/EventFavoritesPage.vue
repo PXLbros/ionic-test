@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="Event Favorites">
+  <DefaultLayout title="Event Favorites" backButtonHref="/fair/schedule">
     <div class="main">
       <div class="main__header">
         <div class="main__header-img">
@@ -13,17 +13,31 @@
         </div>
       </div>
 
-      <pre>
+      <!-- <pre>
         {{ favoriteEventItems }}
-      </pre>
+      </pre> -->
+
+      <div class="main__content">
+        <EventsList
+          :events="favoriteEventItems"
+          :categories="categories"
+          noEventsText="No favorited events"
+        />
+      </div>
     </div>
   </DefaultLayout>
 </template>
 
 <script setup lang="ts">
+import { Category } from '@/types';
 import DefaultLayout from '../../layouts/default.vue';
+import { formatEvent } from '@/utils/event';
 
 const dataStore = useDataStore();
+
+const categories = computed<Category[]>(() => {
+  return dataStore.data.nysfairWebsite?.eventCategories || [];
+});
 
 const favoriteEventItems = computed(() => {
   const favoriteEventItems = [];
@@ -31,13 +45,11 @@ const favoriteEventItems = computed(() => {
   for (const event of dataStore.data.nysfairWebsite.events) {
     for (const eventDate of event.dates) {
       if (eventDate.isFavorite) {
-        favoriteEventItems.push({
-          event: {
-            id: event.id,
-            title: event.title,
-          },
-          eventDate,
-        });
+        const formattedEvent = formatEvent({ event, eventDate, categories: categories.value });
+
+        console.log('formattedEvent', formattedEvent);
+
+        favoriteEventItems.push(formattedEvent);
       }
     }
   }
