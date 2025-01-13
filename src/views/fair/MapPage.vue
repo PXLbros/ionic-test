@@ -145,24 +145,24 @@ onMounted(() => {
 
 
       // Add vendor markers
-      vendors.forEach((vendor: any) => {
-        if (vendor.latitude && vendor.longitude) {
-          const element = createVendorMarkerElement();
+      // vendors.forEach((vendor: any) => {
+      //   if (vendor.latitude && vendor.longitude) {
+      //     const element = createVendorMarkerElement();
 
-          new mapboxgl.Marker({
-            element: element,
-            anchor: 'center'
-          })
-            .setLngLat([parseFloat(vendor.longitude), parseFloat(vendor.latitude)])
-            .setPopup(
-              new mapboxgl.Popup().setHTML(`
-                <h3>${vendor.name}</h3>
-                ${vendor.description ? `<p>${vendor.description}</p>` : ''}
-              `)
-            )
-            .addTo(map);
-        }
-      });
+      //     new mapboxgl.Marker({
+      //       element: element,
+      //       anchor: 'center'
+      //     })
+      //       .setLngLat([parseFloat(vendor.longitude), parseFloat(vendor.latitude)])
+      //       .setPopup(
+      //         new mapboxgl.Popup().setHTML(`
+      //           <h3>${vendor.name}</h3>
+      //           ${vendor.description ? `<p>${vendor.description}</p>` : ''}
+      //         `)
+      //       )
+      //       .addTo(map);
+      //   }
+      // });
     });
 
     setTimeout(() => {
