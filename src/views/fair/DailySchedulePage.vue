@@ -39,7 +39,9 @@
         </div>
       </div>
 
-      <router-link :to="{ name: 'event-favorites' }">View All Favorites</router-link>
+      <div class="favorites-link">
+        <router-link :to="{ name: 'event-favorites' }">View All Favorites</router-link>
+      </div>
 
       <div class="loader-container" v-if="isLoading || isDateChanging">
         <div class="spinner"></div>
@@ -223,6 +225,24 @@ const selectDate = (index: number): void => {
             transition: border-color 0.3s ease;
         }
     }
+}
+
+.favorites-link {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 25px;
+  margin-top: 5px;
+  a {
+    color: #1E5EAE;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #0D3C6E;
+    }
+  }
 }
 
 .schedule-content {
