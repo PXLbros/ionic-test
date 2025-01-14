@@ -110,6 +110,16 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/fair/schedule/favorites',
+    name: 'event-favorites',
+    component: () => import('@/views/fair/EventFavoritesPage.vue'),
+    meta: {
+      title: 'Event Favorites',
+      // showInMenu: true,
+      // menuOrder: 4
+    }
+  },
+  {
     path: '/fair/music',
     component: () => import('@/views/fair/MusicPage.vue'),
     meta: {
