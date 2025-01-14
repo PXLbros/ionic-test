@@ -8,6 +8,9 @@ import { createPinia } from 'pinia';
 import * as Sentry from '@sentry/capacitor';
 import * as SentryVue from '@sentry/vue';
 
+import { Capacitor } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
+
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
 
@@ -69,6 +72,44 @@ Sentry.init(
   SentryVue.init
 );
 
-router.isReady().then(() => {
+router.isReady().then(async () => {
   app.mount('#app');
+
+  const isNativePlatform = Capacitor.isNativePlatform();
+
+  if (isNativePlatform) {
+    let permStatus = await PushNotifications.checkPermissions();
+
+    if (permStatus.receive === 'prompt') {
+      permStatus = await PushNotifications.requestPermissions();
+    }
+
+    if (permStatus.receive !== 'granted') {
+      throw new Error('User denied permissions!');
+    }
+
+    await PushNotifications.register();
+
+    // Handle successful registration
+    await PushNotifications.addListener('registration', (token) => {
+      console.log('Device registered with token:', token.value);
+      // Save the token to your backend (Strapi) if needed
+    });
+
+    await PushNotifications.addListener('registrationError', err => {
+      console.error('Registration error: ', err.error);
+    });
+
+    // Handle foreground notifications
+    await PushNotifications.addListener('pushNotificationReceived', (notification) => {
+      console.log('Notification received:', notification);
+    });
+
+    // Handle notification actions (e.g., when a user clicks on a notification)
+    await PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+      console.log('Notification action performed:', notification);
+    });
+  } else {
+    console.warn('Skipped push notifications setup because app is not running on a native platform');
+  }
 });
