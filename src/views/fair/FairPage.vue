@@ -1,8 +1,8 @@
 <template>
-    
-    <ion-page id="main-content" >
+
+    <ion-page id="main-content" class="main-content--fair-page" >
         <!-- Header Nav -->
-        
+
         <!-- Main Content -->
         <FairNav />
         <ion-content :fullscreen="true">
@@ -16,7 +16,7 @@
                             <div class="main-button">
                                 <svg class="main-button__icon" width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M50.5 44.4444V5.55556C50.5 2.5 48 0 44.9444 0H6.05556C3 0 0.5 2.5 0.5 5.55556V44.4444C0.5 47.5 3 50 6.05556 50H44.9444C48 50 50.5 47.5 50.5 44.4444ZM15.7778 29.1667L22.7222 37.5278L32.4444 25L44.9444 41.6667H6.05556L15.7778 29.1667Z" fill="#1E5EAE"/>
-                                </svg> 
+                                </svg>
                                 <h2 class="main-button__text">Buy Tickets</h2>
                             </div>
                         </ion-col>
@@ -24,7 +24,7 @@
                             <div class="main-button">
                                 <svg class="main-button__icon" width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M50.5 44.4444V5.55556C50.5 2.5 48 0 44.9444 0H6.05556C3 0 0.5 2.5 0.5 5.55556V44.4444C0.5 47.5 3 50 6.05556 50H44.9444C48 50 50.5 47.5 50.5 44.4444ZM15.7778 29.1667L22.7222 37.5278L32.4444 25L44.9444 41.6667H6.05556L15.7778 29.1667Z" fill="#1E5EAE"/>
-                                </svg> 
+                                </svg>
                                 <h2 class="main-button__text">Fair Finder Map</h2>
                             </div>
                         </ion-col>
@@ -34,7 +34,7 @@
                             <div class="main-button">
                                 <svg class="main-button__icon" width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M50.5 44.4444V5.55556C50.5 2.5 48 0 44.9444 0H6.05556C3 0 0.5 2.5 0.5 5.55556V44.4444C0.5 47.5 3 50 6.05556 50H44.9444C48 50 50.5 47.5 50.5 44.4444ZM15.7778 29.1667L22.7222 37.5278L32.4444 25L44.9444 41.6667H6.05556L15.7778 29.1667Z" fill="#1E5EAE"/>
-                                </svg> 
+                                </svg>
                                 <h2 class="main-button__text">Daily Schedule</h2>
                             </div>
                         </ion-col>
@@ -42,7 +42,7 @@
                             <div class="main-button">
                                 <svg class="main-button__icon" width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M50.5 44.4444V5.55556C50.5 2.5 48 0 44.9444 0H6.05556C3 0 0.5 2.5 0.5 5.55556V44.4444C0.5 47.5 3 50 6.05556 50H44.9444C48 50 50.5 47.5 50.5 44.4444ZM15.7778 29.1667L22.7222 37.5278L32.4444 25L44.9444 41.6667H6.05556L15.7778 29.1667Z" fill="#1E5EAE"/>
-                                </svg>  
+                                </svg>
                                 <h2 class="main-button__text">Chevrolet Music Series</h2>
                             </div>
                         </ion-col>
@@ -52,7 +52,7 @@
                             <div class="main-button">
                                 <svg class="main-button__icon" width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M50.5 44.4444V5.55556C50.5 2.5 48 0 44.9444 0H6.05556C3 0 0.5 2.5 0.5 5.55556V44.4444C0.5 47.5 3 50 6.05556 50H44.9444C48 50 50.5 47.5 50.5 44.4444ZM15.7778 29.1667L22.7222 37.5278L32.4444 25L44.9444 41.6667H6.05556L15.7778 29.1667Z" fill="#1E5EAE"/>
-                                </svg>  
+                                </svg>
                                 <h2 class="main-button__text">Real-Time Updates</h2>
                             </div>
                         </ion-col>
@@ -60,7 +60,7 @@
                             <div class="main-button">
                                 <svg class="main-button__icon" width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M50.5 44.4444V5.55556C50.5 2.5 48 0 44.9444 0H6.05556C3 0 0.5 2.5 0.5 5.55556V44.4444C0.5 47.5 3 50 6.05556 50H44.9444C48 50 50.5 47.5 50.5 44.4444ZM15.7778 29.1667L22.7222 37.5278L32.4444 25L44.9444 41.6667H6.05556L15.7778 29.1667Z" fill="#1E5EAE"/>
-                                </svg>  
+                                </svg>
                                 <h2 class="main-button__text">In-App Activities</h2>
                             </div>
                         </ion-col>
@@ -70,7 +70,7 @@
                             <div class="main-button">
                                 <svg class="main-button__icon" width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M50.5 44.4444V5.55556C50.5 2.5 48 0 44.9444 0H6.05556C3 0 0.5 2.5 0.5 5.55556V44.4444C0.5 47.5 3 50 6.05556 50H44.9444C48 50 50.5 47.5 50.5 44.4444ZM15.7778 29.1667L22.7222 37.5278L32.4444 25L44.9444 41.6667H6.05556L15.7778 29.1667Z" fill="#1E5EAE"/>
-                                </svg>                                    
+                                </svg>
                                 <h2 class="main-button__text">Plan Your Visit</h2>
                             </div>
                         </ion-col>
@@ -78,7 +78,7 @@
                             <div class="main-button">
                                 <svg class="main-button__icon" width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M50.5 44.4444V5.55556C50.5 2.5 48 0 44.9444 0H6.05556C3 0 0.5 2.5 0.5 5.55556V44.4444C0.5 47.5 3 50 6.05556 50H44.9444C48 50 50.5 47.5 50.5 44.4444ZM15.7778 29.1667L22.7222 37.5278L32.4444 25L44.9444 41.6667H6.05556L15.7778 29.1667Z" fill="#1E5EAE"/>
-                                </svg>  
+                                </svg>
                                 <h2 class="main-button__text">News</h2>
                             </div>
                         </ion-col>
@@ -93,14 +93,14 @@
                 </div>
                 <div class="sponsor-carousel">
                     <div class="sponsor-carousel__container" ref="carouselContainer">
-                        <div 
+                        <div
                             class="sponsor-item"
-                            v-for="(sponsor, index) in sponsors" 
+                            v-for="(sponsor, index) in sponsors"
                             :key="index"
                         >
                             <div class="sponsor-card">
-                                <img 
-                                    :src="sponsor.image" 
+                                <img
+                                    :src="sponsor.image"
                                     :alt="sponsor.name"
                                     @error="handleImageError"
                                     class="sponsor-image"
@@ -119,10 +119,10 @@
                 <div class="contact-form">
                     <div class="form-group">
                         <label for="email">Email*</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            v-model="email" 
+                        <input
+                            type="email"
+                            id="email"
+                            v-model="email"
                             placeholder="Enter your email"
                             class="form-input"
                         >
@@ -135,26 +135,22 @@
             </div>
 
             <!-- Social Media Section -->
-            <div class="section social-media">
+            <div v-if="dataStore.data.nysfairWebsite.social" class="section social-media">
                 <div class="section-header">
                     <h2 class="section-header__text">Follow Us</h2>
                 </div>
-                <div class="social-icons">
-                    <a href="#" class="social-icon"><ion-icon :icon="logoInstagram" size="large"></ion-icon></a>
-                    <a href="#" class="social-icon"><ion-icon :icon="logoFacebook" size="large"></ion-icon></a>
-                    <a href="#" class="social-icon"><ion-icon :icon="logoX" size="large"></ion-icon></a>
-                    <a href="#" class="social-icon"><ion-icon :icon="logoTiktok" size="large"></ion-icon></a>
-                </div>
+
+                <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
             </div>
         </ion-content>
     </ion-page>
 </template>
 
 <script setup lang="ts">
-    import { IonContent, IonIcon, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
+    import { IonContent, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
     import { useDataStore } from '@/stores/data';
     import FairNav from '@/components/FairNav.vue';
-    import { logoFacebook, logoInstagram, logoTiktok, logoX } from 'ionicons/icons';
+    import SocialIcons from '@/components/SocialIcons.vue';
     import { ref, onMounted } from 'vue';
 
 
@@ -229,7 +225,7 @@
         background-repeat: no-repeat;
         background-size: cover;
         padding-bottom: 20px;
-    
+
         // Create a pseudo-element for the gradient
         &::before {
             content: '';
@@ -242,8 +238,8 @@
             mix-blend-mode: multiply;
             z-index: 0;
         }
-    
-    
+
+
         &-logo {
             width: 100%;
             display: flex;
@@ -259,7 +255,7 @@
         }
 
         &-button {
-            padding: 10px; 
+            padding: 10px;
             border-radius: 30px;
             //box-shadow: 0px 3px 0px 0px #AC37D0;
             //box-shadow: 0px 2px 0px 0px #DA99FEB2 inset;
@@ -306,12 +302,12 @@
                 }
             }
         }
-    }   
+    }
 
     .section {
         padding: 20px 0;
         background-color: white;
-    
+
         &-header {
             display: flex;
             justify-content: center;
@@ -323,7 +319,7 @@
                 background-color: #EFF2F6;
                 width: 100%;
             }
-    
+
             &__text {
                 font-size: 24px;
                 font-family: 'Pally', sans-serif;
@@ -334,11 +330,11 @@
             }
         }
     }
-    
+
     // Sponsor Carousel Styles
     .sponsor-carousel {
         padding: 0 20px;
-        
+
         &__container {
             display: flex;
             overflow-x: auto;
@@ -347,13 +343,13 @@
             scrollbar-width: none;
             gap: 20px;
             padding: 20px 0;
-    
+
             &::-webkit-scrollbar {
                 display: none;
             }
         }
     }
-    
+
     .sponsor-card {
         min-width: 200px;
         height: 100px;
@@ -363,30 +359,30 @@
         align-items: center;
         justify-content: center;
         padding: 10px;
-    
+
         img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
     }
-    
+
     // Keep in Touch Styles
     .keep-in-touch {
         background-color: white;
         padding: 40px 0px;
     }
-    
+
     .contact-form {
         max-width: 500px;
         margin: 0 auto;
         padding: 0 20px;
         margin-top: 40px;
     }
-    
+
     .form-group {
         margin-bottom: 20px;
-    
+
         label {
             display: block;
             margin-bottom: 8px;
@@ -394,7 +390,7 @@
             font-family: 'Inter', sans-serif;
         }
     }
-    
+
     .form-input {
         width: 100%;
         padding: 18px 12px;
@@ -403,14 +399,14 @@
         font-size: 16px;
         background: #EFF2F6;
     }
-    
+
     .form-text {
         color: #666;
         font-size: 14px;
         line-height: 1.5;
         margin-bottom: 20px;
     }
-    
+
     .sign-up-btn {
         background: none;
         border: 2px solid #1E5EAE;
@@ -421,13 +417,13 @@
         font-size: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
-    
+
         &:hover {
             background: #1E5EAE;
             color: white;
         }
     }
-    
+
     // Social Media Section Styles
     .social-media {
         padding-bottom: 40px;
@@ -437,29 +433,27 @@
             background-color: #EFF2F6;
         }
     }
-    
-    .social-icons {
-        display: flex;
-        justify-content: center;
-        gap: 30px;
-        padding: 20px;
-    }
-    
-    .social-icon {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #1E5EAE;
-    
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-    }
-
-
 </style>
-  
+
+<style lang="scss">
+.main-content--fair-page {
+  .social-icons {
+    gap: 30px;
+  }
+
+  .social-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1E5EAE;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+}
+</style>
