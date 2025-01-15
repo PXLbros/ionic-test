@@ -1,14 +1,14 @@
 <template>
     <ion-page>
-        <ion-content>
-            <ion-header>
-                <ion-toolbar>
-                    <ion-buttons slot="start">
-                        <ion-back-button default-href="/fairgrounds"></ion-back-button>
-                    </ion-buttons>
-                    <ion-title>Rental Opportunity</ion-title>
-                </ion-toolbar>
-            </ion-header>
+      <ion-header>
+        <ion-toolbar :translucent="true">
+          <ion-buttons slot="start">
+            <ion-back-button default-href="/fairgrounds"></ion-back-button>
+          </ion-buttons>
+          <ion-title>Rental Opportunity</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content :fullscreen="true">
 
            <div class="main">
                 <div class="main__image">
@@ -22,7 +22,7 @@
                         <h1 class="main__title">Book Your Event</h1>
                         <p class="main__description">To book an event, use the form below to get in touch with us please contact:</p>
                     </div>
-                    
+
                     <div class="contact-info">
                         <h2 class="contact-info__title">The New York State Fairgrounds Events Department</h2>
                         <p class="contact-info__address">581 State Fair Blvd.</p>
@@ -34,9 +34,9 @@
                     <form class="form" @submit.prevent="handleSubmit">
                         <div class="form__group">
                             <label for="name">Name</label>
-                            <input 
-                                type="text" 
-                                id="name" 
+                            <input
+                                type="text"
+                                id="name"
                                 v-model="formData.name"
                                 required
                             >
@@ -44,9 +44,9 @@
 
                         <div class="form__group">
                             <label for="title">Title</label>
-                            <input 
-                                type="text" 
-                                id="title" 
+                            <input
+                                type="text"
+                                id="title"
                                 v-model="formData.title"
                                 required
                             >
@@ -54,9 +54,9 @@
 
                         <div class="form__group">
                             <label for="company">Company/Organization*</label>
-                            <input 
-                                type="text" 
-                                id="company" 
+                            <input
+                                type="text"
+                                id="company"
                                 v-model="formData.company"
                                 required
                             >

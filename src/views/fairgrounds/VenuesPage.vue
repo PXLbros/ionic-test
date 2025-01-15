@@ -1,14 +1,14 @@
 <template>
     <ion-page>
-        <ion-content>
-            <ion-header>
-                <ion-toolbar>
-                    <ion-buttons slot="start">
-                        <ion-back-button default-href="/fairgrounds"></ion-back-button>
-                    </ion-buttons>
-                    <ion-title>Venues</ion-title>
-                </ion-toolbar>
-            </ion-header>
+      <ion-header>
+        <ion-toolbar :translucent="true">
+          <ion-buttons slot="start">
+            <ion-back-button default-href="/fairgrounds"></ion-back-button>
+          </ion-buttons>
+          <ion-title>Venues</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content :fullscreen="true">
 
            <div class="main">
                 <div class="main__header">
