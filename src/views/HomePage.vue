@@ -24,6 +24,12 @@
         </div>
       </div> -->
 
+      Did register device: {{ appStore.didRegisterDevice }}
+      <hr>
+      Device ID: {{ appStore.deviceId || '-' }}
+      <hr>
+      Get Device ID Error: {{ appStore.getDeviceIdError || '-' }}
+
       <div class="main">
         <div class="main__header">
           <div class="main__header--icon"></div>
@@ -52,6 +58,7 @@ import { IonContent, IonHeader, IonRouterOutlet, IonTabs, IonTabBar, IonTabButto
 import { StrapiBlocks } from 'vue-strapi-blocks-renderer';
 import { useDataStore } from '@/stores/data';
 
+const appStore = useAppStore();
 const dataStore = useDataStore();
 
 const VNode = dataStore?.data?.mobileApp ? StrapiBlocks({ content: dataStore.data.mobileApp.homePage.introText }) : null;

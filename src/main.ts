@@ -72,6 +72,8 @@ Sentry.init(
   SentryVue.init
 );
 
+const appStore = useAppStore();
+
 router.isReady().then(async () => {
   app.mount('#app');
 
@@ -88,16 +90,18 @@ router.isReady().then(async () => {
       throw new Error('User denied permissions!');
     }
 
-    await PushNotifications.register();
-
     // Handle successful registration
     await PushNotifications.addListener('registration', (token) => {
       console.log('Device registered with token:', token.value);
       // Save the token to your backend (Strapi) if needed
+
+      appStore.deviceId = token.value;
     });
 
-    await PushNotifications.addListener('registrationError', err => {
-      console.error('Registration error: ', err.error);
+    await PushNotifications.addListener('registrationError', (error) => {
+      console.error('Registration error: ', error.error);
+
+      appStore.getDeviceIdError = error.error;
     });
 
     // Handle foreground notifications
@@ -109,6 +113,10 @@ router.isReady().then(async () => {
     await PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
       console.log('Notification action performed:', notification);
     });
+
+    await PushNotifications.register();
+
+    appStore.didRegisterDevice = true;
   } else {
     console.warn('Skipped push notifications setup because app is not running on a native platform');
   }
