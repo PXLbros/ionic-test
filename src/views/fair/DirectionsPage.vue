@@ -1,15 +1,5 @@
 <template>
-    <ion-page>
-        <ion-header>
-            <ion-toolbar :translucent="true">
-                <ion-buttons slot="start">
-                    <ion-back-button default-href="/fair/plan-your-visit"></ion-back-button>
-                </ion-buttons>
-                <ion-title>Directions</ion-title>
-            </ion-toolbar>
-        </ion-header>
-        <ion-content :fullscreen="true">
-
+      <DefaultLayout title="Directions">
             <div class="main">
                 <div class="main__image">
                     <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
@@ -44,11 +34,11 @@
                     </p>
                 </div>
             </div>
-        </ion-content>
-    </ion-page>
+      </DefaultLayout>
 </template>
 
 <script setup lang="ts">
+import DefaultLayout from '@/layouts/default.vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 </script>
 
