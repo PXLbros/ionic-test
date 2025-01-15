@@ -213,19 +213,27 @@ const formatNYSFairWebsiteData = async (data: any) => {
   return data;
 };
 
-export const saveUserEventFavorite = async ({
+export interface NYSFairFavoriteEventPreferencesApiItem {
+  id: number;
+  start_time_unix: number;
+}
+
+export const addUserEventFavorite = async ({
   deviceId,
   eventId,
   startTime,
-  isFavorite
 }: {
   deviceId: string;
   eventId: number;
   startTime: number;
-  isFavorite: boolean
 }): Promise<boolean> => {
   try {
-    const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/${isFavorite ? 'create' : 'delete'}`, {
+    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+
+    const favoriteEventPreferencesApiItems = JSON.parse(favoriteNYSFairEventIds || '[]');
+
+    // Save to Strapi API
+    const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/create`, {
       deviceId,
       eventId,
       startTime,
@@ -234,6 +242,20 @@ export const saveUserEventFavorite = async ({
     if (response.data?.success !== true) {
       throw new Error();
     }
+
+    // Save to Preferences API
+    const favoriteExistsInPreferencesApi = favoriteEventPreferencesApiItems.some((favoritedEvent: NYSFairFavoriteEventPreferencesApiItem) => {
+      return favoritedEvent.id === eventId && favoritedEvent.start_time_unix === startTime;
+    });
+
+    if (!favoriteExistsInPreferencesApi) {
+      favoriteEventPreferencesApiItems.push({ id: eventId, start_time_unix: startTime });
+    }
+
+    await Preferences.set({
+      key: 'favoriteNYSFairEvents',
+      value: JSON.stringify(favoriteEventPreferencesApiItems),
+    });
 
     return true;
   } catch (error) {
@@ -249,4 +271,55 @@ export const saveUserEventFavorite = async ({
 
     return false;
   }
+}
+
+export const removeUserEventFavorite = async ({
+  deviceId,
+  eventId,
+  startTime,
+}: {
+  deviceId: string;
+  eventId: number;
+  startTime: number;
+}): Promise<boolean> => {
+  try {
+    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+
+    const favoriteEventPreferencesApiItems = JSON.parse(favoriteNYSFairEventIds || '[]');
+
+    // Save to Preferences API
+    const index = favoriteEventPreferencesApiItems.findIndex((favoritedEvent: NYSFairFavoriteEventPreferencesApiItem) => {
+      return favoritedEvent.id === eventId && favoritedEvent.start_time_unix === startTime;
+    });
+
+    if (index !== -1) {
+      favoriteEventPreferencesApiItems.splice(index, 1);
+    }
+
+    await Preferences.set({
+      key: 'favoriteNYSFairEvents',
+      value: JSON.stringify(favoriteEventPreferencesApiItems),
+    });
+  } catch (error) {
+    console.error(error);
+
+    return false;
+  }
+
+  try {
+    // Save to Strapi API
+    const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/delete`, {
+      deviceId,
+      eventId,
+      startTime,
+    });
+
+    if (response.data?.success !== true) {
+      throw new Error();
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return true;
 }
