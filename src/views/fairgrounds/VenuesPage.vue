@@ -16,15 +16,15 @@
                     <div class="description">If you're considering hosting an event, you'll want to first review the different spaces we can offer your organization.</div>
                 </div>
                 <div class="main__venue">
-                    <div 
-                        v-for="venue in venues" 
+                    <div
+                        v-for="venue in venues"
                         :key="venue.id"
                         class="main__venue-card"
                     >
-                        <img v-if="venue.venueMainImage" class="image" :src="getVenueImage(venue)" alt="venue image"> 
+                        <img v-if="venue.venueMainImage" class="image" :src="getVenueImage(venue)" alt="venue image">
                         <img v-else class="image" src="/public/modal-img/News_NYSF.jpg" alt="venue image">
                         <div class="content">
-                            <div class="content__label">{{ venue.venueNavTitle || 'Venue' }}</div>
+                            <div class="content__label">{{ venue.venueDetailPreheader || 'Venue' }}</div>
                             <div class="content__title">{{ venue.title }}</div>
                             <div class="content__description">
                                 {{ venue.venueDetailPreheader || venue.venueDetailBody || 'No description available' }}
@@ -82,7 +82,7 @@ const getVenueImage = (venue: Venue) => {
             font-size: 24px;
             font-style: normal;
             font-weight: 600;
-            line-height: 28px; 
+            line-height: 28px;
             letter-spacing: 0.5px;
             margin-bottom: 5px;
         }
@@ -147,7 +147,7 @@ const getVenueImage = (venue: Venue) => {
                     margin-bottom: 10px;
                 }
             }
-            
+
             .cta {
                 border: 1px solid #486284;
                 border-radius: 50px;

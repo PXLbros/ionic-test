@@ -20,12 +20,12 @@
                 </div>
 
                 <div class="main__description">
-                    {{ venue.venueDetailBody || 'No description available' }}
+                  <div class="main__description" v-html="sanitizedDescription"></div>
                 </div>
 
                 <div class="main__specifications">
                     <h2 class="main__subtitle">Specifications</h2>
-                    
+
                     <div class="spec-group">
                         <h3 class="spec-label">Size</h3>
                         <p class="spec-value">15,946 square feet</p>
@@ -76,6 +76,11 @@ const venue = computed<Venue | undefined>(() => {
         (venue: Venue) => venue.id === venueId
     );
 });
+
+// Sanitize the description to allow HTML
+const sanitizedDescription = computed(() => {
+    return venue.value?.venueDetailBody || 'No description available';
+});
 </script>
 
 <style lang="scss" scoped>
@@ -102,13 +107,44 @@ const venue = computed<Venue | undefined>(() => {
     }
 
     &__description {
-        font-size: 16px;
-        line-height: 28px;
-        letter-spacing: 0.5px;
-        color: #343434;
-        margin-bottom: 30px;
-        font-weight: 400;
-    }
+      font-size: 16px;
+      line-height: 28px;
+      letter-spacing: 0.5px;
+      color: #343434;
+      margin-bottom: 30px;
+      font-weight: 400;
+
+      :deep(a) {
+          color: #1E5EAE;
+          text-decoration: none;
+
+          &:hover {
+              text-decoration: underline;
+          }
+      }
+
+      :deep(ul) {
+          list-style-type: disc;
+          padding-left: 20px;
+          margin: 16px 0;
+      }
+
+      :deep(li) {
+          margin-bottom: 8px;
+      }
+
+      :deep(p) {
+          margin: 16px 0;
+
+          &:first-child {
+              margin-top: 0;
+          }
+
+          &:last-child {
+              margin-bottom: 0;
+          }
+      }
+  }
 
     &__specifications {
         margin-top: 15px;
@@ -126,7 +162,7 @@ const venue = computed<Venue | undefined>(() => {
 
 .spec-group {
     margin-bottom: 20px;
-    
+
     &:last-child {
         margin-bottom: 0;
     }

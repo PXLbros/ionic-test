@@ -1,14 +1,14 @@
 <template>
   <ion-page>
-    <ion-content>
-      <ion-header>
-        <ion-toolbar>
-          <ion-buttons slot="start">
-            <ion-back-button default-href="/fairgrounds"></ion-back-button>
-          </ion-buttons>
-          <ion-title>Upcoming Events</ion-title>
-        </ion-toolbar>
-      </ion-header>
+    <ion-header>
+      <ion-toolbar :translucent="true">
+        <ion-buttons slot="start">
+          <ion-back-button default-href="/fairgrounds"></ion-back-button>
+        </ion-buttons>
+        <ion-title>Upcoming Events</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content :fullscreen="true">
 
       <div class="main">
         <div class="main__header">
@@ -114,24 +114,21 @@
           <!-- Events for selected day-->
           <div v-if="getEventsForDate(selectedDate).length > 0" class="day-events">
             <div v-for="event in getEventsForDate(selectedDate)"
-                 :key="event.id"
+                 :key="`${event.id}-${event.currentDate.date}`"
                  class="day-event">
-                 <router-link class="cta" :to="`/fairgrounds/upcoming-events/${encodeURIComponent(event.id)}`">
+                  <router-link class="cta" :to="`/fairgrounds/upcoming-events/${encodeURIComponent(event.id)}?date=${encodeURIComponent(event.currentDate.date)}`">
                   <div class="event-card__image">
                     <img :src="getEventImage(event) || '/api/placeholder/400/200'" alt="Event image" />
                   </div>
                   <div class="event-card__content">
                     <div class="event-card__meta">
                       <div class="event-card__date">
-                        {{ format(parseISO(event.eventDates[0].date), 'EEE, MMM d, yyyy') }}
+                        {{ format(parseISO(event.currentDate.date), 'EEE, MMM d, yyyy') }}
                       </div>
                       <span class="event-card__separator">•</span>
                       <div class="event-card__time">{{ getEventTime(event) }}</div>
                     </div>
                     <h3 class="event-card__title">{{ event.title }}</h3>
-                    <div class="event-card__location">
-                      {{ event.eventAdmission ? `Admission: ${event.eventAdmission}` : '' }}
-                    </div>
                   </div>
                 </router-link>
             </div>
@@ -142,25 +139,22 @@
         <div v-else class="events-list">
           <div
             v-for="event in filteredEvents"
-            :key="event.id"
+            :key="`${event.id}-${event.currentDate.date}`"
             class="event-card"
           >
-            <router-link class="cta" :to="`/fairgrounds/upcoming-events/${encodeURIComponent(event.id)}`">
+              <router-link class="cta" :to="`/fairgrounds/upcoming-events/${encodeURIComponent(event.id)}?date=${encodeURIComponent(event.currentDate.date)}`">
               <div class="event-card__image">
                 <img :src="getEventImage(event) || '/api/placeholder/400/200'" alt="Event image" />
               </div>
               <div class="event-card__content">
                 <div class="event-card__meta">
                   <div class="event-card__date">
-                    {{ format(parseISO(event.eventDates[0].date), 'EEE, MMM d, yyyy') }}
+                    {{ format(parseISO(event.currentDate.date), 'EEE, MMM d, yyyy') }}
                   </div>
                   <span class="event-card__separator">•</span>
                   <div class="event-card__time">{{ getEventTime(event) }}</div>
                 </div>
                 <h3 class="event-card__title">{{ event.title }}</h3>
-                <div class="event-card__location">
-                  {{ event.eventAdmission ? `Admission: ${event.eventAdmission}` : '' }}
-                </div>
               </div>
             </router-link>
           </div>
@@ -199,6 +193,10 @@ interface Event {
   eventAdmission: string;
   uri: string;
   enabled: boolean;
+}
+
+interface EventWithCurrentDate extends Event {
+  currentDate: EventDate;
 }
 
 // Test Events for now
@@ -355,21 +353,27 @@ const calendarDays = computed(() => {
 });
 
 const filteredEvents = computed(() => {
-  return events.value.filter((event: Event) => {
-    if (!event.enabled) return false;
-    if (!event.eventDates || event.eventDates.length === 0) return false;
+  return events.value.flatMap((event: Event): EventWithCurrentDate[] => {
+    if (!event.enabled) return [];
+    if (!event.eventDates || event.eventDates.length === 0) return [];
 
-    // If there's a search query, ignore date filtering
+    // If there's a search query, return event once if it matches
     if (searchQuery.value) {
-      return event.title.toLowerCase().includes(searchQuery.value.toLowerCase());
+      if (event.title.toLowerCase().includes(searchQuery.value.toLowerCase())) {
+        return [{...event, currentDate: event.eventDates[0]}];
+      }
+      return [];
     }
 
-    // Otherwise filter by selected month/date
-    const eventStartDate = parseISO(event.eventDates[0].date);
-    const matchesDate = isSameMonth(eventStartDate, selectedDate.value) &&
-                eventStartDate.getFullYear() === selectedDate.value.getFullYear();
-
-    return matchesDate;
+    // Otherwise return event multiple times, once for each date in the selected month
+    return event.eventDates.map(date => {
+      const eventDate = parseISO(date.date);
+      if (isSameMonth(eventDate, selectedDate.value) &&
+          eventDate.getFullYear() === selectedDate.value.getFullYear()) {
+        return {...event, currentDate: date};
+      }
+      return null;
+    }).filter((event): event is EventWithCurrentDate => event !== null);
   });
 });
 
@@ -413,23 +417,33 @@ const handleDateSelect = (date: Date) => {
   // The watch on selectedDate will handle the scrolling
 };
 
-const hasEvents = (date: Date) => {
+const hasEvents = (date: Date): boolean => {
   if (!date) return false;
 
-  return events.value.some(event => {
-    if (!event.enabled || !event.eventDates?.[0]) return false;
-    const eventDate = parseISO(event.eventDates[0].date);
-    return isSameDay(eventDate, date);
+  return events.value.some((event: Event) => {
+    if (!event.enabled || !event.eventDates) return false;
+    return event.eventDates.some((eventDate: EventDate) => {
+      const parsedDate = parseISO(eventDate.date);
+      return isSameDay(parsedDate, date);
+    });
   });
 };
 
-const getEventsForDate = (date: Date) => {
+const getEventsForDate = (date: Date): EventWithCurrentDate[] => {
   if (!date) return [];
 
-  return events.value.filter(event => {
-    if (!event.enabled || !event.eventDates?.[0]) return false;
-    const eventDate = parseISO(event.eventDates[0].date);
-    return isSameDay(eventDate, date);
+  return events.value.flatMap((event: Event): EventWithCurrentDate[] => {
+    if (!event.enabled || !event.eventDates) return [];
+
+    const matchingDates = event.eventDates.filter((eventDate: EventDate) => {
+      const parsedDate = parseISO(eventDate.date);
+      return isSameDay(parsedDate, date);
+    });
+
+    return matchingDates.map((matchedDate: EventDate): EventWithCurrentDate => ({
+      ...event,
+      currentDate: matchedDate
+    }));
   });
 };
 
@@ -452,11 +466,9 @@ const navigateMonth = (direction: number) => {
   }
 };
 
-
-const getEventTime = (event: Event): string => {
-  if (!event.eventDates?.[0]) return '';
-  const startTime = event.eventDates[0].startTime || '';
-  const endTime = event.eventDates[0].endTime || '';
+const getEventTime = (event: EventWithCurrentDate): string => {
+  const startTime = event.currentDate.startTime || '';
+  const endTime = event.currentDate.endTime || '';
   if (startTime && endTime) {
     return `${format(parseISO(startTime), 'h:mm aaa')} - ${format(parseISO(endTime), 'h:mm aaa')}`;
   }
@@ -464,7 +476,11 @@ const getEventTime = (event: Event): string => {
 };
 
 const getEventImage = (event: Event): string => {
-  return event.eventImage?.[0]?.url || '/api/placeholder/400/200';
+  if (event.eventImage && event.eventImage.length > 0 && event.eventImage[0].url) {
+    // Return the full URL directly
+    return event.eventImage[0].url;
+  }
+  return '/api/placeholder/400/200';
 };
 </script>
 
