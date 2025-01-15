@@ -1,14 +1,14 @@
 <template>
     <ion-page>
-      <ion-content>
-        <ion-header>
-          <ion-toolbar>
-            <ion-buttons slot="start">
-              <ion-back-button default-href="/fairgrounds/upcoming-events"></ion-back-button>
-            </ion-buttons>
-            <ion-title>FAIRGROUNDS | EVENT DETAIL</ion-title>
-          </ion-toolbar>
-        </ion-header>
+      <ion-header>
+        <ion-toolbar :translucent="true">
+          <ion-buttons slot="start">
+            <ion-back-button default-href="/fairgrounds/upcoming-events"></ion-back-button>
+          </ion-buttons>
+          <ion-title>FAIRGROUNDS | EVENT DETAIL</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content :fullscreen="true">
 
         <div v-if="event" class="main">
 
@@ -71,9 +71,9 @@
             <div class="price">{{ event.eventAdmission || '$0.00' }}</div>
           </div>
 
-          <div v-if="event.eventDates && event.eventDates.length > 1" class="additional-dates">
+          <div v-if="additionalDates.length > 0" class="additional-dates">
             <h2>Additional Dates and Times</h2>
-            <div v-for="(date, index) in event.eventDates.slice(1)" :key="index">
+            <div v-for="(date, index) in additionalDates" :key="index">
               {{ formatAdditionalDate(date) }}
             </div>
           </div>
@@ -120,6 +120,7 @@ interface Event {
 const route = useRoute();
 const dataStore = useDataStore();
 const eventId = decodeURIComponent(route.params.id as string);
+const selectedDate = route.query.date ? decodeURIComponent(route.query.date as string) : null;
 
 const event = computed<Event | undefined>(() => {
   return dataStore.data.nysfairgroundsWebsite.events.find(
@@ -127,11 +128,26 @@ const event = computed<Event | undefined>(() => {
   );
 });
 
+const currentEventDate = computed(() => {
+  if (!event.value || !event.value.eventDates) return null;
+
+  if (selectedDate) {
+    // Find the matching date in eventDates
+    const matchingDate = event.value.eventDates.find(
+      date => parseISO(date.date).getTime() === parseISO(selectedDate).getTime()
+    );
+    return matchingDate || event.value.eventDates[0];
+  }
+
+  return event.value.eventDates[0];
+});
+
 const getEventTime = (event: Event): string => {
-  if (!event.eventDates?.[0]) return '';
-  const date = format(parseISO(event.eventDates[0].date), 'EEE, MMM d, yyyy');
-  const startTime = event.eventDates[0].startTime;
-  const endTime = event.eventDates[0].endTime;
+  if (!currentEventDate.value) return '';
+
+  const date = format(parseISO(currentEventDate.value.date), 'EEE, MMM d, yyyy');
+  const startTime = currentEventDate.value.startTime;
+  const endTime = currentEventDate.value.endTime;
 
   let timeStr = '';
   if (startTime && endTime) {
@@ -143,16 +159,30 @@ const getEventTime = (event: Event): string => {
   return `${date} • ${timeStr}`;
 };
 
+const additionalDates = computed(() => {
+  if (!event.value || !event.value.eventDates) return [];
+
+  return event.value.eventDates.filter(date =>
+    parseISO(date.date).getTime() !== parseISO(currentEventDate.value?.date || '').getTime()
+  );
+});
+
 const hasContactInfo = (event: Event): boolean => {
   return !!(event.eventWebSite || event.eventContactPhone || event.eventContactEmail);
 };
 
 const getEventImage = (event: Event): string => {
-  return event.eventImage?.[0]?.url || '/api/placeholder/400/200';
+  if (event.eventImage && event.eventImage.length > 0 && event.eventImage[0].url) {
+    // Return the full URL directly
+    return event.eventImage[0].url;
+  }
+  return '/api/placeholder/400/200';
 };
 
 const formatAdditionalDate = (date: EventDate): string => {
   const eventDate = format(parseISO(date.date), 'E, MMM d, yyyy');
+  if (!date.startTime || !date.endTime) return eventDate;
+
   const startTime = format(parseISO(date.startTime), 'h:mm aaa');
   const endTime = format(parseISO(date.endTime), 'h:mm aaa');
   return `${eventDate} at ${startTime} - ${endTime}`;
