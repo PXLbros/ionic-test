@@ -11,6 +11,9 @@ export interface AppStoreToastConfig {
 
 interface AppStoreState {
   toast: AppStoreToastConfig;
+  didRegisterDevice: boolean;
+  deviceId: string | null;
+  getDeviceIdError: string | null;
 }
 
 export const useAppStore = defineStore('app', {
@@ -20,6 +23,10 @@ export const useAppStore = defineStore('app', {
       message: '',
       duration: DEFAULT_TOAST_DURATION,
     },
+
+    didRegisterDevice: false,
+    deviceId: null,
+    getDeviceIdError: null,
   }),
 
   actions: {
