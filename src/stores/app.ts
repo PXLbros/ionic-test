@@ -9,11 +9,16 @@ export interface AppStoreToastConfig {
   duration?: number;
 }
 
-interface AppStoreState {
-  toast: AppStoreToastConfig;
+export interface PushNotificationsData {
+  permissionStatus: string | null;
   didRegisterDevice: boolean;
   deviceId: string | null;
   getDeviceIdError: string | null;
+}
+
+interface AppStoreState {
+  toast: AppStoreToastConfig;
+  pushNotifications: PushNotificationsData;
 }
 
 export const useAppStore = defineStore('app', {
@@ -24,9 +29,12 @@ export const useAppStore = defineStore('app', {
       duration: DEFAULT_TOAST_DURATION,
     },
 
-    didRegisterDevice: false,
-    deviceId: null,
-    getDeviceIdError: null,
+    pushNotifications: {
+      permissionStatus: null,
+      didRegisterDevice: false,
+      deviceId: null,
+      getDeviceIdError: null,
+    },
   }),
 
   actions: {

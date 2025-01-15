@@ -24,11 +24,13 @@
         </div>
       </div> -->
 
-      Did register device: {{ appStore.didRegisterDevice }}
+      Permission status: {{ appStore.pushNotifications.permissionStatus || '-' }}
       <hr>
-      Device ID: {{ appStore.deviceId || '-' }}
+      Did register device: {{ appStore.pushNotifications.didRegisterDevice }}
       <hr>
-      Get Device ID Error: {{ appStore.getDeviceIdError || '-' }}
+      Device ID: {{ appStore.pushNotifications.deviceId || '-' }}
+      <hr>
+      Get Device ID Error: {{ appStore.pushNotifications.getDeviceIdError || '-' }}
 
       <div class="main">
         <div class="main__header">
