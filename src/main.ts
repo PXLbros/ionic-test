@@ -90,18 +90,20 @@ router.isReady().then(async () => {
       throw new Error('User denied permissions!');
     }
 
+    appStore.pushNotifications.permissionStatus = permStatus.receive;
+
     // Handle successful registration
     await PushNotifications.addListener('registration', (token) => {
       console.log('Device registered with token:', token.value);
       // Save the token to your backend (Strapi) if needed
 
-      appStore.deviceId = token.value;
+      appStore.pushNotifications.deviceId = token.value;
     });
 
     await PushNotifications.addListener('registrationError', (error) => {
       console.error('Registration error: ', error.error);
 
-      appStore.getDeviceIdError = error.error;
+      appStore.pushNotifications.getDeviceIdError = error.error;
     });
 
     // Handle foreground notifications
@@ -116,8 +118,11 @@ router.isReady().then(async () => {
 
     await PushNotifications.register();
 
-    appStore.didRegisterDevice = true;
+    appStore.pushNotifications.didRegisterDevice = true;
   } else {
     console.warn('Skipped push notifications setup because app is not running on a native platform');
+
+    appStore.pushNotifications.didRegisterDevice = true;
+    appStore.pushNotifications.deviceId = 'web';
   }
 });
