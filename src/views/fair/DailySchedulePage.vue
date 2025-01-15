@@ -30,7 +30,7 @@
 
       <div class="filter-section">
         <div class="category-filter">
-          <select class="category-select"  v-model="selectedCategory" @change="onCategoryChange">
+          <select v-model="selectedCategory" class="category-select">
             <option value="all">All Categories</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.name }}
@@ -47,113 +47,33 @@
       </div>
 
       <div v-else class="schedule-content">
-        <div v-if="filteredEvents.length === 0" class="no-events">
-          <p>No events scheduled for this day</p>
-        </div>
-
-        <div v-else class="events-list">
-          <div v-for="event in filteredEvents" :key="event.id" class="event-item">
-            <div class="content">
-              <h3>{{ event.title || "Event Title" }}</h3>
-              <p>{{ event.start_time || "Event Start Time" }} </p>
-              <p>{{ event.venue.name || "Event Venue N/A" }}</p>
-              <p v-if="event.categories.length > 0">
-                Categories: {{ event.categories.map(catId => getCategoryName(catId)).join(', ') }}
-              </p>
-            </div>
-
-            <div class="favorite">
-              <button
-                class="favorite-button"
-                :class="{ 'is-favorite': event.dateDetails.isFavorite }"
-                @click="toggleFavorite(event.id, event.dateDetails)"
-                :disabled="event.dateDetails.isAddingToFavorites || event.dateDetails.isRemovingFromFavorites"
-              >
-                <ion-icon
-                  :icon="event.dateDetails.isFavorite ? heart : heartOutline"
-                  :class="{ 'loading': event.dateDetails.isAddingToFavorites || event.dateDetails.isRemovingFromFavorites }"
-                ></ion-icon>
-              </button>
-            </div>
-          </div>
-        </div>
+        <EventsList
+          :events="filteredEvents"
+          :categories="categories"
+          noEventsText="No events scheduled for this day"
+        />
       </div>
     </div>
   </DefaultLayout>
 </template>
 
 <script setup lang="ts">
-import { PushNotifications } from '@capacitor/push-notifications';
-import { ref, computed } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-import DefaultLayout from '../../layouts/default.vue';
-import { IonIcon } from '@ionic/vue';
-import { heart, heartOutline } from 'ionicons/icons';
+import DefaultLayout from '@/layouts/default.vue';
+import EventsList from '@/components/EventsList.vue';
 import { useDataStore } from '@/stores/data';
-import { Preferences } from '@capacitor/preferences';
-import { Capacitor } from '@capacitor/core';
 import { storeToRefs } from 'pinia';
-import { saveUserEventFavorite } from '@/services/api';
+import { Category, DateObject, Event } from '@/types';
+import { convertToEasternTime } from '@/utils/time';
+import { formatEvent, FormattedEvent } from '@/utils/event';
 
-const appStore = useAppStore();
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
 const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 const categoriesData = computed(() => data.value?.nysfairWebsite?.eventCategories ?? []);
-const router = useRouter();
-
-// Types for the event data
-interface Venue {
-  name: string;
-  description: string;
-}
-
-interface EventDate {
-  start_time_date: string;
-  start_time_unix: number;
-  isFavorite?: boolean;
-  isAddingToFavorites?: boolean;
-  isRemovingFromFavorites?: boolean;
-}
-
-interface Event {
-  id: number;
-  title: string;
-  description: string;
-  permalink: string;
-  categories: number[];
-  start_time: string;
-  dates: EventDate[];
-  duration: number;
-  created_at: string;
-  featured_image: string;
-  venue: Venue;
-  dateDetails: EventDate;
-  isFavorite?: boolean;
-  isAddingToFavorites?: boolean;
-  isRemovingFromFavorites?: boolean;
-}
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-interface DateObject {
-  dayName: string;
-  day: number;
-  timestamp: number;
-}
 
 const selectedDateIndex = ref(0);
 const isDateChanging = ref(false);
 const selectedCategory = ref<string | number>('all');
-
-const convertToEastern = (unixTimestamp: number): Date => {
-  const date = new Date(unixTimestamp * 1000);
-  return new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-};
 
 const dates = computed<DateObject[]>(() => {
   if (!eventsData.value || !eventsData.value.length) return [];
@@ -167,12 +87,12 @@ const dates = computed<DateObject[]>(() => {
 
   const sortedDates = [...allDates].sort((a, b) => a.timestamp - b.timestamp);
   const uniqueDates = [...new Set(sortedDates.map(date =>
-    convertToEastern(date.timestamp).toDateString()
+    convertToEasternTime(date.timestamp).toDateString()
   ))];
 
   return uniqueDates.map((dateStr, index) => {
     const matchingDate = sortedDates.find(date =>
-      convertToEastern(date.timestamp).toDateString() === dateStr
+      convertToEasternTime(date.timestamp).toDateString() === dateStr
     );
 
     return {
@@ -191,7 +111,7 @@ const categories = computed<Category[]>(() => {
   return categoriesData.value || [];
 });
 
-const filteredEvents = computed((): Event[] => {
+const filteredEvents = computed((): FormattedEvent[] => {
   if (!eventsData.value || !eventsData.value.length || !dates.value.length) return [];
 
   const selectedDate = dates.value[selectedDateIndex.value];
@@ -199,47 +119,31 @@ const filteredEvents = computed((): Event[] => {
 
   const selectedDateUnix = selectedDate.timestamp;
 
-  let filtered = eventsData.value.flatMap((event: Event) => {
+  let filtered: FormattedEvent[] = eventsData.value.flatMap((event: Event) => {
     const matchingDates = event.dates.filter(date =>
-      convertToEastern(date.start_time_unix).toDateString() === convertToEastern(selectedDateUnix).toDateString()
+      convertToEasternTime(date.start_time_unix).toDateString() === convertToEasternTime(selectedDateUnix).toDateString()
     );
 
-    return matchingDates.map(matchingDate => ({
-      ...event,
-      start_time: convertToEastern(matchingDate.start_time_unix).toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: 'numeric',
-        hour12: true,
-      }),
-      isFavorite: matchingDate.isFavorite || false,
-      isAddingToFavorites: matchingDate.isAddingToFavorites || false,
-      isRemovingFromFavorites: matchingDate.isRemovingFromFavorites || false,
-      dateDetails: matchingDate,
-    }));
+    return matchingDates.map(matchingDate => {
+      const formattedEvent = formatEvent({ event, eventDate: matchingDate, categories: categoriesData.value });
+
+      return formattedEvent;
+    });
   });
 
   // Apply category filter
   if (selectedCategory.value !== 'all') {
-    filtered = filtered.filter((event: Event) => event.categories.includes(Number(selectedCategory.value)));
+    filtered = filtered.filter((event: FormattedEvent) => event.categories.includes(Number(selectedCategory.value)));
   }
 
   // Sort events by start time
-  return filtered.sort((a: Event, b: Event) => {
+  return filtered.sort((a: FormattedEvent, b: FormattedEvent) => {
     const aTime = a.dateDetails.start_time_unix;
     const bTime = b.dateDetails.start_time_unix;
 
     return aTime - bTime;
   });
 });
-
-const onCategoryChange = () => {
-
-}
-
-const getCategoryName = (categoryId: number) => {
-  const category = categories.value.find(cat => cat.id === categoryId)
-  return category ? category.name : 'Unknown Category'
-}
 
 const selectDate = (index: number): void => {
   isDateChanging.value = true;
@@ -248,247 +152,10 @@ const selectDate = (index: number): void => {
     selectedDateIndex.value = index;
     isDateChanging.value = false;
   }, 0)
-
-};
-
-const toggleFavorite = async (eventId: number, dateDetails: EventDate): Promise<void> => {
-  if (!dateDetails) {
-    console.warn('No date details provided for the event');
-    return;
-  }
-
-  const selectedStartTimeUnix = dateDetails.start_time_unix;
-
-  if (dateDetails.isFavorite) {
-    await removeEventFromFavorites(eventId, selectedStartTimeUnix);
-  } else {
-    await addEventToFavorites(eventId, selectedStartTimeUnix);
-  }
-};
-
-const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: number): Promise<void> => {
-  const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
-
-  if (!matchingDate) {
-    console.warn('No matching date found for the selected start time.');
-    return;
-  }
-
-  const isNativePlatform = Capacitor.isNativePlatform();
-
-  if (isNativePlatform) {
-    const permissions = await PushNotifications.requestPermissions();
-
-    if (permissions.receive !== 'granted') {
-      console.error('Push notification permissions not granted');
-      return;
-    }
-  }
-
-  matchingDate.isAddingToFavorites = true; // Set loading state
-
-  try {
-    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
-
-    const favoriteIdsArray: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds || '[]');
-
-    if (!favoriteIdsArray.some(favoritedEvent => favoritedEvent.id === eventId && favoritedEvent.start_time_unix === selectedStartTimeUnix)) {
-      favoriteIdsArray.push({ id: eventId, start_time_unix: selectedStartTimeUnix });
-    }
-
-    await Preferences.set({
-      key: 'favoriteNYSFairEvents',
-      value: JSON.stringify(favoriteIdsArray),
-    });
-
-    const saveUserEventFavoriteData: { eventId: number; startTime: number; deviceId: string; isFavorite: boolean } = {
-      eventId: eventId,
-      startTime: selectedStartTimeUnix,
-      isFavorite: true,
-      deviceId: '',
-    };
-
-    const handleSaveUserEventFavoriting = ({ result, matchingDate }: { result: boolean; matchingDate: EventDate }) => {
-      if (result) {
-        appStore.openToast({ message: 'Event added to favorites', duration: 2000 });
-
-        matchingDate.isFavorite = true;
-      }
-
-      matchingDate.isAddingToFavorites = false;
-    };
-
-    // Send to API
-    if (isNativePlatform) {
-      // Fetch the token
-      PushNotifications.addListener('registration', async (token: { value: string }) => {
-        console.log('Device token:', token.value);
-
-        saveUserEventFavoriteData.deviceId = token.value;
-
-        // Send the event ID and token to the backend
-        const saveUserEventFavoriteSuccess = await saveUserEventFavorite(saveUserEventFavoriteData);
-
-        handleSaveUserEventFavoriting({ result: saveUserEventFavoriteSuccess, matchingDate });
-      });
-
-      // Trigger registration if not already done
-      PushNotifications.register();
-    } else {
-      saveUserEventFavoriteData.deviceId = getPersistentWebDeviceId();
-
-      const saveUserEventFavoriteSuccess = await saveUserEventFavorite(saveUserEventFavoriteData);
-
-      handleSaveUserEventFavoriting({ result: saveUserEventFavoriteSuccess, matchingDate });
-    }
-
-    // appStore.openToast({ message: 'Event added to favorites', duration: 2000 });
-
-    // matchingDate.isFavorite = true;
-  } finally {
-    // matchingDate.isAddingToFavorites = false;
-  }
-};
-
-const removeEventFromFavorites = async (eventId: number, selectedStartTimeUnix: number): Promise<void> => {
-  const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
-
-  if (!matchingDate) {
-    console.warn('No matching date found for the selected start time.');
-    return;
-  }
-
-  matchingDate.isRemovingFromFavorites = true;
-
-  try {
-    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
-
-    const favoriteIdsArray: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds || '[]');
-
-    // Find and remove the event from local storage
-    const index = favoriteIdsArray.findIndex(favoritedEvent => favoritedEvent.id === eventId && favoritedEvent.start_time_unix === selectedStartTimeUnix);
-    if (index !== -1) {
-      favoriteIdsArray.splice(index, 1);
-    }
-
-    await Preferences.set({
-      key: 'favoriteNYSFairEvents',
-      value: JSON.stringify(favoriteIdsArray),
-    });
-
-    const saveUserEventFavoriteData: { eventId: number; startTime: number; deviceId: string; isFavorite: boolean } = {
-      eventId: eventId,
-      startTime: selectedStartTimeUnix,
-      isFavorite: false, // Set isFavorite to false
-      deviceId: '',
-    };
-
-    const handleSaveUserEventUnfavoriting = ({ result, matchingDate }: { result: boolean; matchingDate: EventDate }) => {
-      if (result) {
-        appStore.openToast({ message: 'Event removed from favorites', duration: 2000 });
-
-        matchingDate.isFavorite = false;
-      }
-
-      matchingDate.isRemovingFromFavorites = false;
-    };
-
-    const isNativePlatform = Capacitor.isNativePlatform();
-
-    if (isNativePlatform) {
-      // Fetch the token
-      PushNotifications.addListener('registration', async (token: { value: string }) => {
-        saveUserEventFavoriteData.deviceId = token.value;
-
-        // Send the event ID and token to the backend
-        const saveUserEventFavoriteResult = await saveUserEventFavorite(saveUserEventFavoriteData);
-
-        handleSaveUserEventUnfavoriting({ result: saveUserEventFavoriteResult, matchingDate });
-      });
-
-      // Trigger registration if not already done
-      PushNotifications.register();
-    } else {
-      saveUserEventFavoriteData.deviceId = getPersistentWebDeviceId();
-
-      const saveUserEventFavoriteResult = await saveUserEventFavorite(saveUserEventFavoriteData);
-
-      handleSaveUserEventUnfavoriting({ result: saveUserEventFavoriteResult, matchingDate });
-    }
-
-    // matchingDate.isFavorite = false;
-  } finally {
-    // matchingDate.isRemovingFromFavorites = false;
-  }
-};
-
-const findEventDate = (eventId: number, startTimeUnix: number): EventDate | undefined => {
-  const event = eventsData.value.find((event: Event) => event.id === eventId);
-  return event?.dates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
-};
-
-const getPersistentWebDeviceId = (): string => {
-  const storedDeviceId = localStorage.getItem('webDeviceId');
-
-  if (storedDeviceId) {
-    return storedDeviceId;
-  }
-
-  const newDeviceId = uuidv4();
-
-  localStorage.setItem('webDeviceId', newDeviceId);
-
-  return newDeviceId;
 };
 </script>
 
 <style lang="scss" scoped>
-.main {
-    font-family: "Inter", sans-serif;
-
-    &__header {
-        padding: 25px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-
-        &-img {
-            width: 100%;
-            height: 20vh;
-            background-color: #EFF2F6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 24px;
-        }
-
-        &-content {
-            display: flex;
-            flex-direction: column;
-
-            .title {
-                font-size: 24px;
-                font-weight: 700;
-                line-height: 28px;
-                letter-spacing: 0.5px;
-                color: #343434;
-            }
-
-            .subtitle {
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 28px;
-                letter-spacing: 0.5px;
-                color: #343434;
-                margin: 0px;
-                width: 90%;
-            }
-        }
-    }
-}
-
 .date-selector {
     padding: 0 25px;
     margin-bottom: 5px;
@@ -589,74 +256,6 @@ const getPersistentWebDeviceId = (): string => {
             transform: rotate(180deg);
         }
     }
-
-    .events-list {
-        .event-item {
-            padding: 15px 0;
-            border-bottom: 1px solid #EFF2F6;
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-
-            h3 {
-                font-size: 16px;
-                margin: 0 0 5px 0;
-            }
-
-            p {
-                font-size: 14px;
-                color: #666;
-                margin: 0;
-                font-weight: 500;
-            }
-             p:last-child {
-                margin-top: 2px;
-            }
-
-            .favorite {
-                margin-top: 10px;
-            }
-        }
-    }
-}
-
-.favorite {
-
-    .favorite-button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 0.2s ease;
-
-        &:active {
-            transform: scale(0.95);
-        }
-
-        &.is-favorite {
-            ion-icon {
-                color: #e31b23;
-                fill: #e31b23;
-            }
-        }
-
-        &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        ion-icon {
-            font-size: 24px;
-            color: #666;
-            transition: all 0.3s ease;
-        }
-
-        .loading {
-            animation: pulse 1s infinite;
-        }
-    }
 }
 
 .loader-container {
@@ -670,15 +269,6 @@ const getPersistentWebDeviceId = (): string => {
      p {
          margin-top: 10px;
      }
-}
-
-.no-events {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-     min-height: 200px;
-     font-size: 18px;
-    color: #666;
 }
 
 .spinner {

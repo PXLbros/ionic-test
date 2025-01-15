@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { v4 as uuidv4 } from 'uuid';
 
 const DEFAULT_TOAST_DURATION = 2500;
 
@@ -36,6 +37,20 @@ export const useAppStore = defineStore('app', {
         message: '',
         duration: DEFAULT_TOAST_DURATION,
       };
+    },
+
+    getPersistentWebDeviceId(): string {
+      const storedDeviceId = localStorage.getItem('webDeviceId');
+
+      if (storedDeviceId) {
+        return storedDeviceId;
+      }
+
+      const newDeviceId = uuidv4();
+
+      localStorage.setItem('webDeviceId', newDeviceId);
+
+      return newDeviceId;
     },
   },
 });
