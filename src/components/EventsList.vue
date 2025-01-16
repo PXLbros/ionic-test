@@ -6,9 +6,9 @@
           <h3>{{ event.title || "Event Title" }}</h3>
           <p>{{ event.start_time || "Event Start Time" }} </p>
           <p>{{ event.venue.name || "Event Venue N/A" }}</p>
-          <p v-if="event.categories.length > 0">
+          <!-- <p v-if="event.categories.length > 0">
             Categories: {{ event.categoryNames.join(', ') }}
-          </p>
+          </p> -->
         </div>
         <div class="events-list__favorite-container">
           <button
@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
-import { addUserEventFavorite, removeUserEventFavorite, saveUserEventFavorite } from '@/services/api';
+import { addUserEventFavorite, removeUserEventFavorite } from '@/services/api';
 import { IonIcon } from '@ionic/vue';
 import { heart, heartOutline } from 'ionicons/icons';
 import { Category, Event, EventDate } from '@/types';
