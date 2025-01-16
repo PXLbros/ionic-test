@@ -114,27 +114,29 @@ const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: numbe
 
     // Send to API
     if (isNativePlatform) {
-      // Fetch the token
-      PushNotifications.addListener('registration', async (token: { value: string }) => {
-        console.log('Device token:', token.value);
+      // // Fetch the token
+      // PushNotifications.addListener('registration', async (token: { value: string }) => {
+      //   console.log('Device token:', token.value);
 
-        saveUserEventFavoriteData.deviceId = token.value;
+      //   saveUserEventFavoriteData.deviceId = token.value;
 
-        // Send the event ID and token to the backend
-        const saveUserEventFavoriteSuccess = await addUserEventFavorite(saveUserEventFavoriteData);
+      //   // Send the event ID and token to the backend
+      //   const saveUserEventFavoriteSuccess = await addUserEventFavorite(saveUserEventFavoriteData);
 
-        handleSaveUserEventFavoriting({ saveUserEventFavoriteSuccess, matchingDate });
-      });
+      //   handleSaveUserEventFavoriting({ saveUserEventFavoriteSuccess, matchingDate });
+      // });
 
-      // Trigger registration if not already done
-      PushNotifications.register();
+      // // Trigger registration if not already done
+      // PushNotifications.register();
+
+      saveUserEventFavoriteData.deviceId = appStore.pushNotifications.deviceId;
     } else {
       saveUserEventFavoriteData.deviceId = appStore.getPersistentWebDeviceId();
-
-      const saveUserEventFavoriteSuccess = await addUserEventFavorite(saveUserEventFavoriteData);
-
-      handleSaveUserEventFavoriting({ saveUserEventFavoriteSuccess, matchingDate });
     }
+
+    const saveUserEventFavoriteSuccess = await addUserEventFavorite(saveUserEventFavoriteData);
+
+    handleSaveUserEventFavoriting({ saveUserEventFavoriteSuccess, matchingDate });
   } catch (error) {
     console.error(error);
 
@@ -175,25 +177,27 @@ const removeEventFromFavorites = async (eventId: number, selectedStartTimeUnix: 
     const isNativePlatform = Capacitor.isNativePlatform();
 
     if (isNativePlatform) {
-      // Fetch the token
-      PushNotifications.addListener('registration', async (token: { value: string }) => {
-        saveUserEventFavoriteData.deviceId = token.value;
+      // // Fetch the token
+      // PushNotifications.addListener('registration', async (token: { value: string }) => {
+      //   saveUserEventFavoriteData.deviceId = token.value;
 
-        // Send the event ID and token to the backend
-        const saveUserEventFavoriteSuccess = await removeUserEventFavorite(saveUserEventFavoriteData);
+      //   // Send the event ID and token to the backend
+      //   const saveUserEventFavoriteSuccess = await removeUserEventFavorite(saveUserEventFavoriteData);
 
-        handleSaveUserEventUnfavoriting({ saveUserEventFavoriteSuccess, matchingDate });
-      });
+      //   handleSaveUserEventUnfavoriting({ saveUserEventFavoriteSuccess, matchingDate });
+      // });
 
-      // Trigger registration if not already done
-      PushNotifications.register();
+      // // Trigger registration if not already done
+      // PushNotifications.register();
+
+      saveUserEventFavoriteData.deviceId = appStore.pushNotifications.deviceId;
     } else {
       saveUserEventFavoriteData.deviceId = appStore.getPersistentWebDeviceId();
-
-      const saveUserEventFavoriteSuccess = await removeUserEventFavorite(saveUserEventFavoriteData);
-
-      handleSaveUserEventUnfavoriting({ saveUserEventFavoriteSuccess, matchingDate });
     }
+
+    const saveUserEventFavoriteSuccess = await removeUserEventFavorite(saveUserEventFavoriteData);
+
+    handleSaveUserEventUnfavoriting({ saveUserEventFavoriteSuccess, matchingDate });
   } catch (error) {
     console.error(error);
 
