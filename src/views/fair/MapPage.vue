@@ -49,6 +49,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useDataStore } from '@/stores/data';
 
+
 const mapContainer = ref<HTMLElement | null>(null);
 const dataStore = useDataStore();
 const vendors = dataStore.data.nysfairWebsite.vendors;
@@ -75,7 +76,9 @@ onMounted(() => {
       style: 'mapbox://styles/pxldevops/cm4uef2wm005401sm7ebof1mh',
       bearing: 222,
       center: [-76.2197, 43.073],
-      zoom: 14
+      zoom: 14,
+      dragRotate: false,
+      touchZoomRotate: true
     });
 
     map.addControl(new mapboxgl.NavigationControl());
@@ -143,6 +146,82 @@ onMounted(() => {
         .addTo(map);
 
 
+      // Add debug markers for each corner
+      const corners = [
+          {
+              coords: [-76.22070391964486, 43.06337289828724],
+              color: '#FF0000',
+              label: 'TL'
+          },
+          {
+              coords: [-76.23286067186764, 43.073228022199714],
+              color: '#00FF00',
+              label: 'TR'
+          },
+          {
+              coords: [-76.22434604633837, 43.07969309593861],
+              color: '#0000FF',
+              label: 'BR'
+          },
+          {
+              coords: [-76.21212430193944, 43.07221072728862],
+              color: '#FFFF00',
+              label: 'BL'
+          }
+      ];
+
+      // Add colored markers at each corner
+      corners.forEach(corner => {
+          const el = document.createElement('div');
+          el.style.width = '20px';
+          el.style.height = '20px';
+          el.style.borderRadius = '50%';
+          el.style.backgroundColor = corner.color;
+          el.style.border = '2px solid white';
+          el.innerHTML = `<span style="color: white; font-weight: bold;">${corner.label}</span>`;
+          el.style.display = 'flex';
+          el.style.alignItems = 'center';
+          el.style.justifyContent = 'center';
+
+          new mapboxgl.Marker({
+              element: el,
+              anchor: 'center'
+          })
+          .setLngLat(corner.coords as [number, number])
+          .addTo(map);
+      });
+
+
+      // Add the image overlay
+      const testImage = new Image();
+      testImage.onload = () => {
+          map.addSource('chevy-court-area', {
+              'type': 'image',
+              'url': testImage.src,
+              // Verify these coordinates by dropping pins on the map
+              // and using map.getCenter() to get exact coordinates
+              'coordinates': [
+                  [-76.22101527351555, 43.06458007331625], // Top left
+                  [-76.23286067186764, 43.073228022199714],  // Top right
+                  [-76.22396000615883, 43.079945790627306], // Bottom right
+                  [-76.21212430193944, 43.07221072728862]    // Bottom left
+              ]
+          });
+
+          map.addLayer({
+              'id': 'chevy-court-overlay',
+              'type': 'raster',
+              'source': 'chevy-court-area',
+              'paint': {
+                  'raster-opacity': 0.85
+              }
+          });
+
+
+      };
+
+      testImage.src = '/icons/Map_Design.png';
+
 
       // Add vendor markers
       // vendors.forEach((vendor: any) => {
@@ -164,12 +243,16 @@ onMounted(() => {
       //   }
       // });
     });
+    map.on('click', (e) => {
+        console.log(`Clicked coordinates: [${e.lngLat.lng}, ${e.lngLat.lat}]`);
+    });
 
     setTimeout(() => {
       map.resize();
     }, 100);
   }
 });
+
 </script>
 
 <style scoped lang="scss">
