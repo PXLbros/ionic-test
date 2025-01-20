@@ -14,9 +14,9 @@
                 <h1 class="main__title">Recent News</h1>
 
                 <!-- Featured News Article (Latest News) -->
-                <router-link 
-                    v-if="featuredNews" 
-                    :to="`/fair/news/${encodeURIComponent(featuredNews.permalink)}`" 
+                <router-link
+                    v-if="featuredNews"
+                    :to="`/fair/news/${encodeURIComponent(featuredNews.permalink)}`"
                     class="featured-article"
                 >
                     <div class="featured-article__image">
@@ -30,8 +30,8 @@
 
                 <!-- Article List -->
                 <div class="articles-list">
-                    <router-link 
-                        v-for="article in otherNews" 
+                    <router-link
+                        v-for="article in displayedNews"
                         :key="article.permalink"
                         :to="`/fair/news/${encodeURIComponent(article.permalink)}`"
                         class="article-item"
@@ -47,6 +47,17 @@
                             </svg>
                         </div>
                     </router-link>
+
+                    <!-- Load More Button -->
+                    <div v-if="hasMoreNews" class="load-more">
+                      <ion-button
+                          fill="clear"
+                          @click="loadMore"
+                          :disabled="isLoading"
+                      >
+                          {{ isLoading ? 'Loading...' : 'Load More' }}
+                      </ion-button>
+                  </div>
                 </div>
             </div>
         </ion-content>
@@ -66,6 +77,9 @@ interface NewsArticle {
 
 const dataStore = useDataStore();
 console.log('news page data', dataStore.data.nysfairWebsite.news);
+const itemsPerPage = 5;
+const currentPage = ref(1);
+const isLoading = ref(false);
 
 // Get the latest article for the featured section
 const featuredNews = computed(() => {
@@ -73,11 +87,30 @@ const featuredNews = computed(() => {
     return news[0];
 });
 
-// Get the rest of the articles for the list
-const otherNews = computed(() => {
+
+// Get the paginated articles
+const displayedNews = computed(() => {
     const news = dataStore.data.nysfairWebsite.news;
-    return news.slice(1);
+    const startIndex = 1; // Skip the featured article
+    const endIndex = startIndex + (currentPage.value * itemsPerPage);
+    return news.slice(startIndex, endIndex);
 });
+
+// Check if there are more news items to load
+const hasMoreNews = computed(() => {
+    const totalNews = dataStore.data.nysfairWebsite.news.length;
+    const currentlyDisplayed = 1 + (currentPage.value * itemsPerPage); // +1 for featured article
+    return currentlyDisplayed < totalNews;
+});
+
+// Load more function
+const loadMore = async () => {
+    isLoading.value = true;
+    // Simulate loading delay (remove this in production if not needed)
+    await new Promise(resolve => setTimeout(resolve, 500));
+    currentPage.value++;
+    isLoading.value = false;
+};
 
 // Format date function
 const formatDate = (dateString: string): string => {
@@ -140,7 +173,7 @@ a {
 .articles-list {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 0px;
     margin-top: 32px;
 }
 
@@ -148,7 +181,9 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
+    gap: 15px;
+    padding: 15px 0px;
+    border-bottom: 1px solid #EFF2F6;
 
     &__content {
         flex: 1;
@@ -169,14 +204,41 @@ a {
         font-weight: 700;
     }
 
+
     &__image {
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+      flex-shrink: 0; // Prevents the image from shrinking
+      width: 80px; // Fixed width
+      height: 80px; // Fixed height (1:1 aspect ratio)
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #EFF2F6;
+      border-radius: 12px;
+      overflow: hidden; // Ensures content stays within borders
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      svg {
+        width: 40px;
+        height: 40px;
+      }
     }
+}
+
+.load-more {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+
+  ion-button {
+      --color: #1E5EAE;
+      font-weight: 600;
+      text-transform: none;
+  }
 }
 
 :deep(ion-content) {

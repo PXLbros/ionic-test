@@ -9,32 +9,37 @@
         </ion-toolbar>
       </ion-header>
       <ion-content :fullscreen="true">
-
-           <div class="main">
-                <div class="main__header">
-                    <div class="title">Host an Event</div>
-                    <div class="description">If you're considering hosting an event, you'll want to first review the different spaces we can offer your organization.</div>
-                </div>
-                <div class="main__venue">
-                    <div
-                        v-for="venue in venues"
-                        :key="venue.id"
-                        class="main__venue-card"
-                    >
-                        <img v-if="venue.venueMainImage" class="image" :src="getVenueImage(venue)" alt="venue image">
-                        <img v-else class="image" src="/public/modal-img/News_NYSF.jpg" alt="venue image">
-                        <div class="content">
-                            <div class="content__label">{{ venue.venueDetailPreheader || 'Venue' }}</div>
-                            <div class="content__title">{{ venue.title }}</div>
-                            <div class="content__description">
-                                {{ venue.venueDetailPreheader || venue.venueDetailBody || 'No description available' }}
-                            </div>
-                        </div>
-                        <router-link :to="`/fairgrounds/venues/${encodeURIComponent(venue.id)}`" class="cta" >Learn More</router-link>
-                    </div>
-                </div>
-           </div>
-        </ion-content>
+        <div class="main">
+             <div class="main__header">
+                 <div class="title">Host an Event</div>
+                 <div class="description">If you're considering hosting an event, you'll want to first review the different spaces we can offer your organization.</div>
+             </div>
+             <div class="main__venue">
+                 <div
+                     v-for="venue in venues"
+                     :key="venue.id"
+                     class="main__venue-card"
+                     :class="{ 'no-image': !hasImage(venue) }"
+                 >
+                     <!-- Only show image if venueMainImage exists -->
+                     <img
+                         v-if="hasImage(venue)"
+                         class="image"
+                         :src="venue.venueMainImage || ''"
+                         alt="venue image"
+                     >
+                     <div class="content">
+                         <div class="content__label">{{ venue.venueDetailPreheader || 'Venue' }}</div>
+                         <div class="content__title">{{ venue.title }}</div>
+                         <div v-htlml class="content__description">
+                             {{ venue.venuePreheader || 'No description available' }}
+                         </div>
+                     </div>
+                     <router-link :to="`/fairgrounds/venues/${encodeURIComponent(venue.id)}`" class="cta">Learn More</router-link>
+                 </div>
+             </div>
+        </div>
+     </ion-content>
     </ion-page>
 </template>
 
@@ -56,6 +61,7 @@ interface Venue {
   venueNavTitle: string | null;
   venueSubheader: string | null;
   venueMainImage: string | null;
+  venuePreheader: string | null;
 }
 
 const dataStore = useDataStore();
@@ -63,9 +69,9 @@ const venues = ref<Venue[]>(dataStore.data.nysfairgroundsWebsite.venues);
 
 console.log('venues', venues.value);
 
-const getVenueImage = (venue: Venue) => {
-    return venue.venueMainImage || '/public/modal-img/News_NYSF.jpg';
-}
+const hasImage = (venue: Venue): boolean => {
+    return Array.isArray(venue.venueMainImage) && venue.venueMainImage.length > 0;
+};
 
 </script>
 
@@ -100,12 +106,14 @@ const getVenueImage = (venue: Venue) => {
     &__venue {
         display: flex;
         flex-direction: column;
-        gap: 30px;
+        gap: 0px;
 
         &-card {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            padding: 15px 0px;
+            border-bottom: 1px solid #EFF2F6;
 
             img {
                 width: 100%;
@@ -145,6 +153,7 @@ const getVenueImage = (venue: Venue) => {
                     line-height: 28px;
                     letter-spacing: 0.5px;
                     margin-bottom: 10px;
+                    text-transform: capitalize;
                 }
             }
 

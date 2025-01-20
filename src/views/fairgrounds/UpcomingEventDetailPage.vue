@@ -310,10 +310,10 @@ const formatAdditionalDate = (date: EventDate): string => {
 }
 
 .event-pricing {
-    gap: 10px;
+  gap: 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 32px;
 }
 
@@ -327,7 +327,8 @@ const formatAdditionalDate = (date: EventDate): string => {
 }
 
 .price {
-  font-size: 32px;
+  display: none;
+  font-size: 14px;
   font-weight: 600;
   color: #333333;
 }

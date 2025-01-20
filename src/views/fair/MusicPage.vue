@@ -58,9 +58,9 @@
                 </div>
               </div>
           </div>
-          <button 
-            v-if="hasActiveFilters" 
-            @click="clearFilters" 
+          <button
+            v-if="hasActiveFilters"
+            @click="clearFilters"
             class="clear-filters-btn"
           >
             Clear Filters
@@ -92,7 +92,7 @@
             </div>
           </router-link>
         </div>
-        
+
       </div>
     </ion-content>
   </ion-page>
@@ -109,6 +109,11 @@ interface Event {
     start_time_time: string;
     start_time_unix: number;
   }[];
+  currentDate?: { // Add this new property
+    start_time_date: string;
+    start_time_time: string;
+    start_time_unix: number;
+  };
   venue: {
     name: string;
     slug: string;
@@ -166,16 +171,20 @@ const musicEvents = computed<Event[]>(() => {
       const venue = event.venue;
       return venue && Object.values(AcceptedVenueSlugs).includes(venue.slug as AcceptedVenueSlugs);
     })
-    .map((event: Event) => ({
-      ...event,
-      featured_image: event.featured_image?.replace(
-        'http://nys-fair.test:8001/wp-content/uploads/',
-        'https://nysfair.ny.gov/wp-content/uploads/'
-      )
-    }))
+    // Expand events with multiple dates into separate events
+    .flatMap((event: Event) => {
+      return event.dates.map(date => ({
+        ...event,
+        currentDate: date, // Add the current date to each expanded event
+        featured_image: event.featured_image?.replace(
+          'http://nys-fair.test:8001/wp-content/uploads/',
+          'https://nysfair.ny.gov/wp-content/uploads/'
+        )
+      }));
+    })
     .sort((a: Event, b: Event) => {
-      const dateA = parseDateString(a.dates[0]?.start_time_date)?.getTime() ?? 0;
-      const dateB = parseDateString(b.dates[0]?.start_time_date)?.getTime() ?? 0;
+      const dateA = parseDateString(a.currentDate?.start_time_date)?.getTime() ?? 0;
+      const dateB = parseDateString(b.currentDate?.start_time_date)?.getTime() ?? 0;
       return dateA - dateB;
     });
 });
@@ -183,7 +192,7 @@ const musicEvents = computed<Event[]>(() => {
 
 const uniqueDates = computed(() => {
   return [...new Set(musicEvents.value.map(event =>
-    parseDateString(event.dates[0]?.start_time_date)?.toDateString()
+    parseDateString(event.currentDate?.start_time_date)?.toDateString()
   ).filter(date => date !== undefined))];
 });
 
@@ -212,7 +221,7 @@ const uniqueGenres = computed(() => {
 const filteredEvents = computed(() => {
   return musicEvents.value.filter(event => {
     const dateMatch = !selectedDate.value ||
-      parseDateString(event.dates[0]?.start_time_date)?.toDateString() === selectedDate.value;
+      parseDateString(event.currentDate?.start_time_date)?.toDateString() === selectedDate.value;
     const venueMatch = !selectedVenue.value ||
       event.venue?.name === selectedVenue.value;
     const genreMatch = !selectedGenre.value || event.genres?.includes(selectedGenre.value);
@@ -221,8 +230,8 @@ const filteredEvents = computed(() => {
 });
 
 const hasActiveFilters = computed(() => {
-  return selectedDate.value !== '' || 
-         selectedVenue.value !== '' || 
+  return selectedDate.value !== '' ||
+         selectedVenue.value !== '' ||
          selectedGenre.value !== '';
 });
 
@@ -334,8 +343,8 @@ const parseDateString = (dateString: string | undefined): Date | undefined => {
 
 // Format date function with improved error handling
 const formatEventDate = (event: Event): string => {
-    const dateString = event.dates?.[0]?.start_time_date;
-    const timeString = event.dates?.[0]?.start_time_time;
+    const dateString = event.currentDate?.start_time_date;
+    const timeString = event.currentDate?.start_time_time;
 
     if (!dateString || !timeString) {
         console.error(`Unable to parse date for formatting: ${dateString}`);
@@ -359,7 +368,7 @@ const formatEventDate = (event: Event): string => {
         }).format(parsedDate);
     } catch (error) {
         console.error(`Error formatting date: ${combinedDateString}`, error);
-        return combinedDateString; // Return original string if formatting fails
+        return combinedDateString;
     }
 };
 
@@ -419,7 +428,7 @@ const venueInfo = computed(() => {
   font-size: 12px;
   cursor: pointer;
   font-weight: 600;
-  
+
   &:hover {
     background-color: #174a8a;
   }
