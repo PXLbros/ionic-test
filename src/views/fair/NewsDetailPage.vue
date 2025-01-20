@@ -25,6 +25,30 @@
                     </div>
                     <div class="main__text" v-html="article.content"></div>
                 </div>
+
+                <div class="navigation">
+                  <router-link
+                      v-if="previousArticle"
+                      :to="`/fair/news/${encodeURIComponent(previousArticle.permalink)}`"
+                      class="navigation__button"
+                  >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="m15 18-6-6 6-6"/>
+                      </svg>
+                      Previous Article
+                  </router-link>
+
+                  <router-link
+                      v-if="nextArticle"
+                      :to="`/fair/news/${encodeURIComponent(nextArticle.permalink)}`"
+                      class="navigation__button"
+                  >
+                      Next Article
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="m9 18 6-6-6-6"/>
+                      </svg>
+                  </router-link>
+              </div>
             </div>
         </ion-content>
     </ion-page>
@@ -48,11 +72,32 @@ const route = useRoute();
 const dataStore = useDataStore();
 const permalink = decodeURIComponent(route.params.id as string);
 
-// Get the specific article
-const article = computed<NewsArticle | undefined>(() => {
-    return dataStore.data.nysfairWebsite.news.find(
+// Get current article index
+const currentArticleIndex = computed(() => {
+    return dataStore.data.nysfairWebsite.news.findIndex(
         (article: NewsArticle) => article.permalink === permalink
     );
+});
+
+// Get the specific article
+const article = computed<NewsArticle | undefined>(() => {
+    return dataStore.data.nysfairWebsite.news[currentArticleIndex.value];
+});
+
+// Get previous article
+const previousArticle = computed<NewsArticle | undefined>(() => {
+    if (currentArticleIndex.value > 0) {
+        return dataStore.data.nysfairWebsite.news[currentArticleIndex.value - 1];
+    }
+    return undefined;
+});
+
+// Get next article
+const nextArticle = computed<NewsArticle | undefined>(() => {
+    if (currentArticleIndex.value < dataStore.data.nysfairWebsite.news.length - 1) {
+        return dataStore.data.nysfairWebsite.news[currentArticleIndex.value + 1];
+    }
+    return undefined;
 });
 </script>
 
@@ -68,6 +113,13 @@ const article = computed<NewsArticle | undefined>(() => {
         align-items: center;
         justify-content: center;
         margin-bottom: 30px;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 24px;
+        }
     }
 
     &__content {
@@ -108,6 +160,39 @@ const article = computed<NewsArticle | undefined>(() => {
             font-weight: 600;
         }
     }
+
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #EFF2F6;
+
+  &__button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border: 1px solid #486284;
+      border-radius: 50px;
+      color: #486284;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+
+      &:hover {
+          background-color: #486284;
+          color: white;
+      }
+
+      svg {
+          width: 18px;
+          height: 18px;
+      }
+    }
+  }
 }
 
 :deep(ion-content) {
