@@ -3,9 +3,9 @@
     <template v-if="props.events && props.events.length > 0">
       <div v-for="event in props.events" :key="event.id" class="events-list__event-item">
         <div class="content">
-          <h3>{{ event.title || "Event Title" }}</h3>
-          <p>{{ event.start_time || "Event Start Time" }} </p>
-          <p>{{ event.venue.name || "Event Venue N/A" }}</p>
+          <h3>{{ event.title }}</h3>
+          <p>{{ props.showEventDate ? event.eventDate.start_time_formatted : event.start_time }} </p>
+          <p>{{ event.venue.name }}</p>
           <p v-if="event.categories.length > 0">
             Categories: {{ event.categoryNames.join(', ') }}
           </p>
@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
-import { addUserEventFavorite, removeUserEventFavorite, saveUserEventFavorite } from '@/services/api';
+import { addUserEventFavorite, removeUserEventFavorite } from '@/services/api';
 import { IonIcon } from '@ionic/vue';
 import { heart, heartOutline } from 'ionicons/icons';
 import { Category, Event, EventDate } from '@/types';
@@ -45,10 +45,12 @@ const props = withDefaults(defineProps<{
   events: FormattedEvent[];
   categories: Category[];
   noEventsText?: string;
+  showEventDate?: boolean;
 }>(), {
   events: () => [],
   categories: () => [],
   noEventsText: 'No events',
+  showEventDate: false,
 });
 
 const appStore = useAppStore();
@@ -127,7 +129,16 @@ const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: numbe
       // });
 
       // // Trigger registration if not already done
-      // PushNotifications.register();
+      // if (!appStore.pushNotifications.deviceId) {
+      //   await PushNotifications.register();
+
+      //   // Sleep for 1 second
+      //   await new Promise((resolve) => setTimeout(resolve, 1000));
+      // }
+
+      if (!appStore.pushNotifications.deviceId) {
+        throw new Error('Device ID not found');
+      }
 
       saveUserEventFavoriteData.deviceId = appStore.pushNotifications.deviceId;
     } else {
@@ -188,7 +199,16 @@ const removeEventFromFavorites = async (eventId: number, selectedStartTimeUnix: 
       // });
 
       // // Trigger registration if not already done
-      // PushNotifications.register();
+      // if (!appStore.pushNotifications.deviceId) {
+      //   await PushNotifications.register();
+
+      //   // Sleep for 1 second
+      //   await new Promise((resolve) => setTimeout(resolve, 1000));
+      // }
+
+      if (!appStore.pushNotifications.deviceId) {
+        throw new Error('Device ID not found');
+      }
 
       saveUserEventFavoriteData.deviceId = appStore.pushNotifications.deviceId;
     } else {
