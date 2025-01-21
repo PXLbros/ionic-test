@@ -3,6 +3,7 @@ import { convertToEasternTime } from './time';
 
 export interface FormattedEvent extends Event {
   start_time: string;
+  start_time_formatted: string;
   end_time: string;
   eventDate: any;
   dateDetails: any;

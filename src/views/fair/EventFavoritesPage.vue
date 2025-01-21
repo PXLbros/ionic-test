@@ -1,6 +1,6 @@
 <template>
   <DefaultLayout title="Event Favorites" backButtonHref="/fair/schedule">
-    <div class="main">
+    <div class="main main--event-favorites-page">
       <div class="main__header">
         <div class="main__header-img">
           <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
@@ -22,6 +22,7 @@
           :events="favoriteEventItems"
           :categories="categories"
           noEventsText="No favorited events"
+          showEventDate
         />
       </div>
     </div>
@@ -47,8 +48,6 @@ const favoriteEventItems = computed(() => {
       if (eventDate.isFavorite) {
         const formattedEvent = formatEvent({ event, eventDate, categories: categories.value });
 
-        console.log('formattedEvent', formattedEvent);
-
         favoriteEventItems.push(formattedEvent);
       }
     }
@@ -59,9 +58,12 @@ const favoriteEventItems = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-
 .main {
   font-family: 'Inter', sans-serif;
+
+  &--event-favorites-page {
+    padding: 20px;
+  }
 
   &__header {
     padding: 25px;
