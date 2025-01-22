@@ -87,60 +87,62 @@
             </div>
 
             <!-- Sponsors Section -->
-            <div class="section sponsors">
-                <div class="section-header">
-                    <h2 class="section-header__text">App Sponsors</h2>
-                </div>
-                <div class="sponsor-carousel">
+             <div class="wrapper">
+               <div class="section sponsors">
+                 <div class="section-header">
+                   <h2 class="section-header__text">App Sponsors</h2>
+                  </div>
+                  <div class="sponsor-carousel">
                     <div class="sponsor-carousel__container" ref="carouselContainer">
-                        <div
-                            class="sponsor-item"
-                            v-for="(sponsor, index) in sponsors"
-                            :key="index"
-                        >
-                            <div class="sponsor-card">
-                                <img
-                                    :src="sponsor.image"
-                                    :alt="sponsor.name"
-                                    @error="handleImageError"
-                                    class="sponsor-image"
-                                />
-                            </div>
-                        </div>
+                      <div
+                      class="sponsor-item"
+                      v-for="(sponsor, index) in sponsors"
+                      :key="index"
+                      >
+                      <div class="sponsor-card">
+                        <img
+                        :src="sponsor.image"
+                        :alt="sponsor.name"
+                        @error="handleImageError"
+                        class="sponsor-image"
+                        />
+                      </div>
                     </div>
+                  </div>
                 </div>
-            </div>
+              </div>
 
-            <!-- Keep in Touch Section -->
-            <div class="section keep-in-touch">
+              <!-- Keep in Touch Section -->
+              <div class="section keep-in-touch">
                 <div class="section-header bg">
-                    <h2 class="section-header__text">Keep in Touch</h2>
+                  <h2 class="section-header__text">Keep in Touch</h2>
                 </div>
                 <div class="contact-form">
-                    <div class="form-group">
-                        <label for="email">Email*</label>
-                        <input
-                            type="email"
-                            id="email"
-                            v-model="email"
-                            placeholder="Enter your email"
-                            class="form-input"
-                        >
-                    </div>
-                    <p class="form-text">
-                        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                    <button class="sign-up-btn">Sign Up</button>
+                  <div class="form-group">
+                    <label for="email">Email*</label>
+                    <input
+                    type="email"
+                    id="email"
+                    v-model="email"
+                    placeholder="Enter your email"
+                    class="form-input"
+                    >
+                  </div>
+                  <p class="form-text">
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                  </p>
+                  <button class="sign-up-btn">Sign Up</button>
                 </div>
-            </div>
+              </div>
 
-            <!-- Social Media Section -->
-            <div v-if="dataStore.data.nysfairWebsite.social" class="section social-media">
+              <!-- Social Media Section -->
+              <div v-if="dataStore.data.nysfairWebsite.social" class="section social-media">
                 <div class="section-header">
-                    <h2 class="section-header__text">Follow Us</h2>
+                  <h2 class="section-header__text">Follow Us</h2>
                 </div>
 
                 <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
+              </div>
             </div>
         </ion-content>
     </ion-page>
@@ -220,7 +222,7 @@
         flex-direction: column;
         position: relative; // Add this
         // height: 83vh;
-        //background-image: url('/src/imgs/Flags_Pink.png');
+        background-image: url('/src/imgs/Bkg_V4.jpg');
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
