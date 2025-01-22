@@ -28,6 +28,141 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		A47FE3892D408CC300374C72 /* BaseNav-DOQjK-PW.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "BaseNav-DOQjK-PW.css"; sourceTree = "<group>"; };
+		A47FE38A2D408CC300374C72 /* BaseNav-legacy-BTIvbsHQ.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "BaseNav-legacy-BTIvbsHQ.js"; sourceTree = "<group>"; };
+		A47FE38B2D408CC300374C72 /* BaseNav-YaxB0pfu.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "BaseNav-YaxB0pfu.js"; sourceTree = "<group>"; };
+		A47FE38C2D408CC300374C72 /* DailySchedulePage-B4Q20Zgt.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "DailySchedulePage-B4Q20Zgt.css"; sourceTree = "<group>"; };
+		A47FE38D2D408CC300374C72 /* DailySchedulePage-legacy-c0LRxFqh.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "DailySchedulePage-legacy-c0LRxFqh.js"; sourceTree = "<group>"; };
+		A47FE38E2D408CC300374C72 /* DailySchedulePage-QTiTOzsW.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "DailySchedulePage-QTiTOzsW.js"; sourceTree = "<group>"; };
+		A47FE38F2D408CC300374C72 /* default-C91fUYn3.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "default-C91fUYn3.js"; sourceTree = "<group>"; };
+		A47FE3902D408CC300374C72 /* default-legacy-hLBMSoNu.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "default-legacy-hLBMSoNu.js"; sourceTree = "<group>"; };
+		A47FE3912D408CC300374C72 /* DirectionsPage-Bzx9yshy.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "DirectionsPage-Bzx9yshy.css"; sourceTree = "<group>"; };
+		A47FE3922D408CC300374C72 /* DirectionsPage-legacy-Drhze-OY.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "DirectionsPage-legacy-Drhze-OY.js"; sourceTree = "<group>"; };
+		A47FE3932D408CC300374C72 /* DirectionsPage-v5NFn8bB.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "DirectionsPage-v5NFn8bB.js"; sourceTree = "<group>"; };
+		A47FE3942D408CC300374C72 /* event-dlTsgcrN.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "event-dlTsgcrN.css"; sourceTree = "<group>"; };
+		A47FE3952D408CC300374C72 /* event-legacy-1GT5cxx6.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "event-legacy-1GT5cxx6.js"; sourceTree = "<group>"; };
+		A47FE3962D408CC300374C72 /* event-ZWS8lMNn.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "event-ZWS8lMNn.js"; sourceTree = "<group>"; };
+		A47FE3972D408CC300374C72 /* EventFavoritesPage-CQphnt7X.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "EventFavoritesPage-CQphnt7X.css"; sourceTree = "<group>"; };
+		A47FE3982D408CC300374C72 /* EventFavoritesPage-DIM6orlO.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "EventFavoritesPage-DIM6orlO.js"; sourceTree = "<group>"; };
+		A47FE3992D408CC300374C72 /* EventFavoritesPage-legacy-DJzapoMc.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "EventFavoritesPage-legacy-DJzapoMc.js"; sourceTree = "<group>"; };
+		A47FE39A2D408CC300374C72 /* fair-logo-light-BrFusYVC.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "fair-logo-light-BrFusYVC.svg"; sourceTree = "<group>"; };
+		A47FE39B2D408CC300374C72 /* fair-main-logo-GU9EI-n5.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "fair-main-logo-GU9EI-n5.svg"; sourceTree = "<group>"; };
+		A47FE39C2D408CC300374C72 /* fairgrounds-dark-B2VUlWHN.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "fairgrounds-dark-B2VUlWHN.svg"; sourceTree = "<group>"; };
+		A47FE39D2D408CC300374C72 /* FairgroundsPage-Cy7N3a_w.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "FairgroundsPage-Cy7N3a_w.js"; sourceTree = "<group>"; };
+		A47FE39E2D408CC300374C72 /* FairgroundsPage-Cz3OOLBM.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "FairgroundsPage-Cz3OOLBM.css"; sourceTree = "<group>"; };
+		A47FE39F2D408CC300374C72 /* FairgroundsPage-legacy-CiTR_z5C.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "FairgroundsPage-legacy-CiTR_z5C.js"; sourceTree = "<group>"; };
+		A47FE3A02D408CC300374C72 /* FairPage-legacy-C3iG-Qlz.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "FairPage-legacy-C3iG-Qlz.js"; sourceTree = "<group>"; };
+		A47FE3A12D408CC300374C72 /* FairPage-opVPFzu4.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "FairPage-opVPFzu4.js"; sourceTree = "<group>"; };
+		A47FE3A22D408CC300374C72 /* FairPage-QvYQ5ELM.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "FairPage-QvYQ5ELM.css"; sourceTree = "<group>"; };
+		A47FE3A32D408CC300374C72 /* FAQPage-BHR3cf2E.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "FAQPage-BHR3cf2E.js"; sourceTree = "<group>"; };
+		A47FE3A42D408CC300374C72 /* FAQPage-CvWfDiVd.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "FAQPage-CvWfDiVd.css"; sourceTree = "<group>"; };
+		A47FE3A52D408CC300374C72 /* FAQPage-legacy-FkA2Ax6J.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "FAQPage-legacy-FkA2Ax6J.js"; sourceTree = "<group>"; };
+		A47FE3A62D408CC300374C72 /* focus-visible-legacy-CdO5cX4I.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "focus-visible-legacy-CdO5cX4I.js"; sourceTree = "<group>"; };
+		A47FE3A72D408CC300374C72 /* focus-visible-supuXXMI.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "focus-visible-supuXXMI.js"; sourceTree = "<group>"; };
+		A47FE3A82D408CC300374C72 /* GamesPage-BEYCbPO0.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "GamesPage-BEYCbPO0.js"; sourceTree = "<group>"; };
+		A47FE3A92D408CC300374C72 /* GamesPage-ClCXS33d.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "GamesPage-ClCXS33d.css"; sourceTree = "<group>"; };
+		A47FE3AA2D408CC300374C72 /* GamesPage-legacy-CK4tLX-W.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "GamesPage-legacy-CK4tLX-W.js"; sourceTree = "<group>"; };
+		A47FE3AB2D408CC300374C72 /* HomePage-CplyG12A.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "HomePage-CplyG12A.css"; sourceTree = "<group>"; };
+		A47FE3AC2D408CC300374C72 /* HomePage-legacy-AZe0De2L.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "HomePage-legacy-AZe0De2L.js"; sourceTree = "<group>"; };
+		A47FE3AD2D408CC300374C72 /* HomePage-SGklq35M.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "HomePage-SGklq35M.js"; sourceTree = "<group>"; };
+		A47FE3AE2D408CC300374C72 /* index-9it39HhQ.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "index-9it39HhQ.js"; sourceTree = "<group>"; };
+		A47FE3AF2D408CC300374C72 /* index-B-YusJ0l.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "index-B-YusJ0l.js"; sourceTree = "<group>"; };
+		A47FE3B02D408CC300374C72 /* index-BAdn0nFr.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "index-BAdn0nFr.css"; sourceTree = "<group>"; };
+		A47FE3B12D408CC300374C72 /* index-Dily8neB.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "index-Dily8neB.js"; sourceTree = "<group>"; };
+		A47FE3B22D408CC300374C72 /* index-legacy-B3SqIIID.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "index-legacy-B3SqIIID.js"; sourceTree = "<group>"; };
+		A47FE3B32D408CC300374C72 /* index-legacy-BsOSUYrE.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "index-legacy-BsOSUYrE.js"; sourceTree = "<group>"; };
+		A47FE3B42D408CC300374C72 /* index-legacy-DC5ZY9zs.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "index-legacy-DC5ZY9zs.js"; sourceTree = "<group>"; };
+		A47FE3B52D408CC300374C72 /* index9-Ch7ytIJj.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "index9-Ch7ytIJj.js"; sourceTree = "<group>"; };
+		A47FE3B62D408CC300374C72 /* index9-legacy-B_90otLA.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "index9-legacy-B_90otLA.js"; sourceTree = "<group>"; };
+		A47FE3B72D408CC300374C72 /* input-shims-B_Q29ntN.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "input-shims-B_Q29ntN.js"; sourceTree = "<group>"; };
+		A47FE3B82D408CC300374C72 /* input-shims-legacy-D2TDT7OW.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "input-shims-legacy-D2TDT7OW.js"; sourceTree = "<group>"; };
+		A47FE3B92D408CC300374C72 /* ios.transition-CBbWcmtl.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "ios.transition-CBbWcmtl.js"; sourceTree = "<group>"; };
+		A47FE3BA2D408CC300374C72 /* ios.transition-legacy-Dtqccqvx.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "ios.transition-legacy-Dtqccqvx.js"; sourceTree = "<group>"; };
+		A47FE3BB2D408CC300374C72 /* keyboard-Bg3w4__d.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "keyboard-Bg3w4__d.js"; sourceTree = "<group>"; };
+		A47FE3BC2D408CC300374C72 /* keyboard-legacy-EGMj8Z3y.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "keyboard-legacy-EGMj8Z3y.js"; sourceTree = "<group>"; };
+		A47FE3BD2D408CC300374C72 /* keyboard2-CElBUIR5.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "keyboard2-CElBUIR5.js"; sourceTree = "<group>"; };
+		A47FE3BE2D408CC300374C72 /* keyboard2-legacy-7FvKPHyF.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "keyboard2-legacy-7FvKPHyF.js"; sourceTree = "<group>"; };
+		A47FE3BF2D408CC300374C72 /* MapPage-BDqwJrm4.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "MapPage-BDqwJrm4.js"; sourceTree = "<group>"; };
+		A47FE3C02D408CC300374C72 /* MapPage-CFbSMW9A.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "MapPage-CFbSMW9A.css"; sourceTree = "<group>"; };
+		A47FE3C12D408CC300374C72 /* MapPage-legacy-DWm0eI3S.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "MapPage-legacy-DWm0eI3S.js"; sourceTree = "<group>"; };
+		A47FE3C22D408CC300374C72 /* md.transition-5tpIuWCW.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "md.transition-5tpIuWCW.js"; sourceTree = "<group>"; };
+		A47FE3C32D408CC300374C72 /* md.transition-legacy-B3Pf8BFy.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "md.transition-legacy-B3Pf8BFy.js"; sourceTree = "<group>"; };
+		A47FE3C42D408CC300374C72 /* MusicDetailPage-DA8HJaE_.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "MusicDetailPage-DA8HJaE_.js"; sourceTree = "<group>"; };
+		A47FE3C52D408CC300374C72 /* MusicDetailPage-legacy-DGBCHiBE.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "MusicDetailPage-legacy-DGBCHiBE.js"; sourceTree = "<group>"; };
+		A47FE3C62D408CC300374C72 /* MusicDetailPage-YM_vf8jD.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "MusicDetailPage-YM_vf8jD.css"; sourceTree = "<group>"; };
+		A47FE3C72D408CC300374C72 /* MusicPage-ByYYyhzZ.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "MusicPage-ByYYyhzZ.js"; sourceTree = "<group>"; };
+		A47FE3C82D408CC300374C72 /* MusicPage-L8rehWLU.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "MusicPage-L8rehWLU.css"; sourceTree = "<group>"; };
+		A47FE3C92D408CC300374C72 /* MusicPage-legacy-DFkjbZ7i.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "MusicPage-legacy-DFkjbZ7i.js"; sourceTree = "<group>"; };
+		A47FE3CA2D408CC300374C72 /* NewsDetailPage-Btr03Uud.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "NewsDetailPage-Btr03Uud.js"; sourceTree = "<group>"; };
+		A47FE3CB2D408CC300374C72 /* NewsDetailPage-BVwH0Gdw.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "NewsDetailPage-BVwH0Gdw.css"; sourceTree = "<group>"; };
+		A47FE3CC2D408CC300374C72 /* NewsDetailPage-legacy-DZSxfwwB.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "NewsDetailPage-legacy-DZSxfwwB.js"; sourceTree = "<group>"; };
+		A47FE3CD2D408CC300374C72 /* NewsPage-BdQQFIKZ.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "NewsPage-BdQQFIKZ.js"; sourceTree = "<group>"; };
+		A47FE3CE2D408CC300374C72 /* NewsPage-CC0Q2Xjm.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "NewsPage-CC0Q2Xjm.css"; sourceTree = "<group>"; };
+		A47FE3CF2D408CC300374C72 /* NewsPage-legacy-b8carjSY.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "NewsPage-legacy-b8carjSY.js"; sourceTree = "<group>"; };
+		A47FE3D02D408CC300374C72 /* ParkingPage-BXlJ2oVE.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "ParkingPage-BXlJ2oVE.css"; sourceTree = "<group>"; };
+		A47FE3D12D408CC300374C72 /* ParkingPage-Cg4svC--.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "ParkingPage-Cg4svC--.js"; sourceTree = "<group>"; };
+		A47FE3D22D408CC300374C72 /* ParkingPage-legacy-CC8UdAQl.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "ParkingPage-legacy-CC8UdAQl.js"; sourceTree = "<group>"; };
+		A47FE3D32D408CC300374C72 /* parseISO-B3lV911X.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "parseISO-B3lV911X.js"; sourceTree = "<group>"; };
+		A47FE3D42D408CC300374C72 /* parseISO-legacy-D2iQGmZc.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "parseISO-legacy-D2iQGmZc.js"; sourceTree = "<group>"; };
+		A47FE3D52D408CC300374C72 /* PlanVisitPage-CMGx_90-.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "PlanVisitPage-CMGx_90-.css"; sourceTree = "<group>"; };
+		A47FE3D62D408CC300374C72 /* PlanVisitPage-CS0q3OWe.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "PlanVisitPage-CS0q3OWe.js"; sourceTree = "<group>"; };
+		A47FE3D72D408CC300374C72 /* PlanVisitPage-legacy-Bz23_o-u.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "PlanVisitPage-legacy-Bz23_o-u.js"; sourceTree = "<group>"; };
+		A47FE3D82D408CC300374C72 /* polyfills-legacy-dkEPDXm8.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "polyfills-legacy-dkEPDXm8.js"; sourceTree = "<group>"; };
+		A47FE3D92D408CC300374C72 /* RentalOpportunityPage-BGfUjUf1.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "RentalOpportunityPage-BGfUjUf1.css"; sourceTree = "<group>"; };
+		A47FE3DA2D408CC300374C72 /* RentalOpportunityPage-Dsz4-zLe.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "RentalOpportunityPage-Dsz4-zLe.js"; sourceTree = "<group>"; };
+		A47FE3DB2D408CC300374C72 /* RentalOpportunityPage-legacy-CKNLGVb_.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "RentalOpportunityPage-legacy-CKNLGVb_.js"; sourceTree = "<group>"; };
+		A47FE3DC2D408CC300374C72 /* status-tap-B1YmoS9D.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "status-tap-B1YmoS9D.js"; sourceTree = "<group>"; };
+		A47FE3DD2D408CC300374C72 /* status-tap-legacy-Drgzdxdd.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "status-tap-legacy-Drgzdxdd.js"; sourceTree = "<group>"; };
+		A47FE3DE2D408CC300374C72 /* swipe-back-D0gGjGlJ.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "swipe-back-D0gGjGlJ.js"; sourceTree = "<group>"; };
+		A47FE3DF2D408CC300374C72 /* swipe-back-legacy-DOwsNOXz.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "swipe-back-legacy-DOwsNOXz.js"; sourceTree = "<group>"; };
+		A47FE3E02D408CC300374C72 /* TicketsPage-Bw_zCSUp.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "TicketsPage-Bw_zCSUp.js"; sourceTree = "<group>"; };
+		A47FE3E12D408CC300374C72 /* TicketsPage-D_sJv2WE.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "TicketsPage-D_sJv2WE.css"; sourceTree = "<group>"; };
+		A47FE3E22D408CC300374C72 /* TicketsPage-legacy-BonnppS3.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "TicketsPage-legacy-BonnppS3.js"; sourceTree = "<group>"; };
+		A47FE3E32D408CC300374C72 /* UpcomingEventDetailPage-CiynloDt.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "UpcomingEventDetailPage-CiynloDt.js"; sourceTree = "<group>"; };
+		A47FE3E42D408CC300374C72 /* UpcomingEventDetailPage-Dr9I_tcR.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "UpcomingEventDetailPage-Dr9I_tcR.css"; sourceTree = "<group>"; };
+		A47FE3E52D408CC300374C72 /* UpcomingEventDetailPage-legacy-_bgk27c0.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "UpcomingEventDetailPage-legacy-_bgk27c0.js"; sourceTree = "<group>"; };
+		A47FE3E62D408CC300374C72 /* UpcomingEventsPage-DCpQ7fe1.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "UpcomingEventsPage-DCpQ7fe1.js"; sourceTree = "<group>"; };
+		A47FE3E72D408CC300374C72 /* UpcomingEventsPage-DOvKbgOn.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "UpcomingEventsPage-DOvKbgOn.css"; sourceTree = "<group>"; };
+		A47FE3E82D408CC300374C72 /* UpcomingEventsPage-legacy-D5IkZ-4S.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "UpcomingEventsPage-legacy-D5IkZ-4S.js"; sourceTree = "<group>"; };
+		A47FE3E92D408CC300374C72 /* UpdatesPage-Br7MlwfS.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "UpdatesPage-Br7MlwfS.js"; sourceTree = "<group>"; };
+		A47FE3EA2D408CC300374C72 /* UpdatesPage-DXOGZdP2.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "UpdatesPage-DXOGZdP2.css"; sourceTree = "<group>"; };
+		A47FE3EB2D408CC300374C72 /* UpdatesPage-legacy-BUHzh-Vn.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "UpdatesPage-legacy-BUHzh-Vn.js"; sourceTree = "<group>"; };
+		A47FE3EC2D408CC300374C72 /* VenueDetailPage-ADSwARBW.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "VenueDetailPage-ADSwARBW.css"; sourceTree = "<group>"; };
+		A47FE3ED2D408CC300374C72 /* VenueDetailPage-D1XdcxND.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "VenueDetailPage-D1XdcxND.js"; sourceTree = "<group>"; };
+		A47FE3EE2D408CC300374C72 /* VenueDetailPage-legacy-BAts65PF.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "VenueDetailPage-legacy-BAts65PF.js"; sourceTree = "<group>"; };
+		A47FE3EF2D408CC300374C72 /* VenuesPage-BxyFh7_V.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "VenuesPage-BxyFh7_V.js"; sourceTree = "<group>"; };
+		A47FE3F02D408CC300374C72 /* VenuesPage-CEenzE-s.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "VenuesPage-CEenzE-s.css"; sourceTree = "<group>"; };
+		A47FE3F12D408CC300374C72 /* VenuesPage-legacy-DuXXvvDt.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "VenuesPage-legacy-DuXXvvDt.js"; sourceTree = "<group>"; };
+		A47FE3F22D408CC300374C72 /* web-Ct21oNGh.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "web-Ct21oNGh.js"; sourceTree = "<group>"; };
+		A47FE3F32D408CC300374C72 /* web-eP4C8f6Q.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "web-eP4C8f6Q.js"; sourceTree = "<group>"; };
+		A47FE3F42D408CC300374C72 /* web-legacy-cilVaAT6.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "web-legacy-cilVaAT6.js"; sourceTree = "<group>"; };
+		A47FE3F52D408CC300374C72 /* web-legacy-COP4XxoW.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "web-legacy-COP4XxoW.js"; sourceTree = "<group>"; };
+		A47FE3F72D408CC300374C72 /* chicken-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "chicken-icon.png"; sourceTree = "<group>"; };
+		A47FE3F82D408CC300374C72 /* fairgroundsl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fairgroundsl.png; sourceTree = "<group>"; };
+		A47FE3F92D408CC300374C72 /* gates.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gates.png; sourceTree = "<group>"; };
+		A47FE3FA2D408CC300374C72 /* gates (1).svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "gates (1).svg"; sourceTree = "<group>"; };
+		A47FE3FB2D408CC300374C72 /* Map_Design.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Map_Design.png; sourceTree = "<group>"; };
+		A47FE3FC2D408CC300374C72 /* Map_Render.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Map_Render.png; sourceTree = "<group>"; };
+		A47FE3FD2D408CC300374C72 /* Map_Render-min.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Map_Render-min.png"; sourceTree = "<group>"; };
+		A47FE3FE2D408CC300374C72 /* nysf-stage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "nysf-stage.png"; sourceTree = "<group>"; };
+		A47FE3FF2D408CC300374C72 /* pig.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pig.png; sourceTree = "<group>"; };
+		A47FE4002D408CC300374C72 /* shirt.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shirt.png; sourceTree = "<group>"; };
+		A47FE4022D408CC300374C72 /* News_NYSF.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = News_NYSF.jpg; sourceTree = "<group>"; };
+		A47FE4032D408CC300374C72 /* placeholder.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = placeholder.svg; sourceTree = "<group>"; };
+		A47FE4052D408CC300374C72 /* cordova.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = cordova.js; sourceTree = "<group>"; };
+		A47FE4062D408CC300374C72 /* cordova_plugins.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = cordova_plugins.js; sourceTree = "<group>"; };
+		A47FE4072D408CC300374C72 /* favicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = favicon.png; sourceTree = "<group>"; };
+		A47FE4082D408CC300374C72 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		A47FE40A2D408CC300374C72 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		A47FE40B2D408CC300374C72 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A47FE40C2D408CC300374C72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A47FE40D2D408CC300374C72 /* capacitor.config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
+		A47FE40E2D408CC300374C72 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
+		A47FE40F2D408CC300374C72 /* Environment.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Environment.xcconfig; sourceTree = "<group>"; };
+		A47FE4102D408CC300374C72 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		A47FE4112D408CC300374C72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A47FE4122D408CC300374C72 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A47FE4142D408CC300374C72 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A4A99BBC2D304FED00C7578E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A4A99BBE2D384D6D00C7578E /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -62,6 +197,7 @@
 				504EC3051FED79650016851F /* Products */,
 				7F8756D8B27F46E3366F6CEA /* Pods */,
 				27E2DDA53C4D2A4D1A88CE4A /* Frameworks */,
+				A47FE4162D408CC300374C72 /* App */,
 			);
 			sourceTree = "<group>";
 		};
@@ -97,6 +233,180 @@
 				AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		A47FE3F62D408CC300374C72 /* assets */ = {
+			isa = PBXGroup;
+			children = (
+				A47FE3892D408CC300374C72 /* BaseNav-DOQjK-PW.css */,
+				A47FE38A2D408CC300374C72 /* BaseNav-legacy-BTIvbsHQ.js */,
+				A47FE38B2D408CC300374C72 /* BaseNav-YaxB0pfu.js */,
+				A47FE38C2D408CC300374C72 /* DailySchedulePage-B4Q20Zgt.css */,
+				A47FE38D2D408CC300374C72 /* DailySchedulePage-legacy-c0LRxFqh.js */,
+				A47FE38E2D408CC300374C72 /* DailySchedulePage-QTiTOzsW.js */,
+				A47FE38F2D408CC300374C72 /* default-C91fUYn3.js */,
+				A47FE3902D408CC300374C72 /* default-legacy-hLBMSoNu.js */,
+				A47FE3912D408CC300374C72 /* DirectionsPage-Bzx9yshy.css */,
+				A47FE3922D408CC300374C72 /* DirectionsPage-legacy-Drhze-OY.js */,
+				A47FE3932D408CC300374C72 /* DirectionsPage-v5NFn8bB.js */,
+				A47FE3942D408CC300374C72 /* event-dlTsgcrN.css */,
+				A47FE3952D408CC300374C72 /* event-legacy-1GT5cxx6.js */,
+				A47FE3962D408CC300374C72 /* event-ZWS8lMNn.js */,
+				A47FE3972D408CC300374C72 /* EventFavoritesPage-CQphnt7X.css */,
+				A47FE3982D408CC300374C72 /* EventFavoritesPage-DIM6orlO.js */,
+				A47FE3992D408CC300374C72 /* EventFavoritesPage-legacy-DJzapoMc.js */,
+				A47FE39A2D408CC300374C72 /* fair-logo-light-BrFusYVC.svg */,
+				A47FE39B2D408CC300374C72 /* fair-main-logo-GU9EI-n5.svg */,
+				A47FE39C2D408CC300374C72 /* fairgrounds-dark-B2VUlWHN.svg */,
+				A47FE39D2D408CC300374C72 /* FairgroundsPage-Cy7N3a_w.js */,
+				A47FE39E2D408CC300374C72 /* FairgroundsPage-Cz3OOLBM.css */,
+				A47FE39F2D408CC300374C72 /* FairgroundsPage-legacy-CiTR_z5C.js */,
+				A47FE3A02D408CC300374C72 /* FairPage-legacy-C3iG-Qlz.js */,
+				A47FE3A12D408CC300374C72 /* FairPage-opVPFzu4.js */,
+				A47FE3A22D408CC300374C72 /* FairPage-QvYQ5ELM.css */,
+				A47FE3A32D408CC300374C72 /* FAQPage-BHR3cf2E.js */,
+				A47FE3A42D408CC300374C72 /* FAQPage-CvWfDiVd.css */,
+				A47FE3A52D408CC300374C72 /* FAQPage-legacy-FkA2Ax6J.js */,
+				A47FE3A62D408CC300374C72 /* focus-visible-legacy-CdO5cX4I.js */,
+				A47FE3A72D408CC300374C72 /* focus-visible-supuXXMI.js */,
+				A47FE3A82D408CC300374C72 /* GamesPage-BEYCbPO0.js */,
+				A47FE3A92D408CC300374C72 /* GamesPage-ClCXS33d.css */,
+				A47FE3AA2D408CC300374C72 /* GamesPage-legacy-CK4tLX-W.js */,
+				A47FE3AB2D408CC300374C72 /* HomePage-CplyG12A.css */,
+				A47FE3AC2D408CC300374C72 /* HomePage-legacy-AZe0De2L.js */,
+				A47FE3AD2D408CC300374C72 /* HomePage-SGklq35M.js */,
+				A47FE3AE2D408CC300374C72 /* index-9it39HhQ.js */,
+				A47FE3AF2D408CC300374C72 /* index-B-YusJ0l.js */,
+				A47FE3B02D408CC300374C72 /* index-BAdn0nFr.css */,
+				A47FE3B12D408CC300374C72 /* index-Dily8neB.js */,
+				A47FE3B22D408CC300374C72 /* index-legacy-B3SqIIID.js */,
+				A47FE3B32D408CC300374C72 /* index-legacy-BsOSUYrE.js */,
+				A47FE3B42D408CC300374C72 /* index-legacy-DC5ZY9zs.js */,
+				A47FE3B52D408CC300374C72 /* index9-Ch7ytIJj.js */,
+				A47FE3B62D408CC300374C72 /* index9-legacy-B_90otLA.js */,
+				A47FE3B72D408CC300374C72 /* input-shims-B_Q29ntN.js */,
+				A47FE3B82D408CC300374C72 /* input-shims-legacy-D2TDT7OW.js */,
+				A47FE3B92D408CC300374C72 /* ios.transition-CBbWcmtl.js */,
+				A47FE3BA2D408CC300374C72 /* ios.transition-legacy-Dtqccqvx.js */,
+				A47FE3BB2D408CC300374C72 /* keyboard-Bg3w4__d.js */,
+				A47FE3BC2D408CC300374C72 /* keyboard-legacy-EGMj8Z3y.js */,
+				A47FE3BD2D408CC300374C72 /* keyboard2-CElBUIR5.js */,
+				A47FE3BE2D408CC300374C72 /* keyboard2-legacy-7FvKPHyF.js */,
+				A47FE3BF2D408CC300374C72 /* MapPage-BDqwJrm4.js */,
+				A47FE3C02D408CC300374C72 /* MapPage-CFbSMW9A.css */,
+				A47FE3C12D408CC300374C72 /* MapPage-legacy-DWm0eI3S.js */,
+				A47FE3C22D408CC300374C72 /* md.transition-5tpIuWCW.js */,
+				A47FE3C32D408CC300374C72 /* md.transition-legacy-B3Pf8BFy.js */,
+				A47FE3C42D408CC300374C72 /* MusicDetailPage-DA8HJaE_.js */,
+				A47FE3C52D408CC300374C72 /* MusicDetailPage-legacy-DGBCHiBE.js */,
+				A47FE3C62D408CC300374C72 /* MusicDetailPage-YM_vf8jD.css */,
+				A47FE3C72D408CC300374C72 /* MusicPage-ByYYyhzZ.js */,
+				A47FE3C82D408CC300374C72 /* MusicPage-L8rehWLU.css */,
+				A47FE3C92D408CC300374C72 /* MusicPage-legacy-DFkjbZ7i.js */,
+				A47FE3CA2D408CC300374C72 /* NewsDetailPage-Btr03Uud.js */,
+				A47FE3CB2D408CC300374C72 /* NewsDetailPage-BVwH0Gdw.css */,
+				A47FE3CC2D408CC300374C72 /* NewsDetailPage-legacy-DZSxfwwB.js */,
+				A47FE3CD2D408CC300374C72 /* NewsPage-BdQQFIKZ.js */,
+				A47FE3CE2D408CC300374C72 /* NewsPage-CC0Q2Xjm.css */,
+				A47FE3CF2D408CC300374C72 /* NewsPage-legacy-b8carjSY.js */,
+				A47FE3D02D408CC300374C72 /* ParkingPage-BXlJ2oVE.css */,
+				A47FE3D12D408CC300374C72 /* ParkingPage-Cg4svC--.js */,
+				A47FE3D22D408CC300374C72 /* ParkingPage-legacy-CC8UdAQl.js */,
+				A47FE3D32D408CC300374C72 /* parseISO-B3lV911X.js */,
+				A47FE3D42D408CC300374C72 /* parseISO-legacy-D2iQGmZc.js */,
+				A47FE3D52D408CC300374C72 /* PlanVisitPage-CMGx_90-.css */,
+				A47FE3D62D408CC300374C72 /* PlanVisitPage-CS0q3OWe.js */,
+				A47FE3D72D408CC300374C72 /* PlanVisitPage-legacy-Bz23_o-u.js */,
+				A47FE3D82D408CC300374C72 /* polyfills-legacy-dkEPDXm8.js */,
+				A47FE3D92D408CC300374C72 /* RentalOpportunityPage-BGfUjUf1.css */,
+				A47FE3DA2D408CC300374C72 /* RentalOpportunityPage-Dsz4-zLe.js */,
+				A47FE3DB2D408CC300374C72 /* RentalOpportunityPage-legacy-CKNLGVb_.js */,
+				A47FE3DC2D408CC300374C72 /* status-tap-B1YmoS9D.js */,
+				A47FE3DD2D408CC300374C72 /* status-tap-legacy-Drgzdxdd.js */,
+				A47FE3DE2D408CC300374C72 /* swipe-back-D0gGjGlJ.js */,
+				A47FE3DF2D408CC300374C72 /* swipe-back-legacy-DOwsNOXz.js */,
+				A47FE3E02D408CC300374C72 /* TicketsPage-Bw_zCSUp.js */,
+				A47FE3E12D408CC300374C72 /* TicketsPage-D_sJv2WE.css */,
+				A47FE3E22D408CC300374C72 /* TicketsPage-legacy-BonnppS3.js */,
+				A47FE3E32D408CC300374C72 /* UpcomingEventDetailPage-CiynloDt.js */,
+				A47FE3E42D408CC300374C72 /* UpcomingEventDetailPage-Dr9I_tcR.css */,
+				A47FE3E52D408CC300374C72 /* UpcomingEventDetailPage-legacy-_bgk27c0.js */,
+				A47FE3E62D408CC300374C72 /* UpcomingEventsPage-DCpQ7fe1.js */,
+				A47FE3E72D408CC300374C72 /* UpcomingEventsPage-DOvKbgOn.css */,
+				A47FE3E82D408CC300374C72 /* UpcomingEventsPage-legacy-D5IkZ-4S.js */,
+				A47FE3E92D408CC300374C72 /* UpdatesPage-Br7MlwfS.js */,
+				A47FE3EA2D408CC300374C72 /* UpdatesPage-DXOGZdP2.css */,
+				A47FE3EB2D408CC300374C72 /* UpdatesPage-legacy-BUHzh-Vn.js */,
+				A47FE3EC2D408CC300374C72 /* VenueDetailPage-ADSwARBW.css */,
+				A47FE3ED2D408CC300374C72 /* VenueDetailPage-D1XdcxND.js */,
+				A47FE3EE2D408CC300374C72 /* VenueDetailPage-legacy-BAts65PF.js */,
+				A47FE3EF2D408CC300374C72 /* VenuesPage-BxyFh7_V.js */,
+				A47FE3F02D408CC300374C72 /* VenuesPage-CEenzE-s.css */,
+				A47FE3F12D408CC300374C72 /* VenuesPage-legacy-DuXXvvDt.js */,
+				A47FE3F22D408CC300374C72 /* web-Ct21oNGh.js */,
+				A47FE3F32D408CC300374C72 /* web-eP4C8f6Q.js */,
+				A47FE3F42D408CC300374C72 /* web-legacy-cilVaAT6.js */,
+				A47FE3F52D408CC300374C72 /* web-legacy-COP4XxoW.js */,
+			);
+			path = assets;
+			sourceTree = "<group>";
+		};
+		A47FE4012D408CC300374C72 /* icons */ = {
+			isa = PBXGroup;
+			children = (
+				A47FE3F72D408CC300374C72 /* chicken-icon.png */,
+				A47FE3F82D408CC300374C72 /* fairgroundsl.png */,
+				A47FE3F92D408CC300374C72 /* gates.png */,
+				A47FE3FA2D408CC300374C72 /* gates (1).svg */,
+				A47FE3FB2D408CC300374C72 /* Map_Design.png */,
+				A47FE3FC2D408CC300374C72 /* Map_Render.png */,
+				A47FE3FD2D408CC300374C72 /* Map_Render-min.png */,
+				A47FE3FE2D408CC300374C72 /* nysf-stage.png */,
+				A47FE3FF2D408CC300374C72 /* pig.png */,
+				A47FE4002D408CC300374C72 /* shirt.png */,
+			);
+			path = icons;
+			sourceTree = "<group>";
+		};
+		A47FE4042D408CC300374C72 /* modal-img */ = {
+			isa = PBXGroup;
+			children = (
+				A47FE4022D408CC300374C72 /* News_NYSF.jpg */,
+				A47FE4032D408CC300374C72 /* placeholder.svg */,
+			);
+			path = "modal-img";
+			sourceTree = "<group>";
+		};
+		A47FE4092D408CC300374C72 /* public */ = {
+			isa = PBXGroup;
+			children = (
+				A47FE3F62D408CC300374C72 /* assets */,
+				A47FE4012D408CC300374C72 /* icons */,
+				A47FE4042D408CC300374C72 /* modal-img */,
+				A47FE4052D408CC300374C72 /* cordova.js */,
+				A47FE4062D408CC300374C72 /* cordova_plugins.js */,
+				A47FE4072D408CC300374C72 /* favicon.png */,
+				A47FE4082D408CC300374C72 /* index.html */,
+			);
+			path = public;
+			sourceTree = "<group>";
+		};
+		A47FE4162D408CC300374C72 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A47FE4092D408CC300374C72 /* public */,
+				A47FE40A2D408CC300374C72 /* App.entitlements */,
+				A47FE40B2D408CC300374C72 /* AppDelegate.swift */,
+				A47FE40C2D408CC300374C72 /* Assets.xcassets */,
+				A47FE40D2D408CC300374C72 /* capacitor.config.json */,
+				A47FE40E2D408CC300374C72 /* config.xml */,
+				A47FE40F2D408CC300374C72 /* Environment.xcconfig */,
+				A47FE4102D408CC300374C72 /* GoogleService-Info.plist */,
+				A47FE4112D408CC300374C72 /* Info.plist */,
+				A47FE4132D408CC300374C72 /* LaunchScreen.storyboard */,
+				A47FE4152D408CC300374C72 /* Main.storyboard */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -238,6 +548,22 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		A47FE4132D408CC300374C72 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A47FE4122D408CC300374C72 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		A47FE4152D408CC300374C72 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A47FE4142D408CC300374C72 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -292,6 +618,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				"OTHER_SWIFT_FLAGS[arch=*]" = "";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
