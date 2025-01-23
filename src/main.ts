@@ -74,5 +74,9 @@ const appStore = useAppStore();
 router.isReady().then(async () => {
   app.mount('#app');
 
+  // Initialize push notification listeners
+  appStore.initializePushNotifications();
+
+  // Trigger push notification registration
   appStore.enablePushNotifications();
 });

@@ -17,6 +17,7 @@ export interface PushNotificationsData {
   didRegisterDevice: boolean;
   deviceId: string | null;
   getDeviceIdError: string | null;
+  listenersInitialized: boolean;
 }
 
 interface AppStoreState {
@@ -37,6 +38,7 @@ export const useAppStore = defineStore('app', {
       didRegisterDevice: false,
       deviceId: null,
       getDeviceIdError: null,
+      listenersInitialized: false,
     },
   }),
 
@@ -81,7 +83,47 @@ export const useAppStore = defineStore('app', {
       }
     },
 
-    enablePushNotifications() {
+    initializePushNotifications() {
+      if (this.pushNotifications.listenersInitialized) {
+        console.log('Push notification listeners already initialized');
+        return;
+      }
+
+      const isNativePlatform = Capacitor.isNativePlatform();
+
+      if (isNativePlatform) {
+        // Add listeners only once
+        PushNotifications.addListener('registration', async (token) => {
+          console.log('Device registered with token:', token.value);
+          try {
+            await this.createUserDeviceToken({ deviceId: token.value });
+            this.pushNotifications.deviceId = token.value;
+          } catch (error) {
+            console.error('Error saving token to backend:', error);
+          }
+        });
+
+        PushNotifications.addListener('registrationError', (error) => {
+          console.error('Registration error:', error.error);
+          this.pushNotifications.getDeviceIdError = error.error;
+        });
+
+        PushNotifications.addListener('pushNotificationReceived', (notification) => {
+          console.log('Notification received:', notification);
+        });
+
+        PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+          console.log('Notification action performed:', notification);
+        });
+
+        this.pushNotifications.listenersInitialized = true; // Mark listeners as initialized
+        console.log('Push notification listeners initialized');
+      } else {
+        console.warn('Skipped push notifications setup because app is not running on a native platform');
+      }
+    },
+
+    async enablePushNotifications() {
       return new Promise((resolve, reject) => {
         const isNativePlatform = Capacitor.isNativePlatform();
 
@@ -100,49 +142,31 @@ export const useAppStore = defineStore('app', {
 
               this.pushNotifications.permissionStatus = permStatus.receive;
 
-              PushNotifications.addListener('registration', async (token) => {
-                console.log('Device registered with token:', token.value);
-
-                try {
-                  await this.createUserDeviceToken({ deviceId: token.value });
-
-                  this.pushNotifications.deviceId = token.value;
-
-                  resolve(true); // Resolve the Promise here
-                } catch (error) {
-                  console.error('Error saving token to backend:', error);
-
-                  reject(error); // Reject the Promise on backend error
-                }
-              });
-
-              PushNotifications.addListener('registrationError', (error) => {
-                console.error('Registration error:', error.error);
-                this.pushNotifications.getDeviceIdError = error.error;
-                reject(error.error); // Reject the Promise here
-              });
-
               return PushNotifications.register();
+            })
+            .then(() => {
+              this.pushNotifications.didRegisterDevice = true;
+              resolve(true); // Resolve once registration completes
             })
             .catch((error) => {
               console.error('Failed to enable push notifications:', error);
-
-              reject(error); // Reject the Promise on general errors
+              reject(error); // Reject on error
             });
         } else {
           const deviceId = this.getPersistentWebDeviceId();
 
-          this.createUserDeviceToken({ deviceId }).then(() => {
-            this.pushNotifications.permissionStatus = 'granted';
-            this.pushNotifications.didRegisterDevice = true;
-            this.pushNotifications.deviceId = deviceId;
+          this.createUserDeviceToken({ deviceId })
+            .then(() => {
+              this.pushNotifications.permissionStatus = 'granted';
+              this.pushNotifications.didRegisterDevice = true;
+              this.pushNotifications.deviceId = deviceId;
 
-            resolve(true);
-          }).catch((error) => {
-            console.error('Failed to enable push notifications:', error);
-
-            reject(error);
-          });
+              resolve(true);
+            })
+            .catch((error) => {
+              console.error('Failed to enable push notifications:', error);
+              reject(error);
+            });
         }
       });
     },
@@ -168,7 +192,6 @@ export const useAppStore = defineStore('app', {
       } catch (error) {
         console.error('Failed to disable push notifications:', error);
       } finally {
-        // Clear push notifications state
         this.pushNotifications.permissionStatus = 'denied';
         this.pushNotifications.deviceId = null;
         this.pushNotifications.didRegisterDevice = false;
