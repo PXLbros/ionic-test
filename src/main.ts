@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
@@ -8,9 +7,6 @@ import { createPinia } from 'pinia';
 
 import * as Sentry from '@sentry/capacitor';
 import * as SentryVue from '@sentry/vue';
-
-import { Capacitor } from '@capacitor/core';
-import { PushNotifications } from '@capacitor/push-notifications';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -78,74 +74,5 @@ const appStore = useAppStore();
 router.isReady().then(async () => {
   app.mount('#app');
 
-  const isNativePlatform = Capacitor.isNativePlatform();
-
-  if (isNativePlatform) {
-    let permStatus = await PushNotifications.checkPermissions();
-
-    if (permStatus.receive === 'prompt') {
-      permStatus = await PushNotifications.requestPermissions();
-    }
-
-    if (permStatus.receive !== 'granted') {
-      throw new Error('User denied permissions!');
-    }
-
-    appStore.pushNotifications.permissionStatus = permStatus.receive;
-
-    // Handle successful registration
-    await PushNotifications.addListener('registration', async (token) => {
-      console.log('Device registered with token:', token.value);
-
-      // Save the token to your backend (Strapi) if needed
-      const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-device-tokens/create`, {
-        deviceId: token.value,
-      });
-
-      console.log('response.data?.success', response.data?.success);
-
-
-      // if (response.data?.success !== true) {
-      //   throw new Error();
-      // }
-
-      appStore.pushNotifications.deviceId = token.value;
-    });
-
-    await PushNotifications.addListener('registrationError', (error) => {
-      console.error('Registration error: ', error.error);
-
-      appStore.pushNotifications.getDeviceIdError = error.error;
-    });
-
-    // Handle foreground notifications
-    await PushNotifications.addListener('pushNotificationReceived', (notification) => {
-      console.log('Notification received:', notification);
-    });
-
-    // Handle notification actions (e.g., when a user clicks on a notification)
-    await PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
-      console.log('Notification action performed:', notification);
-    });
-
-    await PushNotifications.register();
-
-    appStore.pushNotifications.didRegisterDevice = true;
-  } else {
-    console.warn('Skipped push notifications setup because app is not running on a native platform');
-
-    appStore.pushNotifications.didRegisterDevice = true;
-    appStore.pushNotifications.deviceId = 'web';
-
-    const fakeAddDeviceId = true;
-    const deviceId = appStore.getPersistentWebDeviceId();
-
-    if (fakeAddDeviceId) {
-      const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-device-tokens/create`, {
-        deviceId,
-      });
-
-      console.log('response.data?.success', response.data?.success);
-    }
-  }
+  appStore.enablePushNotifications();
 });
