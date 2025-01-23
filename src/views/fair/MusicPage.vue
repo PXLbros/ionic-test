@@ -485,7 +485,7 @@ const venueInfo = computed(() => {
 .events-list {
   padding: 20px;
   padding-top: 0px;
-  max-height: 50vh;
+  max-height: 45vh;
   overflow: scroll;
 }
 
