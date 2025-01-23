@@ -8,6 +8,10 @@ const config: CapacitorConfig = {
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
+    Sentry: {
+      dsn: process.env.VITE_SENTRY_DSN,
+      environment: process.env.VITE_NODE_ENV,
+    },
   },
 };
 
