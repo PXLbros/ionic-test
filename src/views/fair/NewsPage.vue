@@ -54,6 +54,7 @@
                           fill="clear"
                           @click="loadMore"
                           :disabled="isLoading"
+
                       >
                           {{ isLoading ? 'Loading...' : 'Load More' }}
                       </ion-button>
@@ -238,6 +239,7 @@ a {
       --color: #1E5EAE;
       font-weight: 600;
       text-transform: none;
+      width: 100%; // Full width for clickabile area
   }
 }
 
