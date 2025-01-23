@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
@@ -93,9 +94,20 @@ router.isReady().then(async () => {
     appStore.pushNotifications.permissionStatus = permStatus.receive;
 
     // Handle successful registration
-    await PushNotifications.addListener('registration', (token) => {
+    await PushNotifications.addListener('registration', async (token) => {
       console.log('Device registered with token:', token.value);
+
       // Save the token to your backend (Strapi) if needed
+      const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-device-tokens/create`, {
+        deviceId: token.value,
+      });
+
+      console.log('response.data?.success', response.data?.success);
+
+
+      // if (response.data?.success !== true) {
+      //   throw new Error();
+      // }
 
       appStore.pushNotifications.deviceId = token.value;
     });
@@ -124,5 +136,16 @@ router.isReady().then(async () => {
 
     appStore.pushNotifications.didRegisterDevice = true;
     appStore.pushNotifications.deviceId = 'web';
+
+    const fakeAddDeviceId = true;
+    const deviceId = appStore.getPersistentWebDeviceId();
+
+    if (fakeAddDeviceId) {
+      const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-device-tokens/create`, {
+        deviceId,
+      });
+
+      console.log('response.data?.success', response.data?.success);
+    }
   }
 });

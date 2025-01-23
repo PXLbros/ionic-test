@@ -195,7 +195,7 @@ const formatNYSFairWebsiteData = async (data: any) => {
 
   if (data.events) {
     data.events = data.events.map((event: any) => {
-      event.dates = event.dates.map((date: any) => {
+      event.dates = event.dates?.map((date: any) => {
         const isFavorite = favoriteNYSFairEvents.some((favoritedEvent) => {
           return favoritedEvent.id === event.id && favoritedEvent.start_time_unix === date.start_time_unix;
         });
@@ -204,7 +204,7 @@ const formatNYSFairWebsiteData = async (data: any) => {
           ...date,
           isFavorite,
         };
-      });
+      }) || [];
 
       return event;
     });
