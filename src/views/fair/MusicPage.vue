@@ -93,6 +93,7 @@
           </router-link>
         </div>
 
+
       </div>
     </ion-content>
   </ion-page>
@@ -152,6 +153,7 @@ import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBa
 import { useDataStore } from '@/stores/data';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import EventsList from '@/components/EventsList.vue';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
