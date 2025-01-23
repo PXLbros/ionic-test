@@ -73,7 +73,9 @@
             <div class="separator"></div>
             <div class="notifications">
               <span>Notifications</span>
-              <button class="enable-btn">Enable</button>
+              <button class="enable-btn" @click="toggleNotifications">
+                {{ notificationsButtonText }}
+              </button>
             </div>
 
             <a href="#" class="nav-link secondary">Contact Us <span class="arrow">›</span></a>
@@ -99,8 +101,8 @@
   </div>
 </template>
 
-  <script setup lang="ts">
-  import { ref, computed } from 'vue';
+<script setup lang="ts">
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonToolbar, IonHeader } from '@ionic/vue';
 
@@ -112,6 +114,7 @@ const props = defineProps<{
   logoAlt: string
 }>();
 
+const appStore = useAppStore();
 const dataStore = useDataStore();
 const router = useRouter();
 const isMenuOpen = ref(false);
@@ -159,9 +162,35 @@ const closeMenu = () => {
   isMenuOpen.value = false;
   document.body.style.overflow = '';
 };
-  </script>
 
-  <style scoped lang="scss">
+const notificationsButtonText = computed(() => {
+  return appStore.pushNotifications.permissionStatus === 'granted'
+    ? 'Disable'
+    : 'Enable';
+});
+
+const toggleNotifications = async () => {
+  if (appStore.pushNotifications.permissionStatus === 'granted') {
+    try {
+      await appStore.disablePushNotifications();
+
+      console.log('Notifications disabled successfully');
+    } catch (error) {
+      console.error('Error disabling notifications:', error);
+    }
+  } else {
+    try {
+      await appStore.enablePushNotifications();
+
+      console.log('Notifications enabled successfully');
+    } catch (error) {
+      console.error('Error enabling notifications:', error);
+    }
+  }
+};
+</script>
+
+<style scoped lang="scss">
   ion-toolbar {
     --background: #49027fe9;
     -webkit-backdrop-filter: blur(7px);
