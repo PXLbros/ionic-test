@@ -91,57 +91,43 @@ const faqPageData = ref<FAQPageData>({
 const faqSections = ref<FAQSection[]>([]);
 
 // Improved HTML content parser
+// New parsing function for your Vue component
 const parseHTMLContent = (htmlContent: string) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlContent, 'text/html');
+  //console.log('Parsed document:', doc);
   const sections: FAQSection[] = [];
 
-  // Find all text nodes that end with "?"
-  const walker = document.createTreeWalker(
-    doc.body,
-    NodeFilter.SHOW_TEXT,
-    null
-  );
+  // Find all h2 elements (question headers)
+  const questions = doc.querySelectorAll('h3');
 
-  let node;
-  let currentQuestion = '';
-  let currentContent = '';
+  questions.forEach((question) => {
+    let content = '';
+    let currentNode = question.nextElementSibling;
 
-  while (node = walker.nextNode()) {
-    const text = node.textContent?.trim() || '';
-
-    // Check if this text ends with a question mark
-    if (text.endsWith('?')) {
-      // If we have a previous question, save it
-      if (currentQuestion) {
-        sections.push({
-          title: currentQuestion,
-          content: currentContent,
-          isExpanded: false
-        });
+    // Collect all content until the next h2 or the end
+    while (currentNode && currentNode.tagName !== 'H3') {
+      // Only add non-empty text content
+      const text = currentNode.textContent?.trim();
+      if (text) {
+        content += text + ' ';
       }
-
-      // Start new question
-      currentQuestion = text;
-      currentContent = '';
-    } else if (currentQuestion && text) {
-      // Add to current answer content
-      currentContent += `<p>${text}</p>`;
+      currentNode = currentNode.nextElementSibling;
     }
-  }
 
-  // Add the last section
-  if (currentQuestion) {
-    sections.push({
-      title: currentQuestion,
-      content: currentContent,
-      isExpanded: false
-    });
-  }
+    // Only add sections with actual content
+    const questionText = question.textContent?.trim().replace(/^(?:&nbsp;)?[·•]?\s*/, '');
+    if (questionText && content.trim()) {
+      sections.push({
+        title: questionText,
+        content: `<p>${content.trim()}</p>`,
+        isExpanded: false
+      });
+    }
+  });
 
   return sections;
 };
-
 onMounted(async () => {
   // Get the FAQ page data
   const pageData = dataStore.data.nysfairWebsite.pages['your-visit/faq'];
@@ -231,6 +217,7 @@ const toggleSection = (index: number) => {
     cursor: pointer;
 
     h2 {
+      list-style: none;
       font-size: 18px;
       font-weight: 700;
       color: #333333;
@@ -252,6 +239,15 @@ const toggleSection = (index: number) => {
     padding: 0 20px 20px 20px;
     color: #666666;
     line-height: 1.5;
+
+    :deep(p) {
+      display: block;
+
+    }
+    :deep(p::first-letter) {
+      text-transform: capitalize;
+
+    }
 
     :deep(a) {
       color: #1E5EAE;
