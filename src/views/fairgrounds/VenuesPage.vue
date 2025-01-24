@@ -29,10 +29,12 @@
                          alt="venue image"
                      >
                      <div class="content">
-                         <div class="content__label">{{ venue.venueDetailPreheader || 'Venue' }}</div>
+                         <div class="content__label">{{ venue.venuePreheader || 'Venue' }}</div>
                          <div class="content__title">{{ venue.title }}</div>
-                         <div v-htlml class="content__description">
-                             {{ venue.venuePreheader || 'No description available' }}
+                         <div v-if="venue.venueDetailBody" v-html="stripHTML(venue.venueDetailBody?.slice(0, 75) + '...')" class="content__description">
+                         </div>
+                         <div v-else class="content__description">
+                              No Description Available
                          </div>
                      </div>
                      <router-link :to="`/fairgrounds/venues/${encodeURIComponent(venue.id)}`" class="cta">Learn More</router-link>
@@ -71,6 +73,12 @@ console.log('venues', venues.value);
 
 const hasImage = (venue: Venue): boolean => {
     return Array.isArray(venue.venueMainImage) && venue.venueMainImage.length > 0;
+};
+
+const stripHTML = (html: string): string => {
+    const tmp = document.createElement('DIV');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
 };
 
 </script>
