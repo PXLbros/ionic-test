@@ -25,8 +25,8 @@
                             <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
                         </svg>
                     </div>
-                    <p class="featured-article__description" v-html="stripHTML(featuredNews.content.slice(0, 300) + '...')">
-                    </p>
+                    <h2 class="featured-article__title">{{ featuredNews.title }}</h2>
+                    <!-- <p class="featured-article__description" v-html="stripHTML(featuredNews.content.slice(0, 200) + '...')"></p> -->
                 </router-link>
 
                 <!-- Article List -->
@@ -168,6 +168,15 @@ a {
             object-fit: cover;
             border-radius: 24px;
         }
+    }
+
+    &__title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #343434;
+        margin: 0;
+        line-height: 28px;
+        letter-spacing: 0.5px;
     }
 
     &__description {
