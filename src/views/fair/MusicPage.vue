@@ -1,15 +1,5 @@
 <template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar :translucent="true" >
-        <ion-buttons slot="start">
-          <ion-back-button default-href="/fair"></ion-back-button>
-        </ion-buttons>
-        <ion-title>Chevy Music Series</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content :fullscreen="true">
-
+    <DefaultLayout title="Chevy Music Series">
       <div class="main">
         <div class="main__header">
           <h1 class="main__header-title">Chevrolet Music Series</h1>
@@ -76,27 +66,29 @@
             :to="`/fair/music/${event.id}`"
             class="event-card"
           >
+          <div class="event-image">
+            <img v-if="event.featured_image" :src="event.featured_image" alt="Music Image" />
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 62 62" fill="none">
+              <path
+                d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z"
+                fill="#1E5EAE"
+              />
+            </svg>
+          </div>
             <div class="event-info">
               <div class="venue-name">{{ event?.venue?.name || 'Chevy Court' }}</div>
               <h2 class="event-title">{{ event.title }}</h2>
               <div class="event-date">{{ formatEventDate(event) }}</div>
             </div>
-            <div class="event-image">
-              <img v-if="event.featured_image" :src="event.featured_image" alt="Music Image" />
-              <svg v-else xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 62 62" fill="none">
-                <path
-                  d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z"
-                  fill="#1E5EAE"
-                />
-              </svg>
-            </div>
+            <FavoriteButton
+              :event-id="event.id"
+              :date-details="event.currentDate || { start_time_date: '', start_time_time: '', start_time_unix: 0 }"
+            />
+
           </router-link>
         </div>
-
-
       </div>
-    </ion-content>
-  </ion-page>
+  </DefaultLayout>
 </template>
 
 <script setup lang="ts">
@@ -149,11 +141,12 @@ interface DataStore {
   };
 }
 
+import DefaultLayout from '@/layouts/default.vue';
+import FavoriteButton from '@/components/FavoriteButton.vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import EventsList from '@/components/EventsList.vue';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
@@ -508,7 +501,7 @@ const venueInfo = computed(() => {
   align-items: center;
   padding: 20px 0px;
   border-bottom: 1px solid #EFF2F6;
-  gap: 20px; // Increased gap for better spacing
+  gap: 15px; // Increased gap for better spacing
   text-decoration: none;
   color: #343434;
 }

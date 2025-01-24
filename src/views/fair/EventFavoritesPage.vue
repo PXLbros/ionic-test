@@ -62,11 +62,11 @@ const favoriteEventItems = computed(() => {
   font-family: 'Inter', sans-serif;
 
   &--event-favorites-page {
-    padding: 20px;
+    padding: 25px;
   }
 
   &__header {
-    padding: 25px;
+    padding: 0px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -111,7 +111,7 @@ const favoriteEventItems = computed(() => {
   }
 
   &__content {
-    padding: 0 25px;
+    padding-top: 10px;
   }
 }
 </style>

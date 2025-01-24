@@ -12,6 +12,7 @@ declare module 'vue' {
     EventsList: typeof import('./components/EventsList.vue')['default']
     FairgroundsNav: typeof import('./components/FairgroundsNav.vue')['default']
     FairNav: typeof import('./components/FairNav.vue')['default']
+    FavoriteButton: typeof import('./components/FavoriteButton.vue')['default']
     Loader: typeof import('./components/Loader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
