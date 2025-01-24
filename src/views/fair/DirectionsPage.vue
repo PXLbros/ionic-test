@@ -8,30 +8,7 @@
                 </div>
 
                 <div class="main__content">
-                    <h1 class="main__content-title">Directions</h1>
-
-                    <p class="main__content-text">
-                        The New York State Fairgrounds is immediately adjacent to Route 690 just West of Syracuse. It is easily accessible from the New York State Thruway (Rt. 90) from the West and East, and from Route 81, North and South. Just follow the signs to the Fairgrounds once you enter the Syracuse area.
-                    </p>
-
-                    <p class="main__content-text">
-                        Our street address is:
-                        <a href="https://maps.google.com/?q=581+State+Fair+Blvd,+Syracuse,+New+York+13209" class="main__content-link">
-                            581 State Fair Blvd., Syracuse, New York 13209
-                        </a>
-                    </p>
-
-                    <p class="main__content-text">
-                        Our GPS coordinates are:
-                        <a href="https://maps.google.com/?q=43.073857,-76.215708" class="main__content-link">
-                            43.073857,-76.215708
-                        </a>
-                    </p>
-
-                    <h2 class="main__content-subtitle">From the West - Buffalo / Rochester Area</h2>
-                    <p class="main__content-text">
-                        Take the New York State Thruway (Rt. 90 East) to Exit 39, then follow Rt. 690 East.
-                    </p>
+                    <div class="main__content-text" v-if="directionsPageData.content" v-html="directionsPageData.content"></div>
                 </div>
             </div>
       </DefaultLayout>
@@ -39,66 +16,127 @@
 
 <script setup lang="ts">
 import DefaultLayout from '@/layouts/default.vue';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
+import { useDataStore } from '@/stores/data';
+import { ref } from 'vue';
+
+interface DirectionsPageData {
+    title: string;
+    content: string;
+}
+
+const dataStore = useDataStore();
+const directionsPageData = ref<DirectionsPageData>({
+    title: '',
+    content: '',
+});
+
+// Fix the data path to match the actual structure
+const pageData = dataStore.data.nysfairWebsite.pages['your-visit/plan-your-trip/directions-hours'];
+
+// If you need to set the data
+if (pageData) {
+  directionsPageData.value = {
+    title: pageData.title || '',
+    content: pageData.content || ''
+  };
+}
+console.log('directions page data', pageData);
+
+
 </script>
 
 <style lang="scss" scoped>
 .main {
-    padding: 30px;
-    height: calc(100vh - 56px); // Subtract header height
-    display: flex;
-    flex-direction: column;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
 
-    &__image {
-        background-color: #EFF2F6;
-        border-radius: 24px;
-        height: 25vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 30px;
-        flex: 1;
-    }
+  &__image {
+      background-color: #EFF2F6;
+      border-radius: 24px;
+      height: 25vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+  }
 
-    &__content {
-        &-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #343434;
-            margin: 0 0 5px 0;
-            line-height: 28px;
-            letter-spacing: 0.5px;
-        }
+  &__content {
 
-        &-subtitle {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333333;
-            margin: 24px 0 5px 0;
-            line-height: 1.2;
-        }
+      &-text {
+          font-size: 16px;
+          line-height: 28px;
+          letter-spacing: 0.5px;
+          color: #343434;
+          margin: 0 0 16px 0;
 
-        &-text {
-            font-size: 16px;
-            line-height: 28px;
-            letter-spacing: 0.5px;
-            color: #343434;
-            margin: 0 0 16px 0;
+          &:last-child {
+              margin-bottom: 0;
+          }
 
-            &:last-child {
-                margin-bottom: 0;
+          :deep {
+            // Fix the h1 tag
+            h1 {
+                font-size: 24px;
+                font-weight: 600;
+                color: #343434;
+                margin: 0 0 5px 0;
+                line-height: 28px;
+                letter-spacing: 0.5px;
+
+                &:not(:first-child) {
+                  margin-top: 40px;
+              }
             }
-        }
 
-        &-link {
-            color: #343434;
-            text-decoration: underline;
-            font-weight: 400;
-        }
-    }
+            h2 {
+                font-size: 16px;
+                font-weight: 600;
+                color: #333333;
+                margin: 24px 0 5px 0;
+                line-height: 1.2;
+            }
+
+            hr {
+              margin-bottom: 32px;
+              border: none;
+              border-top: 1px solid #EFF2F6;
+            }
+
+            strong {
+              display: block;
+              margin-top: 10px;
+            }
+
+            a {
+              color: #343434;
+              text-decoration: underline;
+              font-weight: 400;
+            }
+
+            ul {
+               padding: 24px;
+               border-radius: 16px;
+               list-style: none;
+               background-color: #F5F7FA;
+               // color: #42639F;
+            }
+
+
+
+
+          }
+      }
+
+      &-link {
+          color: #343434;
+          text-decoration: underline;
+          font-weight: 400;
+      }
+  }
 }
 
 :deep(ion-content) {
-    --background: white;
+  --background: white;
 }
 </style>
