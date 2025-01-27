@@ -95,19 +95,17 @@ const faqSections = ref<FAQSection[]>([]);
 const parseHTMLContent = (htmlContent: string) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlContent, 'text/html');
-  //console.log('Parsed document:', doc);
   const sections: FAQSection[] = [];
 
-  // Find all h2 elements (question headers)
+  // Find all h3 elements (question headers)
   const questions = doc.querySelectorAll('h3');
 
   questions.forEach((question) => {
     let content = '';
     let currentNode = question.nextElementSibling;
 
-    // Collect all content until the next h2 or the end
+    // Collect all content until the next h3 or the end
     while (currentNode && currentNode.tagName !== 'H3') {
-      // Only add non-empty text content
       const text = currentNode.textContent?.trim();
       if (text) {
         content += text + ' ';
@@ -115,8 +113,16 @@ const parseHTMLContent = (htmlContent: string) => {
       currentNode = currentNode.nextElementSibling;
     }
 
-    // Only add sections with actual content
-    const questionText = question.textContent?.trim().replace(/^(?:&nbsp;)?[·•]?\s*/, '');
+    // Clean the question text:
+    // 1. Remove bullet points (• or · or any other bullet character)
+    // 2. Remove non-breaking spaces (&nbsp;)
+    // 3. Trim whitespace
+    const questionText = question.textContent
+      ?.trim()
+      .replace(/^[·•\s\u2022\u00b7\-]+|^\s*[·•\u2022\u00b7\-]\s*/g, '')  // More aggressive bullet point removal
+      .replace(/&nbsp;|&#8226;/g, '')  // Remove HTML entities
+      .trim();
+
     if (questionText && content.trim()) {
       sections.push({
         title: questionText,
@@ -128,6 +134,8 @@ const parseHTMLContent = (htmlContent: string) => {
 
   return sections;
 };
+
+
 onMounted(async () => {
   // Get the FAQ page data
   const pageData = dataStore.data.nysfairWebsite.pages['your-visit/faq'];
@@ -217,12 +225,19 @@ const toggleSection = (index: number) => {
     cursor: pointer;
 
     h2 {
-      list-style: none;
+      list-style: none !important;
       font-size: 18px;
+      list-style-type: none;
       font-weight: 700;
       color: #333333;
       margin: 0;
       padding-right: 16px;
+      &::before {
+        content: none;
+      }
+      &::marker {
+        display: none;
+      }
     }
   }
 

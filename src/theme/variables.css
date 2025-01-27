@@ -2,10 +2,10 @@
 http://ionicframework.com/docs/theming/ */
 
 
-/* 
+/*
 font-family: 'Stardom', sans-serif;
 font-family: 'Pally', sans-serif;
-font-family: 'General Sans', sans-serif; 
+font-family: 'General Sans', sans-serif;
 */
 
 ion-content {
@@ -13,3 +13,21 @@ ion-content {
     --color: black;
 }
 
+@font-face {
+  font-family: 'lalezar';
+  src: url('../fonts/Lalezar-Regular.ttf') format('ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+h1 {
+    font-family: 'lalezar', sans-serif;
+}
+
+/* Main Homepage Button Font */
+@font-face {
+  font-family: 'jockey';
+  src: url('../fonts/JockeyOne-Regular.ttf') format('ttf');
+  font-weight: normal;
+  font-style: normal;
+}

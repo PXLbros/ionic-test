@@ -322,7 +322,7 @@
 
             // Smaller screens
             @media (max-height: 845px) {
-                width: 130px;
+                width: 34vw;
                 height: 120px;
             }
 
@@ -338,7 +338,8 @@
 
             &__text {
                 font-size: 18px;
-                font-family: 'Pally', sans-serif;
+                font-family: 'jockey', sans-serif;
+                line-height: 16px;
                 color: white;
                 text-transform: uppercase;
                 font-weight: 600;
@@ -346,6 +347,8 @@
                 margin: 0px;
                 padding: 0px 5px;
                 flex-grow: 1;
+                color: #FFF;
+                letter-spacing: -1px;
 
                 // Smaller screens
                 @media (max-height: 845px) {

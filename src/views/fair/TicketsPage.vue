@@ -25,7 +25,7 @@
                 <div class="main__image">
                     <svg width="63" height="63" viewBox="0 0 63 63" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M62.5 55.6111V7.38889C62.5 3.6 59.4 0.5 55.6111 0.5H7.38889C3.6 0.5 0.5 3.6 0.5 7.38889V55.6111C0.5 59.4 3.6 62.5 7.38889 62.5H55.6111C59.4 62.5 62.5 59.4 62.5 55.6111ZM19.4444 36.6667L28.0556 47.0344L40.1111 31.5L55.6111 52.1667H7.38889L19.4444 36.6667Z" fill="#1E5EAE"/>
-                    </svg>                        
+                    </svg>
                 </div>
                 <div class="main__caption">
                     <p>Image Description Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quis, impedit cum quos sapiente </p>
@@ -79,6 +79,7 @@
                 color: #333;
                 margin: 2px 0px 10px 0px;
                 font-weight: 600;
+                font-family: 'lalezar', sans-serif;
             }
         }
     }
