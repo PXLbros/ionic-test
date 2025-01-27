@@ -163,7 +163,7 @@
               <!-- Keep in Touch Section -->
               <div class="section keep-in-touch">
                 <div class="section-header bg">
-                  <h2 class="section-header__text">Keep in Touch</h2>
+                  <h2 class="section-header__text dark">Keep in Touch</h2>
                 </div>
                 <div class="contact-form">
                   <div class="form-group">
@@ -273,6 +273,7 @@
         position: relative; // Add this
         // height: 83vh;
         // background-image: url('/src/imgs/Bkg_V4.jpg');
+        // background: linear-gradient(180deg, #F5B61B 0%, #F5B61B 100%);
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
@@ -285,9 +286,8 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            //background: linear-gradient(360deg, #EAC5FF 7.51%, #EECEFF 30.63%, #BE7CFF 100%);
-            mix-blend-mode: multiply;
+            height: 110%;
+            background: linear-gradient(180deg, #F5B61B 0%, #F5B61B 100%);
             z-index: 0;
         }
 
@@ -298,7 +298,7 @@
             justify-content: center;
             margin-top: 20px;
             position: relative; // Add this
-            z-index: 1; // Add this to ensure logo stays on top
+            z-index: 10; // Add this to ensure logo stays on top
             margin-bottom: 10px;
 
             @media (max-height: 845px) {
@@ -363,6 +363,8 @@
       background-color: #EE4623;
       border-top-left-radius: 40px;
       border-top-right-radius: 40px;
+      position: relative;
+      z-index: 10;
     }
 
     .section {
@@ -382,10 +384,14 @@
             &__text {
                 font-size: 24px;
                 font-family: 'Pally', sans-serif;
-                color: #1F3667;
+                color: #FFF1AF;
                 text-transform: uppercase;
                 font-weight: 900;
                 margin: 0;
+            }
+
+            .dark {
+                color: #1F3667;
             }
         }
     }
@@ -497,11 +503,15 @@
 
     // Social Media Section Styles
     .social-media {
-        padding-bottom: 40px;
-        background-color: #EFF2F6;
+        padding-bottom: 30px;
+        background-color: #1F3667;
 
         .section-header {
-            background-color: #EFF2F6;
+            background-color: #1F3667;
+
+            &__text {
+                color: #FDD252;
+            }
         }
     }
 </style>
