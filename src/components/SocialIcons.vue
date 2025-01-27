@@ -94,7 +94,7 @@ const openSocialLink = async (url: string | null) => {
 
     ion-icon {
       font-size: 24px; // Adjust size as needed
-      color: #333333; // Adjust color as needed
+      color: #FFF1AF; // Adjust color as needed
     }
   }
 }
