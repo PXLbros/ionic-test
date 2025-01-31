@@ -385,10 +385,17 @@ const venueInfo = computed(() => {
     flex-direction: column;
 
     &-title {
-      font-size: 24px;
-      font-weight: 600;
-      line-height: 28px;
+      font-size: 34px;
+      font-family: 'inter', sans-serif;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #2A2A2A;
+      line-height: 32px;
       letter-spacing: 0.5px;
+      text-align: center;
+      max-width: 70%;
+      margin: 0 auto;
+      padding: 10px 0;
     }
 
     &-img {

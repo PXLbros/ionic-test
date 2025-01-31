@@ -27,6 +27,7 @@
     "@ionic/vue-router": "^8.0.0",
     "@sentry/capacitor": "1.0.2",
     "@sentry/vue": "8.37.1",
+    "@types/geojson": "^7946.0.16",
     "@types/mapbox-gl": "^3.1.0",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",

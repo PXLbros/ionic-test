@@ -67,11 +67,34 @@ import { storeToRefs } from 'pinia';
 import { Category, DateObject, Event } from '@/types';
 import { convertToEasternTime } from '@/utils/time';
 import { formatEvent, FormattedEvent } from '@/utils/event';
+import { ref, computed, watch } from 'vue';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
 const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 const categoriesData = computed(() => data.value?.nysfairWebsite?.eventCategories ?? []);
+
+const findCurrentDayIndex = (dates: DateObject[]): number => {
+  if (!dates.length) return 0;
+
+  const now = Date.now();
+  const today = convertToEasternTime(now).toDateString();
+
+  // Find today's index
+  const todayIndex = dates.findIndex(date => {
+    const dateStr = convertToEasternTime(date.timestamp).toDateString();
+    return dateStr === today;
+  });
+
+  if (todayIndex >= 0) return todayIndex;
+
+  // If today not found, find next upcoming day
+  const upcomingIndex = dates.findIndex(date => date.timestamp > now);
+  if (upcomingIndex >= 0) return upcomingIndex;
+
+  // If no upcoming days, default to first day
+  return 0;
+};
 
 const selectedDateIndex = ref(0);
 const isDateChanging = ref(false);
@@ -127,7 +150,11 @@ const filteredEvents = computed((): FormattedEvent[] => {
     );
 
     return matchingDates.map(matchingDate => {
-      const formattedEvent = formatEvent({ event, eventDate: matchingDate, categories: categoriesData.value });
+      const formattedEvent = formatEvent({
+        event,
+        eventDate: matchingDate,
+        categories: categoriesData.value
+      });
 
       return formattedEvent;
     });
@@ -135,25 +162,57 @@ const filteredEvents = computed((): FormattedEvent[] => {
 
   // Apply category filter
   if (selectedCategory.value !== 'all') {
-    filtered = filtered.filter((event: FormattedEvent) => event.categories.includes(Number(selectedCategory.value)));
+    filtered = filtered.filter((event: FormattedEvent) =>
+      event.categories.includes(Number(selectedCategory.value))
+    );
   }
 
   // Sort events by start time
   return filtered.sort((a: FormattedEvent, b: FormattedEvent) => {
     const aTime = a.dateDetails.start_time_unix;
     const bTime = b.dateDetails.start_time_unix;
-
     return aTime - bTime;
   });
 });
 
+// Watch for dates to be populated
+watch(dates, (newDates) => {
+  if (newDates.length && selectedDateIndex.value === 0) {
+    // Set initial date index
+    selectedDateIndex.value = findCurrentDayIndex(newDates);
+
+    // Scroll to the selected date after a short delay
+    setTimeout(() => {
+      const container = document.querySelector('.date-selector__container');
+      const activeButton = container?.children[selectedDateIndex.value] as HTMLElement;
+      if (activeButton) {
+        activeButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+    }, 100);
+  }
+}, { immediate: true });
+
 const selectDate = (index: number): void => {
   isDateChanging.value = true;
+  selectedDateIndex.value = index;
 
+  // Add scroll behavior when selecting dates
   setTimeout(() => {
-    selectedDateIndex.value = index;
+    const container = document.querySelector('.date-selector__container');
+    const activeButton = container?.children[index] as HTMLElement;
+    if (activeButton) {
+      activeButton.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      });
+    }
     isDateChanging.value = false;
-  }, 0)
+  }, 0);
 };
 </script>
 

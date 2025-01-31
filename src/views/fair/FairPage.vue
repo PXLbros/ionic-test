@@ -302,7 +302,7 @@
             margin-bottom: 10px;
 
             @media (max-height: 845px) {
-                max-height: 120px;
+                max-height: 16vh;
             }
         }
 
@@ -322,8 +322,8 @@
 
             // Smaller screens
             @media (max-height: 845px) {
-                width: 34vw;
-                height: 120px;
+                width: 35vw;
+                height: 16vh;
             }
 
             &__icon {
@@ -383,8 +383,9 @@
 
             &__text {
                 font-size: 24px;
-                font-family: 'Pally', sans-serif;
+                font-family: 'lalezar', sans-serif;
                 color: #FFF1AF;
+                letter-spacing: 0.5px;
                 text-transform: uppercase;
                 font-weight: 900;
                 margin: 0;
@@ -453,6 +454,7 @@
             margin-bottom: 8px;
             font-weight: 600;
             font-family: 'Inter', sans-serif;
+            color: #48027F;
         }
     }
 

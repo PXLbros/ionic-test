@@ -8,6 +8,7 @@
         <ion-title>NY State Fair Map</ion-title>
       </ion-toolbar>
     </ion-header>
+
     <ion-content>
       <div class="main">
         <div class="main__header">
@@ -33,6 +34,7 @@
             <ion-icon :icon="searchOutline" class="search-icon"></ion-icon>
           </div>
         </div>
+
         <ion-content class="ion-padding">
           <div class="map" ref="mapContainer"></div>
         </ion-content>
@@ -43,216 +45,217 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { IonBackButton, IonButtons, IonIcon, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import {
+  IonBackButton,
+  IonButtons,
+  IonIcon,
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar
+} from '@ionic/vue';
 import { searchOutline, chevronDownOutline, optionsOutline } from 'ionicons/icons';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import type { Feature, FeatureCollection, Point, GeoJSON } from 'geojson';
+
+
+interface VendorProperties {
+  name: string;
+  description: string;
+}
+
+// Your Pinia or Vuex store that contains CMS data
 import { useDataStore } from '@/stores/data';
 
-
 const mapContainer = ref<HTMLElement | null>(null);
+
+// Grabbing vendor data from your CMS
 const dataStore = useDataStore();
 const vendors = dataStore.data.nysfairWebsite.vendors;
-console.log('vendors', vendors);
+console.log('vendors:', vendors); // Ensure these have latitude/longitude
 
+// Convert vendors to GeoJSON
+function buildVendorGeoJSON(vendors: any[]): GeoJSON {
+  const features: Array<Feature<Point, VendorProperties>> = vendors
+    .filter((v) => v.latitude && v.longitude)
+    .map((v) => ({
+      type: 'Feature' as const,
+      properties: {
+        name: v.name ?? 'Unknown Vendor',
+        description: v.description ?? ''
+      },
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [
+          parseFloat(v.longitude),
+          parseFloat(v.latitude)
+        ]
+      }
+    }));
 
-
-const createVendorMarkerElement = () => {
-  const element = document.createElement('div');
-  const image = document.createElement('img');
-  image.src = '/icons/fairgroundsl.png';
-  image.style.width = '45px';
-  image.style.height = '45px';
-  element.appendChild(image);
-  return element;
-};
+  return {
+    type: 'FeatureCollection' as const,
+    features
+  };
+}
 
 onMounted(() => {
   if (mapContainer.value) {
+    // Replace with your own Mapbox Access Token
     mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
 
     const map = new mapboxgl.Map({
       container: mapContainer.value,
       style: 'mapbox://styles/pxldevops/cm4uef2wm005401sm7ebof1mh',
-      bearing: 222,
       center: [-76.2197, 43.073],
       zoom: 14,
+      bearing: 222,           // Just matching your original
       dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
       touchZoomRotate: true
     });
 
     map.addControl(new mapboxgl.NavigationControl());
 
-    // Create gate marker element
-    const createGateMarkerElement = () => {
-      const element = document.createElement('div');
-      const image = document.createElement('img');
-      image.src = '/icons/gates.png';
-      image.style.width = '45px';  // Smaller size for gate icon
-      image.style.height = '45px';
-      element.appendChild(image);
-      return element;
-    };
-
-    // Create gate marker element
-    const createStageMarkerElement = () => {
-      const element = document.createElement('div');
-      const image = document.createElement('img');
-      image.src = '/icons/nysf-stage.png';
-      image.style.width = '45px';  // Smaller size for gate icon
-      image.style.height = '45px';
-      element.appendChild(image);
-      return element;
-    };
-
     map.on('load', () => {
-      // Get the features from the nysfair-data layer
-      const features = map.querySourceFeatures('composite', {
-        sourceLayer: 'NYSFair_Data'
-      });
+      // 1. Image overlay FIRST (so we can put clusters on top)
+      const testImage = new Image();
+      testImage.onload = () => {
+        map.addSource('chevy-court-area', {
+          type: 'image',
+          url: testImage.src,
+          coordinates: [
+            [-76.22101527351555, 43.06458007331625],   // Top left
+            [-76.23286067186764, 43.073228022199714],  // Top right
+            [-76.22396000615883, 43.079945790627306],  // Bottom right
+            [-76.21212430193944, 43.07221072728862]    // Bottom left
+          ]
+        });
 
-      // Find the gate feature (assuming it's the one with title "Front Gate")
-      const gateFeature = features.find(feature =>
-        feature.properties?.title === "Front Gate"
-      );
-      console.log('gateFeature', gateFeature);
+        map.addLayer({
+          id: 'chevy-court-overlay',
+          type: 'raster',
+          source: 'chevy-court-area',
+          paint: {
+            'raster-opacity': 0.85
+          }
+        });
 
-      if (gateFeature?.geometry?.type === 'Point' && Array.isArray(gateFeature.geometry.coordinates)) {
-        const gateMarker = new mapboxgl.Marker({
-          element: createGateMarkerElement(),
-          anchor: 'center'
-        })
-          .setLngLat(gateFeature.geometry.coordinates as [number, number])
-          .addTo(map);
-      }
 
-      // Add stage feature just through normal coordinates
-      const stageFeature = {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [-76.2157, 43.073]
-        },
-        properties: {
-          title: 'Chevy Court'
-        }
+        // 2. Build real vendor GeoJSON and add as a clustered source
+        const vendorGeoJson = buildVendorGeoJSON(vendors);
+
+        map.addSource('vendors-clustered', {
+          type: 'geojson',
+          data: vendorGeoJson,
+          cluster: true,
+          clusterRadius: 50,   // Adjust to taste
+          clusterMaxZoom: 14   // Stop clustering beyond zoom 14
+        });
+
+        // 3. Add cluster layers (ensuring they're on top of the overlay)
+        map.addLayer({
+          id: 'vendor-clusters',
+          type: 'circle',
+          source: 'vendors-clustered',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': '#000000',
+            'circle-radius': 16,
+            'circle-stroke-width': 1,
+            'circle-stroke-color': '#fff'
+          }
+        });
+
+        map.addLayer({
+          id: 'vendor-cluster-count',
+          type: 'symbol',
+          source: 'vendors-clustered',
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': '{point_count_abbreviated}',
+            'text-size': 12
+          },
+          paint: {
+            'text-color': '#ffffff'
+          }
+        });
+
+        map.addLayer({
+          id: 'vendor-unclustered-point',
+          type: 'circle',
+          source: 'vendors-clustered',
+          filter: ['!', ['has', 'point_count']],
+          paint: {
+            'circle-color': '#ff0000',
+            'circle-radius': 7,
+            'circle-stroke-width': 1,
+            'circle-stroke-color': '#fff'
+          }
+        });
       };
 
-      const stageMarker = new mapboxgl.Marker({
-        element: createStageMarkerElement(),
-        anchor: 'center'
-      })
-        .setLngLat(stageFeature.geometry.coordinates as [number, number])
-        .addTo(map);
+      // Make sure the image is valid
+      testImage.src = '/icons/Map_Design.png';
 
-
-      // Add debug markers for each corner
+      // 4. Example corners (just debugging)
       const corners = [
-          {
-              coords: [-76.22070391964486, 43.06337289828724],
-              color: '#FF0000',
-              label: 'TL'
-          },
-          {
-              coords: [-76.23286067186764, 43.073228022199714],
-              color: '#00FF00',
-              label: 'TR'
-          },
-          {
-              coords: [-76.22434604633837, 43.07969309593861],
-              color: '#0000FF',
-              label: 'BR'
-          },
-          {
-              coords: [-76.21212430193944, 43.07221072728862],
-              color: '#FFFF00',
-              label: 'BL'
-          }
+        {
+          coords: [-76.22070391964486, 43.06337289828724],
+          color: '#FF0000',
+          label: 'TL'
+        },
+        {
+          coords: [-76.23286067186764, 43.073228022199714],
+          color: '#00FF00',
+          label: 'TR'
+        },
+        {
+          coords: [-76.22434604633837, 43.07969309593861],
+          color: '#0000FF',
+          label: 'BR'
+        },
+        {
+          coords: [-76.21212430193944, 43.07221072728862],
+          color: '#FFFF00',
+          label: 'BL'
+        }
       ];
 
-      // Add colored markers at each corner
       corners.forEach(corner => {
-          const el = document.createElement('div');
-          el.style.width = '20px';
-          el.style.height = '20px';
-          el.style.borderRadius = '50%';
-          el.style.backgroundColor = corner.color;
-          el.style.border = '2px solid white';
-          el.innerHTML = `<span style="color: white; font-weight: bold;">${corner.label}</span>`;
-          el.style.display = 'flex';
-          el.style.alignItems = 'center';
-          el.style.justifyContent = 'center';
+        const el = document.createElement('div');
+        el.style.width = '20px';
+        el.style.height = '20px';
+        el.style.borderRadius = '50%';
+        el.style.backgroundColor = corner.color;
+        el.style.border = '2px solid white';
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+        el.style.color = 'white';
+        el.style.fontWeight = 'bold';
+        el.textContent = corner.label;
 
-          new mapboxgl.Marker({
-              element: el,
-              anchor: 'center'
-          })
+        new mapboxgl.Marker({ element: el, anchor: 'center' })
           .setLngLat(corner.coords as [number, number])
           .addTo(map);
       });
 
-
-      // Add the image overlay
-      const testImage = new Image();
-      testImage.onload = () => {
-          map.addSource('chevy-court-area', {
-              'type': 'image',
-              'url': testImage.src,
-              // Verify these coordinates by dropping pins on the map
-              // and using map.getCenter() to get exact coordinates
-              'coordinates': [
-                  [-76.22101527351555, 43.06458007331625], // Top left
-                  [-76.23286067186764, 43.073228022199714],  // Top right
-                  [-76.22396000615883, 43.079945790627306], // Bottom right
-                  [-76.21212430193944, 43.07221072728862]    // Bottom left
-              ]
-          });
-
-          map.addLayer({
-              'id': 'chevy-court-overlay',
-              'type': 'raster',
-              'source': 'chevy-court-area',
-              'paint': {
-                  'raster-opacity': 0.85
-              }
-          });
-
-
-      };
-
-      testImage.src = '/icons/Map_Design.png';
-
-
-      // Add vendor markers
-      // vendors.forEach((vendor: any) => {
-      //   if (vendor.latitude && vendor.longitude) {
-      //     const element = createVendorMarkerElement();
-
-      //     new mapboxgl.Marker({
-      //       element: element,
-      //       anchor: 'center'
-      //     })
-      //       .setLngLat([parseFloat(vendor.longitude), parseFloat(vendor.latitude)])
-      //       .setPopup(
-      //         new mapboxgl.Popup().setHTML(`
-      //           <h3>${vendor.name}</h3>
-      //           ${vendor.description ? `<p>${vendor.description}</p>` : ''}
-      //         `)
-      //       )
-      //       .addTo(map);
-      //   }
-      // });
-    });
-    map.on('click', (e) => {
+      // 5. Optional: Click event to see coords
+      map.on('click', (e) => {
         console.log(`Clicked coordinates: [${e.lngLat.lng}, ${e.lngLat.lat}]`);
-    });
+      });
 
-    setTimeout(() => {
-      map.resize();
-    }, 100);
+      // Resize map if needed
+      setTimeout(() => {
+        map.resize();
+      }, 100);
+    });
   }
 });
-
 </script>
 
 <style scoped lang="scss">
@@ -318,7 +321,6 @@ onMounted(() => {
     border: none;
     background: transparent;
     color: #333;
-    font-size: 14px;
     font-weight: 700;
     border-radius: 20px;
     font-size: 14px;
@@ -344,6 +346,7 @@ onMounted(() => {
   border-radius: 30px;
 }
 
+/* Customize popups, etc. */
 :deep .mapboxgl-popup-content {
   background-color: white;
   padding: 20px;
@@ -353,35 +356,13 @@ onMounted(() => {
 
   h3 {
     color: black;
-    margin-top: 0px;
-    font-size: 18px;
-    text-align: center;
-    font-weight: 600;
-  }
-
-  p {
-    color: black;
-  }
-}
-:deep .gate-popup .mapboxgl-popup-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 300px;
-
-  h3 {
-    color: black;
     margin-top: 0;
     font-size: 18px;
-    font-weight: 600;
     text-align: center;
-    margin-bottom: 10px;
+    font-weight: 600;
   }
-
   p {
     color: black;
-    margin: 0;
-    line-height: 1.4;
   }
 }
 </style>
