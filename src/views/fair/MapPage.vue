@@ -60,6 +60,9 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, FeatureCollection, Point, GeoJSON } from 'geojson';
 
+// Access Token for Mapbox
+mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
+
 
 interface VendorProperties {
   name: string;
@@ -103,8 +106,6 @@ function buildVendorGeoJSON(vendors: any[]): GeoJSON {
 
 onMounted(() => {
   if (mapContainer.value) {
-    // Replace with your own Mapbox Access Token
-    mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
 
     const map = new mapboxgl.Map({
       container: mapContainer.value,
@@ -115,7 +116,9 @@ onMounted(() => {
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
-      touchZoomRotate: true
+      touchZoomRotate: true,
+      renderWorldCopies: false,
+      preserveDrawingBuffer: true // Needed for image export
     });
 
     map.addControl(new mapboxgl.NavigationControl());
