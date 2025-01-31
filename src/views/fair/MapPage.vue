@@ -163,7 +163,7 @@ onMounted(() => {
           source: 'vendors-clustered',
           filter: ['has', 'point_count'],
           paint: {
-            'circle-color': '#000000',
+            'circle-color': '#1E5EAE',
             'circle-radius': 16,
             'circle-stroke-width': 1,
             'circle-stroke-color': '#fff'
@@ -190,7 +190,7 @@ onMounted(() => {
           source: 'vendors-clustered',
           filter: ['!', ['has', 'point_count']],
           paint: {
-            'circle-color': '#ff0000',
+            'circle-color': '#EE4722',
             'circle-radius': 7,
             'circle-stroke-width': 1,
             'circle-stroke-color': '#fff'
