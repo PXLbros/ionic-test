@@ -30,7 +30,7 @@
                             </div>
                         </div>
                     <div class="main__header-title">
-                        <h1>Featured Events</h1>
+                        <h1>Upcoming Events</h1>
                     </div>
                 </div>
                 <div class="main__grid">
