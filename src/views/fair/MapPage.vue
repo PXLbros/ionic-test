@@ -263,7 +263,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .main {
-  height: calc(100vh - 66px);
+  height: calc(100vh - 70px);
   display: flex;
   flex-direction: column;
 }
