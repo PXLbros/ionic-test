@@ -82,21 +82,22 @@ console.log('vendors:', vendors); // Ensure these have latitude/longitude
 // Convert vendors to GeoJSON
 function buildVendorGeoJSON(vendors: any[]): GeoJSON {
   const features: Array<Feature<Point, VendorProperties>> = vendors
-    .filter((v) => v.latitude && v.longitude)
-    .map((v) => ({
+    .filter((v) => v.locations && v.locations.length > 0)
+    .flatMap((v) => v.locations.map((location: any) => ({
       type: 'Feature' as const,
       properties: {
         name: v.name ?? 'Unknown Vendor',
-        description: v.description ?? ''
+        description: v.description ?? '',
+        id: v.id
       },
       geometry: {
         type: 'Point' as const,
         coordinates: [
-          parseFloat(v.longitude),
-          parseFloat(v.latitude)
+          parseFloat(location.longitude),
+          parseFloat(location.latitude)
         ]
       }
-    }));
+    })));
 
   return {
     type: 'FeatureCollection' as const,
@@ -118,7 +119,8 @@ onMounted(() => {
       touchPitch: false,
       touchZoomRotate: true,
       renderWorldCopies: false,
-      preserveDrawingBuffer: true // Needed for image export
+      preserveDrawingBuffer: true, // Needed for image export
+
     });
 
     map.addControl(new mapboxgl.NavigationControl());
@@ -150,6 +152,7 @@ onMounted(() => {
 
         // 2. Build real vendor GeoJSON and add as a clustered source
         const vendorGeoJson = buildVendorGeoJSON(vendors);
+        console.log('vendorGeoJson:', vendorGeoJson);
 
         map.addSource('vendors-clustered', {
           type: 'geojson',
@@ -198,6 +201,33 @@ onMounted(() => {
             'circle-stroke-width': 1,
             'circle-stroke-color': '#fff'
           }
+        });
+
+        // 4. Add click handlers for vendor points
+        map.on('click', 'vendor-unclustered-point', (e) => {
+          if (!e.features || e.features.length === 0) return;
+
+          const feature = e.features[0];
+          const coordinates = (feature.geometry as Point).coordinates.slice();
+          const { name, description } = feature.properties as VendorProperties;
+
+          // Create popup content
+          const popupContent = `
+            <div class="vendor-popup">
+              <h3>${name}</h3>
+              ${description ? `<p>${description}</p>` : ''}
+            </div>
+          `;
+
+          // Ensure proper positioning at all zoom levels
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
+
+          new mapboxgl.Popup()
+            .setLngLat(coordinates as [number, number])
+            .setHTML(popupContent)
+            .addTo(map);
         });
       };
 
@@ -356,6 +386,10 @@ onMounted(() => {
   border-radius: 8px;
   max-height: 30vh;
   overflow-y: auto;
+
+  .vendor-popup {
+
+  }
 
   h3 {
     color: black;
