@@ -40,3 +40,10 @@ export interface DateObject {
   day: number;
   timestamp: number;
 }
+
+export interface NewsArticle {
+  title: string;
+  content: string;
+  permalink: string;
+  created_at: string;
+}
