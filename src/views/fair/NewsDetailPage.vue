@@ -9,7 +9,15 @@
           </ion-toolbar>
       </ion-header>
       <ion-content :fullscreen="true">
-          <div v-if="article" class="main">
+          <div v-if="isFetchingArticle" class="loading-article">
+              Loading article...
+          </div>
+
+          <div v-else-if="fetchArticleError">
+              {{ fetchArticleError }}
+          </div>
+
+          <div v-else-if="article" class="main">
               <div class="main__image">
                   <img v-if="article.image" :src="article.image" alt="News Image">
                   <svg v-else xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
@@ -27,9 +35,9 @@
 
               <div class="navigation">
                   <a
-                      v-if="previousArticle"
+                      v-if="previousArticleId"
                       href="#"
-                      @click.prevent="navigateToArticle(previousArticle.permalink)"
+                      @click.prevent="navigateToArticle(previousArticleId)"
                       class="navigation__button"
                   >
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -39,9 +47,9 @@
                   </a>
 
                   <a
-                      v-if="nextArticle"
+                      v-if="nextArticleId"
                       href="#"
-                      @click.prevent="navigateToArticle(nextArticle.permalink)"
+                      @click.prevent="navigateToArticle(nextArticleId)"
                       class="navigation__button"
                   >
                       Next Article
@@ -58,8 +66,8 @@
 <script setup lang="ts">
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useDataStore } from '@/stores/data';
-import { computed } from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
 interface NewsArticle {
   title: string;
@@ -71,40 +79,47 @@ interface NewsArticle {
 
 const route = useRoute();
 const router = useRouter();
-const dataStore = useDataStore();
-const permalink = decodeURIComponent(route.params.id as string);
+const article = ref<NewsArticle | null>(null);
+const previousArticleId = ref<number | null>(null);
+const nextArticleId = ref<number | null>(null);
+const id = decodeURIComponent(route.params.id as string);
+const isFetchingArticle = ref(false);
+const fetchArticleError = ref<string | null>(null);
 
-const navigateToArticle = (permalink: string) => {
-  router.replace(`/fair/news/${encodeURIComponent(permalink)}`);
+const navigateToArticle = (id: number) => {
+  router.replace(`/fair/news/${encodeURIComponent(id)}`);
 };
 
-// Get current article index
-const currentArticleIndex = computed(() => {
-  return dataStore.data.nysfairWebsite.news.findIndex(
-      (article: NewsArticle) => article.permalink === permalink
-  );
-});
+const fetchArticle = async () => {
+  try {
+    isFetchingArticle.value = true;
+    fetchArticleError.value = null;
 
-// Get the specific article
-const article = computed<NewsArticle | undefined>(() => {
-  return dataStore.data.nysfairWebsite.news[currentArticleIndex.value];
-});
+    const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data/news/${id}`);
 
-// Get previous article
-const previousArticle = computed<NewsArticle | undefined>(() => {
-  if (currentArticleIndex.value > 0) {
-      return dataStore.data.nysfairWebsite.news[currentArticleIndex.value - 1];
+    if (!response.data?.data) {
+      throw new Error('Article not found');
+    }
+
+    article.value = response.data.data;
+
+    if (response.data.previous_id) {
+      previousArticleId.value = response.data.previous_id;
+    }
+
+    if (response.data.next_id) {
+      nextArticleId.value = response.data.next_id;
+    }
+  } catch (error) {
+    console.error('Error fetching article:', error);
+
+    fetchArticleError.value = 'An error occurred while fetching the article. Please try again later.';
+  } finally {
+    isFetchingArticle.value = false;
   }
-  return undefined;
-});
+};
 
-// Get next article
-const nextArticle = computed<NewsArticle | undefined>(() => {
-  if (currentArticleIndex.value < dataStore.data.nysfairWebsite.news.length - 1) {
-      return dataStore.data.nysfairWebsite.news[currentArticleIndex.value + 1];
-  }
-  return undefined;
-});
+fetchArticle();
 </script>
 
 <style lang="scss" scoped>
@@ -202,5 +217,10 @@ const nextArticle = computed<NewsArticle | undefined>(() => {
 
 :deep(ion-content) {
   --background: white;
+}
+
+.loading-article {
+  margin-top: 1.5rem;
+  text-align: center;
 }
 </style>
