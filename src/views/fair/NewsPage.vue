@@ -163,7 +163,7 @@ const fetchNews = async ({ page }: { page: number } = { page: 1 }) => {
     isLoading.value = true;
     loadError.value = null;
 
-    const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data/news?page=${page}${import.meta.env.VITE_NODE_ENV === 'local' ? '&cache=0' : ''}`);
+    const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data/news?page=${page}`);
 
     if (!response || !Array.isArray(response.data?.data)) {
       throw new Error('Invalid response data');

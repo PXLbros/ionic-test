@@ -72,7 +72,7 @@ import { ref, computed, watch } from 'vue';
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
 const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
-const categoriesData = computed(() => data.value?.nysfairWebsite?.eventCategories ?? []);
+const categoriesData = computed(() => data.value?.nysfairWebsite?.event_categories ?? []);
 
 const findCurrentDayIndex = (dates: DateObject[]): number => {
   if (!dates.length) return 0;

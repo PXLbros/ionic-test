@@ -37,7 +37,7 @@ import { formatEvent } from '@/utils/event';
 const dataStore = useDataStore();
 
 const categories = computed<Category[]>(() => {
-  return dataStore.data.nysfairWebsite?.eventCategories || [];
+  return dataStore.data.nysfairWebsite?.event_categories || [];
 });
 
 const favoriteEventItems = computed(() => {
