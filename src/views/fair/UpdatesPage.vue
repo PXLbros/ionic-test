@@ -9,38 +9,67 @@
             </ion-toolbar>
         </ion-header>
         <ion-content :fullscreen="true">
-
             <div class="main">
                 <div class="main__header">
                     <h1 class="main__header-text">Real-time <br/> Updates</h1>
                 </div>
                 <div class="main__content">
-                    <div class="main__content-item">
-                        <p class="date">Wed, Aug 21 • 6pm</p>
-                        <p class="headline">Notification Headline</p>
-                        <p class="content">Curabitur lorem lectus donec; pharetra fringilla torquent facilisis. Egestas suspendisse natoque ex etiam curabitur tempus volutpat molestie.</p>
-                    </div>
-                    <div class="main__content-item">
-                        <p class="date">Wed, Aug 21 • 6pm</p>
-                        <p class="headline">Notification Headline</p>
-                        <p class="content">Curabitur lorem lectus donec; pharetra fringilla torquent facilisis. Egestas suspendisse natoque ex etiam curabitur tempus volutpat molestie.</p>
-                    </div>
-                    <div class="main__content-item">
-                        <p class="date">Wed, Aug 21 • 6pm</p>
-                        <p class="headline">Notification Headline</p>
-                        <p class="content">Curabitur lorem lectus donec; pharetra fringilla torquent facilisis. Egestas suspendisse natoque ex etiam curabitur tempus volutpat molestie.</p>
+                    <div v-if="isLoading">Loading updates...</div>
+                    <div v-else-if="loadError">{{ loadError }}</div>
+                    <div v-else>
+                        <div v-for="update in updates" :key="update.id" class="main__content-item">
+                            <p class="date">{{ formatDate(update.created_at) }}</p>
+                            <p class="headline">{{ update.title }}</p>
+                            <p class="content">{{ update.message }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
-
         </ion-content>
     </ion-page>
-
 </template>
 
 <script setup lang="ts">
-    import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
+import axios from 'axios';
+import { ref } from 'vue';
+import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 
+const updates = ref([]);
+const isLoading = ref(true);
+const loadError = ref<string | null>(null);
+
+const fetchUpdates = async () => {
+    try {
+        isLoading.value = true;
+        loadError.value = null;
+
+        const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data/real-time-updates`);
+
+        if (!response || !Array.isArray(response.data?.realTimeUpdates)) {
+            throw new Error('Invalid response data');
+        }
+
+        updates.value = response.data.realTimeUpdates;
+    } catch (error) {
+        console.error('Error fetching updates:', error);
+        loadError.value = (error instanceof Error) ? error.message : 'An error occurred while fetching updates.';
+    } finally {
+        isLoading.value = false;
+    }
+};
+
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+    }).format(date);
+};
+
+fetchUpdates();
 </script>
 
 <style lang="scss" scoped>

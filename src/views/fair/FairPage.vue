@@ -12,7 +12,7 @@
                 </div>
                 <ion-grid>
                     <ion-row>
-                        <ion-col router-link="/fair/tickets">
+                        <ion-col v-if="ticketsUrl" @click="openTicketsWebsite">
                             <div class="main-button">
                                 <svg class="main-button__icon"  viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                   <rect width="80" height="80" fill="url(#pattern0_1820_157)"/>
@@ -229,6 +229,30 @@
     let startX = 0;
     let scrollLeft = 0;
     let isDown = false;
+
+    const ticketsUrl = computed(() => {
+      let url = dataStore.data.nysfairWebsite?.tickets?.etix_ticket_url || null;
+
+      if (!url) {
+        return null;
+      }
+
+      const partnerId = dataStore.data.nysfairWebsite?.tickets?.partner_id || null;
+
+      if (partnerId) {
+        url = `${url}?partner_id=${partnerId}`;
+      }
+
+      return url;
+    });
+
+    const openTicketsWebsite = () => {
+      if (!ticketsUrl.value) {
+        return;
+      }
+
+      window.open(ticketsUrl.value);
+    };
 
     onMounted(() => {
         const container = carouselContainer.value;
