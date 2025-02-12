@@ -38,7 +38,7 @@
             class="nav-logo"
           >
           <button class="close-button" @click="closeMenu">
-            <span>×</span>
+            <ion-icon :icon="closeCircleOutline"></ion-icon>
           </button>
         </div>
 
@@ -105,6 +105,8 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { IonToolbar, IonHeader } from '@ionic/vue';
+import { closeCircleOutline } from 'ionicons/icons';
+import { IonIcon } from '@ionic/vue';
 
 const props = defineProps<{
   type: 'fair' | 'fairgrounds'
@@ -277,7 +279,7 @@ const toggleNotifications = async () => {
   .close-button {
     background: none;
     border: none;
-    color: black;
+    color: #FDD252;
     font-size: 36px;
     padding: 0px 0px;
     cursor: pointer;
@@ -292,12 +294,12 @@ const toggleNotifications = async () => {
   }
 
   .nav-link {
-    color: #343434;
+    color: #FFF;
     text-decoration: none;
     font-family: 'Inter', sans-serif;
     font-size: 20px;
-    line-height: 52px;
-    font-weight: 500;
+    line-height: 45px;
+    font-weight: 600;
     display: flex;
     justify-content: space-between;
     align-items: center;

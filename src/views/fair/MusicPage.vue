@@ -1,61 +1,78 @@
 <template>
-    <DefaultLayout title="Chevy Music Series">
+    <DefaultLayout title="Concert">
       <div class="main">
         <div class="main__header">
-          <h1 class="main__header-title">Chevrolet Music Series</h1>
+          <div class="main__header-content">
+            <h1 class="main__header-title">Chevrolet Music Series</h1>
+            <p class="main__header-subtitle">Aug 21 - Sept 2</p>
+          </div>
           <div class="main__header-img">
-            <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
+            <!-- just using the first image for now -->
+            <img v-if="filteredEvents[0].featured_image" :src="filteredEvents[0].featured_image" alt="Music Image" />
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
               <path
                 d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z"
                 fill="#1E5EAE"
               />
             </svg>
           </div>
+          <div class="main__header-sponsor">
+            <p class="title">Sponsored By</p>
+            <img src="/src/imgs/Sponsor_Chevrolet_Black.png" alt="Chevy Logo" />
+          </div>
         </div>
 
         <!-- Filter Section -->
-        <div class="filters">
-          <div class="filter-dropdown">
-              <button class="filter-btn" @click="toggleDateDropdown">
-                {{ selectedDate || 'Date' }} ▼
-              </button>
-              <div v-if="showDateDropdown" class="dropdown-content">
-                <div @click="selectDate('')">All Dates</div>
-                <div v-for="date in uniqueDates" :key="date" @click="selectDate(date || '')">
-                  {{ formatDate(date || '') }}
-                </div>
-              </div>
+        <div class="wrapper">
+
+          <div class="action-buttons">
+            <router-link to="/fair/music/favorites" class="favorites-btn">
+              <ion-icon class="heart-icon" :icon="heart"></ion-icon>
+              My Favorites
+            </router-link>
+            <button class="reset-btn" @click="clearFilters">
+              <ion-icon class="reset-icon" :icon="refreshOutline"></ion-icon>
+              Reset Filters
+            </button>
           </div>
-          <div class="filter-dropdown">
-              <button class="filter-btn" @click="toggleVenueDropdown">
-                {{ selectedVenue || 'Venue' }} ▼
-              </button>
-              <div v-if="showVenueDropdown" class="dropdown-content">
-                <div @click="selectVenue('')">All Venues</div>
-                <div v-for="venue in uniqueVenues" :key="venue" @click="selectVenue(venue || '')">
-                  {{ venue }}
+          <div class="filters">
+            <div class="filter-dropdown">
+                <button class="filter-btn" @click="toggleDateDropdown">
+                  {{ selectedDate || 'Date' }}
+                  <span>▼</span>
+                </button>
+                <div v-if="showDateDropdown" class="dropdown-content">
+                  <div @click="selectDate('')">All Dates</div>
+                  <div v-for="date in uniqueDates" :key="date" @click="selectDate(date || '')">
+                    {{ formatDate(date || '') }}
+                  </div>
                 </div>
-              </div>
-          </div>
-          <div class="filter-dropdown">
-              <button class="filter-btn" @click="toggleGenreDropdown">
-                  {{ selectedGenre || 'Genre' }} ▼
-              </button>
-              <div v-if="showGenreDropdown" class="dropdown-content">
-                <div @click="selectGenre('')">All Genres</div>
-                <div v-for="genre in uniqueGenres" :key="genre" @click="selectGenre(genre)">
-                  {{ genre }}
+            </div>
+            <div class="filter-dropdown">
+                <button class="filter-btn" @click="toggleVenueDropdown">
+                  {{ selectedVenue || 'Venue' }}
+                  <span>▼</span>
+                </button>
+                <div v-if="showVenueDropdown" class="dropdown-content">
+                  <div @click="selectVenue('')">All Venues</div>
+                  <div v-for="venue in uniqueVenues" :key="venue" @click="selectVenue(venue || '')">
+                    {{ venue }}
+                  </div>
                 </div>
-              </div>
-          </div>
-          <button
-            v-if="hasActiveFilters"
-            @click="clearFilters"
-            class="clear-filters-btn"
-          >
-            Clear Filters
-          </button>
-      </div>
+            </div>
+            <div class="filter-dropdown">
+                <button class="filter-btn" @click="toggleGenreDropdown">
+                    {{ selectedGenre || 'Genre' }}
+                    <span>▼</span>
+                </button>
+                <div v-if="showGenreDropdown" class="dropdown-content">
+                  <div @click="selectGenre('')">All Genres</div>
+                  <div v-for="genre in uniqueGenres" :key="genre" @click="selectGenre(genre)">
+                    {{ genre }}
+                  </div>
+                </div>
+            </div>
+        </div>
 
 
         <!-- Events List -->
@@ -88,6 +105,7 @@
           </router-link>
         </div>
       </div>
+    </div>
   </DefaultLayout>
 </template>
 
@@ -143,10 +161,11 @@ interface DataStore {
 
 import DefaultLayout from '@/layouts/default.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import { refreshOutline, heart, triangle } from 'ionicons/icons';
+import { IonIcon } from '@ionic/vue';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
@@ -381,21 +400,35 @@ const venueInfo = computed(() => {
   &__header {
     display: flex;
     gap: 10px;
-    padding: 20px;
+    padding: 10px 20px 40px 20px;
     flex-direction: column;
+    background-color: #FDD252;
+    position: relative;
 
     &-title {
-      font-size: 34px;
-      font-family: 'inter', sans-serif;
-      font-weight: 800;
+      font-size: 32px;
+      font-family: 'lalezar', sans-serif;
+      font-weight: 400;
       text-transform: uppercase;
       color: #2A2A2A;
-      line-height: 32px;
+      line-height: 24px;
       letter-spacing: 0.5px;
       text-align: center;
       max-width: 70%;
       margin: 0 auto;
-      padding: 10px 0;
+      padding: 10px 0px 0px 0px;
+    }
+
+    &-subtitle {
+      color: #2A2A2A;
+      text-align: center;
+      font-family: 'lalezar', sans-serif;
+      font-size: 22px;
+      margin: 0 auto;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 30px; /* 136.364% */
+      letter-spacing: 0.5px;
     }
 
     &-img {
@@ -403,54 +436,128 @@ const venueInfo = computed(() => {
       align-items: center;
       justify-content: center;
       width: 100%;
-      height: 25vh;
-      border-radius: 24px;
+      height: 26vh;
+      border-radius: 10px;
+      border: 5px solid #F4E8AB;
       background-color: #EFF2F6;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
     }
+
+    &-sponsor {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+
+      .title {
+        color: #2A2A2A;
+        text-align: center;
+        font-family: 'inter', sans-serif;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 900;
+        line-height: 24px; /* 200% */
+        letter-spacing: 0.5px;
+        margin: 0 auto;
+        position: absolute;
+        text-transform: uppercase;
+        top: 4px;
+      }
+
+
+      img {
+        margin-top: 8px;
+        width: 100%;
+        max-width: 100px;
+        height: auto;
+      }
+    }
+  }
+}
+
+// START OF THE FILTERS SECTION AND EVENT LIST
+.wrapper {
+  background-color: #098944;
+  padding-top: 20px;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  margin-top: -40px; // This creates the overlap
+  position: relative; // Ensures it stays above the content below
+  z-index: 1; // Ensures the wrapper stays on top
+}
+
+// Clear Filters and Go to Favorites buttons
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0px;
+  padding: 0 20px 0px 20px;
+
+  .favorites-btn, .reset-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #F4E8AB;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 8px 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .heart-icon {
+    font-size: 20px;
+  }
+
+  .reset-icon {
+    font-size: 18px;
   }
 }
 
 .filters {
     display: flex;
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 5px;
     padding: 10px 20px 20px 20px;
     justify-content: space-between;
     position: relative;
 }
 
-.clear-filters-btn {
-  position: absolute;
-  bottom: -30px;
-  right: 20px;
-  background-color: #1E5EAE;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  cursor: pointer;
-  font-weight: 600;
-
-  &:hover {
-    background-color: #174a8a;
-  }
-}
 
 .filter-dropdown {
     width: 100%;
     position: relative;
-    display: inline-block;
+    display: flex;
+    flex-basis: 49%;
+
+    // last child make full width
+    &:last-child {
+        flex-basis: 100%;
+    }
 
     .filter-btn {
-        background-color: #EFF2F6;
+        background-color: #1F3667;
         border: none;
-        padding: 10px 20px;
+        padding: 15px 20px;
         border-radius: 12px;
-        font-size: 14px;
+        font-size: 16px;
         cursor: pointer;
         font-weight: 700;
         width: 100%;
-        color: #333;
+        color: #F1F1F1;
         text-align: left; // Keep text aligned left for dropdown buttons
         display: flex;
         justify-content: space-between;
@@ -487,8 +594,9 @@ const venueInfo = computed(() => {
 .events-list {
   padding: 20px;
   padding-top: 0px;
-  max-height: 45vh;
-  overflow: scroll;
+  // max-height: 45vh;
+  // overflow: scroll;
+  background-color: #098944;
 }
 
 .backup {
@@ -505,12 +613,12 @@ const venueInfo = computed(() => {
 .event-card {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  // align-items: center;
   padding: 20px 0px;
-  border-bottom: 1px solid #EFF2F6;
+  // border-bottom: 1px solid #EFF2F6;
   gap: 15px; // Increased gap for better spacing
   text-decoration: none;
-  color: #343434;
+  color: #FFF;
 }
 
 .event-info {
@@ -519,24 +627,26 @@ const venueInfo = computed(() => {
 
   .venue-name {
     font-size: 12px;
-    color: #333;
+    color: #FFF;
     margin-bottom: 4px;
     font-weight: 600;
+    font-family: 'inter', sans-serif;
   }
 
   .event-title {
     font-size: 24px;
     font-weight: 700;
-    margin: 4px 0;
+    margin: 0px 0;
     // Add text truncation for long titles
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-family: 'lalezar', sans-serif;
   }
 
   .event-date {
     font-size: 16px;
-    color: #333;
+    color: #FFF;
     font-weight: 700;
   }
 }
