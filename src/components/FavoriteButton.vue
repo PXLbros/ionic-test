@@ -38,10 +38,11 @@ const handleFavoriteClick = async (event: Event) => {
   border: none;
   cursor: pointer;
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: center;
   transition: transform 0.2s ease;
   padding: 8px;
+  padding-top: 0px;
 
   &:active {
     transform: scale(0.95);
@@ -49,8 +50,8 @@ const handleFavoriteClick = async (event: Event) => {
 
   &--is-favorite {
     ion-icon {
-      color: #e31b23;
-      fill: #e31b23;
+      color: #FDD252;
+      fill: #FDD252;
     }
   }
 
@@ -61,7 +62,7 @@ const handleFavoriteClick = async (event: Event) => {
 
   ion-icon {
     font-size: 24px;
-    color: #666;
+    color: #FDD252;
     transition: all 0.3s ease;
   }
 

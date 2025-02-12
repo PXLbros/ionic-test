@@ -1,51 +1,41 @@
 <template>
-    <ion-page>
-        <ion-header>
-            <ion-toolbar :translucent="true">
-                <ion-buttons slot="start">
-                    <ion-back-button default-href="/fair"></ion-back-button>
-                </ion-buttons>
-                <ion-title>Recent Updates</ion-title>
-            </ion-toolbar>
-        </ion-header>
-        <ion-content :fullscreen="true">
 
-            <div class="main">
-                <div class="main__header">
-                    <h1 class="main__header-text">Real-time <br/> Updates</h1>
-                </div>
-                <div class="main__content">
-                    <div class="main__content-item">
-                        <p class="date">Wed, Aug 21 • 6pm</p>
-                        <p class="headline">Notification Headline</p>
-                        <p class="content">Curabitur lorem lectus donec; pharetra fringilla torquent facilisis. Egestas suspendisse natoque ex etiam curabitur tempus volutpat molestie.</p>
-                    </div>
-                    <div class="main__content-item">
-                        <p class="date">Wed, Aug 21 • 6pm</p>
-                        <p class="headline">Notification Headline</p>
-                        <p class="content">Curabitur lorem lectus donec; pharetra fringilla torquent facilisis. Egestas suspendisse natoque ex etiam curabitur tempus volutpat molestie.</p>
-                    </div>
-                    <div class="main__content-item">
-                        <p class="date">Wed, Aug 21 • 6pm</p>
-                        <p class="headline">Notification Headline</p>
-                        <p class="content">Curabitur lorem lectus donec; pharetra fringilla torquent facilisis. Egestas suspendisse natoque ex etiam curabitur tempus volutpat molestie.</p>
-                    </div>
-                </div>
+  <DefaultLayout title="Notifications">
+    <div class="main">
+        <div class="main__header">
+            <h1 class="main__header-text">Real-time <br/> Updates</h1>
+        </div>
+        <div class="main__content">
+            <div class="main__content-item">
+                <p class="date">Wed, Aug 21 • 6pm</p>
+                <p class="headline">Notification Headline</p>
+                <p class="content">Curabitur lorem lectus donec; pharetra fringilla torquent facilisis. Egestas suspendisse natoque ex etiam curabitur tempus volutpat molestie.</p>
             </div>
-
-        </ion-content>
-    </ion-page>
+            <div class="main__content-item">
+                <p class="date">Wed, Aug 21 • 6pm</p>
+                <p class="headline">Notification Headline</p>
+                <p class="content">Curabitur lorem lectus donec; pharetra fringilla torquent facilisis. Egestas suspendisse natoque ex etiam curabitur tempus volutpat molestie.</p>
+            </div>
+            <div class="main__content-item">
+                <p class="date">Wed, Aug 21 • 6pm</p>
+                <p class="headline">Notification Headline</p>
+                <p class="content">Curabitur lorem lectus donec; pharetra fringilla torquent facilisis. Egestas suspendisse natoque ex etiam curabitur tempus volutpat molestie.</p>
+            </div>
+        </div>
+    </div>
+  </DefaultLayout>
 
 </template>
 
 <script setup lang="ts">
-    import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
+    import DefaultLayout from '@/layouts/default.vue';
 
 </script>
 
 <style lang="scss" scoped>
 
 .main {
+  background-color: #FDD252;
 
     padding: 30px;
 
@@ -74,7 +64,7 @@
             flex-direction: column;
             gap: 5px;
             padding: 20px;
-            background-color: #EEF2F6;
+            background-color: #F4E8AB;
             border-radius: 10px;
 
             .date {

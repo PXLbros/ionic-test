@@ -302,7 +302,7 @@
             margin-bottom: 10px;
 
             @media (max-height: 845px) {
-                max-height: 16vh;
+                max-height: 15vh;
             }
         }
 
@@ -342,13 +342,12 @@
                 line-height: 16px;
                 color: white;
                 text-transform: uppercase;
-                font-weight: 600;
+                font-weight: 400;
                 text-align: center;
                 margin: 0px;
                 padding: 0px 5px;
                 flex-grow: 1;
                 color: #FFF;
-                letter-spacing: -1px;
 
                 // Smaller screens
                 @media (max-height: 845px) {
