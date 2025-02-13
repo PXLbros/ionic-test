@@ -9,13 +9,15 @@
     "preview": "vite preview",
     "test:e2e": "cypress run",
     "test:unit": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "android:run": "npx npm run build && npx cap copy && npx cap sync --inline && $HOME/Downloads/android-studio/bin/studio.sh android &"
   },
   "dependencies": {
     "@capacitor/android": "6.2.0",
     "@capacitor/app": "^6.0.2",
     "@capacitor/browser": "^6.0.4",
     "@capacitor/core": "^6.1.1",
+    "@capacitor/device": "^6.0.2",
     "@capacitor/geolocation": "^6.0.0",
     "@capacitor/haptics": "^6.0.2",
     "@capacitor/ios": "6.2.0",

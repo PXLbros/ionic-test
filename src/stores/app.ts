@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { Device } from '@capacitor/device';
 
 const DEFAULT_TOAST_DURATION = 2500;
 
@@ -73,9 +74,12 @@ export const useAppStore = defineStore('app', {
       return newDeviceId;
     },
 
-    async createUserDeviceToken({ deviceId }: { deviceId: string }) {
+    async createUserDeviceToken({ deviceId, model, platform, operatingSystem }: { deviceId: string; model?: string; platform?: string; operatingSystem?: string }) {
       const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-device-tokens/create`, {
         deviceId,
+        model,
+        platform,
+        operatingSystem,
       });
 
       if (response.data?.success !== true) {
@@ -95,8 +99,20 @@ export const useAppStore = defineStore('app', {
         // Add listeners only once
         PushNotifications.addListener('registration', async (token) => {
           console.log('Device registered with token:', token.value);
+          
           try {
-            await this.createUserDeviceToken({ deviceId: token.value });
+            // Get device information
+            const deviceInfo = await Device.getInfo();
+            
+            console.log('Device info:', JSON.stringify(deviceInfo, null, 2));
+            
+            await this.createUserDeviceToken({
+              deviceId: token.value,
+              model: deviceInfo.model || undefined,
+              platform: deviceInfo.platform || undefined,
+              operatingSystem: deviceInfo.operatingSystem || undefined,
+            });
+
             this.pushNotifications.deviceId = token.value;
           } catch (error) {
             console.error('Error saving token to backend:', error);
@@ -155,7 +171,7 @@ export const useAppStore = defineStore('app', {
         } else {
           const deviceId = this.getPersistentWebDeviceId();
 
-          this.createUserDeviceToken({ deviceId })
+          this.createUserDeviceToken({ deviceId, model: 'Web', platform: 'web', operatingSystem: 'web' })
             .then(() => {
               this.pushNotifications.permissionStatus = 'granted';
               this.pushNotifications.didRegisterDevice = true;
