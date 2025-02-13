@@ -12,6 +12,9 @@ const config: CapacitorConfig = {
       dsn: process.env.VITE_SENTRY_DSN,
       environment: process.env.VITE_NODE_ENV,
     },
+    FirebaseAnalytics: {
+      autoCollectionEnabled: true, // Enables automatic event tracking
+    },
   },
 };
 

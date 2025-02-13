@@ -24,6 +24,9 @@ import '@ionic/vue/css/text-transformation.css';
 import '@ionic/vue/css/flex-utils.css';
 import '@ionic/vue/css/display.css';
 
+import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
+import { Capacitor } from '@capacitor/core';
+
 /**
  * Ionic Dark Mode
  * -----------------------------------------------------
@@ -44,6 +47,23 @@ const app = createApp(App)
   .use(IonicVue)
   .use(router)
   .use(pinia);
+
+const initializeFirebase = async () => {
+  try {
+    if (!Capacitor.isNativePlatform()) {
+      console.warn('Firebase Analytics is only available on iOS/Android.');
+      return;
+    }
+
+    console.log('Initializing Firebase Analytics...');
+
+    await FirebaseAnalytics.setEnabled({ enabled: true });
+
+    console.log('Firebase Analytics Initialized Successfully');
+  } catch (error) {
+    console.error('Firebase Initialization Error:', error);
+  }
+};
 
 Sentry.init(
   {
@@ -72,6 +92,34 @@ Sentry.init(
 const appStore = useAppStore();
 
 router.isReady().then(async () => {
+  initializeFirebase().then(() => {
+    // Get the initial route
+    const initialRoute = router.currentRoute.value;
+
+    // Log initial screen view
+    if (initialRoute) {
+      console.log('Initial Page Load:', initialRoute);
+
+      FirebaseAnalytics.logEvent({
+        name: 'screen_view',
+        params: {
+          screen_name: initialRoute.name || initialRoute.path,
+        },
+      });
+    }
+
+    router.afterEach((to) => {
+      console.log('Route changed to: ', to);
+
+      // FirebaseAnalytics.logEvent({
+      //   name: 'screen_view',
+      //   params: {
+      //     screen_name: to.name || to.path, // Use route name or path
+      //   }
+      // });
+    });
+  });
+
   app.mount('#app');
 
   // Initialize push notification listeners
