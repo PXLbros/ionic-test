@@ -12,6 +12,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@capacitor-firebase/analytics": "^6.3.1",
     "@capacitor/android": "6.2.0",
     "@capacitor/app": "^6.0.2",
     "@capacitor/browser": "^6.0.4",
