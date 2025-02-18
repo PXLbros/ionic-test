@@ -16,7 +16,7 @@
                 <div class="main__content">
                     <div v-if="isLoading">Loading updates...</div>
                     <div v-else-if="loadError">{{ loadError }}</div>
-                    <div v-else>
+                    <div class="main__content-grid" v-else>
                         <div v-for="update in updates" :key="update.id" class="main__content-item">
                             <p class="date">{{ formatDate(update.created_at) }}</p>
                             <p class="headline">{{ update.title }}</p>
@@ -34,7 +34,14 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 
-const updates = ref([]);
+interface Update {
+    id: number;
+    created_at: string;
+    title: string;
+    message: string;
+}
+
+const updates = ref<Update[]>([]);
 const isLoading = ref(true);
 const loadError = ref<string | null>(null);
 
@@ -98,6 +105,12 @@ fetchUpdates();
         display: flex;
         flex-direction: column;
         gap: 15px;
+
+        &-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
 
         &-item {
             display: flex;
