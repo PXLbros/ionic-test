@@ -15,7 +15,7 @@ ion-content {
 
 @font-face {
   font-family: 'lalezar';
-  src: url('../fonts/Lalezar-Regular.ttf') format('ttf');
+  src: url('../fonts/Lalezar-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -27,7 +27,15 @@ h1 {
 /* Main Homepage Button Font */
 @font-face {
   font-family: 'jockey';
-  src: url('../fonts/JockeyOne-Regular.ttf') format('ttf');
+  src: url('../fonts/JockeyOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'inter';
+  src: url('../fonts/Inter-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
