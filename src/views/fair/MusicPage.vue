@@ -24,19 +24,19 @@
 
         <!-- Filter Section -->
         <div class="wrapper">
-
-          <div class="action-buttons">
-            <router-link :to="{ name: 'event-favorites' }" class="favorites-btn">
-              <ion-icon class="heart-icon" :icon="heart"></ion-icon>
-              My Favorites
-            </router-link>
-            <button class="reset-btn" @click="clearFilters">
-              <ion-icon class="reset-icon" :icon="refreshOutline"></ion-icon>
-              Reset Filters
-            </button>
-          </div>
-          <div class="filters">
-            <div class="filter-dropdown">
+          <div class="sticky-wrapper">
+            <div class="action-buttons">
+              <router-link :to="{ name: 'event-favorites' }" class="favorites-btn">
+                <ion-icon class="heart-icon" :icon="heart"></ion-icon>
+                My Favorites
+              </router-link>
+              <button class="reset-btn" @click="clearFilters">
+                <ion-icon class="reset-icon" :icon="refreshOutline"></ion-icon>
+                Reset Filters
+              </button>
+            </div>
+            <div class="filters">
+              <div class="filter-dropdown">
                 <button class="filter-btn" @click="toggleDateDropdown">
                   {{ selectedDate || 'Date' }}
                   <span>▼</span>
@@ -47,8 +47,8 @@
                     {{ formatDate(date || '') }}
                   </div>
                 </div>
-            </div>
-            <div class="filter-dropdown">
+              </div>
+              <div class="filter-dropdown">
                 <button class="filter-btn" @click="toggleVenueDropdown">
                   {{ selectedVenue || 'Venue' }}
                   <span>▼</span>
@@ -59,11 +59,11 @@
                     {{ venue }}
                   </div>
                 </div>
-            </div>
-            <div class="filter-dropdown">
+              </div>
+              <div class="filter-dropdown">
                 <button class="filter-btn" @click="toggleGenreDropdown">
-                    {{ selectedGenre || 'Genre' }}
-                    <span>▼</span>
+                  {{ selectedGenre || 'Genre' }}
+                  <span>▼</span>
                 </button>
                 <div v-if="showGenreDropdown" class="dropdown-content">
                   <div @click="selectGenre('')">All Genres</div>
@@ -71,8 +71,9 @@
                     {{ genre }}
                   </div>
                 </div>
+              </div>
             </div>
-        </div>
+          </div>
 
 
         <!-- Events List -->
@@ -487,12 +488,22 @@ const venueInfo = computed(() => {
 // START OF THE FILTERS SECTION AND EVENT LIST
 .wrapper {
   background-color: #098944;
-  padding-top: 20px;
+  padding-top: 10px;
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
   margin-top: -40px; // This creates the overlap
   position: relative; // Ensures it stays above the content below
   z-index: 1; // Ensures the wrapper stays on top
+
+  .sticky-wrapper {
+    position: sticky;
+    top: 0px;
+    backdrop-filter: blur(70px);
+    background-color: rgb(9, 137, 68, 1.0);
+    margin: 5px;
+    border-radius: 10px;
+    z-index: 100;
+  }
 }
 
 // Clear Filters and Go to Favorites buttons
@@ -500,7 +511,7 @@ const venueInfo = computed(() => {
   display: flex;
   justify-content: center;
   gap: 0px;
-  padding: 0 20px 0px 20px;
+  padding: 10px 20px 0px 20px;
 
   .favorites-btn, .reset-btn {
     display: flex;
