@@ -1,35 +1,24 @@
 <template>
-    <ion-page>
-        <ion-header>
-            <ion-toolbar :translucent="true">
-                <ion-buttons slot="start">
-                    <ion-back-button default-href="/fair"></ion-back-button>
-                </ion-buttons>
-                <ion-title>Recent Updates</ion-title>
-            </ion-toolbar>
-        </ion-header>
-        <ion-content :fullscreen="true">
-            <div class="main">
-                <div class="main__header">
-                    <h1 class="main__header-text">Real-time <br/> Updates</h1>
-                </div>
-                <div class="main__content">
-                    <div v-if="isLoading">Loading updates...</div>
-                    <div v-else-if="loadError">{{ loadError }}</div>
-                    <div class="main__content-grid" v-else>
-                        <div v-for="update in updates" :key="update.id" class="main__content-item">
-                            <p class="date">{{ formatDate(update.created_at) }}</p>
-                            <p class="headline">{{ update.title }}</p>
-                            <p class="content">{{ update.message }}</p>
-                        </div>
+      <DefaultLayout title="Real-Time Updates">
+        <div class="main">
+            <div class="main__content">
+                <div class="loading-content" v-if="isLoading">Loading updates...</div>
+                <div v-else-if="loadError">{{ loadError }}</div>
+                <div class="main__content-grid" v-else>
+                    <div v-for="update in updates" :key="update.id" class="main__content-item">
+                        <p class="date">{{ formatDate(update.created_at) }}</p>
+                        <h4 class="headline">{{ update.title }}</h4>
+                        <p class="content">{{ update.message }}</p>
                     </div>
                 </div>
             </div>
-        </ion-content>
-    </ion-page>
+        </div>
+      </DefaultLayout>
+
 </template>
 
 <script setup lang="ts">
+import DefaultLayout from '@/layouts/default.vue';
 import axios from 'axios';
 import { ref } from 'vue';
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
@@ -101,6 +90,11 @@ fetchUpdates();
         }
     }
 
+    // Loading content screen
+    .loading-content {
+      height: 100vh;
+    }
+
     &__content {
         display: flex;
         flex-direction: column;
@@ -128,7 +122,6 @@ fetchUpdates();
                 line-height: 24px;
             }
             .headline {
-                font-size: 21px;
                 font-weight: 700;
                 color: #343434;
                 margin: 0px;
@@ -137,9 +130,9 @@ fetchUpdates();
             .content {
                 font-size: 16px;
                 font-weight: 400;
-                color: #343434;
+                color: #202020;
                 margin: 0px;
-                line-height: 26px;
+                line-height: 22px;
             }
         }
     }
