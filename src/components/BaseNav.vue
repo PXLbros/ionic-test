@@ -248,18 +248,23 @@ const toggleNotifications = async () => {
 
   .nav-menu {
     position: fixed;
-    top: 0;
-    right: -100%;
+    top: -100%;
+    left: 0;
+    // right: -100%;
     width: 100%;
-    height: 100vh; // Changed to viewport height
+    height: 95vh; // Changed to viewport height
     background: linear-gradient(180deg, #7323B4 0%, #540F8C 100%);
     transition: transform 0.3s ease;
     pointer-events: auto;
     overflow-y: auto;
     z-index: 10000; // Ensure menu is above overlay
+    border-bottom-left-radius: 15px; /* Added rounded corners */
+    border-bottom-right-radius: 15px; /* Added rounded corners */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Added shadow for better visual separation */
 
     &.is-open {
-      transform: translateX(-100%);
+      // transform: translateX(-100%);
+      transform: translateY(100%);
     }
   }
 
@@ -268,7 +273,8 @@ const toggleNotifications = async () => {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    padding-top: 40px;
+    // padding-top: 40px;
+    padding-top: 80px;
     background: #48027FE5;
   }
 
@@ -290,6 +296,7 @@ const toggleNotifications = async () => {
     flex-direction: column;
     padding: 20px;
     min-height: calc(100vh - 100px); // Changed to viewport height
+    // min-height: calc(90vh - 100px); /* Adjusted for 90vh height */
     justify-content: space-between;
   }
 
