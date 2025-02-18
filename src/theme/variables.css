@@ -24,6 +24,15 @@ h1 {
     font-family: 'lalezar', sans-serif;
 }
 
+p {
+    font-family: 'inter', sans-serif;
+}
+
+h4 {
+    font-family: 'lalezar', sans-serif;
+    font-size: 24px;
+}
+
 /* Main Homepage Button Font */
 @font-face {
   font-family: 'jockey';
