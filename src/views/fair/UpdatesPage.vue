@@ -75,6 +75,7 @@ fetchUpdates();
 <style lang="scss" scoped>
 
 .main {
+  background-color: #FDD252;
 
     padding: 30px;
 
@@ -103,7 +104,7 @@ fetchUpdates();
             flex-direction: column;
             gap: 5px;
             padding: 20px;
-            background-color: #EEF2F6;
+            background-color: #F4E8AB;
             border-radius: 10px;
 
             .date {
@@ -132,3 +133,4 @@ fetchUpdates();
 }
 
 </style>
+

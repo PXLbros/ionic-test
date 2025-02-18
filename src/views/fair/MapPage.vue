@@ -133,10 +133,10 @@ onMounted(() => {
           type: 'image',
           url: testImage.src,
           coordinates: [
-            [-76.22101527351555, 43.06458007331625],   // Top left
-            [-76.23286067186764, 43.073228022199714],  // Top right
-            [-76.22396000615883, 43.079945790627306],  // Bottom right
-            [-76.21212430193944, 43.07221072728862]    // Bottom left
+            [-76.21532502658798, 43.055330160826315],   // Top left
+            [-76.23753721914531, 43.07114978353832],  // Top right
+            [-76.22037084830293, 43.08502388194864],  // Bottom right
+            [-76.19757700157899, 43.06982854755563]    // Bottom left
           ]
         });
 
@@ -232,7 +232,7 @@ onMounted(() => {
       };
 
       // Make sure the image is valid
-      testImage.src = '/icons/Map_Design.png';
+      testImage.src = '/icons/Map_Design-big-min.png';
 
       // 4. Example corners (just debugging)
       const corners = [

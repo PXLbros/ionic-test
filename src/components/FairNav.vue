@@ -3,7 +3,7 @@
     <BaseNavMenu
       type="fair"
       toolbarBackground="#098944"
-      menuBackground="linear-gradient(180deg, #ffffff 0%, #ffffff 100%)"
+      menuBackground="linear-gradient(180deg, #098944 0%, #098944 100%)"
       :logoSrc="fairLogo"
       logoAlt="NYSF Logo"
     />
