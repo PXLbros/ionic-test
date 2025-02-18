@@ -26,7 +26,7 @@
         <div class="wrapper">
 
           <div class="action-buttons">
-            <router-link to="/fair/music/favorites" class="favorites-btn">
+            <router-link :to="{ name: 'event-favorites' }" class="favorites-btn">
               <ion-icon class="heart-icon" :icon="heart"></ion-icon>
               My Favorites
             </router-link>
@@ -436,11 +436,13 @@ const venueInfo = computed(() => {
       align-items: center;
       justify-content: center;
       width: 100%;
-      height: 26vh;
+      height: 22vh;
       border-radius: 10px;
       border: 5px solid #F4E8AB;
       background-color: #EFF2F6;
       overflow: hidden;
+      margin: 0 auto;
+      max-width: 302px;
 
       img {
         width: 100%;
@@ -562,6 +564,10 @@ const venueInfo = computed(() => {
         display: flex;
         justify-content: space-between;
         align-items: center;
+
+        span {
+          color: #F4E8AB;
+        }
     }
 
 
