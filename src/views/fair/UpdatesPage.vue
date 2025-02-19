@@ -70,7 +70,7 @@ fetchUpdates();
 <style lang="scss" scoped>
 
 .main {
-  background-color: #FDD252;
+  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
 
     padding: 30px;
 

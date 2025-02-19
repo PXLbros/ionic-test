@@ -52,7 +52,7 @@ const openGame = async (url: string) => {
 
 <style lang="scss" scoped>
 .activities-container {
-  background-color: #FDD252;
+  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
   height: 100%;
   padding: 20px;
   display: flex;

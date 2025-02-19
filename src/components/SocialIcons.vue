@@ -1,5 +1,7 @@
 <template>
-  <div class="social-icons">
+  <div class="social-media">
+    <h2 class="social-media__text">Follow Us</h2>
+    <div class="social-icons">
     <ion-button
       fill="clear"
       v-if="props.socialData.instagram"
@@ -33,6 +35,7 @@
       <ion-icon :icon="logoTiktok" size="large"></ion-icon>
     </ion-button>
   </div>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -81,20 +84,42 @@ const openSocialLink = async (url: string | null) => {
 </script>
 
 <style lang="scss" scoped>
-.social-icons {
+// Socials
+.social-media {
   display: flex;
+  flex-direction: column;
+  padding: 35px 0px 20px 0px;
   justify-content: center;
-  padding: 20px;
-  gap: 12px; // Add some spacing between icons
+  align-items: center;
+  background-color: #1F3667;
+  gap: 5px;
 
-  .social-icon {
-    --padding-start: 0;
-    --padding-end: 0;
-    height: auto;
+  &__text {
+    margin: 0;
+    color: #FDD252;
+    font-size: 22px;
+    font-family: 'inter', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
 
-    ion-icon {
-      font-size: 24px; // Adjust size as needed
-      color: #FFF1AF; // Adjust color as needed
+  .social-icons {
+    display: flex;
+    justify-content: center;
+    padding: 0px;
+    gap: 25px; // Add some spacing between icons
+
+    .social-icon {
+      --padding-start: 0;
+      --padding-end: 0;
+      height: auto;
+
+      ion-icon {
+        font-size: 24px; // Adjust size as needed
+        color: #FFF1AF; // Adjust color as needed
+        width: 10vw;
+        height: 7vh;
+      }
     }
   }
 }

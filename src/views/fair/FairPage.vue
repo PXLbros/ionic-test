@@ -163,14 +163,8 @@
               <!-- Keep in Touch Section -->
               <Contact />
 
-              <!-- Social Media Section -->
-              <div v-if="dataStore.data.nysfairWebsite.social" class="section social-media">
-                <div class="section-header">
-                  <h2 class="section-header__text">Follow Us</h2>
-                </div>
-
-                <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
-              </div>
+              <!-- Social Icons -->
+              <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
             </div>
         </ion-content>
     </ion-page>
@@ -434,40 +428,6 @@ import Contact from '@/components/Contact.vue';
         }
     }
 
-    // Social Media Section Styles
-    .social-media {
-        padding-bottom: 30px;
-        background-color: #1F3667;
 
-        .section-header {
-            background-color: #1F3667;
-
-            &__text {
-                color: #FDD252;
-            }
-        }
-    }
 </style>
 
-<style lang="scss">
-.main-content--fair-page {
-  .social-icons {
-    gap: 30px;
-  }
-
-  .social-icon {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #1E5EAE;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-  }
-}
-</style>

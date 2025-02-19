@@ -183,6 +183,8 @@ a {
 }
 .main {
     padding: 30px;
+    background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+
 
     &__title {
         font-size: 24px;
@@ -245,7 +247,6 @@ a {
     align-items: center;
     gap: 15px;
     padding: 15px 0px;
-    border-bottom: 1px solid #EFF2F6;
 
     &__content {
         flex: 1;
@@ -264,6 +265,7 @@ a {
         color: #343434;
         margin: 0;
         font-weight: 700;
+
     }
 
 
