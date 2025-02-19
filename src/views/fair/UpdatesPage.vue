@@ -1,5 +1,5 @@
 <template>
-      <DefaultLayout title="Real-Time Updates">
+      <DefaultLayout title="Real-Time Updates" :showMenuButton="true">
         <div class="main">
             <div class="main__content">
                 <div class="loading-content" v-if="isLoading">Loading updates...</div>
@@ -21,7 +21,6 @@
 import DefaultLayout from '@/layouts/default.vue';
 import axios from 'axios';
 import { ref } from 'vue';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 
 interface Update {
     id: number;

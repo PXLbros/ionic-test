@@ -1,5 +1,5 @@
 <template>
-    <DefaultLayout title="Interactive Map">
+    <DefaultLayout title="Interactive Map" :showMenuButton="true">
       <div class="main">
         <div class="main__header">
 
