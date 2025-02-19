@@ -84,12 +84,9 @@
               <span class="arrow">›</span>
             </a>
 
-            <!-- Social Links -->
-            <div class="social-links" v-if="dataStore.data.nysfairWebsite?.social">
-              <h3>FOLLOW US</h3>
-              <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
-            </div>
           </div>
+
+          <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
         </nav>
       </div>
     </div>
@@ -295,9 +292,17 @@ ion-back-button {
 .nav-links {
   display: flex;
   flex-direction: column;
-  padding: 20px;
+
   min-height: calc(100vh - 100px);
   justify-content: space-between;
+
+  .primary-links {
+    padding: 20px;
+  }
+
+  .secondary-links {
+    padding: 0px 20px 30px 20px;
+  }
 }
 
 .nav-link {
