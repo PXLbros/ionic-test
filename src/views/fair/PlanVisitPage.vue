@@ -13,41 +13,69 @@
               <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
           </div>
 
-          <div class="main__links">
+            <div class="main__links">
               <router-link to="/fair/directions" class="link-item">
                   <span>Directions</span>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 18L15 12L9 6" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="29" height="30" viewBox="0 0 29 30" fill="none">
+                    <g clip-path="url(#clip0_2339_258)">
+                      <path d="M14.97 28.51C22.4313 28.51 28.48 22.4614 28.48 15C28.48 7.53862 22.4313 1.48999 14.97 1.48999C7.50859 1.48999 1.45996 7.53862 1.45996 15C1.45996 22.4614 7.50859 28.51 14.97 28.51Z" fill="#FDD252"/>
+                      <path d="M13.2201 22.0199C12.9201 22.0199 12.6301 21.8999 12.4101 21.6899C11.9701 21.2499 11.9701 20.5199 12.4101 20.0799L17.0101 15.4799L12.4101 10.8799C11.9701 10.4399 11.9701 9.70993 12.4101 9.25993C12.6301 9.04993 12.9101 8.92993 13.2201 8.92993C13.5301 8.92993 13.8101 9.04993 14.0301 9.25993L19.4401 14.6699C19.6601 14.8899 19.7701 15.1699 19.7701 15.4799C19.7701 15.7899 19.6501 16.0699 19.4401 16.2899L14.0301 21.6999C13.8201 21.9199 13.5301 22.0299 13.2201 22.0299V22.0199Z" fill="#1F3667"/>
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_2339_258">
+                        <rect width="28.06" height="28.06" fill="white" transform="translate(0.939941 0.969971)"/>
+                      </clipPath>
+                    </defs>
                   </svg>
               </router-link>
 
               <router-link to="/fair/parking" class="link-item">
                   <span>Parking</span>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 18L15 12L9 6" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="29" height="30" viewBox="0 0 29 30" fill="none">
+                    <g clip-path="url(#clip0_2339_258)">
+                      <path d="M14.97 28.51C22.4313 28.51 28.48 22.4614 28.48 15C28.48 7.53862 22.4313 1.48999 14.97 1.48999C7.50859 1.48999 1.45996 7.53862 1.45996 15C1.45996 22.4614 7.50859 28.51 14.97 28.51Z" fill="#FDD252"/>
+                      <path d="M13.2201 22.0199C12.9201 22.0199 12.6301 21.8999 12.4101 21.6899C11.9701 21.2499 11.9701 20.5199 12.4101 20.0799L17.0101 15.4799L12.4101 10.8799C11.9701 10.4399 11.9701 9.70993 12.4101 9.25993C12.6301 9.04993 12.9101 8.92993 13.2201 8.92993C13.5301 8.92993 13.8101 9.04993 14.0301 9.25993L19.4401 14.6699C19.6601 14.8899 19.7701 15.1699 19.7701 15.4799C19.7701 15.7899 19.6501 16.0699 19.4401 16.2899L14.0301 21.6999C13.8201 21.9199 13.5301 22.0299 13.2201 22.0299V22.0199Z" fill="#1F3667"/>
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_2339_258">
+                        <rect width="28.06" height="28.06" fill="white" transform="translate(0.939941 0.969971)"/>
+                      </clipPath>
+                    </defs>
                   </svg>
               </router-link>
 
               <router-link to="/fair/faq" class="link-item">
                   <span>FAQ's</span>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 18L15 12L9 6" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="29" height="30" viewBox="0 0 29 30" fill="none">
+                    <g clip-path="url(#clip0_2339_258)">
+                      <path d="M14.97 28.51C22.4313 28.51 28.48 22.4614 28.48 15C28.48 7.53862 22.4313 1.48999 14.97 1.48999C7.50859 1.48999 1.45996 7.53862 1.45996 15C1.45996 22.4614 7.50859 28.51 14.97 28.51Z" fill="#FDD252"/>
+                      <path d="M13.2201 22.0199C12.9201 22.0199 12.6301 21.8999 12.4101 21.6899C11.9701 21.2499 11.9701 20.5199 12.4101 20.0799L17.0101 15.4799L12.4101 10.8799C11.9701 10.4399 11.9701 9.70993 12.4101 9.25993C12.6301 9.04993 12.9101 8.92993 13.2201 8.92993C13.5301 8.92993 13.8101 9.04993 14.0301 9.25993L19.4401 14.6699C19.6601 14.8899 19.7701 15.1699 19.7701 15.4799C19.7701 15.7899 19.6501 16.0699 19.4401 16.2899L14.0301 21.6999C13.8201 21.9199 13.5301 22.0299 13.2201 22.0299V22.0199Z" fill="#1F3667"/>
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_2339_258">
+                        <rect width="28.06" height="28.06" fill="white" transform="translate(0.939941 0.969971)"/>
+                      </clipPath>
+                    </defs>
                   </svg>
               </router-link>
+            </div>
           </div>
-      </div>
+          <div class="contact-form">
+            <Contact />
+          </div>
     </DefaultLayout>
 </template>
 
 <script setup lang="ts">
 import DefaultLayout from '@/layouts/default.vue';
+import Contact from '@/components/Contact.vue';
 
 
 </script>
 
 <style lang="scss" scoped>
 .main {
-    height: calc(100vh - 56px); // Subtract header height
+    height: calc(100vh - 35px); // Subtract header height
     display: flex;
     flex-direction: column;
     background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
@@ -117,10 +145,12 @@ import DefaultLayout from '@/layouts/default.vue';
             line-height: 22px;
             font-family: 'Inter', sans-serif;
         }
-        svg {
-          fill: #F1F1F1;
-        }
+
     }
+}
+
+.contact-form {
+  background-color: #EE4623;
 }
 
 :deep(ion-content) {
