@@ -9,7 +9,7 @@
           </div>
 
           <div class="main__content">
-              <h1>Plan Your Visit</h1>
+              <h2>Plan Your Visit</h2>
               <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
           </div>
 
@@ -50,47 +50,47 @@ import DefaultLayout from '@/layouts/default.vue';
     height: calc(100vh - 56px); // Subtract header height
     display: flex;
     flex-direction: column;
+    background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+
 
     &__image {
-        margin: 30px;
+        margin: 30px 20px;
         background-color: #EFF2F6;
         border-radius: 24px;
-        height: 35vh;
+        height: 27vh;
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 0px;
+        border: 5px solid #F4E8AB;
     }
 
     &__content {
-        padding: 30px;
+        padding: 30px 20px;
 
-        flex-grow: 1;
-
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
+        h2 {
+            font-weight: 400;
             color: #343434;
             margin: 0 0 5px 0;
-            line-height: 28px;
+            line-height: 36px;
             letter-spacing: 0.5px;
         }
 
         p {
-            font-size: 16px;
+            font-size: 14px;
             color: #343434;
             margin: 0;
-            line-height: 28px;
+            line-height: 24px;
             letter-spacing: 0.5px;
         }
     }
 
     &__links {
-        display: flex;
-        flex-direction: column;
-        background-color: #EFF2F6;
-        overflow: hidden;
-        margin-bottom: 5px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      margin: 0px 20px;
+      gap: 5px;
     }
 
     .link-item {
@@ -99,18 +99,26 @@ import DefaultLayout from '@/layouts/default.vue';
         justify-content: space-between;
         align-items: center;
         padding: 13px 30px;
-        background-color: white;
+        background-color: #1F3667;
         text-decoration: none;
-        color: #333333;
+        color: #F1F1F1;
         font-size: 18px;
         font-weight: 700;
+        border-radius: 10px;
+        height: 9vh;
 
         &:active {
-            background-color: #f5f5f5;
+            background-color: #1F3667;
         }
 
         span {
             font-weight: 700;
+            font-size: 16px;
+            line-height: 22px;
+            font-family: 'Inter', sans-serif;
+        }
+        svg {
+          fill: #F1F1F1;
         }
     }
 }

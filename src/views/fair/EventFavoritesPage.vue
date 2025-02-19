@@ -60,6 +60,8 @@ const favoriteEventItems = computed(() => {
 <style lang="scss" scoped>
 .main {
   font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+  min-height: calc(100vh - 7.5vh);
 
   &--event-favorites-page {
     padding: 25px;

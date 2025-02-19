@@ -8,7 +8,7 @@
           </svg>
         </div>
         <div class="main__header-content">
-          <h1 class="title">Daily Schedule</h1>
+          <h2 class="title">Daily Schedule</h2>
           <p class="subtitle">Class ridiculus rhoncus ad suspendisse ridiculus malesuada; litora morbi</p>
         </div>
       </div>
@@ -39,21 +39,23 @@
         </div>
       </div>
 
-      <div class="favorites-link">
-        <router-link :to="{ name: 'event-favorites' }">View All Favorites</router-link>
-      </div>
+       <div class="wrapper">
+        <div class="favorites-link">
+          <router-link :to="{ name: 'event-favorites' }">View All Favorites</router-link>
+        </div>
 
-      <div class="loader-container" v-if="isLoading || isDateChanging">
-        <div class="spinner"></div>
-        <p>Loading Schedule...</p>
-      </div>
+        <div class="loader-container" v-if="isLoading || isDateChanging">
+          <div class="spinner"></div>
+          <p>Loading Schedule...</p>
+        </div>
 
-      <div v-else class="schedule-content">
-        <EventsList
-          :events="filteredEvents"
-          :categories="categories"
-          noEventsText="No events scheduled for this day"
-        />
+        <div v-else class="schedule-content">
+          <EventsList
+            :events="filteredEvents"
+            :categories="categories"
+            noEventsText="No events scheduled for this day"
+            />
+        </div>
       </div>
     </div>
   </DefaultLayout>
@@ -219,9 +221,10 @@ const selectDate = (index: number): void => {
 <style lang="scss" scoped>
 .main {
   font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
 
   &__header {
-    padding: 25px;
+    padding: 25px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -235,7 +238,9 @@ const selectDate = (index: number): void => {
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 24px;
+      border-radius: 10px;
+      background: #EFF2F6;
+      border: 5px solid #F4E8AB;
     }
 
     &-content {
@@ -243,7 +248,6 @@ const selectDate = (index: number): void => {
       flex-direction: column;
 
       .title {
-        font-size: 24px;
         font-weight: 700;
         line-height: 28px;
         letter-spacing: 0.5px;
@@ -251,10 +255,11 @@ const selectDate = (index: number): void => {
       }
 
       .subtitle {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 500;
-        line-height: 28px;
+        line-height: 24px;
         letter-spacing: 0.5px;
+        font-family: 'Inter', sans-serif;
         color: #343434;
         margin: 0px;
         width: 90%;
@@ -267,94 +272,113 @@ const selectDate = (index: number): void => {
   }
 }
 .date-selector {
-    padding: 0 25px;
-    margin-bottom: 5px;
+    padding: 0 20px;
+    margin-bottom: 6px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 
     &__container {
         display: flex;
-        gap: 10px;
-        padding: 0px 0px 10px 0px;
+        gap: 6px;
+        padding: 0px 0px 0px 0px;
         min-width: min-content;
     }
 }
 
 .date-card {
-    background-color: #F5F7FA;
-    padding: 15px 20px;
-    border-radius: 12px;
+    background-color: #1F3667;
+    width: 32vw;
+    height: 9vh;
+    padding: 12px 25px;
+    border-radius: 15px;
     text-align: center;
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
     flex: 1;
     min-width: 120px;
-    color: #1E5EAE;
+    color: #F1F1F1;
     white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     &--active {
-        background-color: #1E5EAE;
-        color: white;
+        background-color: #EE4623;
+        color: #F1F1F1;
     }
 
     &__day {
-        font-size: 14px;
-        margin-bottom: 5px;
+        font-size: 12px;
+        margin-bottom: 1px;
         font-weight: 500;
     }
 
     &__date {
-        font-weight: 600;
-        font-size: 24px;
-        font-weight: 700;
+        font-weight: 400;
+        font-size: 28px;
+        font-family: 'lalezar', sans-serif;
     }
 }
 
 
 .filter-section {
-    padding: 0px 25px 10px 25px;
+    padding: 0px 20px 10px 20px;
     display: flex;
     justify-content: flex-end;
     width: 100%;
+    margin-bottom: 50px;
 
     .category-filter {
         width: 100%;
 
         .category-select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            padding: 13px 10px;
+            border-radius: 15px;
             font-size: 16px;
             cursor: pointer;
-            background-color: white;
-            color: #333;
+            background-color: #1F3667;
+            color: #F1F1F1;
             transition: border-color 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
         }
     }
 }
 
+.wrapper {
+  background-color: #098944;
+  padding-top: 20px;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  margin-top: -40px; // This creates the overlap
+  position: relative; // Ensures it stays above the content below
+  z-index: 1; // Ensures the wrapper stays on top
+}
+
 .favorites-link {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   padding: 0 25px;
-  margin-top: 5px;
+  margin-bottom: 5px;
+
   a {
-    color: #1E5EAE;
+    color: #F4E8AB;
     font-size: 16px;
     font-weight: 700;
     text-decoration: none;
     transition: color 0.3s ease;
 
     &:hover {
-      color: #0D3C6E;
+      color: #F4E8AB;
     }
   }
 }
 
 .schedule-content {
-    padding: 0 25px;
+    padding: 5px 25px 0px 25px;
 
     .category-section {
         margin-bottom: 20px;

@@ -45,24 +45,28 @@ const props = withDefaults(defineProps<{
 .events-list {
   &__event-item {
     padding: 15px 0;
-    border-bottom: 1px solid #EFF2F6;
     display: flex;
     justify-content: space-between;
     gap: 20px;
 
+    .content {
+      max-width: 75%;
+    }
+
     h3 {
-      font-size: 16px;
       margin: 0 0 5px 0;
+      line-height: 28px;
+      color: #FFF
     }
 
     p {
       font-size: 14px;
-      color: #666;
+      color: #FFF;
       margin: 0;
       font-weight: 500;
 
       &:last-child {
-        margin-top: 2px;
+        margin-top: 3px;
       }
     }
   }
