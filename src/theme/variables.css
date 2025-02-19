@@ -22,16 +22,34 @@ ion-content {
 
 h1 {
     font-family: 'lalezar', sans-serif;
+    font-size: 36px;
 }
 
-p {
-    font-family: 'inter', sans-serif;
+h2 {
+    font-family: 'lalezar', sans-serif;
+    font-size: 32px;
+}
+
+h3 {
+    font-family: 'lalezar', sans-serif;
+    font-size: 28px;
 }
 
 h4 {
     font-family: 'lalezar', sans-serif;
     font-size: 24px;
 }
+
+h5 {
+    font-family: 'lalezar', sans-serif;
+    font-size: 22px;
+}
+
+
+p {
+    font-family: 'inter', sans-serif;
+}
+
 
 /* Main Homepage Button Font */
 @font-face {
