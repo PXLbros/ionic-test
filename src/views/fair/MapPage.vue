@@ -1,64 +1,52 @@
 <template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button default-href="/fair"></ion-back-button>
-        </ion-buttons>
-        <ion-title>NY State Fair Map</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content>
+    <DefaultLayout title="Interactive Map">
       <div class="main">
         <div class="main__header">
-          <div class="main__header-top">
-            <h1 class="main__header-text">Interactive <br/>Map</h1>
-            <h1 class="main__header-sponsor">Sponsorship</h1>
+
+          <div class="wrapper">
+            <div class="search-container">
+              <input type="text" placeholder="Enter first name here" class="search-input">
+              <ion-icon :icon="searchOutline" class="search-icon"></ion-icon>
+            </div>
+            <div class="group">
+              <button class="filter-button">
+                <ion-icon size="small" :icon="optionsOutline"></ion-icon>
+                Filters
+              </button>
+              <button class="filter-button">
+                <ion-icon size="small" :icon="refreshOutline"></ion-icon>
+                Reset
+              </button>
+            </div>
           </div>
 
           <div class="filter-tabs">
-            <button class="filter-tab">
-              <ion-icon :icon="optionsOutline"></ion-icon>
-              Filters
-            </button>
             <button class="filter-tab">Categories</button>
             <button class="filter-tab">
               Exhibitors
               <ion-icon :icon="chevronDownOutline"></ion-icon>
             </button>
           </div>
-
-          <div class="search-container">
-            <input type="text" placeholder="Enter first name here" class="search-input">
-            <ion-icon :icon="searchOutline" class="search-icon"></ion-icon>
-          </div>
         </div>
 
-        <ion-content class="ion-padding">
+        <ion-content class="map-container">
           <div class="map" ref="mapContainer"></div>
         </ion-content>
       </div>
-    </ion-content>
-  </ion-page>
+    </DefaultLayout>
 </template>
 
 <script setup lang="ts">
+import DefaultLayout from '@/layouts/default.vue';
 import { ref, onMounted } from 'vue';
 import {
-  IonBackButton,
-  IonButtons,
   IonIcon,
   IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar
 } from '@ionic/vue';
-import { searchOutline, chevronDownOutline, optionsOutline } from 'ionicons/icons';
+import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline } from 'ionicons/icons';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import type { Feature, FeatureCollection, Point, GeoJSON } from 'geojson';
+import type { Feature, Point, GeoJSON } from 'geojson';
 
 // Access Token for Mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
@@ -237,22 +225,22 @@ onMounted(() => {
       // 4. Example corners (just debugging)
       const corners = [
         {
-          coords: [-76.22070391964486, 43.06337289828724],
+          coords: [-76.21532502658798, 43.055330160826315],
           color: '#FF0000',
           label: 'TL'
         },
         {
-          coords: [-76.23286067186764, 43.073228022199714],
+          coords: [-76.23753721914531, 43.07114978353832],
           color: '#00FF00',
           label: 'TR'
         },
         {
-          coords: [-76.22434604633837, 43.07969309593861],
+          coords: [-76.22037084830293, 43.08502388194864],
           color: '#0000FF',
           label: 'BR'
         },
         {
-          coords: [-76.21212430193944, 43.07221072728862],
+          coords: [-76.19757700157899, 43.06982854755563],
           color: '#FFFF00',
           label: 'BL'
         }
@@ -293,73 +281,87 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .main {
-  height: calc(100vh - 70px);
+  height: 100%;
   display: flex;
   flex-direction: column;
+  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
 }
-.main__header {
-  &-top {
-    padding: 20px 30px;
+
+.wrapper {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: space-between;
+  padding: 20px 20px 0 20px;
+
+  .group {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    .filter-button {
+      background-color: transparent;
+      color: #202020;
+      font-family: 'inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+
+      svg {
+        font-size: 34px;
+      }
+    }
   }
 
-  &-text {
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0;
+  .search-container {
+    position: relative;
+
+    .search-input {
+      width: 100%;
+      padding: 15px 20px;
+      border-radius: 15px;
+      border: 1px solid #eee;
+      background-color: #F4E8AB;
+      font-size: 16px;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+    }
   }
 
-  &-sponsor {
-    background-color: #f1f1f1;
-    padding: 10px 20px;
-    line-height: 40px;
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0;
-    border-radius: 5px;
-  }
-}
 
-.search-container {
-  margin: 0 30px;
-  position: relative;
 
-  .search-input {
-    width: 100%;
-    padding: 15px 20px;
-    border-radius: 25px;
-    border: 1px solid #eee;
-    background-color: transparent;
-    font-size: 16px;
-  }
-
-  .search-icon {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666;
-  }
 }
 
 .filter-tabs {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 10px 30px;
+  padding: 14px 20px;
+  gap: 6px;
 
   .filter-tab {
     padding: 10px 20px;
     border: none;
-    background: transparent;
-    color: #333;
+    background: #1F3667;
+    color: #F1F1F1;
     font-weight: 700;
-    border-radius: 20px;
+    border-radius: 15px;
+    height: 50px;
     font-size: 14px;
     display: flex;
     align-items: center;
     gap: 5px;
+    font-family: 'inter', sans-serif;
+    flex-grow: 1;
   }
 }
 
@@ -370,13 +372,11 @@ onMounted(() => {
 .map {
   width: 100%;
   height: 100%;
-  border-radius: 10px;
 }
 
 .mapboxgl-canvas {
   width: 100%;
   height: 100%;
-  border-radius: 30px;
 }
 
 /* Customize popups, etc. */
