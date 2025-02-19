@@ -63,12 +63,19 @@
           <div class="contact-form">
             <Contact />
           </div>
+
+          <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
     </DefaultLayout>
 </template>
 
 <script setup lang="ts">
 import DefaultLayout from '@/layouts/default.vue';
 import Contact from '@/components/Contact.vue';
+import { useDataStore } from '@/stores/data';
+
+
+const dataStore = useDataStore();
+console.log('fair page data store', dataStore.data);
 
 
 </script>

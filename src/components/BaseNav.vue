@@ -88,13 +88,10 @@
               <span class="arrow">›</span>
             </a>
 
-            <!-- Social Links -->
-            <div class="social-links">
-              <h3>FOLLOW US</h3>
-
-              <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
-            </div>
           </div>
+
+          <!-- Social Links -->
+          <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
         </nav>
       </div>
     </div>
@@ -294,10 +291,14 @@ const toggleNotifications = async () => {
   .nav-links {
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    //padding: 20px;
     min-height: calc(100vh - 100px); // Changed to viewport height
     // min-height: calc(90vh - 100px); /* Adjusted for 90vh height */
     justify-content: space-between;
+
+    .primary-links {
+      padding: 20px;
+    }
   }
 
   .nav-link {
@@ -337,6 +338,9 @@ const toggleNotifications = async () => {
   }
 
   .secondary-links {
+    padding: 0px 20px 30px 20px;
+
+
     .notifications {
       display: flex;
       justify-content: space-between;
@@ -358,34 +362,4 @@ const toggleNotifications = async () => {
   }
   </style>
 
-<style lang="scss">
-.base-nav {
-  .social-links {
-    margin-top: 40px;
-    text-align: center;
 
-    h3 {
-      color: #343434;
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 20px;
-    }
-
-    .social-icons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-
-      .social-icon {
-        background: transparent;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #343434;
-        text-decoration: none;
-      }
-    }
-  }
-}
-</style>
