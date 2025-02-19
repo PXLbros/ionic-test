@@ -1,5 +1,8 @@
 <template>
-    <DefaultLayout title="Concert">
+  <DefaultLayout
+    title="Concert"
+    :showMenuButton="true"
+  >
       <div class="main">
         <div class="main__header">
           <div class="main__header-content">

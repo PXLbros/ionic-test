@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="Schedule">
+  <DefaultLayout title="Schedule" :showMenuButton="true">
     <div class="main">
       <div class="main__header">
         <div class="main__header-img">
