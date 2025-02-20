@@ -1,71 +1,53 @@
 <template>
-    <ion-page>
-        <ion-header>
-            <ion-toolbar :translucent="true">
-                <ion-buttons slot="start">
-                    <ion-back-button default-href="/fair/plan-your-visit"></ion-back-button>
-                </ion-buttons>
-                <ion-title>Parking</ion-title>
-            </ion-toolbar>
-        </ion-header>
-        <ion-content :fullscreen="true">
-            <!-- Notification Banner -->
-            <div class="notification">
-                Parking Section Brown at Full Capacity...
-            </div>
+  <DefaultLayout title="Parking">
+    <!-- Notification Banner -->
+    <div class="notification">
+        Parking Section Brown at Full Capacity...
+    </div>
 
-            <div class="main">
-                <div class="main__image">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
-                        <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
+    <div class="main">
+        <div class="main__image">
+            <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
+                <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
+            </svg>
+        </div>
+
+        <div class="main__content">
+            <h1 class="main__content-title">{{ parkingPageData?.title }}</h1>
+            <p class="main__content-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+        </div>
+
+        <div class="expandable-sections">
+            <div
+                v-for="(section, index) in parsedParkingSections"
+                :key="index"
+                class="expandable-section"
+                @click="toggleSection(index)"
+            >
+                <div class="expandable-section__header">
+                    <p>{{ section.title }}</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path fill-rule="evenodd" clip-rule="evenodd" d="M8.41698 1.4988C8.41698 0.671037 7.74594 0 6.91817 0C6.09041 0 5.41937 0.671036 5.41937 1.4988V5.5809L5.34121 5.58087C5.34013 5.58087 5.33909 5.5813 5.33832 5.58207C5.33755 5.58284 5.33651 5.58327 5.33543 5.58327H1.4988C0.671037 5.58327 0 6.2543 0 7.08207C0 7.90984 0.671037 8.58087 1.4988 8.58087H5.41937V12.5012C5.41937 13.329 6.09041 14 6.91817 14C7.74594 14 8.41698 13.329 8.41698 12.5012L8.41829 8.58087H12.5012C13.329 8.58087 14 7.90984 14 7.08207C14 6.2543 13.329 5.58327 12.5012 5.58327L8.41929 5.5819L8.41937 5.34121C8.41937 5.34013 8.41894 5.33909 8.41817 5.33832C8.41741 5.33755 8.41698 5.33651 8.41698 5.33543V1.4988Z" fill="#FDD252"/>
                     </svg>
                 </div>
-
-                <div class="main__content">
-                    <h1 class="main__content-title">{{ parkingPageData?.title }}</h1>
-                    <p class="main__content-text">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                    </p>
-                </div>
-
-                <div class="expandable-sections">
-                    <div
-                        v-for="(section, index) in parsedParkingSections"
-                        :key="index"
-                        class="expandable-section"
-                        @click="toggleSection(index)"
-                    >
-                        <div class="expandable-section__header">
-                            <h2>{{ section.title }}</h2>
-                            <svg
-                                class="expandable-section__icon"
-                                :class="{ 'expanded': section.isExpanded }"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path d="M6 9L12 15L18 9" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div
-                            class="expandable-section__content"
-                            :class="{ 'expandable-section__content--expanded': section.isExpanded }"
-                            v-html="section.content"
-                        >
-                        </div>
-                    </div>
+                <div
+                    class="expandable-section__content"
+                    :class="{ 'expandable-section__content--expanded': section.isExpanded }"
+                    v-html="section.content"
+                >
                 </div>
             </div>
-        </ion-content>
-    </ion-page>
+        </div>
+    </div>
+  </DefaultLayout>
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { ref, watch } from 'vue';
 import { useDataStore } from '@/stores/data';
+import DefaultLayout from '@/layouts/default.vue';
 
 interface ParkingSection {
     title: string;
@@ -131,7 +113,7 @@ const toggleSection = (index: number) => {
 
 <style lang="scss" scoped>
 .notification {
-    background-color: #EFF2F6;
+    background-color: #b9f9cc;
     padding: 16px 20px;
     font-size: 16px;
     color: #333333;
@@ -154,10 +136,11 @@ const toggleSection = (index: number) => {
         display: flex;
         align-items: center;
         justify-content: center;
+        border: 5px solid #F4E8AB;
     }
 
     &__content {
-        padding: 30px;
+        padding: 20px;
 
         &-title {
             font-size: 24px;
@@ -185,11 +168,11 @@ const toggleSection = (index: number) => {
 }
 
 .expandable-section {
-    border-top: 1px solid #D9E3ED;
-    background: #EEF2F6;
+    // border-top: 1px solid #D9E3ED;
+    background: #1F3667;
 
     &:last-child {
-        border-bottom: 1px solid #D9E3ED;
+        // border-bottom: 1px solid #D9E3ED;
     }
 
     &__header {
@@ -199,10 +182,10 @@ const toggleSection = (index: number) => {
         padding: 20px 30px;
         cursor: pointer;
 
-        h2 {
-            font-size: 18px;
+        p {
+            font-size: 16px;
             font-weight: 700;
-            color: #333333;
+            color: #F1F1F1;
             margin: 0;
             padding-right: 16px;
         }
@@ -219,7 +202,7 @@ const toggleSection = (index: number) => {
 
     &__content {
         padding: 0 30px;
-        color: #666666;
+        color: #FFF;
         line-height: 1.5;
         max-height: 0;
         overflow: hidden;

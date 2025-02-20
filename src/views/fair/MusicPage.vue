@@ -506,6 +506,7 @@ const venueInfo = computed(() => {
     margin: 5px;
     border-radius: 10px;
     z-index: 100;
+    box-shadow: 1px 22px 15px 1px rgb(9, 137, 68)
   }
 }
 
