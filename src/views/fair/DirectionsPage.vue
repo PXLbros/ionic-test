@@ -47,7 +47,7 @@ console.log('directions page data', pageData);
 
 <style lang="scss" scoped>
 .main {
-  padding: 30px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
@@ -60,16 +60,20 @@ console.log('directions page data', pageData);
       align-items: center;
       justify-content: center;
       margin-bottom: 30px;
+      border: 5px solid #F4E8AB;
   }
 
   &__content {
 
       &-text {
-          font-size: 16px;
-          line-height: 28px;
+          font-size: 14px;
+          line-height: 24px;
           letter-spacing: 0.5px;
           color: #343434;
           margin: 0 0 16px 0;
+          font-family: 'inter', sans-serif;
+          font-weight: 400;
+
 
           &:last-child {
               margin-bottom: 0;
@@ -78,11 +82,11 @@ console.log('directions page data', pageData);
           :deep {
             // Fix the h1 tag
             h1 {
-                font-size: 24px;
+                font-size: 32px;
                 font-weight: 600;
                 color: #343434;
                 margin: 0 0 5px 0;
-                line-height: 28px;
+                line-height: 36px;
                 letter-spacing: 0.5px;
 
                 &:not(:first-child) {
@@ -101,7 +105,7 @@ console.log('directions page data', pageData);
             hr {
               margin-bottom: 32px;
               border: none;
-              border-top: 1px solid #EFF2F6;
+              border-top: 1px solid #eff2f600;
             }
 
             strong {
@@ -119,8 +123,15 @@ console.log('directions page data', pageData);
                padding: 24px;
                border-radius: 16px;
                list-style: none;
-               background-color: #F5F7FA;
+               background-color: #1F3667;
+               color: #FFF;
                // color: #42639F;
+
+               a {
+                  color: #FFF;
+                  text-decoration: underline;
+                  font-weight: 400;
+               }
             }
 
 
