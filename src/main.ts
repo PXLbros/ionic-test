@@ -111,12 +111,12 @@ router.isReady().then(async () => {
     router.afterEach((to) => {
       console.log('Route changed to: ', to);
 
-      // FirebaseAnalytics.logEvent({
-      //   name: 'screen_view',
-      //   params: {
-      //     screen_name: to.name || to.path, // Use route name or path
-      //   }
-      // });
+      FirebaseAnalytics.logEvent({
+        name: 'screen_view',
+        params: {
+          screen_name: to.name || to.path,
+        }
+      });
     });
   });
 
