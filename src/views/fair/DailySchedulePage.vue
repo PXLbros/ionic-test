@@ -363,6 +363,8 @@ const selectDate = (index: number): void => {
   justify-content: center;
   padding: 0 25px;
   margin-bottom: 5px;
+  position: sticky;
+  top: 10px;
 
   a {
     color: #F4E8AB;
@@ -370,6 +372,12 @@ const selectDate = (index: number): void => {
     font-weight: 700;
     text-decoration: none;
     transition: color 0.3s ease;
+    padding: 5px 10px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+    background-color: #09894588;
+    // box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
 
     &:hover {
       color: #F4E8AB;
