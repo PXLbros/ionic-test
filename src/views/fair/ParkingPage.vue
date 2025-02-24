@@ -13,7 +13,7 @@
         </div>
 
         <div class="main__content">
-            <h1 class="main__content-title">{{ parkingPageData?.title }}</h1>
+            <h2 class="main__content-title">{{ parkingPageData?.title }}</h2>
             <p class="main__content-text">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
@@ -128,10 +128,10 @@ const toggleSection = (index: number) => {
     background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
 
     &__image {
-        margin: 30px;
+        margin: 20px;
         margin-bottom: 0px;
         background-color: #EFF2F6;
-        border-radius: 24px;
+        border-radius: 10px;
         height: 25vh;
         display: flex;
         align-items: center;
@@ -140,20 +140,19 @@ const toggleSection = (index: number) => {
     }
 
     &__content {
-        padding: 20px;
+        padding: 0px 20px 20px 20px;
 
         &-title {
-            font-size: 24px;
             font-weight: 600;
             color: #343434;
             margin: 0 0 5px 0;
-            line-height: 28px;
+            line-height: 36px;
             letter-spacing: 0.5px;
         }
 
         &-text {
-            font-size: 16px;
-            line-height: 28px;
+            font-size: 14px;
+            line-height: 24px;
             letter-spacing: 0.5px;
             color: #343434;
             font-weight: 400;
