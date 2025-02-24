@@ -54,7 +54,7 @@ console.log('directions page data', pageData);
 
   &__image {
       background-color: #EFF2F6;
-      border-radius: 24px;
+      border-radius: 10px;
       height: 25vh;
       display: flex;
       align-items: center;

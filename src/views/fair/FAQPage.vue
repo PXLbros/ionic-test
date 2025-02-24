@@ -14,7 +14,7 @@
         </div>
 
         <div class="main__content">
-          <h1 class="main__content-title">{{ faqPageData.title }}</h1>
+          <h2 class="main__content-title">{{ faqPageData.title }}</h2>
           <p class="main__content-text">
             Find answers to frequently asked questions about the New York State Fair.
           </p>
@@ -160,10 +160,10 @@ const toggleSection = (index: number) => {
 
 
   &__image {
-    margin: 30px;
+    margin: 20px;
     margin-bottom: 0px;
     background-color: #EFF2F6;
-    border-radius: 24px;
+    border-radius: 10px;
     height: 25vh;
     display: flex;
     align-items: center;
@@ -175,14 +175,18 @@ const toggleSection = (index: number) => {
     padding: 0 20px;
 
     &-title {
-      font-size: 24px;
+      line-height: 36px;
       font-weight: 700;
       color: #333333;
       margin-bottom: 12px;
+      margin-top: 0;
     }
 
     &-text {
-      color: #666666;
+      color: #343434;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 24px;
       line-height: 1.5;
     }
   }
