@@ -124,22 +124,26 @@ fetchArticle();
 
 <style lang="scss" scoped>
 .main {
-  padding: 30px;
+  padding: 20px;
+  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+
 
   &__image {
       background-color: #EFF2F6;
-      border-radius: 24px;
+      border-radius: 10px;
       height: 25vh;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 30px;
+      border: 5px solid #F4E8AB;
+
 
       img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          border-radius: 24px;
+          border-radius: 10px;
       }
   }
 
@@ -173,13 +177,31 @@ fetchArticle();
       font-weight: 400;
       color: #343434;
 
+      :deep(h4) {
+        font-size: 14px;
+        font-weight: 400;
+        font-family: 'inter', sans-serif;
+        color: #343434;
+        margin: 0;
+        line-height: 24px;
+      }
+
+      // last chile of h4 margin bottom
+      :deep(h4:last-child) {
+          margin-bottom: 20px;
+      }
+
       :deep(p) {
           margin: 0 0 16px 0;
+          font-size: 14px;
+          line-height: 24px;
       }
 
       :deep(strong) {
           font-weight: 600;
       }
+
+
   }
 }
 
