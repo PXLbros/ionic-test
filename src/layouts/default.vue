@@ -12,7 +12,7 @@
         </div>
 
         <!-- Menu button on the right side if showMenuButton is true -->
-        <ion-buttons slot="end" v-if="showMenuButton">
+        <ion-buttons class="menu-button" slot="end" v-if="showMenuButton">
           <ion-button @click="openMenu">
             <img src="/src/imgs/svg/menu.svg" alt="menu-open" class="menu-icon" />
           </ion-button>
@@ -361,6 +361,11 @@ ion-back-button {
     }
   }
 }
+
+.menu-button {
+  margin-right: 10px;
+}
+
 
 .social-links {
   margin-top: 40px;

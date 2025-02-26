@@ -40,7 +40,7 @@
             </div>
             <div class="filters">
               <div class="filter-dropdown">
-                <button class="filter-btn" @click="toggleDateDropdown">
+                <button class="filter-btn" :class="{ 'filter-btn--active': showDateDropdown === true }" @click="toggleDateDropdown">
                   {{ selectedDate || 'Date' }}
                   <span>▼</span>
                 </button>
@@ -52,7 +52,7 @@
                 </div>
               </div>
               <div class="filter-dropdown">
-                <button class="filter-btn" @click="toggleVenueDropdown">
+                <button class="filter-btn" :class="{ 'filter-btn--active': showVenueDropdown === true }" @click="toggleVenueDropdown">
                   {{ selectedVenue || 'Venue' }}
                   <span>▼</span>
                 </button>
@@ -64,13 +64,13 @@
                 </div>
               </div>
               <div class="filter-dropdown">
-                <button class="filter-btn" @click="toggleGenreDropdown">
+                <button class="filter-btn" :class="{ 'filter-btn--active': showGenreDropdown === true }" @click="toggleGenreDropdown">
                   {{ selectedGenre || 'Genre' }}
                   <span>▼</span>
                 </button>
                 <div v-if="showGenreDropdown" class="dropdown-content">
                   <div @click="selectGenre('')">All Genres</div>
-                  <div v-for="genre in uniqueGenres" :key="genre" @click="selectGenre(genre)">
+                  <div :class="{ 'active': selectedGenre !== '' }" v-for="genre in uniqueGenres" :key="genre" @click="selectGenre(genre)">
                     {{ genre }}
                   </div>
                 </div>
@@ -114,6 +114,7 @@
 </template>
 
 <script setup lang="ts">
+
 interface Event {
   id: number;
   title: string;
@@ -135,7 +136,7 @@ interface Event {
   } | undefined;
   featured_image?: string;
   duration?: number;
-  genres: string[];
+  genres: number[];
 }
 
 interface Venue {
@@ -144,6 +145,13 @@ interface Venue {
   description?: string;
   latitude?: string;
   longitude?: string;
+}
+
+interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+  num_events: number;
 }
 
 // Enum for accepted venue slugs - easy to add more venues
@@ -159,6 +167,7 @@ interface DataStore {
     nysfairWebsite: {
       events: Event[];
       venues: Venue[];
+      event_genres: Genre[];
     };
   };
 }
@@ -221,18 +230,28 @@ const uniqueVenues = computed(() => {
   ).filter(venue => venue !== undefined))];
 });
 
-const uniqueGenres = computed(() => {
-    const genres = musicEvents.value.reduce((acc: string[], event: Event) => {
-        if (event.genres) {
-            event.genres.forEach(genre => {
-              if (!acc.includes(genre)) {
-                acc.push(genre)
-            }
-           })
+const genreMap = computed<Record<number, string>>(() => {
+  const genreData = data.value?.nysfairWebsite?.event_genres ?? [];
+  const map: Record<number, string> = {};
+  genreData.forEach((genre: Genre) => {
+    map[genre.id] = genre.name;
+  });
+  return map;
+});
+
+const uniqueGenres = computed<string[]>(() => {
+  const genres = musicEvents.value.reduce((acc: string[], event) => {
+    if (event.genres && Array.isArray(event.genres)) {
+      event.genres.forEach(genreId => {
+        const genreName = genreMap.value[genreId];
+        if (genreName && !acc.includes(genreName)) {
+          acc.push(genreName);
         }
-        return acc
-    }, []);
-    return genres.sort();
+      });
+    }
+    return acc;
+  }, []);
+  return genres.sort();
 });
 
 
@@ -242,7 +261,8 @@ const filteredEvents = computed(() => {
       parseDateString(event.currentDate?.start_time_date)?.toDateString() === selectedDate.value;
     const venueMatch = !selectedVenue.value ||
       event.venue?.name === selectedVenue.value;
-    const genreMatch = !selectedGenre.value || event.genres?.includes(selectedGenre.value);
+    const genreMatch = !selectedGenre.value ||
+      (event.genres && event.genres.some(genreId => genreMap.value[genreId] === selectedGenre.value));
     return dateMatch && venueMatch && genreMatch;
   });
 });
@@ -406,7 +426,7 @@ const venueInfo = computed(() => {
     gap: 10px;
     padding: 10px 20px 40px 20px;
     flex-direction: column;
-    background-color: #FDD252;
+    background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
     position: relative;
 
     &-title {
@@ -579,8 +599,20 @@ const venueInfo = computed(() => {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        transition: transform 0.3s ease;
+
+
+        // active then make the span svg element rotate 180 degrees
+        &.filter-btn--active {
+            span {
+                transform: rotate(180deg);
+                transition: transform 0.3s ease;
+            }
+        }
 
         span {
+          transform: rotate(0deg);
+          transition: transform 0.3s ease;
           color: #F4E8AB;
         }
     }
@@ -588,24 +620,23 @@ const venueInfo = computed(() => {
 
   .dropdown-content {
     position: absolute;
-    top: 100%;
+    top: 110%;
     left: 0;
     width: 100%;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #F4E8AB;
+    border-radius: 12px;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.4);
     z-index: 10;
-    max-height: 200px;
+    max-height: 30vh;
     overflow-y: auto;
+    padding: 10px;
 
         div {
             padding: 10px;
             cursor: pointer;
-            border-bottom: 1px solid #EFF2F6;
 
             &:hover {
-              background-color: #f0f0f0;
+              background-color: #f3e59c;
             }
         }
     }
