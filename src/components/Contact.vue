@@ -2,45 +2,79 @@
   <!-- Keep in Touch Section -->
   <div class="section keep-in-touch">
     <div class="section-header bg">
-      <h2 class="section-header__text dark">Keep in Touch</h2>
+      <h2 class="section-header__text dark">
+        Keep in Touch
+      </h2>
     </div>
-    <div class="contact-form">
-      <div class="form-group">
-        <label for="email">Email*</label>
-        <input
-        type="email"
-        id="email"
-        v-model="email"
-        placeholder="Enter your email"
-        class="form-input"
-        >
+
+    <form class="contact-form" @submit.prevent="handleSubmit">
+      <div v-if="submitError && !isFormSubmitted" class="error-message">
+        An error occurred. Please try again.
       </div>
-      <p class="form-text">
-        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      </p>
-      <div class="btn">
-        <button class="sign-up-btn">Sign Up</button>
+
+      <div v-if="isFormSubmitted">
+        Form submitted!
       </div>
-    </div>
+
+      <template v-else>
+        <div class="form-group">
+          <label for="email">Email*</label>
+          <input
+            type="email"
+            id="email"
+            v-model="email"
+            placeholder="Enter your email"
+            class="form-input"
+          >
+        </div>
+        <p class="form-text">
+          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+        <div class="btn">
+          <button class="sign-up-btn" :disabled="isSubmitting">
+            {{ submitButtonText }}
+          </button>
+        </div>
+      </template>
+    </form>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { useDataStore } from '@/stores/data';
-  import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
+const email = ref('');
 
-  const dataStore = useDataStore();
-  console.log('fair page data store', dataStore.data);
+const isSubmitting = ref(false);
+const isFormSubmitted = ref(false);
+const submitError = ref(false);
 
-  const email = ref('');
+const submitButtonText = computed(() => {
+  return isSubmitting.value ? 'Submitting...' : 'Submit';
+});
 
+const handleSubmit = async () => {
+  try {
+    isSubmitting.value = true;
+    submitError.value = false;
 
+    await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/data/nysfair/newsletter-sign-up`, {
+      email: email.value,
+    });
+
+    email.value = '';
+
+    isFormSubmitted.value = true;
+  } catch (error) {
+    submitError.value = true;
+  } finally {
+    isSubmitting.value = false;
+  }
+};
 </script>
 
 <style scoped lang="scss">
-
-  // Keep in Touch Styles
+// Keep in Touch Styles
 .keep-in-touch {
     background-color: #EE4623;
     padding: 40px 0px;
@@ -121,6 +155,10 @@
     &:hover {
       background: #098944;
       color: #FFF1AF;
+    }
+    &:disabled {
+      opacity: 0.6;
+      cursor: default;
     }
   }
 }
