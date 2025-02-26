@@ -91,8 +91,8 @@ console.log('fair page data store', dataStore.data);
     &__image {
         margin: 30px 20px;
         background-color: #EFF2F6;
-        border-radius: 24px;
-        height: 27vh;
+        border-radius: 10px;
+        height: 25vh;
         display: flex;
         align-items: center;
         justify-content: center;
