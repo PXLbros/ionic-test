@@ -51,8 +51,8 @@ const app = createApp(App)
 const initializeFirebase = async () => {
   try {
     if (!Capacitor.isNativePlatform()) {
-      console.warn('Firebase Analytics is only available on iOS/Android.');
-      return;
+      // throw new Error('Firebase Analytics is only available on iOS/Android.');
+      return false;
     }
 
     console.log('Initializing Firebase Analytics...');
@@ -60,8 +60,12 @@ const initializeFirebase = async () => {
     await FirebaseAnalytics.setEnabled({ enabled: true });
 
     console.log('Firebase Analytics Initialized Successfully');
+
+    return true;
   } catch (error) {
-    console.error('Firebase Initialization Error:', error);
+    console.error(error);
+
+    return false;
   }
 };
 
@@ -92,7 +96,11 @@ Sentry.init(
 const appStore = useAppStore();
 
 router.isReady().then(async () => {
-  initializeFirebase().then(() => {
+  initializeFirebase().then((initializedFirebase) => {
+    if (!initializedFirebase) {
+      return;
+    }
+
     // Get the initial route
     const initialRoute = router.currentRoute.value;
 
