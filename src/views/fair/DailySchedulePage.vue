@@ -233,7 +233,7 @@ const selectDate = (index: number): void => {
 
     &-img {
       width: 100%;
-      height: 20vh;
+      height: 25vh;
       background-color: #EFF2F6;
       display: flex;
       justify-content: center;
