@@ -299,7 +299,7 @@ import Contact from '@/components/Contact.vue';
             margin-bottom: 10px;
 
             @media (max-height: 845px) {
-                max-height: 15vh;
+                max-height: 14vh;
             }
         }
 
