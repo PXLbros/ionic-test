@@ -171,12 +171,14 @@
 </template>
 
 <script setup lang="ts">
-    import { IonContent, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
-    import { useDataStore } from '@/stores/data';
-    import FairNav from '@/components/FairNav.vue';
-    import SocialIcons from '@/components/SocialIcons.vue';
-    import { ref, onMounted } from 'vue';
+import { InAppBrowser, DefaultWebViewOptions, DefaultSystemBrowserOptions } from '@capacitor/inappbrowser';
+import { IonContent, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
+import { useDataStore } from '@/stores/data';
+import FairNav from '@/components/FairNav.vue';
+import SocialIcons from '@/components/SocialIcons.vue';
+import { ref, onMounted } from 'vue';
 import Contact from '@/components/Contact.vue';
+import { Capacitor } from '@capacitor/core';
 
 
     const dataStore = useDataStore();
@@ -219,12 +221,20 @@ import Contact from '@/components/Contact.vue';
       return url;
     });
 
-    const openTicketsWebsite = () => {
+    const openTicketsWebsite = async () => {
       if (!ticketsUrl.value) {
         return;
       }
 
-      window.open(ticketsUrl.value);
+      // if native
+      if (Capacitor.isNativePlatform()) {
+        await InAppBrowser.openInSystemBrowser({
+          url: ticketsUrl.value,
+          options: DefaultSystemBrowserOptions,
+        });
+      } else {
+        window.open(ticketsUrl.value);
+      }
     };
 
     onMounted(() => {
@@ -253,8 +263,6 @@ import Contact from '@/components/Contact.vue';
             container.scrollLeft = scrollLeft - walk;
         });
     });
-
-
 </script>
 
 <style scoped lang="scss">
