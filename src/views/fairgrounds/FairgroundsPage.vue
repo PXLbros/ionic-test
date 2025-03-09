@@ -32,6 +32,10 @@
                               </div> -->
                           </div>
                       </div>
+                      <div class="image-banner">
+                        <p class="date">Feb 27th, 2025</p>
+                        <h3 class="title">Spring NYS RV Show</h3>
+                      </div>
                 </div>
                 <div class="main__grid">
                     <router-link to="/fairgrounds/upcoming-events" class="main__grid-top">
@@ -67,7 +71,7 @@
       &__header {
           display: flex;
           flex-direction: column;
-          gap: 10px;
+
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
           margin-bottom: 10px;
@@ -112,7 +116,31 @@
                       text-align: center;
                   }
               }
-          }
+            }
+
+            .image-banner {
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              gap: 5px;
+              background-color: #ecedef;
+              padding: 30px 0px;
+
+              .date {
+                color: #0077C8;
+                font-size: 16px;
+                font-weight: 700;
+                margin: 0px;
+              }
+              .title {
+                color: #343434;
+                margin: 0px;
+                font-size: 18px;
+                font-weight: 700;
+                font-family: 'inter', sans-serif;
+              }
+            }
 
           &-title {
               width: 100%;
