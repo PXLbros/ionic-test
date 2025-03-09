@@ -1,10 +1,10 @@
 <!-- components/base/BaseNavMenu.vue -->
 <template>
-  <div class="base-nav">
+  <div :id="sectionId" class="base-nav">
     <!-- Main Navbar -->
     <ion-header>
       <ion-toolbar :style="{ '--background': toolbarBackground }">
-        <div class="nav-container">
+        <div  class="nav-container">
           <router-link :to="`/${type}`">
             <img
               :src="logoSrc"
@@ -18,12 +18,15 @@
             class="header-side menu-icon"
             @click="openMenu"
           >
+          <!-- <svg class="header-side menu-icon" @click="openMenu" xmlns="http://www.w3.org/2000/svg" width="33" height="20" viewBox="0 0 33 20" fill="none">
+            <path d="M14.85 18.6957C14.85 17.9826 15.411 17.3913 16.0875 17.3913H31.7625C32.439 17.3913 33 17.9826 33 18.6957C33 19.4087 32.439 20 31.7625 20H16.0875C15.411 20 14.85 19.4087 14.85 18.6957ZM0 10C0 9.28696 0.561 8.69565 1.2375 8.69565H31.7625C32.439 8.69565 33 9.28696 33 10C33 10.713 32.439 11.3043 31.7625 11.3043H1.2375C0.561 11.3043 0 10.713 0 10ZM6.6 1.30435C6.6 0.591304 7.161 0 7.8375 0H31.7625C32.439 0 33 0.591304 33 1.30435C33 2.01739 32.439 2.6087 31.7625 2.6087H7.8375C7.161 2.6087 6.6 2.01739 6.6 1.30435Z" fill="#FFD100"/>
+          </svg> -->
         </div>
       </ion-toolbar>
     </ion-header>
 
     <!-- Slide-out Menu -->
-    <div class="nav-wrapper" :class="{ 'is-open': isMenuOpen }">
+    <div :id="sectionId" class="nav-wrapper" :class="{ 'is-open': isMenuOpen }">
       <div
         class="nav-overlay"
         :class="{ 'is-visible': isMenuOpen }"
@@ -91,7 +94,7 @@
           </div>
 
           <!-- Social Links -->
-          <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
+          <SocialIcons :type="type" :social-data="dataStore.data.nysfairWebsite.social" />
         </nav>
       </div>
     </div>
@@ -131,6 +134,9 @@ const oppositeSection = computed(() => {
     };
   }
 });
+
+// ID based on the type
+const sectionId = props.type === 'fair' ? 'fair' : 'fairgrounds';
 
 const mainNavLinks = computed(() => {
   return router.options.routes.filter(route => {
@@ -190,6 +196,11 @@ const toggleNotifications = async () => {
 </script>
 
 <style scoped lang="scss">
+
+  ion-header {
+    box-shadow: none;
+  }
+
   ion-toolbar {
     --background: #49027fe9;
     -webkit-backdrop-filter: blur(7px);
@@ -214,6 +225,10 @@ const toggleNotifications = async () => {
 
   .menu-icon {
     cursor: pointer;
+  }
+
+  #fairgrounds .menu-icon {
+    color: #FFD100;
   }
 
   .nav-wrapper {
@@ -321,6 +336,12 @@ const toggleNotifications = async () => {
       border-bottom: none;
     }
 
+    // fairgrounds specific active state
+    #fairgrounds &.router-link-active {
+      color: #FDD252;
+      font-weight: 500;
+    }
+
     &.router-link-active {
       color: #000000;
       font-weight: 500;
@@ -337,6 +358,10 @@ const toggleNotifications = async () => {
     margin: 40px 0;
   }
 
+  #fairgrounds .secondary-links .notifications {
+    color: #FFF;
+  }
+
   .secondary-links {
     padding: 0px 20px 30px 20px;
 
@@ -349,6 +374,7 @@ const toggleNotifications = async () => {
       color: black;
       font-weight: 500;
       font-size: 20px;
+
 
       .enable-btn {
         background: none;

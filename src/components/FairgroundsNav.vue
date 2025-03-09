@@ -2,8 +2,8 @@
 <template>
     <BaseNavMenu
       type="fairgrounds"
-      toolbarBackground="#0077c8"
-      menuBackground="linear-gradient(180deg, #0077c8 0%, #0077c8 100%)"
+      toolbarBackground="#19262D"
+      menuBackground="#19262D"
       :logoSrc="fairgroundsLogo"
       logoAlt="Fairgrounds Logo"
     />
