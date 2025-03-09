@@ -1,5 +1,5 @@
 <template>
-  <div class="social-media">
+  <div :class="['social-media', `social-media--${type}`]">
     <h2 class="social-media__text">Follow Us</h2>
     <div class="social-icons">
     <ion-button
@@ -51,6 +51,7 @@ const props = withDefaults(defineProps<{
     twitter: string | null;
     tiktok: string | null;
   };
+  type: 'fair' | 'fairgrounds';
 }>(), {
   socialData: () => ({
     facebook: null,
@@ -58,6 +59,7 @@ const props = withDefaults(defineProps<{
     twitter: null,
     tiktok: null,
   }),
+  type: 'fair'
 });
 
 const openSocialLink = async (url: string | null) => {
@@ -91,12 +93,12 @@ const openSocialLink = async (url: string | null) => {
   padding: 35px 0px 20px 0px;
   justify-content: center;
   align-items: center;
-  background-color: #1F3667;
+  background-color: #1F3667; // Fair background default
   gap: 5px;
 
   &__text {
     margin: 0;
-    color: #FDD252;
+    color: #FDD252; // Fair text color default
     font-size: 22px;
     font-family: 'inter', sans-serif;
     font-weight: 900;
@@ -116,10 +118,23 @@ const openSocialLink = async (url: string | null) => {
 
       ion-icon {
         font-size: 24px; // Adjust size as needed
-        color: #FFF1AF; // Adjust color as needed
+        color: #FFF1AF; // Fair icon color default
         width: 10vw;
         height: 7vh;
       }
+    }
+  }
+
+  // Fairgrounds-specific styles
+  &--fairgrounds {
+    background-color: #EBEBEB;
+
+    .social-media__text {
+      color: #19262D;
+    }
+
+    .social-icons .social-icon ion-icon {
+      color: #19262D;
     }
   }
 }

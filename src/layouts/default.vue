@@ -4,7 +4,7 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button :default-href="backButtonHref"></ion-back-button>
+          <ion-back-button :default-href="backButtonHref" @click="goBack"></ion-back-button>
         </ion-buttons>
 
         <div class="header-container">
@@ -172,6 +172,16 @@ const toggleNotifications = async () => {
     } catch (error) {
       console.error('Error enabling notifications:', error);
     }
+  }
+};
+
+const goBack = () => {
+  if (window.history.length > 1) {
+    console.log('History length:', window.history.length);
+    router.back();
+  } else {
+    console.log('No history, redirecting to:', props.backButtonHref);
+    router.push('/fair');
   }
 };
 </script>
