@@ -2,6 +2,7 @@
     <ion-page id="main-content">
         <!-- Header Nav -->
         <FairgroundsNav />
+        <FairgroundsBottomNavigation />
 
         <ion-content>
             <div class="main">
@@ -56,6 +57,7 @@
     import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
     import FairgroundsNav from '@/components/FairgroundsNav.vue';
     import { useDataStore } from '@/stores/data';
+    import FairgroundsBottomNavigation from '@/components/tabs/FairgroundsBottomNavigation.vue';
 
     const dataStore = useDataStore();
     console.log('dataStore', dataStore.data);
@@ -67,6 +69,7 @@
 <style lang="scss" scoped>
   .main {
       padding: 0px;
+      padding-bottom: 70px;
 
       &__header {
           display: flex;

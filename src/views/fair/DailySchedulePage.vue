@@ -222,6 +222,7 @@ const selectDate = (index: number): void => {
 .main {
   font-family: 'Inter', sans-serif;
   background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+  padding-bottom: 70px;
 
   &__header {
     padding: 25px 20px;

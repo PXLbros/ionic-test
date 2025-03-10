@@ -71,8 +71,8 @@ fetchUpdates();
 
 .main {
   background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
-
-    padding: 30px;
+  padding: 30px;
+  padding-bottom: 80px;
 
     &__header {
         display: flex;

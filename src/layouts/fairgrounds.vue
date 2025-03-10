@@ -1,8 +1,8 @@
-<!-- layouts/default.vue -->
+<!-- layouts/fairgrounds.vue -->
 <template>
   <ion-page id="layout">
     <ion-header :translucent="true">
-      <ion-toolbar>
+      <ion-toolbar style="--background: #19262D; color: #FFFFFF;">
         <ion-buttons slot="start">
           <ion-back-button :default-href="backButtonHref" @click="goBack"></ion-back-button>
         </ion-buttons>
@@ -28,11 +28,11 @@
         @click="closeMenu"
       ></div>
 
-      <div class="nav-menu" :class="{ 'is-open': isMenuOpen }">
-        <div class="nav-header">
+      <div class="nav-menu" :class="{ 'is-open': isMenuOpen }" style="background: #19262D;">
+        <div class="nav-header" style="background: #19262D;">
           <img
-            src="/src/imgs/svg/fair-logo-light.svg"
-            alt="NYSF Logo"
+            src="/src/imgs/svg/fairgrounds-dark.svg"
+            alt="Fairgrounds Logo"
             class="nav-logo"
           >
           <button class="close-button" @click="closeMenu">
@@ -55,11 +55,11 @@
 
             <div class="section-switch">
               <router-link
-                to="/fairgrounds"
+                to="/fair"
                 class="nav-link"
                 @click="closeMenu"
               >
-                New York State Fairgrounds
+                New York State Fair
               </router-link>
             </div>
           </div>
@@ -83,10 +83,9 @@
               Privacy Policy
               <span class="arrow">›</span>
             </a>
-
           </div>
 
-          <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
+          <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
         </nav>
       </div>
     </div>
@@ -95,8 +94,7 @@
       <slot />
     </ion-content>
 
-    <FairBottomNavigation v-if="isFairRoute" />
-    <FairgroundsBottomNavigation v-if="isFairgroundsRoute" />
+    <FairgroundsBottomNavigation />
 
     <ion-toast
       :isOpen="appStore.toast.isOpen"
@@ -116,17 +114,14 @@ import { useDataStore } from '@/stores/data';
 import { closeCircleOutline } from 'ionicons/icons';
 import SocialIcons from '@/components/SocialIcons.vue';
 import { useRouter } from 'vue-router';
-import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
 import FairgroundsBottomNavigation from '@/components/tabs/FairgroundsBottomNavigation.vue';
-import { useRoute } from 'vue-router';
-const route = useRoute();
 
 const props = withDefaults(defineProps<{
   title: string;
   backButtonHref?: string;
   showMenuButton?: boolean;
 }>(), {
-  backButtonHref: '/fair',
+  backButtonHref: '/fairgrounds',
   showMenuButton: false
 });
 
@@ -134,15 +129,6 @@ const appStore = useAppStore();
 const dataStore = useDataStore();
 const router = useRouter();
 const isMenuOpen = ref(false);
-
-// Determine which navigation to show based on route
-const isFairRoute = computed(() => {
-  return route.path === '/fair' || route.path.startsWith('/fair/');
-});
-
-const isFairgroundsRoute = computed(() => {
-  return route.path === '/fairgrounds' || route.path.startsWith('/fairgrounds/');
-});
 
 const mainNavLinks = computed(() => {
   return router.options.routes.filter(route => {
@@ -155,7 +141,7 @@ const mainNavLinks = computed(() => {
     }
 
     const pathSegments = route.path.split('/').filter(Boolean);
-    return pathSegments[0] === 'fair';
+    return pathSegments[0] === 'fairgrounds';
   }).sort((a, b) => (Number(a.meta?.menuOrder) || 99) - (Number(b.meta?.menuOrder) || 99));
 });
 
@@ -197,15 +183,15 @@ const goBack = () => {
     router.back();
   } else {
     console.log('No history, redirecting to:', props.backButtonHref);
-    router.push('/fair');
+    router.push('/fairgrounds');
   }
 };
 </script>
 
 <style scoped lang="scss">
 ion-toolbar {
-  --background: #098944;
-  color: #F4E8AB;
+  --background: #19262D;
+  color: #FFFFFF;
   text-transform: uppercase;
 }
 
@@ -240,7 +226,7 @@ ion-title {
 }
 
 ion-back-button {
-  color: #FDD252;
+  color: #FFFFFF;
   position: relative; // Ensures it stays above the centered title
   z-index: 1;
 }
@@ -279,7 +265,7 @@ ion-back-button {
   left: 0;
   width: 100%;
   height: 95vh;
-  background: linear-gradient(180deg, #098944 0%, #098944 100%);
+  background: #19262D;
   transition: transform 0.3s ease;
   pointer-events: auto;
   overflow-y: auto;
@@ -299,7 +285,7 @@ ion-back-button {
   align-items: center;
   padding: 20px;
   padding-top: 80px;
-  background: #098944;
+  background: #19262D;
 }
 
 .nav-logo {
@@ -309,7 +295,7 @@ ion-back-button {
 .close-button {
   background: none;
   border: none;
-  color: #FDD252;
+  color: #FFFFFF;
   font-size: 36px;
   padding: 0px 0px;
   cursor: pointer;
@@ -318,7 +304,6 @@ ion-back-button {
 .nav-links {
   display: flex;
   flex-direction: column;
-
   min-height: calc(100vh - 100px);
   justify-content: space-between;
 
@@ -352,7 +337,7 @@ ion-back-button {
   }
 
   &.router-link-active {
-    color: #000000;
+    color: #FDD252;
     font-weight: 500;
   }
 
@@ -363,61 +348,30 @@ ion-back-button {
 
 .separator {
   height: 1px;
-  background: rgba(20, 20, 20, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   margin: 40px 0;
 }
 
-.secondary-links {
-  .notifications {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    color: black;
-    font-weight: 500;
-    font-size: 20px;
+.notifications {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  color: #FFFFFF;
+  font-weight: 500;
+  font-size: 20px;
 
-    .enable-btn {
-      background: none;
-      border: none;
-      color: #7323B4;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-    }
+  .enable-btn {
+    background: none;
+    border: none;
+    color: #FDD252;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
   }
 }
 
 .menu-button {
   margin-right: 10px;
-}
-
-
-.social-links {
-  margin-top: 40px;
-  text-align: center;
-
-  h3 {
-    color: #343434;
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 20px;
-  }
-
-  :deep(.social-icons) {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-
-    .social-icon {
-      background: transparent;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #343434;
-      text-decoration: none;
-    }
-  }
 }
 </style>

@@ -126,6 +126,7 @@ const toggleSection = (index: number) => {
     flex-direction: column;
     gap: 24px;
     background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+    padding-bottom: 70px;
 
     &__image {
         margin: 20px;

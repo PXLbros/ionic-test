@@ -421,6 +421,8 @@ const venueInfo = computed(() => {
 
 <style lang="scss" scoped>
 .main {
+  padding-bottom: 70px;
+
   &__header {
     display: flex;
     gap: 10px;

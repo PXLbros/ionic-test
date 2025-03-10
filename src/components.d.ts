@@ -8,9 +8,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BaseNav: typeof import('./components/BaseNav.vue')['default']
+    BaseTabNavigation: typeof import('./components/tabs/BaseTabNavigation.vue')['default']
     Contact: typeof import('./components/Contact.vue')['default']
     EventModal: typeof import('./components/EventModal.vue')['default']
     EventsList: typeof import('./components/EventsList.vue')['default']
+    FairBottomNavigation: typeof import('./components/tabs/FairBottomNavigation.vue')['default']
+    FairgroundsBottomNavigation: typeof import('./components/tabs/FairgroundsBottomNavigation.vue')['default']
     FairgroundsNav: typeof import('./components/FairgroundsNav.vue')['default']
     FairNav: typeof import('./components/FairNav.vue')['default']
     FavoriteButton: typeof import('./components/FavoriteButton.vue')['default']
@@ -18,5 +21,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SocialIcons: typeof import('./components/SocialIcons.vue')['default']
+    Venue: typeof import('./components/icons/venue.vue')['default']
+    VenueIcon: typeof import('./components/icons/venueIcon.vue')['default']
   }
 }
