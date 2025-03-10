@@ -1,14 +1,8 @@
 <template>
-    <ion-page>
-      <ion-header>
-        <ion-toolbar :translucent="true">
-          <ion-buttons slot="start">
-            <ion-back-button default-href="/fairgrounds/upcoming-events"></ion-back-button>
-          </ion-buttons>
-          <ion-title>FAIRGROUNDS | EVENT DETAIL</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content :fullscreen="true">
+  <Fairgrounds
+    title="Upcoming Events"
+    :showMenuButton="true"
+  >
 
         <div v-if="event" class="main">
 
@@ -81,16 +75,15 @@
         <div v-else class="alt">
           <h2>No Upcoming Events. Check back soon</h2>
         </div>
-      </ion-content>
-    </ion-page>
+  </Fairgrounds>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useRoute } from 'vue-router';
 import { useDataStore } from '@/stores/data';
 import { format, parseISO } from 'date-fns';
+import Fairgrounds from '@/layouts/fairgrounds.vue';
 
 interface EventDate {
   date: string;
@@ -192,6 +185,7 @@ const formatAdditionalDate = (date: EventDate): string => {
 <style lang="scss" scoped>
 .main {
   padding: 20px 30px;
+  padding-bottom: 80px;
 
   &__header {
     margin-bottom: 30px;

@@ -1,15 +1,8 @@
 <template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar :translucent="true">
-        <ion-buttons slot="start">
-          <ion-back-button default-href="/fairgrounds"></ion-back-button>
-        </ion-buttons>
-        <ion-title>Upcoming Events</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content :fullscreen="true">
-
+  <Fairgrounds
+    title="Upcoming Events"
+    :showMenuButton="true"
+  >
       <div class="main">
         <div class="main__header">
           <h1 class="main__header-title">Upcoming Events</h1>
@@ -160,16 +153,15 @@
           </div>
         </div>
       </div>
-    </ion-content>
-  </ion-page>
+    </Fairgrounds>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import { listOutline } from 'ionicons/icons';
 import { format, isSameMonth, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from 'date-fns';
+import Fairgrounds from '@/layouts/fairgrounds.vue';
 
 interface EventDate {
   date: string;
@@ -598,7 +590,7 @@ const getEventImage = (event: Event): string => {
   .events-list {
     padding: 30px;
     padding-top: 10px;
-
+    padding-bottom: 70px;
   }
   .event-card {
       display: flex;
@@ -704,6 +696,7 @@ const getEventImage = (event: Event): string => {
 
   .calendar-view {
     padding: 20px;
+    padding-bottom: 90px;
 
     .calendar-header {
       display: flex;

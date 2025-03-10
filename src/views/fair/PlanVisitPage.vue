@@ -63,8 +63,9 @@
           <div class="contact-form">
             <Contact />
           </div>
-
-          <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
+          <div class="wrapper">
+            <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
+          </div>
     </DefaultLayout>
 </template>
 
@@ -86,6 +87,7 @@ console.log('fair page data store', dataStore.data);
     display: flex;
     flex-direction: column;
     background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+
 
 
     &__image {
@@ -154,7 +156,10 @@ console.log('fair page data store', dataStore.data);
         }
 
     }
-}
+  }
+  .wrapper {
+    padding-bottom: 70px;
+  }
 
 .contact-form {
   background-color: #EE4623;

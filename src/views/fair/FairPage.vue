@@ -5,6 +5,7 @@
 
         <!-- Main Content -->
         <FairNav />
+        <FairBottomNavigation />
         <ion-content :fullscreen="true">
             <div class="main">
                 <div class="main-logo">
@@ -164,19 +165,20 @@
               <Contact />
 
               <!-- Social Icons -->
-              <SocialIcons :social-data="dataStore.data.nysfairWebsite.social" />
+              <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
             </div>
         </ion-content>
     </ion-page>
 </template>
 
 <script setup lang="ts">
-    import { IonContent, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
-    import { useDataStore } from '@/stores/data';
-    import FairNav from '@/components/FairNav.vue';
-    import SocialIcons from '@/components/SocialIcons.vue';
-    import { ref, onMounted } from 'vue';
+import { IonContent, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
+import { useDataStore } from '@/stores/data';
+import FairNav from '@/components/FairNav.vue';
+import SocialIcons from '@/components/SocialIcons.vue';
+import { ref, onMounted } from 'vue';
 import Contact from '@/components/Contact.vue';
+import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
 
 
     const dataStore = useDataStore();
@@ -276,6 +278,7 @@ import Contact from '@/components/Contact.vue';
         background-size: cover;
         padding-bottom: 20px;
 
+
         // Create a pseudo-element for the gradient
         &::before {
             content: '';
@@ -361,6 +364,7 @@ import Contact from '@/components/Contact.vue';
       border-top-right-radius: 40px;
       position: relative;
       z-index: 10;
+      padding-bottom: 70px;
     }
 
     .section {
