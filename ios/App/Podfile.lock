@@ -20,6 +20,9 @@ PODS:
     - Capacitor
   - CapacitorHaptics (6.0.2):
     - Capacitor
+  - CapacitorInappbrowser (1.0.3):
+    - Capacitor
+    - OSInAppBrowserLib (~> 1.0)
   - CapacitorKeyboard (6.0.3):
     - Capacitor
   - CapacitorPreferences (6.0.3):
@@ -27,6 +30,8 @@ PODS:
   - CapacitorPushNotifications (6.0.4):
     - Capacitor
   - CapacitorStatusBar (6.0.2):
+    - Capacitor
+  - CapgoInappbrowser (6.10.1):
     - Capacitor
   - FirebaseAnalytics (11.7.0):
     - FirebaseAnalytics/AdIdSupport (= 11.7.0)
@@ -121,6 +126,7 @@ PODS:
     - nanopb/encode (= 3.30910.0)
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
+  - OSInAppBrowserLib (1.0.0)
   - PromisesObjC (2.4.0)
   - Sentry/HybridSDK (8.36.0)
   - SentryCapacitor (1.0.2):
@@ -137,10 +143,12 @@ DEPENDENCIES:
   - "CapacitorFirebaseAnalytics/Analytics (from `../../node_modules/@capacitor-firebase/analytics`)"
   - "CapacitorGeolocation (from `../../node_modules/@capacitor/geolocation`)"
   - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
+  - "CapacitorInappbrowser (from `../../node_modules/@capacitor/inappbrowser`)"
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
   - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
   - "CapacitorPushNotifications (from `../../node_modules/@capacitor/push-notifications`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - "CapgoInappbrowser (from `../../node_modules/@capgo/inappbrowser`)"
   - FirebaseMessaging
   - "SentryCapacitor (from `../../node_modules/@sentry/capacitor`)"
 
@@ -155,6 +163,7 @@ SPEC REPOS:
     - GoogleDataTransport
     - GoogleUtilities
     - nanopb
+    - OSInAppBrowserLib
     - PromisesObjC
     - Sentry
 
@@ -175,6 +184,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/geolocation"
   CapacitorHaptics:
     :path: "../../node_modules/@capacitor/haptics"
+  CapacitorInappbrowser:
+    :path: "../../node_modules/@capacitor/inappbrowser"
   CapacitorKeyboard:
     :path: "../../node_modules/@capacitor/keyboard"
   CapacitorPreferences:
@@ -183,6 +194,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/push-notifications"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  CapgoInappbrowser:
+    :path: "../../node_modules/@capgo/inappbrowser"
   SentryCapacitor:
     :path: "../../node_modules/@sentry/capacitor"
 
@@ -195,10 +208,12 @@ SPEC CHECKSUMS:
   CapacitorFirebaseAnalytics: 8205f8274204183618e5be246b3d9cafe7429c88
   CapacitorGeolocation: d994ee64ee41909e2089e575c9d3a976007c2812
   CapacitorHaptics: b53409aaca1203f79c6d0eb3ed5de40556339518
+  CapacitorInappbrowser: 8d2cc19c882a8176f489d5a31a690a0b418a12ea
   CapacitorKeyboard: 460c6f9ec5e52c84f2742d5ce2e67bbc7ab0ebb0
   CapacitorPreferences: 9f9935bce493977183511362131a93f7b260191a
   CapacitorPushNotifications: 1fc22ae360214a0ac0625c348d3aea217085163d
   CapacitorStatusBar: 3b9ac7d0684770522c532d1158a1434512ab1477
+  CapgoInappbrowser: 5f32a8883bc4cb141d26f0eeff63fac70330ed10
   FirebaseAnalytics: bc9e565af9044ba8d6c6e4157e4edca8e5fdf7ec
   FirebaseCore: 3227e35f4197a924206fbcdc0349325baf4f5de4
   FirebaseCoreInternal: d6c17dafc8dc33614733a8b52df78fcb4394c881
@@ -208,10 +223,11 @@ SPEC CHECKSUMS:
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
+  OSInAppBrowserLib: c3d0b21a0c8b6d81e69117ad08bb6b8a4849c4e1
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   Sentry: f8374b5415bc38dfb5645941b3ae31230fbeae57
   SentryCapacitor: 808a63a267d5053af12c25e6125c13f79b32debc
 
-PODFILE CHECKSUM: d6b1c6f7b9d2b538ce53b96cfaf521142534435d
+PODFILE CHECKSUM: 89b5112b2c59dc6a189eb19b0f4e192929c4c8ee
 
 COCOAPODS: 1.16.2

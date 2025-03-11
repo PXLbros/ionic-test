@@ -171,7 +171,8 @@
 </template>
 
 <script setup lang="ts">
-import { InAppBrowser, DefaultWebViewOptions, DefaultSystemBrowserOptions } from '@capacitor/inappbrowser';
+// import { InAppBrowser, DefaultWebViewOptions, DefaultSystemBrowserOptions, ToolbarPosition, iOSAnimation, iOSViewStyle } from '@capacitor/inappbrowser';
+import { BackgroundColor, InAppBrowser, ToolBarType } from '@capgo/inappbrowser';
 import { IonContent, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import FairNav from '@/components/FairNav.vue';
@@ -179,7 +180,6 @@ import SocialIcons from '@/components/SocialIcons.vue';
 import { ref, onMounted } from 'vue';
 import Contact from '@/components/Contact.vue';
 import { Capacitor } from '@capacitor/core';
-
 
     const dataStore = useDataStore();
     console.log('fair page data store', dataStore.data);
@@ -228,9 +228,41 @@ import { Capacitor } from '@capacitor/core';
 
       // if native
       if (Capacitor.isNativePlatform()) {
-        await InAppBrowser.openInSystemBrowser({
+        // await InAppBrowser.openInWebView({
+        //   url: ticketsUrl.value,
+        //   // options: DefaultWebViewOptions,
+        //   options: {
+        //     showURL: false,
+        //     showToolbar: true,
+        //     toolbarPosition: ToolbarPosition.TOP,
+        //     clearCache: true,
+        //     clearSessionCache	: true,
+        //     mediaPlaybackRequiresUserAction: false,
+        //     closeButtonText: 'Custom Close',
+        //     showNavigationButtons: true,
+        //     leftToRight: true,
+        //     iOS: {
+        //       allowInLineMediaPlayback: true,
+        //       allowOverScroll: true,
+        //       animationEffect: iOSAnimation.COVER_VERTICAL,
+        //       enableViewportScale: true,
+        //       surpressIncrementalRendering: true,
+        //       viewStyle: iOSViewStyle.FULL_SCREEN,
+        //     },
+        //     android: {
+        //       allowZoom: true,
+        //       hardwareBack: false,
+        //       pauseMedia: true,
+        //     },
+        //   },
+        // });
+
+        await InAppBrowser.openWebView({
           url: ticketsUrl.value,
-          options: DefaultSystemBrowserOptions,
+          backgroundColor: BackgroundColor.WHITE,
+          toolbarType: ToolBarType.DEFAULT,
+          title: 'Tickets',
+          toolbarColor: '#00ff00',
         });
       } else {
         window.open(ticketsUrl.value);
