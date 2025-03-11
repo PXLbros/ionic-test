@@ -1,78 +1,70 @@
 <template>
-    <ion-page>
-      <ion-header>
-        <ion-toolbar :translucent="true">
-          <ion-buttons slot="start">
-            <ion-back-button default-href="/fairgrounds"></ion-back-button>
-          </ion-buttons>
-          <ion-title>Rental Opportunity</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content :fullscreen="true">
+  <Fairgrounds
+      title="Rental Opportunities"
+      :showMenuButton="true"
+    >
+        <div class="main">
+            <div class="main__image">
+                <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
+                    <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
+                </svg>
+            </div>
 
-           <div class="main">
-                <div class="main__image">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
-                        <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
-                    </svg>
+            <div class="main__content">
+                <div class="wrapper">
+                    <h1 class="main__title">Book Your Event</h1>
+                    <p class="main__description">To book an event, use the form below to get in touch with us please contact:</p>
                 </div>
 
-                <div class="main__content">
-                    <div class="wrapper">
-                        <h1 class="main__title">Book Your Event</h1>
-                        <p class="main__description">To book an event, use the form below to get in touch with us please contact:</p>
-                    </div>
-
-                    <div class="contact-info">
-                        <h2 class="contact-info__title">The New York State Fairgrounds Events Department</h2>
-                        <p class="contact-info__address">581 State Fair Blvd.</p>
-                        <p class="contact-info__city">Syracuse, NY 13209</p>
-                        <a href="#" class="contact-info__directions">Get Directions</a>
-                        <p class="contact-info__phone">800.475.FAIR</p>
-                    </div>
-
-                    <form class="form" @submit.prevent="handleSubmit">
-                        <div class="form__group">
-                            <label for="name">Name</label>
-                            <input
-                                type="text"
-                                id="name"
-                                v-model="formData.name"
-                                required
-                            >
-                        </div>
-
-                        <div class="form__group">
-                            <label for="title">Title</label>
-                            <input
-                                type="text"
-                                id="title"
-                                v-model="formData.title"
-                                required
-                            >
-                        </div>
-
-                        <div class="form__group">
-                            <label for="company">Company/Organization*</label>
-                            <input
-                                type="text"
-                                id="company"
-                                v-model="formData.company"
-                                required
-                            >
-                        </div>
-
-                        <button type="submit" class="submit-button">Submit</button>
-                    </form>
+                <div class="contact-info">
+                    <h2 class="contact-info__title">The New York State Fairgrounds Events Department</h2>
+                    <p class="contact-info__address">581 State Fair Blvd.</p>
+                    <p class="contact-info__city">Syracuse, NY 13209</p>
+                    <a href="#" class="contact-info__directions">Get Directions</a>
+                    <p class="contact-info__phone">800.475.FAIR</p>
                 </div>
-           </div>
-        </ion-content>
-    </ion-page>
+
+                <form class="form" @submit.prevent="handleSubmit">
+                    <div class="form__group">
+                        <label for="name">Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            v-model="formData.name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form__group">
+                        <label for="title">Title</label>
+                        <input
+                            type="text"
+                            id="title"
+                            v-model="formData.title"
+                            required
+                        >
+                    </div>
+
+                    <div class="form__group">
+                        <label for="company">Company/Organization*</label>
+                        <input
+                            type="text"
+                            id="company"
+                            v-model="formData.company"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="submit-button">Submit</button>
+                </form>
+            </div>
+        </div>
+    </Fairgrounds>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
+import Fairgrounds from '@/layouts/fairgrounds.vue';
 
 interface FormData {
     name: string;

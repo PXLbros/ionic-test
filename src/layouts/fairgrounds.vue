@@ -8,7 +8,7 @@
         </ion-buttons>
 
         <div class="header-container">
-          <ion-title>{{ title }}</ion-title>
+          <ion-title id="fg-bar-title">{{ title }}</ion-title>
         </div>
 
         <!-- Menu button on the right side if showMenuButton is true -->

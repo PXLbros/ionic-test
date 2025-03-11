@@ -50,6 +50,26 @@ p {
     font-family: 'inter', sans-serif;
 }
 
+/* fairgrounds styles for the pt-sans */
+
+#fg-title {
+    font-family: 'pt-sans-bold', sans-serif;
+    font-size: 28px;
+    line-height: 40px;
+}
+
+#fg-bar-title {
+    font-family: 'pt-sans-bold', sans-serif;
+    font-size: 22px;
+    line-height: 28px;
+}
+
+#fg-h2 {
+    font-family: 'pt-sans-bold', sans-serif;
+    font-size: 22px;
+    line-height: 40px;
+}
+
 
 /* Main Homepage Button Font */
 @font-face {
@@ -66,3 +86,19 @@ p {
   font-weight: normal;
   font-style: normal;
 }
+
+@font-face {
+  font-family: 'pt-sans-reg';
+  src: url('../fonts/PTSansNarrow-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'pt-sans-bold';
+  src: url('../fonts/PTSansNarrow-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+

@@ -10,6 +10,7 @@ declare module 'vue' {
     BaseNav: typeof import('./components/BaseNav.vue')['default']
     BaseTabNavigation: typeof import('./components/tabs/BaseTabNavigation.vue')['default']
     Contact: typeof import('./components/Contact.vue')['default']
+    CustomEventGallery: typeof import('./components/CustomEventGallery.vue')['default']
     EventModal: typeof import('./components/EventModal.vue')['default']
     EventsList: typeof import('./components/EventsList.vue')['default']
     FairBottomNavigation: typeof import('./components/tabs/FairBottomNavigation.vue')['default']
