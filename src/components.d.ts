@@ -19,6 +19,7 @@ declare module 'vue' {
     FairgroundsNav: typeof import('./components/FairgroundsNav.vue')['default']
     FairNav: typeof import('./components/FairNav.vue')['default']
     FavoriteButton: typeof import('./components/FavoriteButton.vue')['default']
+    FGKeepInTouch: typeof import('./components/FGKeepInTouch.vue')['default']
     HomeIcon: typeof import('./components/icons/HomeIcon.vue')['default']
     Loader: typeof import('./components/Loader.vue')['default']
     MapIcon: typeof import('./components/icons/MapIcon.vue')['default']
