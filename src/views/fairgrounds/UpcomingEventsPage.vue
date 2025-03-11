@@ -5,8 +5,6 @@
   >
       <div class="main">
         <div class="main__header">
-          <h1 class="main__header-title">Upcoming Events</h1>
-
           <div class="main__header-toggles">
             <div class="filter">
               <span>

@@ -1,54 +1,47 @@
 <template>
-    <ion-page>
-      <ion-header>
-        <ion-toolbar :translucent="true">
-          <ion-buttons slot="start">
-            <ion-back-button default-href="/fairgrounds"></ion-back-button>
-          </ion-buttons>
-          <ion-title>Venues</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content :fullscreen="true">
-        <div class="main">
-             <div class="main__header">
-                 <div class="title">Host an Event</div>
-                 <div class="description">If you're considering hosting an event, you'll want to first review the different spaces we can offer your organization.</div>
-             </div>
-             <div class="main__venue">
-                 <div
-                     v-for="venue in venues"
-                     :key="venue.id"
-                     class="main__venue-card"
-                     :class="{ 'no-image': !hasImage(venue) }"
-                 >
-                     <!-- Only show image if venueMainImage exists -->
-                     <img
-                         v-if="hasImage(venue)"
-                         class="image"
-                         :src="venue.venueMainImage || ''"
-                         alt="venue image"
-                     >
-                     <div class="content">
-                         <div class="content__label">{{ venue.venuePreheader || 'Venue' }}</div>
-                         <div class="content__title">{{ venue.title }}</div>
-                         <div v-if="venue.venueDetailBody" v-html="stripHTML(venue.venueDetailBody?.slice(0, 75) + '...')" class="content__description">
-                         </div>
-                         <div v-else class="content__description">
-                              No Description Available
-                         </div>
-                     </div>
-                     <router-link :to="`/fairgrounds/venues/${encodeURIComponent(venue.id)}`" class="cta">Learn More</router-link>
-                 </div>
-             </div>
-        </div>
-     </ion-content>
-    </ion-page>
+  <Fairgrounds
+    title="Venues"
+    :showMenuButton="true"
+  >
+    <div class="main">
+          <div class="main__header">
+              <div class="title">Host an Event</div>
+              <div class="description">If you're considering hosting an event, you'll want to first review the different spaces we can offer your organization.</div>
+          </div>
+          <div class="main__venue">
+              <div
+                  v-for="venue in venues"
+                  :key="venue.id"
+                  class="main__venue-card"
+                  :class="{ 'no-image': !hasImage(venue) }"
+              >
+                  <!-- Only show image if venueMainImage exists -->
+                  <img
+                      v-if="hasImage(venue)"
+                      class="image"
+                      :src="venue.venueMainImage || ''"
+                      alt="venue image"
+                  >
+                  <div class="content">
+                      <div class="content__label">{{ venue.venuePreheader || 'Venue' }}</div>
+                      <div class="content__title">{{ venue.title }}</div>
+                      <div v-if="venue.venueDetailBody" v-html="stripHTML(venue.venueDetailBody?.slice(0, 75) + '...')" class="content__description">
+                      </div>
+                      <div v-else class="content__description">
+                          No Description Available
+                      </div>
+                  </div>
+                  <router-link :to="`/fairgrounds/venues/${encodeURIComponent(venue.id)}`" class="cta">Learn More</router-link>
+              </div>
+          </div>
+    </div>
+  </Fairgrounds>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
+import Fairgrounds from '@/layouts/fairgrounds.vue';
 
 interface Venue {
   id: string;
