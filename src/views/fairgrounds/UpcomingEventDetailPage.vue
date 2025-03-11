@@ -185,7 +185,7 @@ const formatAdditionalDate = (date: EventDate): string => {
 
 <style lang="scss" scoped>
 .main {
-  padding-bottom: 70px;
+  padding-bottom: 90px;
   background-color: #F0F0F0;
 
   &__header {

@@ -158,7 +158,7 @@ console.log('fair page data store', dataStore.data);
     }
   }
   .wrapper {
-    padding-bottom: 70px;
+    padding-bottom: 90px;
   }
 
 .contact-form {

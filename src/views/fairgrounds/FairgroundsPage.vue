@@ -89,7 +89,7 @@
 <style lang="scss" scoped>
 .main {
     padding: 0px;
-    padding-bottom: 70px;
+    padding-bottom: 90px;
     background-color: #19262D;
 
     &__header {

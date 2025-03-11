@@ -485,7 +485,7 @@ const getEventImage = (event: Event): string => {
 <style lang="scss" scoped>
 
 .main {
-  padding-bottom: 70px;
+  padding-bottom: 90px;
   background-color: #19262D;
 
   .wrapper {
