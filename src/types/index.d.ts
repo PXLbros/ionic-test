@@ -42,8 +42,10 @@ export interface DateObject {
 }
 
 export interface NewsArticle {
+  id: number;
   title: string;
   content: string;
   permalink: string;
   created_at: string;
+  image?: string; // Add the image property
 }
