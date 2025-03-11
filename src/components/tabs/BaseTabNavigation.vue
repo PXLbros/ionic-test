@@ -67,7 +67,8 @@ watch(() => route.path, (newPath) => {
   left: 0;
   right: 0;
   height: 70px;
-  background: rgba(255, 255, 255, 0.744);
+  background: rgba(255, 255, 255, 0.844);
+  --webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: space-around;

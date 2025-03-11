@@ -11,7 +11,6 @@ declare module 'vue' {
     BaseTabNavigation: typeof import('./components/tabs/BaseTabNavigation.vue')['default']
     CalendarIcon: typeof import('./components/icons/CalendarIcon.vue')['default']
     Contact: typeof import('./components/Contact.vue')['default']
-    CustomEventGallery: typeof import('./components/CustomEventGallery.vue')['default']
     EventCarousel: typeof import('./components/EventCarousel.vue')['default']
     EventModal: typeof import('./components/EventModal.vue')['default']
     EventsList: typeof import('./components/EventsList.vue')['default']
@@ -29,9 +28,6 @@ declare module 'vue' {
     ScheduleIcon: typeof import('./components/icons/ScheduleIcon.vue')['default']
     SocialIcons: typeof import('./components/SocialIcons.vue')['default']
     StartIcon: typeof import('./components/icons/StartIcon.vue')['default']
-    TicketIcon: typeof import('./components/icons/TicketIcon.vue')['default']
     TicketsIcon: typeof import('./components/icons/TicketsIcon.vue')['default']
-    Venue: typeof import('./components/icons/venue.vue')['default']
-    VenueIcon: typeof import('./components/icons/venueIcon.vue')['default']
   }
 }
