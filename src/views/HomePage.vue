@@ -67,13 +67,12 @@ console.log('data from the store', dataStore.data);
   flex-direction: column;
   height: 100%;
   background-color: #1a1a1a;
-  padding: 20px 0;
+  padding: 65px 35px;
 
   &__container {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 0 16px;
     height: 100%;
   }
 
@@ -82,7 +81,7 @@ console.log('data from the store', dataStore.data);
     position: relative;
     flex-direction: column;
     flex: 1;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     text-decoration: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);

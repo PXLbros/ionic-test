@@ -58,7 +58,7 @@ const openGame = async (url: string) => {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding-bottom: 80px;
+  padding-bottom: 100px;
 }
 
 .game-grid {

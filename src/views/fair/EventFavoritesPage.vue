@@ -97,7 +97,6 @@ const favoriteEventItems = computed(() => {
         line-height: 28px;
         letter-spacing: 0.5px;
         color: #343434;
-
       }
 
       .subtitle {

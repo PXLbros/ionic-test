@@ -51,7 +51,7 @@ console.log('directions page data', pageData);
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
-  padding-bottom: 80px;
+  padding-bottom: 110px;
 
   &__image {
       background-color: #EFF2F6;

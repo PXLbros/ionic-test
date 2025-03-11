@@ -364,7 +364,7 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
       border-top-right-radius: 40px;
       position: relative;
       z-index: 10;
-      padding-bottom: 70px;
+      padding-bottom: 90px;
     }
 
     .section {

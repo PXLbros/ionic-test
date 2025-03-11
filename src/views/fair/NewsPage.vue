@@ -185,7 +185,7 @@ a {
 }
 .main {
     background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
-    padding-bottom: 70px;
+    padding-bottom: 90px;
 
     .wrapper {
       padding: 20px;
