@@ -11,47 +11,58 @@ import homeIcon from '@/imgs/svg/home.svg';
 import mapIcon from '@/imgs/svg/map.svg';
 import scheduleIcon from '@/imgs/svg/calendar.svg';
 import ticketIcon from '@/imgs/svg/ticket.svg';
+import HomeIcon from '@/components/icons/HomeIcon.vue';
+import StartIcon from '@/components/icons/StartIcon.vue';
+import MapIcon from '@/components/icons/MapIcon.vue';
+import CalendarIcon from '@/components/icons/CalendarIcon.vue';
+import PinIcon from '@/components/icons/PinIcon.vue';
 
 const fairgroundsTabs = ref([
   {
     path: '/',
     label: 'Start',
-    icon: startIcon
+    icon: StartIcon
   },
   {
     path: '/fairgrounds',
     label: 'Home',
-    icon: homeIcon
+    icon: HomeIcon
   },
   {
     path: '/fair/map',
     label: 'Map',
-    icon: mapIcon
+    icon: MapIcon
   },
   {
-    path: '/fairgrounds/events',
+    path: '/fairgrounds/upcoming-events',
     label: 'Events',
-    icon: scheduleIcon
+    icon: CalendarIcon
   },
   {
     path: '/fairgrounds/venues',
     label: 'Venues',
-    icon: ticketIcon
+    icon: PinIcon
   },
 ]);
 </script>
 
 <style scoped lang="scss">
 :deep(.tab-navigation) {
-  :deep(.tab-navigation) {
-    background: #098944;
+  background: #098944;
+}
+
+:deep(.tab-item) {
+  color: #999999;
+
+  .tab-icon svg path {
+    fill: #999999;
   }
 
-  :deep(.tab-item) {
-    color: #999999;
+  &.active {
+    color: #007AFF;
 
-    &.active {
-      color: #007AFF;
+    .tab-icon svg path {
+      fill: #007AFF;
     }
   }
 }

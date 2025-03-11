@@ -11,33 +11,39 @@ import homeIcon from '@/imgs/svg/home.svg';
 import mapIcon from '@/imgs/svg/map.svg';
 import scheduleIcon from '@/imgs/svg/calendar.svg';
 import ticketIcon from '@/imgs/svg/ticket.svg';
+import HomeIcon from '@/components/icons/HomeIcon.vue';
+import StartIcon from '@/components/icons/StartIcon.vue';
+import MapIcon from '@/components/icons/MapIcon.vue';
+import ScheduleIcon from '@/components/icons/ScheduleIcon.vue';
+import TicketsIcon from '@/components/icons/TicketsIcon.vue';
+
 
 
 const fairTabs = ref([
   {
     path: '/',
     label: 'Start',
-    icon: startIcon
+    icon: StartIcon
   },
   {
     path: '/fair',
     label: 'Home',
-    icon: homeIcon
+    icon: HomeIcon
   },
   {
     path: '/fair/map',
     label: 'Map',
-    icon: mapIcon
+    icon: MapIcon
   },
   {
     path: '/fair/schedule',
     label: 'Schedule',
-    icon: scheduleIcon
+    icon: ScheduleIcon
   },
   {
     path: '/fair/tickets',
     label: 'Tickets',
-    icon: ticketIcon
+    icon: TicketsIcon
   },
 ]);
 </script>
@@ -50,8 +56,16 @@ const fairTabs = ref([
 :deep(.tab-item) {
   color: #999999;
 
+  .tab-icon svg path {
+    fill: #999999;
+  }
+
   &.active {
     color: #007AFF;
+
+    .tab-icon svg path {
+      fill: #007AFF;
+    }
   }
 }
 </style>

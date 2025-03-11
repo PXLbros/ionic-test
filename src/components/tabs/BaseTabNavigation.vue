@@ -25,7 +25,7 @@ const props = defineProps<{
   tabs: Array<{
     path: string;
     label: string;
-    icon: string ;
+    icon: any;
   }>;
 }>();
 
