@@ -3,7 +3,7 @@
     title="Upcoming Events"
     :showMenuButton="true"
   >
-      <div class="main">
+      <div class="main" id="events">
         <div class="wrapper">
           <div class="main__header">
             <div class="main__header-toggles">
@@ -153,6 +153,11 @@
             </router-link>
           </div>
         </div>
+
+        <FGKeepInTouch />
+
+        <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
+
       </div>
     </Fairgrounds>
 </template>
@@ -480,6 +485,8 @@ const getEventImage = (event: Event): string => {
 <style lang="scss" scoped>
 
 .main {
+  padding-bottom: 70px;
+  background-color: #19262D;
 
   .wrapper {
     background-color: #EBEDEF;
@@ -596,8 +603,10 @@ const getEventImage = (event: Event): string => {
 
   .events-list {
     padding: 20px;
-    padding-top: 20px;
-    padding-bottom: 70px;
+    padding-bottom: 5px;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    background-color: #FFF;
   }
   .event-card {
       display: flex;
@@ -701,8 +710,10 @@ const getEventImage = (event: Event): string => {
 
   .calendar-view {
     padding: 20px;
-    padding-bottom: 90px;
+    padding-bottom: 30px;
     background-color: #EBEDEF;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 12px;
 
     .calendar-header {
       display: flex;
