@@ -5,12 +5,7 @@
 
 <script setup lang="ts">
 import BaseTabNavigation from '../tabs/BaseTabNavigation.vue';
-import { ref } from 'vue';
-import startIcon from '@/imgs/svg/start.svg';
-import homeIcon from '@/imgs/svg/home.svg';
-import mapIcon from '@/imgs/svg/map.svg';
-import scheduleIcon from '@/imgs/svg/calendar.svg';
-import ticketIcon from '@/imgs/svg/ticket.svg';
+import { ref, markRaw } from 'vue';
 import HomeIcon from '@/components/icons/HomeIcon.vue';
 import StartIcon from '@/components/icons/StartIcon.vue';
 import MapIcon from '@/components/icons/MapIcon.vue';
@@ -23,27 +18,27 @@ const fairTabs = ref([
   {
     path: '/',
     label: 'Start',
-    icon: StartIcon
+    icon: markRaw(StartIcon)
   },
   {
     path: '/fair',
     label: 'Home',
-    icon: HomeIcon
+    icon: markRaw(HomeIcon)
   },
   {
     path: '/fair/map',
     label: 'Map',
-    icon: MapIcon
+    icon: markRaw(MapIcon)
   },
   {
     path: '/fair/schedule',
     label: 'Schedule',
-    icon: ScheduleIcon
+    icon: markRaw(ScheduleIcon)
   },
   {
     path: '/fair/tickets',
     label: 'Tickets',
-    icon: TicketsIcon
+    icon: markRaw(TicketsIcon)
   },
 ]);
 </script>
