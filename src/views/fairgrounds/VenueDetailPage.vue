@@ -1,39 +1,41 @@
 <template>
   <Fairgrounds
-    title="Venue Detail"
+    title="Venue Details"
     :showMenuButton="true"
   >
     <div v-if="venue" class="main">
-        <h1 class="main__title">{{ venue.title }}</h1>
 
-        <div class="main__image">
-            <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
-                <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
-            </svg>
-        </div>
+      <div class="main__image">
+        <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
+          <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
+        </svg>
+      </div>
+      <p v-if=venue.venuePreheader class="main__category">{{ venue.venuePreheader}}</p>
+      <h1 class="main__title">{{ venue.title }}</h1>
+      <div class="main__description">
+        <div class="main__description" v-html="sanitizedDescription"></div>
+      </div>
+      <div class="main__specifications">
+          <h2 class="main__subtitle">Specifications</h2>
 
-        <div class="main__description">
-          <div class="main__description" v-html="sanitizedDescription"></div>
-        </div>
+          <div class="spec-group">
+              <h3 class="spec-label">Size</h3>
+              <p class="spec-value">15,946 square feet</p>
+          </div>
 
-        <div class="main__specifications">
-            <h2 class="main__subtitle">Specifications</h2>
+          <div class="spec-group">
+              <h3 class="spec-label">Restrooms</h3>
+              <p class="spec-value">2 public</p>
+          </div>
 
-            <div class="spec-group">
-                <h3 class="spec-label">Size</h3>
-                <p class="spec-value">15,946 square feet</p>
-            </div>
-
-            <div class="spec-group">
-                <h3 class="spec-label">Restrooms</h3>
-                <p class="spec-value">2 public</p>
-            </div>
-
-            <div class="spec-group">
-                <h3 class="spec-label">Electoral</h3>
-                <p class="spec-value">110/208 non-commercial</p>
-            </div>
-        </div>
+          <div class="spec-group">
+              <h3 class="spec-label">Electoral</h3>
+              <p class="spec-value">110/208 non-commercial</p>
+          </div>
+      </div>
+    </div>
+    <div class="wrapper">
+      <FGKeepInTouch />
     </div>
   </Fairgrounds>
 </template>
@@ -56,6 +58,7 @@ interface Venue {
     venueDetailPreheader: string | null;
     venueNavTitle: string | null;
     venueSubheader: string | null;
+    venuePreheader: string | null;
 }
 
 const route = useRoute();
@@ -69,6 +72,7 @@ const venue = computed<Venue | undefined>(() => {
     );
 });
 
+console.log('venue', venue.value);
 // Sanitize the description to allow HTML
 const sanitizedDescription = computed(() => {
     return venue.value?.venueDetailBody || 'No description available';
@@ -77,7 +81,17 @@ const sanitizedDescription = computed(() => {
 
 <style lang="scss" scoped>
 .main {
-    padding: 30px;
+    padding: 20px;
+    background-color: #EBEDEF;
+
+    &__category {
+       color: #0077C8;
+       margin: 0px;
+       margin-bottom: 5px;
+       font-weight: 600;
+       font-family: 'inter', sans-serif;
+      font-size: 14px;
+    }
 
     &__title {
         font-size: 24px;
@@ -86,11 +100,12 @@ const sanitizedDescription = computed(() => {
         margin: 0 0 16px 0;
         line-height: 28px;
         letter-spacing: 0.5px;
+        font-family: 'inter', sans-serif;
     }
 
     &__image {
         background-color: #EFF2F6;
-        border-radius: 24px;
+        border-radius: 5px;
         height: 25vh;
         display: flex;
         align-items: center;
@@ -176,6 +191,10 @@ const sanitizedDescription = computed(() => {
         line-height: 24px;
         letter-spacing: 0.5px;
     }
+}
+
+.wrapper {
+    padding-bottom: 90px;
 }
 
 :deep(ion-content) {

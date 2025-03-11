@@ -5,6 +5,7 @@
   >
     <div class="main">
           <div class="main__header">
+              <img src="/public/Host_Event.png" alt="Venues" class="main__header-image" />
               <div class="title">Host an Event</div>
               <div class="description">If you're considering hosting an event, you'll want to first review the different spaces we can offer your organization.</div>
           </div>
@@ -79,10 +80,17 @@ const stripHTML = (html: string): string => {
 <style lang="scss" scoped>
 
 .main {
-    padding: 30px;
+
 
     &__header {
-        margin-bottom: 30px;
+        padding: 20px;
+        padding-bottom: 30px;
+        background-color: #EBEDEF;
+
+        &-image {
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
 
         .title {
             color: #343434;
@@ -108,6 +116,7 @@ const stripHTML = (html: string): string => {
         display: flex;
         flex-direction: column;
         gap: 0px;
+        padding: 0px 20px 95px 20px;
 
         &-card {
             display: flex;
@@ -120,7 +129,7 @@ const stripHTML = (html: string): string => {
                 width: 100%;
                 height: 25vh;
                 object-fit: cover;
-                border-radius: 24px;
+                border-radius: 5px;
             }
 
             .content {
@@ -159,13 +168,17 @@ const stripHTML = (html: string): string => {
             }
 
             .cta {
-                border: 1px solid #486284;
-                border-radius: 50px;
+                border: 1px solid #0077C8;
+                background-color: #0077C8;
+                border-radius: 5px;
                 width: fit-content;
-                padding: 12px 20px;
+                padding: 15px 30px;
                 text-decoration: none;
-                color: #486284;
+                font-family: 'Inter', sans-serif;
+                font-size: 14px;
+                color: #F1F1F1;
                 font-weight: 700;
+                text-transform: uppercase;
             }
         }
     }
