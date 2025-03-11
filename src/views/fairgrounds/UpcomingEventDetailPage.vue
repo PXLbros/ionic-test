@@ -205,7 +205,7 @@ const formatAdditionalDate = (date: EventDate): string => {
 
 .event-details {
   margin-bottom: 24px;
-  padding: 0px 20px;
+  padding: 20px 20px 0px 20px;
 }
 
 .event-time {
@@ -234,7 +234,7 @@ const formatAdditionalDate = (date: EventDate): string => {
 .event-image {
   width: 100%;
   height: 250px;
-  border-radius: 16px;
+  border-radius: 10px;
   overflow: hidden;
   margin-bottom: 24px;
   background-color: #F5F7FA;
@@ -334,6 +334,8 @@ const formatAdditionalDate = (date: EventDate): string => {
 }
 
 .additional-dates {
+  padding: 0px 20px 20px 20px;
+
   h2 {
     font-size: 24px;
     font-weight: 600;
