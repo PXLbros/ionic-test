@@ -67,7 +67,7 @@ console.log('data from the store', dataStore.data);
   flex-direction: column;
   height: 100%;
   background-color: #1a1a1a;
-  padding: 65px 35px;
+  padding: 65px 25px 50px;
 
   &__container {
     display: flex;

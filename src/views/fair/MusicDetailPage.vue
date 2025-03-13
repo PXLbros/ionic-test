@@ -1,68 +1,58 @@
 <template>
-    <ion-page>
-      <ion-header>
-        <ion-toolbar :translucent="true">
-          <ion-buttons slot="start">
-            <ion-back-button default-href="/fair/music"></ion-back-button>
-          </ion-buttons>
-          <ion-title>Artist</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content :fullscreen="true">
+  <DefaultLayout title="Music" :showMenuButton="false">
+    <div v-if="event" class="main">
+        <div class="main__image">
+            <img v-if="event.featured_image" :src="event.featured_image" alt="">
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
+                <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
+            </svg>
+        </div>
 
-            <div v-if="event" class="main">
-                <div class="main__image">
-                    <img v-if="event.featured_image" :src="event.featured_image" alt="">
-                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
-                        <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
-                    </svg>
-                </div>
+        <div class="main__content">
+            <div class="group">
+                <div class="main__venue">{{ event.venue?.name }}</div>
+                <h1 class="main__title">{{ event.title }}</h1>
+                <div class="main__date" v-if="event.dates && event.dates.length > 0">{{ formatEventDate(event.dates) }} ({{event.duration}} min)</div>
+                <div class="main__price" v-if="event.price">Price: ${{event.price || 'price not available'}}</div>
+            </div>
 
-                <div class="main__content">
-                    <div class="group">
-                        <div class="main__venue">{{ event.venue?.name }}</div>
-                        <h1 class="main__title">{{ event.title }}</h1>
-                        <div class="main__date" v-if="event.dates && event.dates.length > 0">{{ formatEventDate(event.dates) }} ({{event.duration}} min)</div>
-                        <div class="main__price" v-if="event.price">Price: ${{event.price || 'price not available'}}</div>
-                    </div>
+            <div class="main__description" v-html="event.description"></div>
 
-                    <div class="main__description" v-html="event.description"></div>
-
-                    <!-- Facts Sections -->
-                    <div class="facts-section">
-                        <h2 class="facts-title">Facts</h2>
-                        <div class="facts-item">
-                            <div class="facts-label">Label</div>
-                            <div class="facts-value">fadfadfasdfl</div>
-                        </div>
-                    </div>
-
-                    <div class="facts-section">
-                        <h2 class="facts-title">Facts</h2>
-                        <div class="facts-item">
-                            <div class="facts-label">Label</div>
-                            <div class="facts-value">fadfadfasdfl</div>
-                        </div>
-                    </div>
-
-                    <div class="facts-section">
-                        <h2 class="facts-title">Facts</h2>
-                        <div class="facts-item">
-                            <div class="facts-label">Label</div>
-                            <div class="facts-value">fadfadfasdfl</div>
-                        </div>
-                    </div>
+            <!-- Facts Sections -->
+            <div class="facts-section">
+                <h2 class="facts-title">Facts</h2>
+                <div class="facts-item">
+                    <div class="facts-label">Label</div>
+                    <div class="facts-value">fadfadfasdfl</div>
                 </div>
             </div>
-        </ion-content>
-    </ion-page>
+
+            <div class="facts-section">
+                <h2 class="facts-title">Facts</h2>
+                <div class="facts-item">
+                    <div class="facts-label">Label</div>
+                    <div class="facts-value">fadfadfasdfl</div>
+                </div>
+            </div>
+
+            <div class="facts-section">
+                <h2 class="facts-title">Facts</h2>
+                <div class="facts-item">
+                    <div class="facts-label">Label</div>
+                    <div class="facts-value">fadfadfasdfl</div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </DefaultLayout>
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
 import { useRoute } from 'vue-router';
 import { useDataStore } from '@/stores/data';
 import { computed } from 'vue';
+import DefaultLayout from '@/layouts/default.vue';
+
 
 interface Event {
     id: number;
@@ -205,7 +195,7 @@ ion-back-button {
 
     &__image {
         background-color: #EFF2F6;
-        border-radius: 24px;
+        border-radius: 10px;
         height: 25vh;
         display: flex;
         align-items: center;
@@ -217,7 +207,7 @@ ion-back-button {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 24px;
+            border-radius: 10px;
         }
     }
 

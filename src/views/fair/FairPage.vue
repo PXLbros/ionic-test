@@ -270,25 +270,39 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
         display: flex;
         flex-direction: column;
         position: relative; // Add this
-        // height: 83vh;
-        // background-image: url('/src/imgs/Bkg_V4.jpg');
-        // background: linear-gradient(180deg, #F5B61B 0%, #F5B61B 100%);
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        padding-bottom: 20px;
+        padding-bottom: 80px;
+        z-index: 10;
+        background: linear-gradient(180deg, rgba(245, 182, 27, 0.7), rgba(245, 182, 27, 0.7));
 
 
-        // Create a pseudo-element for the gradient
         &::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 110%;
-            background: linear-gradient(180deg, #F5B61B 0%, #F5B61B 100%);
-            z-index: 0;
+          content: '';
+          position: absolute;
+          top: -75px;
+          left: 0;
+          width: 100%;
+          height: 110%;
+          background-image: url('/home/NYSF_Home_Flags.png');
+          background-repeat: no-repeat;
+          background-size: contain;
+          z-index: -2; /* Negative z-index to place it behind the background */
+          pointer-events: none;
+        }
+
+        /* Create another pseudo-element for the background image */
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url('/home/NYSF_Home_Art.png');
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: cover;
+          z-index: -1; /* Higher than the gradient but still behind content */
+          pointer-events: none;
         }
 
 
@@ -365,6 +379,7 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
       position: relative;
       z-index: 10;
       padding-bottom: 90px;
+      margin-top: -50px;
     }
 
     .section {
