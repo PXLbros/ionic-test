@@ -52,18 +52,6 @@
                 </div>
               </div>
               <div class="filter-dropdown">
-                <button class="filter-btn" :class="{ 'filter-btn--active': showVenueDropdown === true }" @click="toggleVenueDropdown">
-                  {{ selectedVenue || 'Venue' }}
-                  <span>▼</span>
-                </button>
-                <div v-if="showVenueDropdown" class="dropdown-content">
-                  <div @click="selectVenue('')">All Venues</div>
-                  <div v-for="venue in uniqueVenues" :key="venue" @click="selectVenue(venue || '')">
-                    {{ venue }}
-                  </div>
-                </div>
-              </div>
-              <div class="filter-dropdown">
                 <button class="filter-btn" :class="{ 'filter-btn--active': showGenreDropdown === true }" @click="toggleGenreDropdown">
                   {{ selectedGenre || 'Genre' }}
                   <span>▼</span>
@@ -72,6 +60,18 @@
                   <div @click="selectGenre('')">All Genres</div>
                   <div :class="{ 'active': selectedGenre !== '' }" v-for="genre in uniqueGenres" :key="genre" @click="selectGenre(genre)">
                     {{ genre }}
+                  </div>
+                </div>
+              </div>
+              <div class="filter-dropdown">
+                <button class="filter-btn" :class="{ 'filter-btn--active': showVenueDropdown === true }" @click="toggleVenueDropdown">
+                  {{ selectedVenue || 'Venue' }}
+                  <span>▼</span>
+                </button>
+                <div v-if="showVenueDropdown" class="dropdown-content">
+                  <div @click="selectVenue('')">All Venues</div>
+                  <div v-for="venue in uniqueVenues" :key="venue" @click="selectVenue(venue || '')">
+                    {{ venue }}
                   </div>
                 </div>
               </div>
@@ -512,7 +512,8 @@ const venueInfo = computed(() => {
 
 // START OF THE FILTERS SECTION AND EVENT LIST
 .wrapper {
-  background-color: #098944;
+  background-color: rgba(9, 137, 69, 1.0);
+  backdrop-filter: blur(30px);
   padding-top: 10px;
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
@@ -523,12 +524,12 @@ const venueInfo = computed(() => {
   .sticky-wrapper {
     position: sticky;
     top: 0px;
-    backdrop-filter: blur(70px);
+    backdrop-filter: blur(30px);
     background-color: rgb(9, 137, 68, 1.0);
     margin: 5px;
     border-radius: 10px;
     z-index: 100;
-    box-shadow: 1px 22px 15px 1px rgb(9, 137, 68)
+    box-shadow: 1px 22px 15px 1px rgb(9, 137, 68, 1.0);
   }
 }
 

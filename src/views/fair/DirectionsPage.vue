@@ -124,12 +124,12 @@ console.log('directions page data', pageData);
                padding: 24px;
                border-radius: 16px;
                list-style: none;
-               background-color: #1F3667;
-               color: #FFF;
+               background-color: #F4E8AB;
+               color: #000;
                // color: #42639F;
 
                a {
-                  color: #FFF;
+                  color: #000;
                   text-decoration: underline;
                   font-weight: 400;
                }
