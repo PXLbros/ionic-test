@@ -44,7 +44,7 @@ import {
   IonContent,
 } from '@ionic/vue';
 import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline } from 'ionicons/icons';
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { Map } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, GeoJSON } from 'geojson';
 
@@ -66,6 +66,8 @@ const mapContainer = ref<HTMLElement | null>(null);
 const dataStore = useDataStore();
 const vendors = dataStore.data.nysfairWebsite.vendors;
 console.log('vendors:', vendors); // Ensure these have latitude/longitude
+
+let map: Map;
 
 // Convert vendors to GeoJSON
 function buildVendorGeoJSON(vendors: any[]): GeoJSON {
@@ -95,8 +97,7 @@ function buildVendorGeoJSON(vendors: any[]): GeoJSON {
 
 onMounted(() => {
   if (mapContainer.value) {
-
-    const map = new mapboxgl.Map({
+    map = new mapboxgl.Map({
       container: mapContainer.value,
       style: 'mapbox://styles/pxldevops/cm4uef2wm005401sm7ebof1mh',
       center: [-76.2197, 43.073],
@@ -108,7 +109,6 @@ onMounted(() => {
       touchZoomRotate: true,
       renderWorldCopies: false,
       preserveDrawingBuffer: true, // Needed for image export
-
     });
 
     map.addControl(new mapboxgl.NavigationControl());
@@ -117,6 +117,10 @@ onMounted(() => {
       // 1. Image overlay FIRST (so we can put clusters on top)
       const testImage = new Image();
       testImage.onload = () => {
+        if (!map) {
+          return;
+        }
+
         map.addSource('chevy-court-area', {
           type: 'image',
           url: testImage.src,
@@ -275,6 +279,12 @@ onMounted(() => {
         map.resize();
       }, 100);
     });
+  }
+});
+
+onUnmounted(() => {
+  if (map) {
+    map.remove();
   }
 });
 </script>
