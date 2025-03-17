@@ -26,8 +26,7 @@
     "@capacitor/status-bar": "^6.0.2",
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
-    "@sentry/capacitor": "1.0.2",
-    "@sentry/vue": "8.37.1",
+    "@sentry/capacitor": "^1.2.0",
     "@types/geojson": "^7946.0.16",
     "@types/mapbox-gl": "^3.1.0",
     "axios": "^1.7.7",
@@ -43,9 +42,9 @@
     "vue-strapi-blocks-renderer": "^0.2.2"
   },
   "devDependencies": {
-    "@capacitor/cli": "6.2.0",
-    "@vitejs/plugin-legacy": "^5.0.0",
-    "@vitejs/plugin-vue": "^4.0.0",
+    "@capacitor/cli": "^7.1.0",
+    "@vitejs/plugin-legacy": "^6.0.2",
+    "@vitejs/plugin-vue": "^5.2.3",
     "@vue/eslint-config-typescript": "^12.0.0",
     "@vue/test-utils": "^2.3.0",
     "eslint": "^8.35.0",
@@ -54,10 +53,10 @@
     "sass": "^1.77.8",
     "terser": "^5.4.0",
     "typescript": "^5.1.6",
-    "unplugin-auto-import": "^0.18.3",
-    "unplugin-vue-components": "^0.27.4",
-    "vite": "~5.2.0",
-    "vue-tsc": "^1.8.27"
+    "unplugin-auto-import": "^19.1.1",
+    "unplugin-vue-components": "^28.4.1",
+    "vite": "^6.2.2",
+    "vue-tsc": "^3.0.0-alpha.2"
   },
   "description": "An Ionic project"
 }
