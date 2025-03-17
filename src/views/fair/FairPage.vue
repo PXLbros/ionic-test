@@ -270,7 +270,7 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
         display: flex;
         flex-direction: column;
         position: relative; // Add this
-        padding-bottom: 80px;
+        padding-bottom: 100px;
         z-index: 10;
         background: linear-gradient(180deg, rgba(245, 182, 27, 0.7), rgba(245, 182, 27, 0.7));
 
@@ -296,13 +296,18 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
           top: 0;
           left: 0;
           width: 100%;
-          height: 100%;
+          height: 117%;
           background-image: url('/home/NYSF_Home_Art.png');
           background-position: center;
           background-repeat: no-repeat;
-          background-size: cover;
+          background-size: contain;
           z-index: -1; /* Higher than the gradient but still behind content */
           pointer-events: none;
+
+          // For smaller screens use differe bg image
+          @media (max-width: 410px) {
+              background-image: url('/home/NYSF_Home_Art_380.png');
+          }
         }
 
 
@@ -315,7 +320,7 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
             z-index: 10; // Add this to ensure logo stays on top
             margin-bottom: 10px;
 
-            @media (max-height: 845px) {
+            @media (max-height: 950px) {
                 max-height: 14vh;
             }
         }
@@ -379,7 +384,7 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
       position: relative;
       z-index: 10;
       padding-bottom: 90px;
-      margin-top: -50px;
+      margin-top: -86px;
     }
 
     .section {
