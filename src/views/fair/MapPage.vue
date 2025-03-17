@@ -66,6 +66,7 @@ const mapContainer = ref<HTMLElement | null>(null);
 const dataStore = useDataStore();
 const vendors = dataStore.data.nysfairWebsite.vendors;
 console.log('vendors:', vendors); // Ensure these have latitude/longitude
+console.log('data from store for map:', dataStore.data.nysfairWebsite);
 
 let map: Map;
 
