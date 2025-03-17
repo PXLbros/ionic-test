@@ -96,37 +96,37 @@ const initializeFirebase = async () => {
 const appStore = useAppStore();
 
 router.isReady().then(async () => {
-  // initializeFirebase().then((initializedFirebase) => {
-  //   if (!initializedFirebase) {
-  //     return;
-  //   }
+  initializeFirebase().then((initializedFirebase) => {
+    if (!initializedFirebase) {
+      return;
+    }
 
-  //   // Get the initial route
-  //   const initialRoute = router.currentRoute.value;
+    // Get the initial route
+    const initialRoute = router.currentRoute.value;
 
-  //   // Log initial screen view
-  //   if (initialRoute) {
-  //     console.log('Initial Page Load:', initialRoute);
+    // Log initial screen view
+    if (initialRoute) {
+      console.log('Initial Page Load:', initialRoute);
 
-  //     FirebaseAnalytics.logEvent({
-  //       name: 'screen_view',
-  //       params: {
-  //         screen_name: initialRoute.name || initialRoute.path,
-  //       },
-  //     });
-  //   }
+      FirebaseAnalytics.logEvent({
+        name: 'screen_view',
+        params: {
+          screen_name: initialRoute.name || initialRoute.path,
+        },
+      });
+    }
 
-  //   router.afterEach((to) => {
-  //     console.log('Route changed to: ', to);
+    router.afterEach((to) => {
+      console.log('Route changed to: ', to);
 
-  //     FirebaseAnalytics.logEvent({
-  //       name: 'screen_view',
-  //       params: {
-  //         screen_name: to.name || to.path,
-  //       }
-  //     });
-  //   });
-  // });
+      FirebaseAnalytics.logEvent({
+        name: 'screen_view',
+        params: {
+          screen_name: to.name || to.path,
+        }
+      });
+    });
+  });
 
   app.mount('#app');
 
