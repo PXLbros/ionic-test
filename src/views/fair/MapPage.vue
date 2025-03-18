@@ -20,12 +20,23 @@
         </div>
 
         <div class="filter-tabs">
-          <button class="filter-tab">Vendors</button>
-          <button class="filter-tab">
-            Services
-            <ion-icon :icon="chevronDownOutline"></ion-icon>
-          </button>
-          <button class="filter-tab">Categories</button>
+          <div class="map-dropdown">
+            <button class="filter-tab" @click="toggleMapDropdown">
+              {{ currentMapName }}
+              <ion-icon :icon="chevronDownOutline"></ion-icon>
+            </button>
+            <div class="dropdown-content" v-if="showMapDropdown">
+              <div
+                v-for="map in serviceMaps"
+                :key="map.id"
+                class="dropdown-item"
+                @click="selectMap(map)"
+              >
+                {{ map.name }}
+              </div>
+            </div>
+          </div>
+          <button class="filter-tab">Exhibitors</button>
         </div>
       </div>
 
@@ -51,7 +62,7 @@
 
 <script setup lang="ts">
 import DefaultLayout from '@/layouts/default.vue';
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import {
   IonIcon,
   IonContent,
@@ -81,23 +92,74 @@ interface ServiceProperties {
   categories: number[];
 }
 
+interface ServiceMap {
+  id: number;
+  name: string;
+  slug: string;
+  num_services: number;
+}
+
 // Your Pinia or Vuex store that contains CMS data
 import { useDataStore } from '@/stores/data';
 
 const mapContainer = ref<HTMLElement | null>(null);
+const showMapDropdown = ref(false);
+const currentMapId = ref<number | null>(null);
 
 // Grabbing data from your CMS
 const dataStore = useDataStore();
 const vendors = dataStore.data.nysfairWebsite.vendors;
 const services = dataStore.data.nysfairWebsite.services;
 const serviceCategories = dataStore.data.nysfairWebsite.service_categories;
+const serviceMaps = dataStore.data.nysfairWebsite.service_maps;
 
-// Debug logging
-console.log('Service Categories:', serviceCategories);
-console.log('Sample service data:', services[0]);
+// Find the master map ID
+const masterMap = serviceMaps.find((map: any) => map.slug === 'master');
+currentMapId.value = masterMap?.id ?? serviceMaps[0]?.id ?? null;
+
+// Get the current map name for display
+const currentMapName = computed(() => {
+  const map = serviceMaps.find((m: any) => m.id === currentMapId.value);
+  return map ? map.name : 'Maps';
+});
 
 // Map reference
 let map: Map;
+
+// Toggle dropdown visibility
+function toggleMapDropdown() {
+  showMapDropdown.value = !showMapDropdown.value;
+}
+
+// Close dropdown when clicking elsewhere
+function closeDropdownOnOutsideClick(event: MouseEvent) {
+  const dropdown = document.querySelector('.map-dropdown');
+  if (dropdown && !dropdown.contains(event.target as Node) && showMapDropdown.value) {
+    showMapDropdown.value = false;
+  }
+}
+
+// Select a map type and update the display
+function selectMap(mapData: ServiceMap) {
+  currentMapId.value = mapData.id;
+  showMapDropdown.value = false;
+
+  // Update the map data based on selected map type
+  updateMapForSelectedType();
+}
+
+// Update the map data based on the selected map type
+function updateMapForSelectedType() {
+  if (!map || !currentMapId.value) return;
+
+  // Get the GeoJSON source
+  const source = map.getSource('points-clustered') as mapboxgl.GeoJSONSource;
+  if (!source) return;
+
+  // Update the data with filtered GeoJSON
+  const filteredGeoJson = buildFilteredGeoJSON();
+  source.setData(filteredGeoJson);
+}
 
 // Convert vendors to GeoJSON features
 function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperties>> {
@@ -121,47 +183,61 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
     })));
 }
 
-// Convert services to GeoJSON features
-function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServiceProperties>> {
-  return services
-    .filter((s) => s.latitude && s.longitude) // Make sure latitude and longitude exist
-    .map((s) => {
-      // Debug single service
-      console.log('Processing service:', s.id, s.title);
+// Convert services to GeoJSON features, filtering by map ID if needed
+function buildServiceGeoJSON(services: any[], mapId: number | null = null): Array<Feature<Point, ServiceProperties>> {
+  let filteredServices = services;
 
-      return {
-        type: 'Feature' as const,
-        properties: {
-          title: s.title ?? 'Unknown Service',
-          description: s.description ?? '',
-          id: s.id,
-          is_accessible: Boolean(s.is_accessible),
-          type: 'service' as const,
-          categories: s.categories || [] // Make sure categories is an array
-        },
-        geometry: {
-          type: 'Point' as const,
-          coordinates: [
-            parseFloat(s.longitude),
-            parseFloat(s.latitude)
-          ]
-        }
-      };
+  // Filter services by map ID if provided
+  if (mapId !== null) {
+    filteredServices = services.filter((s) => {
+      // If it's the master map, include all services
+      if (masterMap && mapId === masterMap.id) {
+        return true;
+      }
+
+      // Otherwise, check if the service is in the selected map
+      return Array.isArray(s.maps) && s.maps.includes(mapId);
     });
+  }
+
+  return filteredServices
+    .filter((s) => s.latitude && s.longitude) // Make sure latitude and longitude exist
+    .map((s) => ({
+      type: 'Feature' as const,
+      properties: {
+        title: s.title ?? 'Unknown Service',
+        description: s.description ?? '',
+        id: s.id,
+        is_accessible: Boolean(s.is_accessible),
+        type: 'service' as const,
+        categories: s.categories || [] // Make sure categories is an array
+      },
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [
+          parseFloat(s.longitude),
+          parseFloat(s.latitude)
+        ]
+      }
+    }));
 }
 
-// Combine all features into one GeoJSON object
-function buildCombinedGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
+// Build GeoJSON for the currently selected map type
+function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
   const vendorFeatures = buildVendorGeoJSON(vendors);
-  console.log('Vendor features:', vendorFeatures.length);
+  const serviceFeatures = buildServiceGeoJSON(services, currentMapId.value);
 
-  const serviceFeatures = buildServiceGeoJSON(services);
-  console.log('Service features:', serviceFeatures.length);
+  console.log(`Map ${currentMapId.value}: ${serviceFeatures.length} services, ${vendorFeatures.length} vendors`);
 
   return {
     type: 'FeatureCollection' as const,
     features: [...vendorFeatures, ...serviceFeatures]
   };
+}
+
+// Initial GeoJSON build for map initialization
+function buildCombinedGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
+  return buildFilteredGeoJSON();
 }
 
 // Get service category name by ID
@@ -171,6 +247,9 @@ function getCategoryName(categoryId: number): string {
 }
 
 onMounted(() => {
+  // Setup listener for closing dropdown when clicking outside
+  document.addEventListener('click', closeDropdownOnOutsideClick);
+
   if (mapContainer.value) {
     map = new mapboxgl.Map({
       container: mapContainer.value,
@@ -218,7 +297,7 @@ onMounted(() => {
 
         // 2. Build combined GeoJSON and add as a clustered source
         const combinedGeoJson = buildCombinedGeoJSON();
-        console.log('Combined GeoJSON feature count:', combinedGeoJson.features.length);
+        console.log('Initial GeoJSON feature count:', combinedGeoJson.features.length);
 
         map.addSource('points-clustered', {
           type: 'geojson',
@@ -323,16 +402,11 @@ onMounted(() => {
 
         // 6. Add click handlers for service points
         map.on('click', 'service-point', (e) => {
-          console.log('Service point clicked:', e.features);
           if (!e.features || e.features.length === 0) return;
 
           const feature = e.features[0];
-          console.log('Service feature:', feature);
-
           const coordinates = (feature.geometry as Point).coordinates.slice();
           const props = feature.properties as ServiceProperties;
-
-          console.log('Service properties:', props);
 
           // Get category names for this service if categories exist
           let categoryNames = '';
@@ -411,19 +485,14 @@ onMounted(() => {
 
       // Make sure the image is valid
       testImage.src = '/icons/Map_Design-big-min.png';
-
-      // Additionally, register a click handler directly on the map
-      // to debug what's being clicked
-      map.on('click', (e) => {
-        const features = map.queryRenderedFeatures(e.point);
-        console.log('All clicked features:', features);
-        console.log(`Clicked coordinates: [${e.lngLat.lng}, ${e.lngLat.lat}]`);
-      });
     });
   }
 });
 
 onUnmounted(() => {
+  // Clean up event listener
+  document.removeEventListener('click', closeDropdownOnOutsideClick);
+
   if (map) {
     map.remove();
   }
@@ -511,6 +580,47 @@ onUnmounted(() => {
     gap: 5px;
     font-family: 'inter', sans-serif;
     flex-grow: 1;
+  }
+
+  .map-dropdown {
+    position: relative;
+    flex-grow: 1;
+
+    .dropdown-content {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 6px;
+      max-height: 300px;
+      overflow-y: auto;
+
+      .dropdown-item {
+        padding: 12px 20px;
+        color: #333;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+
+        &:hover {
+          background-color: #f5f5f5;
+        }
+
+        &:first-child {
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+        }
+
+        &:last-child {
+          border-bottom-left-radius: 10px;
+          border-bottom-right-radius: 10px;
+        }
+      }
+    }
   }
 }
 
