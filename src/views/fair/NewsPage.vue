@@ -22,7 +22,7 @@
 
         <!-- Article List -->
         <div class="loader" v-if="isLoading && newsItems === null">
-          Loading news...
+          <Loader />
         </div>
 
         <div v-else-if="loadError">
@@ -70,6 +70,7 @@ import { IonButton } from '@ionic/vue';
 import { computed } from 'vue';
 import { NewsArticle } from '@/types'
 import DefaultLayout from '@/layouts/default.vue';
+import Loader from '@/components/Loader.vue';
 
 
 // const dataStore = useDataStore();

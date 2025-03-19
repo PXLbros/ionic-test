@@ -34,7 +34,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m15 18-6-6 6-6"/>
                 </svg>
-                Previous Article
+                Previous
             </a>
 
             <a
@@ -43,7 +43,7 @@
                 @click.prevent="navigateToArticle(nextArticleId)"
                 class="navigation__button"
             >
-                Next Article
+                Next
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m9 18 6-6-6-6"/>
                 </svg>
@@ -200,27 +200,25 @@ fetchArticle();
 .navigation {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #EFF2F6;
+  gap: 10px;
 
   &__button {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
-      padding: 12px 20px;
-      border: 1px solid #486284;
-      border-radius: 50px;
-      color: #486284;
+      padding: 20px 25px;
+      border-radius: 10px;
+      background: #1F3667;
+      color: #f1f1f1;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
       transition: all 0.2s ease;
+      width: 50%;
 
-      &:hover {
-          background-color: #486284;
-          color: white;
-      }
 
       svg {
           width: 18px;
@@ -234,7 +232,9 @@ fetchArticle();
 }
 
 .loading-article {
-  margin-top: 1.5rem;
+  padding-top: 1.5rem;
   text-align: center;
+  height: 100vh;
+  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
 }
 </style>

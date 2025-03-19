@@ -2,7 +2,9 @@
       <DefaultLayout title="Real-Time Updates" :showMenuButton="true">
         <div class="main">
             <div class="main__content">
-                <div class="loading-content" v-if="isLoading">Loading updates...</div>
+                <div class="loading-content" v-if="isLoading">
+                  <Loader />
+                </div>
                 <div v-else-if="loadError">{{ loadError }}</div>
                 <div class="main__content-grid" v-else>
                     <div v-for="update in updates" :key="update.id" class="main__content-item">
@@ -21,6 +23,7 @@
 import DefaultLayout from '@/layouts/default.vue';
 import axios from 'axios';
 import { ref } from 'vue';
+import Loader from '@/components/Loader.vue';
 
 interface Update {
     id: number;
