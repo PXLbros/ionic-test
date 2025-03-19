@@ -4,8 +4,29 @@
       <div class="main__header">
         <div class="wrapper">
           <div class="search-container">
-            <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @input="handleLiveSearch" @keyup.enter="handleSearch">
+            <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @input="handleLiveSearch" @keyup.enter="handleSearch" @focus="showSearchSuggestions = true">
             <ion-icon :icon="searchOutline" class="search-icon" @click="handleSearch"></ion-icon>
+            <div
+              class="search-suggestions"
+              v-if="showSearchSuggestions && filteredSuggestions.length > 0"
+            >
+              <div
+                v-for="(suggestion, index) in filteredSuggestions"
+                :key="index"
+                class="suggestion-item"
+                @click="selectSuggestion(suggestion)"
+              >
+                <div class="suggestion-type-badge" :class="suggestion.type">
+                  {{ suggestion.type === 'vendor' ? 'Vendor' : 'Service' }}
+                </div>
+                <div class="suggestion-content">
+                  <div class="suggestion-name">{{ suggestion.name }}</div>
+                  <div class="suggestion-description" v-if="suggestion.description">
+                    {{ truncateText(suggestion.description, 60) }}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="group">
             <button class="filter-button" @click="toggleFiltersPanel">
@@ -156,6 +177,16 @@ interface Category {
   maps?: number[];
 }
 
+interface SearchSuggestion {
+  id: number;
+  name: string;
+  description?: string;
+  type: 'vendor' | 'service';
+  longitude: number;
+  latitude: number;
+  categories?: number[];
+}
+
 import { useDataStore } from '@/stores/data';
 
 const mapContainer = ref<HTMLElement | null>(null);
@@ -168,6 +199,11 @@ const searchDebounceTimeout = ref<number | null>(null);
 const selectedCategories = ref<Record<number, boolean>>({});
 const showFiltersPanel = ref(false);
 const hasFilterChanges = ref(false);
+
+// Refs for search suggestions
+const showSearchSuggestions = ref(false);
+const filteredSuggestions = ref<SearchSuggestion[]>([]);
+const maxSuggestionsToShow = 5; // Reduced for mobile screens
 
 // Grabbing data from CMS
 const dataStore = useDataStore();
@@ -305,6 +341,9 @@ function handleLiveSearch() {
     clearTimeout(searchDebounceTimeout.value);
   }
 
+  // Generate search suggestions as user types
+  generateSearchSuggestions();
+
   // Set a new timeout to avoid too many updates while typing
   searchDebounceTimeout.value = setTimeout(() => {
     updateMapForSelectedType();
@@ -314,6 +353,8 @@ function handleLiveSearch() {
 // Reset search and filters
 function resetFilters() {
   searchQuery.value = '';
+  showSearchSuggestions.value = false;
+  filteredSuggestions.value = [];
   clearCategoryFilters();
 
   // Reset to master map if it exists, otherwise use the first map
@@ -456,6 +497,134 @@ function getCategoryName(categoryId: number): string {
   // Then check vendor categories
   const vendorCategory = vendorCategories.find((cat: any) => cat.id === categoryId);
   return vendorCategory ? vendorCategory.name : 'Unknown Category';
+}
+
+// Helper function to truncate text
+function truncateText(text: string, maxLength: number): string {
+  if (!text) return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
+
+// Generate search suggestions based on current search query
+function generateSearchSuggestions() {
+  if (!searchQuery.value.trim()) {
+    filteredSuggestions.value = [];
+    return;
+  }
+
+  const query = searchQuery.value.toLowerCase().trim();
+
+  // Generate suggestions from vendors
+  const vendorSuggestions = vendors
+    .filter((v: any) => {
+      // Filter by current map
+      if (currentMapId.value !== null && (!Array.isArray(v.maps) || !v.maps.includes(currentMapId.value))) {
+        return false;
+      }
+
+      // Filter by category if selected
+      if (Object.values(selectedCategories.value).some(selected => selected)) {
+        if (!v.categories || !v.categories.some((catId: number) => selectedCategories.value[catId])) {
+          return false;
+        }
+      }
+
+      // Check if vendor name or description matches the query
+      return (v.name && v.name.toLowerCase().includes(query)) ||
+             (v.description && v.description.toLowerCase().includes(query));
+    })
+    .map((v: any) => {
+      // Only take the first location for the suggestion
+      const location = v.locations && v.locations.length > 0 ? v.locations[0] : null;
+      return {
+        id: v.id,
+        name: v.name || 'Unknown Vendor',
+        description: v.description || '',
+        type: 'vendor' as const,
+        latitude: location ? parseFloat(location.latitude) : 0,
+        longitude: location ? parseFloat(location.longitude) : 0,
+        categories: v.categories || []
+      };
+    });
+
+  // Generate suggestions from services
+  const serviceSuggestions = services
+    .filter((s: any) => {
+      // Filter by current map
+      if (currentMapId.value !== null && (!Array.isArray(s.maps) || !s.maps.includes(currentMapId.value))) {
+        return false;
+      }
+
+      // Filter by category if selected
+      if (Object.values(selectedCategories.value).some(selected => selected)) {
+        if (!s.categories || !s.categories.some((catId: number) => selectedCategories.value[catId])) {
+          return false;
+        }
+      }
+
+      // Check if service title or description matches the query
+      return (s.title && s.title.toLowerCase().includes(query)) ||
+             (s.description && s.description.toLowerCase().includes(query));
+    })
+    .map((s: any) => ({
+      id: s.id,
+      name: s.title || 'Unknown Service',
+      description: s.description || '',
+      type: 'service' as const,
+      latitude: parseFloat(s.latitude) || 0,
+      longitude: parseFloat(s.longitude) || 0,
+      categories: s.categories || []
+    }));
+
+  // Combine and limit the suggestions
+  filteredSuggestions.value = [...vendorSuggestions, ...serviceSuggestions]
+    .slice(0, maxSuggestionsToShow);
+}
+
+// Select a suggestion
+function selectSuggestion(suggestion: SearchSuggestion) {
+  searchQuery.value = suggestion.name;
+  showSearchSuggestions.value = false;
+
+  // Update the map to focus on the selected point
+  if (map) {
+    map.flyTo({
+      center: [suggestion.longitude, suggestion.latitude],
+      zoom: 17,
+      essential: true
+    });
+
+    // Find the feature on the map and show its popup after a short delay
+    setTimeout(() => {
+      const features = map.queryRenderedFeatures(
+        map.project([suggestion.longitude, suggestion.latitude]),
+        { layers: suggestion.type === 'vendor' ? ['vendor-point'] : ['service-point'] }
+      );
+
+      if (features.length > 0) {
+        // Create a synthetic click event
+        const clickEvent = {
+          lngLat: { lng: suggestion.longitude, lat: suggestion.latitude },
+          point: map.project([suggestion.longitude, suggestion.latitude]),
+          features: [features.find(f =>
+            (suggestion.type === 'vendor' &&
+             f.properties &&
+             f.properties.id === suggestion.id &&
+             f.properties.type === 'vendor') ||
+            (suggestion.type === 'service' &&
+             f.properties &&
+             f.properties.id === suggestion.id &&
+             f.properties.type === 'service')
+          )]
+        };
+
+
+      }
+    }, 500); // Small delay to allow the map to finish flying
+  }
+
+  // Also update the map with filtered results
+  handleSearch();
 }
 
 onMounted(() => {
@@ -757,6 +926,7 @@ onUnmounted(() => {
 
   .search-container {
     position: relative;
+    width: 100%;
 
     .search-input {
       width: 100%;
@@ -1145,5 +1315,80 @@ onUnmounted(() => {
     opacity: 1;
     visibility: visible;
   }
+}
+
+/* Search suggestions styles */
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  width: 90vw;
+}
+
+.suggestion-item {
+  display: flex;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  align-items: center;
+  gap: 12px;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:active {
+  background-color: #f0f0f0;
+}
+
+.suggestion-type-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  flex-shrink: 0;
+  color: white;
+  min-width: 60px;
+}
+
+.suggestion-type-badge.vendor {
+  background-color: #EE4722;
+}
+
+.suggestion-type-badge.service {
+  background-color: #1E5EAE;
+}
+
+.suggestion-content {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.suggestion-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestion-description {
+  font-size: 13px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
