@@ -5,7 +5,7 @@
       <div class="main__header">
         <div class="wrapper">
           <div class="search-container">
-            <input type="text" placeholder="Search for vendors & services" class="search-input" v-model="searchQuery" @keyup.enter="handleSearch">
+            <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @keyup.enter="handleSearch">
             <ion-icon :icon="searchOutline" class="search-icon"></ion-icon>
           </div>
           <div class="group">
@@ -31,6 +31,7 @@
                 v-for="map in allMaps"
                 :key="map.id"
                 class="dropdown-item"
+                :class="{ 'active': map.id === currentMapId }"
                 @click="selectMap(map)"
               >
                 {{ map.name }}
@@ -124,7 +125,7 @@ const allMaps = computed(() => {
   const combinedMaps = [...serviceMaps];
 
   // Add vendor maps if they don't already exist in the combined list
-  vendorMaps.forEach(vendorMap => {
+  vendorMaps.forEach((vendorMap: ServiceMap) => {
     if (!combinedMaps.some(map => map.id === vendorMap.id)) {
       combinedMaps.push(vendorMap);
     }
@@ -204,13 +205,14 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
   let filteredVendors = vendors
     .filter((v) => v.locations && v.locations.length > 0);
 
-  // Filter by map ID if it's not the master map
-  if (currentMapId.value !== null && masterMap && currentMapId.value !== masterMap.id) {
+  // Filter by map ID for all maps, including master
+  if (currentMapId.value !== null) {
     filteredVendors = filteredVendors.filter((v) => {
       // Check if the vendor has maps array and it includes the current map ID
       return Array.isArray(v.maps) && v.maps.includes(currentMapId.value);
     });
   }
+
 
   // Apply search filtering
   if (searchQuery.value.trim() !== '') {
@@ -244,8 +246,8 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
 function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServiceProperties>> {
   let filteredServices = services;
 
-  // Filter services by map ID if it's not the master map
-  if (currentMapId.value !== null && masterMap && currentMapId.value !== masterMap.id) {
+  // Filter services by map ID for all maps, including master
+  if (currentMapId.value !== null) {
     filteredServices = services.filter((s) => {
       // Check if the service is in the selected map
       return Array.isArray(s.maps) && s.maps.includes(currentMapId.value);
@@ -679,6 +681,17 @@ onUnmounted(() => {
         &:last-child {
           border-bottom-left-radius: 10px;
           border-bottom-right-radius: 10px;
+        }
+
+        &.active {
+          background-color: #f0f8ff; /* Light blue background */
+          color: #1F3667; /* Match your blue theme color */
+          font-weight: 600; /* Make it slightly bolder */
+          position: relative;
+
+          /* Optional: Add a left border or indicator */
+          border-left: 3px solid #1F3667;
+          padding-left: 17px; /* Adjust padding to account for border */
         }
       }
     }
