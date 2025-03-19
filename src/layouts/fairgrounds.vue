@@ -284,7 +284,7 @@ ion-back-button {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  padding-top: 80px;
+  padding-top: 90px;
   background: #19262D;
 }
 
