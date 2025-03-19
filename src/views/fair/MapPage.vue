@@ -1,15 +1,14 @@
-<!-- Changes to make in the template section -->
 <template>
   <DefaultLayout title="Interactive Map" :showMenuButton="true">
     <div class="main">
       <div class="main__header">
         <div class="wrapper">
           <div class="search-container">
-            <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @keyup.enter="handleSearch">
-            <ion-icon :icon="searchOutline" class="search-icon"></ion-icon>
+            <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @input="handleLiveSearch" @keyup.enter="handleSearch">
+            <ion-icon :icon="searchOutline" class="search-icon" @click="handleSearch"></ion-icon>
           </div>
           <div class="group">
-            <button class="filter-button" @click="handleSearch">
+            <button class="filter-button" @click="toggleFiltersPanel">
               <ion-icon size="small" :icon="optionsOutline"></ion-icon>
               Filter
             </button>
@@ -59,17 +58,61 @@
         </div>
       </ion-content>
     </div>
+
+    <!-- Filters Modal -->
+    <div class="filter-panel" :class="{ 'filter-panel--open': showFiltersPanel }">
+      <div class="filter-panel__header">
+        <h3>Filter Options</h3>
+        <button class="close-button" @click="toggleFiltersPanel">
+          <ion-icon :icon="closeOutline"></ion-icon>
+        </button>
+      </div>
+      <div class="filter-panel__content">
+        <h4>Categories</h4>
+        <div class="categories-list">
+          <div v-if="filteredCategories.length === 0" class="no-categories">
+            No categories available for this map
+          </div>
+          <div
+            v-for="category in filteredCategories"
+            :key="category.id"
+            class="category-item"
+            :class="{ 'category-item--selected': selectedCategories[category.id] }"
+            @click="toggleCategory(category.id)"
+          >
+            <div class="category-checkbox">
+              <div class="checkbox-inner" v-if="selectedCategories[category.id]"></div>
+            </div>
+            <div class="category-name">{{ category.name }}</div>
+            <div class="category-count" v-if="category.num_services || category.num_vendors">
+              ({{ (category.num_services || 0) + (category.num_vendors || 0) }})
+            </div>
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button class="action-button apply" @click="applyFilters">Apply Filters</button>
+          <button class="action-button clear" @click="clearCategoryFilters">Clear All</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backdrop for filter panel -->
+    <div
+      class="filter-backdrop"
+      :class="{ 'filter-backdrop--visible': showFiltersPanel }"
+      @click="toggleFiltersPanel"
+    ></div>
   </DefaultLayout>
 </template>
 
 <script setup lang="ts">
 import DefaultLayout from '@/layouts/default.vue';
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import {
   IonIcon,
   IonContent,
 } from '@ionic/vue';
-import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline } from 'ionicons/icons';
+import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline, closeOutline } from 'ionicons/icons';
 import mapboxgl, { Map } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
@@ -103,19 +146,35 @@ interface ServiceMap {
   num_vendors?: number;
 }
 
-// Your Pinia or Vuex store that contains CMS data
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  num_services?: number;
+  num_vendors?: number;
+  maps?: number[];
+}
+
 import { useDataStore } from '@/stores/data';
 
 const mapContainer = ref<HTMLElement | null>(null);
 const showMapDropdown = ref(false);
 const currentMapId = ref<number | null>(null);
 const searchQuery = ref('');
+const searchDebounceTimeout = ref<number | null>(null);
 
-// Grabbing data from your CMS
+// Add new refs for filters modal
+const selectedCategories = ref<Record<number, boolean>>({});
+const showFiltersPanel = ref(false);
+const hasFilterChanges = ref(false);
+
+// Grabbing data from CMS
 const dataStore = useDataStore();
 const vendors = dataStore.data.nysfairWebsite.vendors;
 const services = dataStore.data.nysfairWebsite.services;
 const serviceCategories = dataStore.data.nysfairWebsite.service_categories;
+const vendorCategories = dataStore.data.nysfairWebsite.vendor_categories;
 const serviceMaps = dataStore.data.nysfairWebsite.service_maps;
 const vendorMaps = dataStore.data.nysfairWebsite.vendor_maps;
 
@@ -144,6 +203,23 @@ const currentMapName = computed(() => {
   return map ? map.name : 'Maps';
 });
 
+// Filter categories based on the current map
+const filteredCategories = computed(() => {
+  if (!currentMapId.value) return [];
+
+  // Combine service and vendor categories
+  const combinedCategories = [
+    ...serviceCategories,
+    ...vendorCategories
+  ];
+
+  // Filter to only show categories related to the current map
+  return combinedCategories.filter((category: Category) => {
+    // Check if the category has a maps array and includes the current map ID
+    return Array.isArray(category.maps) && category.maps.includes(currentMapId.value as number);
+  });
+});
+
 // Map reference
 let map: Map;
 
@@ -165,11 +241,46 @@ function selectMap(mapData: ServiceMap) {
   currentMapId.value = mapData.id;
   showMapDropdown.value = false;
 
+  // Reset category filters when changing maps
+  clearCategoryFilters();
+
   // Update the map data based on selected map type
   updateMapForSelectedType();
 }
 
-// Update the map data based on the selected map type
+// Functions for filters modal
+
+// Toggle filters panel
+function toggleFiltersPanel() {
+  showFiltersPanel.value = !showFiltersPanel.value;
+  console.log('Show filters panel:', showFiltersPanel.value);
+
+  // If closing the panel after changes were made, apply the filters
+  if (!showFiltersPanel.value && hasFilterChanges.value) {
+    applyFilters();
+  }
+}
+
+// Toggle a category selection
+function toggleCategory(categoryId: number) {
+  selectedCategories.value[categoryId] = !selectedCategories.value[categoryId];
+  hasFilterChanges.value = true;
+}
+
+// Clear all category filters
+function clearCategoryFilters() {
+  selectedCategories.value = {};
+  hasFilterChanges.value = false;
+}
+
+// Apply the filters
+function applyFilters() {
+  updateMapForSelectedType();
+  hasFilterChanges.value = false;
+  showFiltersPanel.value = false;
+}
+
+// Update the map data based on the selected map type and filters
 function updateMapForSelectedType() {
   if (!map || !currentMapId.value) return;
 
@@ -187,9 +298,24 @@ function handleSearch() {
   updateMapForSelectedType();
 }
 
+// Handle live search as user types
+function handleLiveSearch() {
+  // Clear any existing timeout
+  if (searchDebounceTimeout.value) {
+    clearTimeout(searchDebounceTimeout.value);
+  }
+
+  // Set a new timeout to avoid too many updates while typing
+  searchDebounceTimeout.value = setTimeout(() => {
+    updateMapForSelectedType();
+  }, 300) as unknown as number;
+}
+
 // Reset search and filters
 function resetFilters() {
   searchQuery.value = '';
+  clearCategoryFilters();
+
   // Reset to master map if it exists, otherwise use the first map
   if (masterMap) {
     currentMapId.value = masterMap.id;
@@ -197,6 +323,19 @@ function resetFilters() {
     currentMapId.value = allMaps.value[0].id;
   }
   updateMapForSelectedType();
+}
+
+// Check if an item matches the category filters
+function matchesCategoryFilters(categories: number[] = []): boolean {
+  // If no categories are selected, everything matches
+  const hasSelectedCategories = Object.values(selectedCategories.value).some(selected => selected);
+
+  if (!hasSelectedCategories) {
+    return true;
+  }
+
+  // Check if any of the item's categories are selected
+  return categories.some(categoryId => selectedCategories.value[categoryId]);
 }
 
 // Convert vendors to GeoJSON features
@@ -213,7 +352,6 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
     });
   }
 
-
   // Apply search filtering
   if (searchQuery.value.trim() !== '') {
     const query = searchQuery.value.toLowerCase();
@@ -222,6 +360,9 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
       (v.description && v.description.toLowerCase().includes(query))
     );
   }
+
+  // Apply category filtering
+  filteredVendors = filteredVendors.filter(v => matchesCategoryFilters(v.categories));
 
   return filteredVendors.flatMap((v) => v.locations.map((location: any) => ({
     type: 'Feature' as const,
@@ -262,6 +403,9 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
       (s.description && s.description.toLowerCase().includes(query))
     );
   }
+
+  // Apply category filtering
+  filteredServices = filteredServices.filter(s => matchesCategoryFilters(s.categories));
 
   return filteredServices
     .filter((s) => s.latitude && s.longitude) // Make sure latitude and longitude exist
@@ -305,8 +449,13 @@ function buildCombinedGeoJSON(): FeatureCollection<Point, VendorProperties | Ser
 
 // Get service category name by ID
 function getCategoryName(categoryId: number): string {
-  const category = serviceCategories.find((cat: any) => cat.id === categoryId);
-  return category ? category.name : 'Unknown Category';
+  // Check service categories first
+  const serviceCategory = serviceCategories.find((cat: any) => cat.id === categoryId);
+  if (serviceCategory) return serviceCategory.name;
+
+  // Then check vendor categories
+  const vendorCategory = vendorCategories.find((cat: any) => cat.id === categoryId);
+  return vendorCategory ? vendorCategory.name : 'Unknown Category';
 }
 
 onMounted(() => {
@@ -553,6 +702,11 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  // Clean up debounce timeout
+  if (searchDebounceTimeout.value) {
+    clearTimeout(searchDebounceTimeout.value);
+  }
+
   // Clean up event listener
   document.removeEventListener('click', closeDropdownOnOutsideClick);
 
@@ -569,6 +723,7 @@ onUnmounted(() => {
   flex-direction: column;
   background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
   padding-bottom: 90px;
+  position: relative;
 }
 
 .wrapper {
@@ -618,6 +773,7 @@ onUnmounted(() => {
       top: 50%;
       transform: translateY(-50%);
       color: #666;
+      cursor: pointer;
     }
   }
 }
@@ -655,7 +811,7 @@ onUnmounted(() => {
       left: 0;
       right: 0;
       z-index: 10;
-      background-color: white;
+      background-color: #F4E8AB;
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       margin-top: 6px;
@@ -685,7 +841,7 @@ onUnmounted(() => {
 
         &.active {
           background-color: #f0f8ff; /* Light blue background */
-          color: #1F3667; /* Match your blue theme color */
+          color: #1F3667;
           font-weight: 600; /* Make it slightly bolder */
           position: relative;
 
@@ -797,6 +953,197 @@ onUnmounted(() => {
     .legend-label {
       font-size: 12px;
     }
+  }
+}
+
+/* Filter Panel Styles */
+.filter-panel {
+  position: absolute;
+  top: 55px;
+  left: 0;
+  right: 0;
+  background-color: #F4E8AB;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 100;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 45px;
+
+  &--open {
+    transform: translateY(0);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #F4E8AB;
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+
+  &__content {
+    padding: 16px 20px;
+    overflow-y: auto;
+
+    h4 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #555;
+    }
+  }
+}
+
+/* Categories list styles */
+.categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 54px;
+
+  .no-categories {
+    color: #666;
+    font-style: italic;
+    padding: 12px 0;
+  }
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #F4E8AB;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &--selected {
+    background-color: #E9EFFD;
+
+    &:hover {
+      background-color: #dae5fc;
+    }
+  }
+
+  .category-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid #1F3667;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .checkbox-inner {
+      width: 12px;
+      height: 12px;
+      background-color: #1F3667;
+      border-radius: 2px;
+    }
+  }
+
+  .category-name {
+    flex-grow: 1;
+    font-size: 15px;
+    color: #333;
+  }
+
+  .category-count {
+    color: #777;
+    font-size: 13px;
+    margin-left: 8px;
+  }
+}
+
+/* Filter actions styles */
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  left: 0px;
+  padding: 10px;
+  background: #F4E8AB49;
+  backdrop-filter: blur(6px);
+
+  .action-button {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: 15px;
+    transition: all 0.2s ease;
+
+    &.apply {
+      background-color: #1F3667;
+      color: white;
+
+      &:hover {
+        background-color: #15264d;
+      }
+    }
+
+    &.clear {
+      background-color: #f0f0f0;
+      color: #555;
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
+    }
+  }
+}
+
+/* Backdrop styles */
+.filter-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 90;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+
+  &--visible {
+    opacity: 1;
+    visibility: visible;
   }
 }
 </style>

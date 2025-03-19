@@ -286,7 +286,7 @@ const toggleNotifications = async () => {
     align-items: center;
     padding: 20px;
     // padding-top: 40px;
-    padding-top: 80px;
+    padding-top: 90px;
     background: #48027FE5;
   }
 
