@@ -1,18 +1,19 @@
+<!-- Changes to make in the template section -->
 <template>
   <DefaultLayout title="Interactive Map" :showMenuButton="true">
     <div class="main">
       <div class="main__header">
         <div class="wrapper">
           <div class="search-container">
-            <input type="text" placeholder="Search for vendors & services" class="search-input">
+            <input type="text" placeholder="Search for vendors & services" class="search-input" v-model="searchQuery" @keyup.enter="handleSearch">
             <ion-icon :icon="searchOutline" class="search-icon"></ion-icon>
           </div>
           <div class="group">
-            <button class="filter-button">
+            <button class="filter-button" @click="handleSearch">
               <ion-icon size="small" :icon="optionsOutline"></ion-icon>
-              Filters
+              Filter
             </button>
-            <button class="filter-button">
+            <button class="filter-button" @click="resetFilters">
               <ion-icon size="small" :icon="refreshOutline"></ion-icon>
               Reset
             </button>
@@ -27,7 +28,7 @@
             </button>
             <div class="dropdown-content" v-if="showMapDropdown">
               <div
-                v-for="map in serviceMaps"
+                v-for="map in allMaps"
                 :key="map.id"
                 class="dropdown-item"
                 @click="selectMap(map)"
@@ -36,7 +37,7 @@
               </div>
             </div>
           </div>
-          <button class="filter-tab">Exhibitors</button>
+          <!-- <button class="filter-tab">Exhibitors</button> -->
         </div>
       </div>
 
@@ -81,6 +82,7 @@ interface VendorProperties {
   description: string;
   id: number;
   type: 'vendor';
+  categories?: number[];
 }
 
 interface ServiceProperties {
@@ -96,7 +98,8 @@ interface ServiceMap {
   id: number;
   name: string;
   slug: string;
-  num_services: number;
+  num_services?: number;
+  num_vendors?: number;
 }
 
 // Your Pinia or Vuex store that contains CMS data
@@ -105,6 +108,7 @@ import { useDataStore } from '@/stores/data';
 const mapContainer = ref<HTMLElement | null>(null);
 const showMapDropdown = ref(false);
 const currentMapId = ref<number | null>(null);
+const searchQuery = ref('');
 
 // Grabbing data from your CMS
 const dataStore = useDataStore();
@@ -112,14 +116,30 @@ const vendors = dataStore.data.nysfairWebsite.vendors;
 const services = dataStore.data.nysfairWebsite.services;
 const serviceCategories = dataStore.data.nysfairWebsite.service_categories;
 const serviceMaps = dataStore.data.nysfairWebsite.service_maps;
+const vendorMaps = dataStore.data.nysfairWebsite.vendor_maps;
+
+// Combine service maps and vendor maps for the dropdown
+const allMaps = computed(() => {
+  // Start with service maps
+  const combinedMaps = [...serviceMaps];
+
+  // Add vendor maps if they don't already exist in the combined list
+  vendorMaps.forEach(vendorMap => {
+    if (!combinedMaps.some(map => map.id === vendorMap.id)) {
+      combinedMaps.push(vendorMap);
+    }
+  });
+
+  return combinedMaps;
+});
 
 // Find the master map ID
-const masterMap = serviceMaps.find((map: any) => map.slug === 'master');
-currentMapId.value = masterMap?.id ?? serviceMaps[0]?.id ?? null;
+const masterMap = allMaps.value.find((map: any) => map.slug === 'master');
+currentMapId.value = masterMap?.id ?? allMaps.value[0]?.id ?? null;
 
 // Get the current map name for display
 const currentMapName = computed(() => {
-  const map = serviceMaps.find((m: any) => m.id === currentMapId.value);
+  const map = allMaps.value.find((m: any) => m.id === currentMapId.value);
   return map ? map.name : 'Maps';
 });
 
@@ -161,43 +181,84 @@ function updateMapForSelectedType() {
   source.setData(filteredGeoJson);
 }
 
+// Handle search input
+function handleSearch() {
+  updateMapForSelectedType();
+}
+
+// Reset search and filters
+function resetFilters() {
+  searchQuery.value = '';
+  // Reset to master map if it exists, otherwise use the first map
+  if (masterMap) {
+    currentMapId.value = masterMap.id;
+  } else if (allMaps.value.length > 0) {
+    currentMapId.value = allMaps.value[0].id;
+  }
+  updateMapForSelectedType();
+}
+
 // Convert vendors to GeoJSON features
 function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperties>> {
-  return vendors
-    .filter((v) => v.locations && v.locations.length > 0)
-    .flatMap((v) => v.locations.map((location: any) => ({
-      type: 'Feature' as const,
-      properties: {
-        name: v.name ?? 'Unknown Vendor',
-        description: v.description ?? '',
-        id: v.id,
-        type: 'vendor' as const
-      },
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [
-          parseFloat(location.longitude),
-          parseFloat(location.latitude)
-        ]
-      }
-    })));
+  // Apply filtering by map ID and search query
+  let filteredVendors = vendors
+    .filter((v) => v.locations && v.locations.length > 0);
+
+  // Filter by map ID if it's not the master map
+  if (currentMapId.value !== null && masterMap && currentMapId.value !== masterMap.id) {
+    filteredVendors = filteredVendors.filter((v) => {
+      // Check if the vendor has maps array and it includes the current map ID
+      return Array.isArray(v.maps) && v.maps.includes(currentMapId.value);
+    });
+  }
+
+  // Apply search filtering
+  if (searchQuery.value.trim() !== '') {
+    const query = searchQuery.value.toLowerCase();
+    filteredVendors = filteredVendors.filter(v =>
+      (v.name && v.name.toLowerCase().includes(query)) ||
+      (v.description && v.description.toLowerCase().includes(query))
+    );
+  }
+
+  return filteredVendors.flatMap((v) => v.locations.map((location: any) => ({
+    type: 'Feature' as const,
+    properties: {
+      name: v.name ?? 'Unknown Vendor',
+      description: v.description ?? '',
+      id: v.id,
+      type: 'vendor' as const,
+      categories: v.categories || []
+    },
+    geometry: {
+      type: 'Point' as const,
+      coordinates: [
+        parseFloat(location.longitude),
+        parseFloat(location.latitude)
+      ]
+    }
+  })));
 }
 
 // Convert services to GeoJSON features, filtering by map ID if needed
-function buildServiceGeoJSON(services: any[], mapId: number | null = null): Array<Feature<Point, ServiceProperties>> {
+function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServiceProperties>> {
   let filteredServices = services;
 
-  // Filter services by map ID if provided
-  if (mapId !== null) {
+  // Filter services by map ID if it's not the master map
+  if (currentMapId.value !== null && masterMap && currentMapId.value !== masterMap.id) {
     filteredServices = services.filter((s) => {
-      // If it's the master map, include all services
-      if (masterMap && mapId === masterMap.id) {
-        return true;
-      }
-
-      // Otherwise, check if the service is in the selected map
-      return Array.isArray(s.maps) && s.maps.includes(mapId);
+      // Check if the service is in the selected map
+      return Array.isArray(s.maps) && s.maps.includes(currentMapId.value);
     });
+  }
+
+  // Apply search filtering
+  if (searchQuery.value.trim() !== '') {
+    const query = searchQuery.value.toLowerCase();
+    filteredServices = filteredServices.filter(s =>
+      (s.title && s.title.toLowerCase().includes(query)) ||
+      (s.description && s.description.toLowerCase().includes(query))
+    );
   }
 
   return filteredServices
@@ -225,7 +286,7 @@ function buildServiceGeoJSON(services: any[], mapId: number | null = null): Arra
 // Build GeoJSON for the currently selected map type
 function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
   const vendorFeatures = buildVendorGeoJSON(vendors);
-  const serviceFeatures = buildServiceGeoJSON(services, currentMapId.value);
+  const serviceFeatures = buildServiceGeoJSON(services);
 
   console.log(`Map ${currentMapId.value}: ${serviceFeatures.length} services, ${vendorFeatures.length} vendors`);
 

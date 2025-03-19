@@ -282,7 +282,7 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
           left: 0;
           width: 100%;
           height: 110%;
-          background-image: url('/home/NYSF_Home_Flags.png');
+          background-image: url('/home/NYSF_Home_Flags_Two.png');
           background-repeat: no-repeat;
           background-size: contain;
           z-index: -2; /* Negative z-index to place it behind the background */
