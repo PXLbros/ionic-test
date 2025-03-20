@@ -185,7 +185,7 @@ a {
     color: inherit;
 }
 .main {
-    background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+    background: #FDD456;
     padding-bottom: 90px;
 
     .wrapper {

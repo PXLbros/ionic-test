@@ -221,7 +221,7 @@ const selectDate = (index: number): void => {
 <style lang="scss" scoped>
 .main {
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+  background: #FDD456;
   padding-bottom: 90px;
 
   &__header {
@@ -274,7 +274,7 @@ const selectDate = (index: number): void => {
 }
 .date-selector {
     padding: 0 20px;
-    margin-bottom: 6px;
+    margin-bottom: 20px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 

@@ -59,7 +59,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+      background: #FDD456;
       color: #000;
       z-index: 99999;
     }

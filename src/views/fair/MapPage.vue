@@ -890,7 +890,7 @@ onUnmounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+  background: #FDD456;
   padding-bottom: 90px;
   position: relative;
 }
@@ -955,6 +955,7 @@ onUnmounted(() => {
   padding: 14px 20px;
   gap: 6px;
 
+
   .filter-tab {
     padding: 10px 20px;
     border: none;
@@ -969,11 +970,14 @@ onUnmounted(() => {
     gap: 5px;
     font-family: 'inter', sans-serif;
     flex-grow: 1;
+    justify-content: space-between;
+    width: 100%;
   }
 
   .map-dropdown {
     position: relative;
     flex-grow: 1;
+    width: 100%;
 
     .dropdown-content {
       position: absolute;
@@ -1045,19 +1049,26 @@ onUnmounted(() => {
   border-radius: 8px;
   max-height: 30vh;
   overflow-y: auto;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
 
   .vendor-popup, .service-popup {
     h3 {
       color: black;
       margin-top: 0;
       font-size: 18px;
-      text-align: center;
+      text-align: start;
       font-weight: 600;
+      line-height: 24px;
+      font-family: 'inter', sans-serif;
     }
 
     p {
       color: black;
       margin: 8px 0;
+      font-family: 'inter', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
     }
 
     .popup-type {
@@ -1065,19 +1076,19 @@ onUnmounted(() => {
       font-size: 12px;
       color: #666;
       border-top: 1px solid #eee;
-      padding-top: 8px;
+      padding-top: 2px;
     }
   }
 
   .service-popup {
     h3 {
-      color: #1E5EAE;
+      color: #000;
     }
   }
 
   .vendor-popup {
     h3 {
-      color: #EE4722;
+      color: #000;
     }
   }
 }
