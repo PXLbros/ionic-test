@@ -428,7 +428,7 @@ const venueInfo = computed(() => {
     gap: 10px;
     padding: 10px 20px 40px 20px;
     flex-direction: column;
-    background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+    background: #FDD456;
     position: relative;
 
     &-title {

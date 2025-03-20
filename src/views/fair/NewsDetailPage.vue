@@ -116,7 +116,7 @@ fetchArticle();
 <style lang="scss" scoped>
 .main {
   padding: 20px;
-  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+  background: #FDD456;
   padding-bottom: 110px;
 
 
@@ -208,7 +208,7 @@ fetchArticle();
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 20px 25px;
+      padding: 24px 25px;
       border-radius: 10px;
       background: #1F3667;
       color: #f1f1f1;
@@ -235,6 +235,6 @@ fetchArticle();
   padding-top: 1.5rem;
   text-align: center;
   height: 100vh;
-  background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+  background: #FDD456;
 }
 </style>

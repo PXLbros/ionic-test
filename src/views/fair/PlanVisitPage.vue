@@ -86,7 +86,7 @@ console.log('fair page data store', dataStore.data);
     height: calc(100vh - 35px); // Subtract header height
     display: flex;
     flex-direction: column;
-    background: linear-gradient(180deg, #FDD456 0%, #E09B1D 100%);
+    background: #FDD456;
 
 
 

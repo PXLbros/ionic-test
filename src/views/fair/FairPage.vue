@@ -272,7 +272,7 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
         position: relative; // Add this
         padding-bottom: 100px;
         z-index: 10;
-        background: linear-gradient(180deg, rgba(245, 182, 27, 0.7), rgba(245, 182, 27, 0.7));
+        background: #FDD456;
 
 
         &::before {
