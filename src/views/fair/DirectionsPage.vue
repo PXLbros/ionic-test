@@ -105,8 +105,7 @@ console.log('directions page data', pageData);
 
             hr {
               margin-bottom: 32px;
-              border: none;
-              border-top: 1px solid #eff2f600;
+              border-top: 1px solid rgba(239, 242, 246, 1);
             }
 
             strong {

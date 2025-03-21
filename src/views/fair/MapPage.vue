@@ -923,7 +923,7 @@ onUnmounted(() => {
 
 .wrapper {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   width: 100%;
   justify-content: space-between;
   padding: 20px 20px 0 20px;
@@ -952,7 +952,7 @@ onUnmounted(() => {
       .badge {
         position: absolute;
         top: -10px;
-        right: -7px;
+        left: -7px;
         background-color: #1F3667;
         color: #fff;
         border-radius: 50%;
