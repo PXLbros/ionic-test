@@ -427,7 +427,7 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             gap: 20px;
-            padding: 20px 0px 20px 25px;
+            padding: 20px 20px 20px 25px;
 
             &::-webkit-scrollbar {
                 display: none;
