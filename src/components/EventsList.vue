@@ -10,6 +10,7 @@
         </div>
         <div class="events-list__favorite-container">
           <FavoriteButton
+            site="nysfair"
             :event-id="event.id"
             :date-details="event.dateDetails"
           />

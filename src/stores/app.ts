@@ -96,16 +96,15 @@ export const useAppStore = defineStore('app', {
       const isNativePlatform = Capacitor.isNativePlatform();
 
       if (isNativePlatform) {
-        // Add listeners only once
         PushNotifications.addListener('registration', async (token) => {
           console.log('Device registered with token:', token.value);
-          
+
           try {
             // Get device information
             const deviceInfo = await Device.getInfo();
-            
+
             console.log('Device info:', JSON.stringify(deviceInfo, null, 2));
-            
+
             await this.createUserDeviceToken({
               deviceId: token.value,
               model: deviceInfo.model || undefined,
@@ -132,10 +131,20 @@ export const useAppStore = defineStore('app', {
           console.log('Notification action performed:', notification);
         });
 
-        this.pushNotifications.listenersInitialized = true; // Mark listeners as initialized
+        this.pushNotifications.listenersInitialized = true;
         console.log('Push notification listeners initialized');
       } else {
-        console.warn('Skipped push notifications setup because app is not running on a native platform');
+        const deviceId = this.getPersistentWebDeviceId();
+
+        this.createUserDeviceToken({ deviceId, model: 'Web', platform: navigator.userAgent, operatingSystem: 'web' })
+          .then(() => {
+            this.pushNotifications.permissionStatus = 'granted';
+            this.pushNotifications.didRegisterDevice = true;
+            this.pushNotifications.deviceId = deviceId;
+          })
+          .catch((error) => {
+            console.error('Failed to enable push notifications:', error);
+          });
       }
     },
 
@@ -167,21 +176,6 @@ export const useAppStore = defineStore('app', {
             .catch((error) => {
               console.error('Failed to enable push notifications:', error);
               reject(error); // Reject on error
-            });
-        } else {
-          const deviceId = this.getPersistentWebDeviceId();
-
-          this.createUserDeviceToken({ deviceId, model: 'Web', platform: 'web', operatingSystem: 'web' })
-            .then(() => {
-              this.pushNotifications.permissionStatus = 'granted';
-              this.pushNotifications.didRegisterDevice = true;
-              this.pushNotifications.deviceId = deviceId;
-
-              resolve(true);
-            })
-            .catch((error) => {
-              console.error('Failed to enable push notifications:', error);
-              reject(error);
             });
         }
       });

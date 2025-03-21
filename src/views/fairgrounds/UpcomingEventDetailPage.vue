@@ -13,6 +13,12 @@
         </div>
         <h1 class="event-title">{{ event.title }}</h1>
         <!-- <div class="event-location">Location Name</div> -->
+
+        <!-- <FavoriteButton
+          site="nysfairgrounds"
+          :event-id="event.id"
+          :date-details="event.dateDetails"
+        /> -->
       </div>
 
       <div class="event-description" v-html="event.eventBody"></div>

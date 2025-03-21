@@ -20,7 +20,8 @@ import { useEventFavorites } from '@/composables/useEventsFavorites';
 import type { EventDate } from '@/types';
 
 const props = defineProps<{
-  eventId: number;
+  site: string;
+  eventId: number | string;
   dateDetails: EventDate;
 }>();
 
@@ -28,7 +29,8 @@ const { toggleFavorite } = useEventFavorites();
 
 const handleFavoriteClick = async (event: Event) => {
   event.stopPropagation();
-  await toggleFavorite(props.eventId, props.dateDetails);
+
+  await toggleFavorite(props.site, props.eventId, props.dateDetails);
 };
 </script>
 

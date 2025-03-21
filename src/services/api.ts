@@ -220,10 +220,12 @@ export interface NYSFairFavoriteEventPreferencesApiItem {
 
 export const addUserEventFavorite = async ({
   deviceId,
+  site,
   eventId,
   startTime,
 }: {
   deviceId: string;
+  site: string;
   eventId: number;
   startTime: number;
 }): Promise<boolean> => {
@@ -235,6 +237,7 @@ export const addUserEventFavorite = async ({
     // Save to Strapi API
     const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/create`, {
       deviceId,
+      site,
       eventId,
       startTime,
     });
@@ -275,10 +278,12 @@ export const addUserEventFavorite = async ({
 
 export const removeUserEventFavorite = async ({
   deviceId,
+  site,
   eventId,
   startTime,
 }: {
   deviceId: string;
+  site: string;
   eventId: number;
   startTime: number;
 }): Promise<boolean> => {
@@ -310,6 +315,7 @@ export const removeUserEventFavorite = async ({
     // Save to Strapi API
     const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/delete`, {
       deviceId,
+      site,
       eventId,
       startTime,
     });

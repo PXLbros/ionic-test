@@ -164,6 +164,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue';
+import { IonIcon } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import { listOutline } from 'ionicons/icons';
 import { format, isSameMonth, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from 'date-fns';
