@@ -32,6 +32,9 @@
             <button class="filter-button" @click="toggleFiltersPanel">
               <ion-icon size="small" :icon="optionsOutline"></ion-icon>
               Filter
+              <span class="badge" v-if="selectedFilterCount > 0">
+                {{ selectedFilterCount }}
+              </span>
             </button>
             <button class="filter-button" @click="resetFilters">
               <ion-icon size="small" :icon="refreshOutline"></ion-icon>
@@ -493,7 +496,6 @@ function getCategoryName(categoryId: number): string {
   // Check service categories first
   const serviceCategory = serviceCategories.find((cat: any) => cat.id === categoryId);
   if (serviceCategory) return serviceCategory.name;
-
   // Then check vendor categories
   const vendorCategory = vendorCategories.find((cat: any) => cat.id === categoryId);
   return vendorCategory ? vendorCategory.name : 'Unknown Category';
@@ -626,6 +628,11 @@ function selectSuggestion(suggestion: SearchSuggestion) {
   // Also update the map with filtered results
   handleSearch();
 }
+
+// Get Number of currently selected filters for badge
+const selectedFilterCount = computed(() => {
+  return Object.values(selectedCategories.value).filter(Boolean).length;
+});
 
 onMounted(() => {
   // Setup listener for closing dropdown when clicking outside
@@ -788,12 +795,31 @@ onMounted(() => {
           const feature = e.features[0];
           const coordinates = (feature.geometry as Point).coordinates.slice();
           const props = feature.properties as ServiceProperties;
+          console.log('Service properties:', props);
 
           // Get category names for this service if categories exist
           let categoryNames = '';
-          if (props.categories && Array.isArray(props.categories) && props.categories.length > 0) {
-            const names = props.categories.map(id => getCategoryName(id));
-            categoryNames = `<p><strong>Categories:</strong> ${names.join(', ')}</p>`;
+
+          // Parse categories properly - they might be stringified in the GeoJSON
+          let categoriesArray = [];
+          if (props.categories) {
+            try {
+              // If it's a string, try to parse it as JSON
+              if (typeof props.categories === 'string') {
+                categoriesArray = JSON.parse(props.categories);
+              }
+              // If it's already an array, use it as is
+              else if (Array.isArray(props.categories)) {
+                categoriesArray = props.categories;
+              }
+
+              if (categoriesArray.length > 0) {
+                const names = categoriesArray.map((id: any) => getCategoryName(Number(id)));
+                categoryNames = `<p class="popup-category">${names.join(', ')}</p>`;
+              }
+            } catch (error) {
+              console.error('Error parsing categories:', error);
+            }
           }
 
           // Create popup content
@@ -801,8 +827,8 @@ onMounted(() => {
             <div class="service-popup">
               <h3>${props.title || 'Unknown Service'}</h3>
               ${props.description ? `<p>${props.description}</p>` : ''}
-              ${categoryNames}
               ${props.is_accessible ? `<p><strong>Accessible</strong></p>` : ''}
+              ${categoryNames}
               <p class="popup-type">Service</p>
             </div>
           `;
@@ -917,9 +943,21 @@ onUnmounted(() => {
       display: flex;
       align-items: center;
       gap: 5px;
+      position: relative;
 
       svg {
         font-size: 34px;
+      }
+
+      .badge {
+        position: absolute;
+        top: -10px;
+        right: -7px;
+        background-color: #1F3667;
+        color: #fff;
+        border-radius: 50%;
+        padding: 4px 6px;
+        font-size: 10px;
       }
     }
   }
@@ -1071,14 +1109,29 @@ onUnmounted(() => {
       line-height: 22px;
     }
 
+    .popup-category {
+      font-size: 12px;
+      margin-top: 8px;
+      margin-bottom: 0px;
+      font-weight: 500;
+      background-color: #F4E8AB;
+      padding: 4px 8px;
+      border-radius: 8px;
+      text-align: center;
+      width: fit-content;
+      line-height: normal;
+    }
+
     .popup-type {
       margin-top: 12px;
       font-size: 12px;
       color: #666;
       border-top: 1px solid #eee;
       padding-top: 2px;
+      margin-bottom: 0px;
     }
   }
+
 
   .service-popup {
     h3 {
@@ -1089,6 +1142,16 @@ onUnmounted(() => {
   .vendor-popup {
     h3 {
       color: #000;
+    }
+  }
+
+  .mapboxgl-popup-close-button {
+    top: 8px;
+    right: 12px;
+    color: black;
+
+    span {
+      font-size: 18px;
     }
   }
 }
@@ -1229,11 +1292,9 @@ onUnmounted(() => {
   transition: background-color 0.2s ease;
 
   &--selected {
-    background-color: #E9EFFD;
+    // background-color: #E9EFFD;
+    background-color: #F4E8AB;
 
-    &:hover {
-      background-color: #dae5fc;
-    }
   }
 
   .category-checkbox {
