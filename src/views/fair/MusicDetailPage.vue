@@ -18,30 +18,6 @@
 
             <div class="main__description" v-html="event.description"></div>
 
-            <!-- Facts Sections -->
-            <div class="facts-section">
-                <h2 class="facts-title">Facts</h2>
-                <div class="facts-item">
-                    <div class="facts-label">Label</div>
-                    <div class="facts-value">fadfadfasdfl</div>
-                </div>
-            </div>
-
-            <div class="facts-section">
-                <h2 class="facts-title">Facts</h2>
-                <div class="facts-item">
-                    <div class="facts-label">Label</div>
-                    <div class="facts-value">fadfadfasdfl</div>
-                </div>
-            </div>
-
-            <div class="facts-section">
-                <h2 class="facts-title">Facts</h2>
-                <div class="facts-item">
-                    <div class="facts-label">Label</div>
-                    <div class="facts-value">fadfadfasdfl</div>
-                </div>
-            </div>
         </div>
     </div>
   </DefaultLayout>

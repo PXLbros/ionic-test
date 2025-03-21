@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import DefaultLayout from '@/layouts/default.vue';
 import axios from 'axios';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import Loader from '@/components/Loader.vue';
 
 interface Update {
@@ -30,6 +30,10 @@ interface Update {
     created_at: string;
     title: string;
     message: string;
+    category?: {
+        label: string;
+        value: string;
+    };
 }
 
 const updates = ref<Update[]>([]);
@@ -48,6 +52,7 @@ const fetchUpdates = async () => {
         }
 
         updates.value = response.data.realTimeUpdates;
+        console.log('Updates:', updates.value);
     } catch (error) {
         console.error('Error fetching updates:', error);
         loadError.value = (error instanceof Error) ? error.message : 'An error occurred while fetching updates.';
