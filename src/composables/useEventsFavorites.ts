@@ -19,7 +19,7 @@ export function useEventFavorites() {
     return event?.dates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
   };
 
-  const toggleFavorite = async (eventId: number, dateDetails: EventDate): Promise<void> => {
+  const toggleFavorite = async (site: string, eventId: number, dateDetails: EventDate): Promise<void> => {
     if (!dateDetails) {
       console.warn('No date details provided for the event');
       return;
@@ -28,13 +28,13 @@ export function useEventFavorites() {
     const selectedStartTimeUnix = dateDetails.start_time_unix;
 
     if (dateDetails.isFavorite) {
-      await removeEventFromFavorites(eventId, selectedStartTimeUnix);
+      await removeEventFromFavorites(site, eventId, selectedStartTimeUnix);
     } else {
-      await addEventToFavorites(eventId, selectedStartTimeUnix);
+      await addEventToFavorites(site, eventId, selectedStartTimeUnix);
     }
   };
 
-  const addEventToFavorites = async (eventId: number, selectedStartTimeUnix: number): Promise<void> => {
+  const addEventToFavorites = async (site: string, eventId: number, selectedStartTimeUnix: number): Promise<void> => {
     const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
 
     if (!matchingDate) {
@@ -68,7 +68,8 @@ export function useEventFavorites() {
         eventId,
         startTime: selectedStartTimeUnix,
         isFavorite: true,
-        deviceId
+        deviceId,
+        site,
       };
 
       const saveUserEventFavoriteSuccess = await addUserEventFavorite(saveUserEventFavoriteData);
@@ -87,7 +88,7 @@ export function useEventFavorites() {
     }
   };
 
-  const removeEventFromFavorites = async (eventId: number, selectedStartTimeUnix: number): Promise<void> => {
+  const removeEventFromFavorites = async (site: string, eventId: number, selectedStartTimeUnix: number): Promise<void> => {
     const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
 
     if (!matchingDate) {
@@ -99,13 +100,13 @@ export function useEventFavorites() {
 
     try {
       const isNativePlatform = Capacitor.isNativePlatform();
+
       const saveUserEventFavoriteData = {
         eventId,
         startTime: selectedStartTimeUnix,
         isFavorite: false,
-        deviceId: isNativePlatform ?
-          appStore.pushNotifications.deviceId :
-          appStore.getPersistentWebDeviceId()
+        deviceId: isNativePlatform ? appStore.pushNotifications.deviceId : appStore.getPersistentWebDeviceId(),
+        site,
       };
 
       if (!saveUserEventFavoriteData.deviceId) {
