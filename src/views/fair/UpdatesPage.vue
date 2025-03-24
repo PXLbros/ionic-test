@@ -7,7 +7,11 @@
                 </div>
                 <div v-else-if="loadError">{{ loadError }}</div>
                 <div class="main__content-grid" v-else>
-                    <div v-for="update in updates" :key="update.id" class="main__content-item">
+                    <div
+                      v-for="update in updates"
+                      :key="update.id"
+                      class="main__content-item"
+                      >
                         <p class="date">{{ formatDate(update.created_at) }}</p>
                         <h4 class="headline">{{ update.title }}</h4>
                         <p class="content">{{ update.message }}</p>

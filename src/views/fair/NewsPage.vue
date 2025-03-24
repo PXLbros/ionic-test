@@ -39,7 +39,7 @@
             >
                 <div class="article-item__content">
                     <div class="article-item__date">{{ formatDate(article.created_at) }}</div>
-                    <h4 class="article-item__title">{{ article.title }}</h4>
+                    <h4 class="article-item__title">{{ truncateText(article.title, 60) }}</h4>
                 </div>
                 <div class="article-item__image">
                     <img v-if="article.image" :src="article.image" alt="News Image">
@@ -177,6 +177,16 @@ const fetchNews = async ({ page }: { page: number } = { page: 1 }) => {
 }
 
 fetchNews();
+
+
+// Truncate the title to 100 characters
+const truncateText = (title: string, length: number): string => {
+    if (title.length > length) {
+        return title.substring(0, length) + '...'; // Truncate with ellipsis
+    }
+    return title;
+};
+
 </script>
 
 <style lang="scss" scoped>

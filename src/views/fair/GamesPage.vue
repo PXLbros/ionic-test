@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="In-App Activities" :showMenuButton="true">
+  <DefaultLayout title="Activities & Ag Facts" :showMenuButton="true">
     <div class="activities-container">
       <div
         v-if="games"
