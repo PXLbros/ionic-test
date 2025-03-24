@@ -139,6 +139,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/fair/updates',
+    name: 'updates',
     component: () => import('@/views/fair/UpdatesPage.vue'),
     meta: {
       title: 'Real-Time Updates',
@@ -150,7 +151,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/fair/games',
     component: () => import('@/views/fair/GamesPage.vue'),
     meta: {
-      title: 'In-App Activities',
+      title: 'Activities & Ag Facts',
       showInMenu: true,
       menuOrder: 7
     }

@@ -1,8 +1,11 @@
 <template>
   <DefaultLayout title="Parking">
-    <div class="notification" v-if="latestParkingUpdate" router-link="/fair/updates">
-        {{ truncateContent(latestParkingUpdate.message, 75) }}
+    <div class="notification" v-if="showNotification && latestParkingUpdate">
+      <router-link class="link" :to="{ name: 'updates', params: { updateId: latestParkingUpdate.id } }">
+          {{ truncateContent(latestParkingUpdate.message, 75) }}
+      </router-link>
     </div>
+
     <!-- Loading -->
     <div v-if="isLoadingUpdates" class="loading-content notification">
         Loading Parking Updates...
@@ -188,6 +191,11 @@ onMounted(() => {
     position: sticky;
     top: 0;
     backdrop-filter: blur(5px);
+
+    .link {
+      color: #333333;
+      text-decoration: none;
+    }
 }
 
 .main {
