@@ -17,6 +17,7 @@ declare module 'vue' {
     EventsList: typeof import('./components/EventsList.vue')['default']
     FairBottomNavigation: typeof import('./components/tabs/FairBottomNavigation.vue')['default']
     FairgroundsBottomNavigation: typeof import('./components/tabs/FairgroundsBottomNavigation.vue')['default']
+    FairgroundsMenu: typeof import('./components/icons/FairgroundsMenu.vue')['default']
     FairgroundsNav: typeof import('./components/FairgroundsNav.vue')['default']
     FairNav: typeof import('./components/FairNav.vue')['default']
     FavoriteButton: typeof import('./components/FavoriteButton.vue')['default']
