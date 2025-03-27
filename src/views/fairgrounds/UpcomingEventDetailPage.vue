@@ -331,6 +331,7 @@ const formatAdditionalDate = (date: EventDate): string => {
   height: 60px;
   display: flex;
   gap: 10px;
+  display: none;
 }
 
 .price {
