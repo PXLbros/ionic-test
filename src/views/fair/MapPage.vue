@@ -4,7 +4,7 @@
       <div class="main__header">
         <div class="wrapper">
           <div class="search-container">
-            <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @input="handleLiveSearch" @keyup.enter="handleSearch" @focus="showSearchSuggestions = true">
+            <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @input="handleLiveSearch" @keyup.enter="handleSearch" @focus="handleFocus" @blur="handleBlur">
             <ion-icon :icon="searchOutline" class="search-icon" @click="handleSearch"></ion-icon>
             <div
               class="search-suggestions"
@@ -344,13 +344,112 @@ function handleLiveSearch() {
     clearTimeout(searchDebounceTimeout.value);
   }
 
-  // Generate search suggestions as user types
-  generateSearchSuggestions();
+  // Show suggestions panel
+  showSearchSuggestions.value = true;
+
+  // If input is empty, show initial suggestions instead
+  if (!searchQuery.value.trim()) {
+    generateInitialSuggestions();
+  } else {
+    // Otherwise generate filtered suggestions based on input
+    generateSearchSuggestions();
+  }
 
   // Set a new timeout to avoid too many updates while typing
   searchDebounceTimeout.value = setTimeout(() => {
     updateMapForSelectedType();
   }, 300) as unknown as number;
+}
+
+function handleFocus() {
+  showSearchSuggestions.value = true;
+
+  // Generate initial suggestions without requiring any text input
+  generateInitialSuggestions();
+}
+
+// When the input loses focus, hide the suggestions after a short delay
+function handleBlur() {
+  // Use setTimeout to allow clicks on suggestions to register before closing
+  setTimeout(() => {
+    showSearchSuggestions.value = false;
+  }, 150);
+}
+
+function generateInitialSuggestions() {
+  // If there's already a search query, use the standard search function
+  if (searchQuery.value.trim()) {
+    generateSearchSuggestions();
+    return;
+  }
+
+  // Generate suggestions based on current map and category filters
+
+  // Vendor suggestions - get only the ones for current map and filters
+  const vendorSuggestions = vendors
+    .filter((v: any) => {
+      // Filter by current map
+      if (currentMapId.value !== null && (!Array.isArray(v.maps) || !v.maps.includes(currentMapId.value))) {
+        return false;
+      }
+
+      // Filter by category if selected
+      if (Object.values(selectedCategories.value).some(selected => selected)) {
+        if (!v.categories || !v.categories.some((catId: number) => selectedCategories.value[catId])) {
+          return false;
+        }
+      }
+
+      return true; // Include all remaining vendors
+    })
+    .map((v: any) => {
+      // Only take the first location for the suggestion
+      const location = v.locations && v.locations.length > 0 ? v.locations[0] : null;
+      return {
+        id: v.id,
+        name: v.name || 'Unknown Vendor',
+        description: v.description || '',
+        type: 'vendor' as const,
+        latitude: location ? parseFloat(location.latitude) : 0,
+        longitude: location ? parseFloat(location.longitude) : 0,
+        categories: v.categories || []
+      };
+    });
+
+  // Service suggestions - get only the ones for current map and filters
+  const serviceSuggestions = services
+    .filter((s: any) => {
+      // Filter by current map
+      if (currentMapId.value !== null && (!Array.isArray(s.maps) || !s.maps.includes(currentMapId.value))) {
+        return false;
+      }
+
+      // Filter by category if selected
+      if (Object.values(selectedCategories.value).some(selected => selected)) {
+        if (!s.categories || !s.categories.some((catId: number) => selectedCategories.value[catId])) {
+          return false;
+        }
+      }
+
+      return true; // Include all remaining services
+    })
+    .map((s: any) => ({
+      id: s.id,
+      name: s.title || 'Unknown Service',
+      description: s.description || '',
+      type: 'service' as const,
+      latitude: parseFloat(s.latitude) || 0,
+      longitude: parseFloat(s.longitude) || 0,
+      categories: s.categories || []
+    }));
+
+  // Combine and limit the suggestions
+  // First sort by name for better usability
+  const sortedSuggestions = [...vendorSuggestions, ...serviceSuggestions]
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  // Then take only the first few items to show
+  filteredSuggestions.value = sortedSuggestions.slice(0, maxSuggestionsToShow);
 }
 
 // Reset search and filters
