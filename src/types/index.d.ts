@@ -1,3 +1,5 @@
+export type Site = 'nysfair' | 'nysfairgrounds';
+
 export interface Venue {
   name: string;
   description: string;

@@ -119,10 +119,12 @@ router.isReady().then(async () => {
     router.afterEach((to) => {
       console.log('Route changed to: ', to);
 
+      const screenName = to.name || to.path;
+
       FirebaseAnalytics.logEvent({
         name: 'screen_view',
         params: {
-          screen_name: to.name || to.path,
+          screen_name: screenName,
         }
       });
     });

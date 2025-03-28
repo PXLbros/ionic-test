@@ -17,18 +17,20 @@
 import { IonIcon } from '@ionic/vue';
 import { heart, heartOutline } from 'ionicons/icons';
 import { useEventFavorites } from '@/composables/useEventsFavorites';
-import type { EventDate } from '@/types';
+import type { EventDate, Site } from '@/types';
 
 const props = defineProps<{
-  eventId: number;
+  site: Site;
+  eventId: number | string;
   dateDetails: EventDate;
 }>();
 
-const { toggleFavorite } = useEventFavorites();
+const { toggleFavorite } = useEventFavorites({ site: props.site });
 
 const handleFavoriteClick = async (event: Event) => {
   event.stopPropagation();
-  await toggleFavorite(props.eventId, props.dateDetails);
+
+  await toggleFavorite(props.site, props.eventId, props.dateDetails);
 };
 </script>
 

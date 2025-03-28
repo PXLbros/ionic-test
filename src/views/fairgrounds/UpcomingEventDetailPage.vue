@@ -13,6 +13,13 @@
         </div>
         <h1 class="event-title">{{ event.title }}</h1>
         <!-- <div class="event-location">Location Name</div> -->
+
+        <FavoriteButton
+          v-if="dateDetails"
+          site="nysfairgrounds"
+          :event-id="event.id"
+          :date-details="dateDetails"
+        />
       </div>
 
       <div class="event-description" v-html="event.eventBody"></div>
@@ -88,25 +95,33 @@ import { useRoute } from 'vue-router';
 import { useDataStore } from '@/stores/data';
 import { format, parseISO } from 'date-fns';
 import Fairgrounds from '@/layouts/fairgrounds.vue';
+import type { EventDate } from '@/types';
 
-interface EventDate {
+interface NYSFairgroundsEventDate {
   date: string;
   endTime: string;
   startTime: string;
+  start_time_date: string;
+  start_time_unix: number;
+  end_time_time: string;
+  date_time_formatted: string;
+  isFavorite: boolean;
+  isAddingToFavorites: boolean;
+  isRemovingFromFavorites: boolean;
 }
 
-interface EventImage {
+interface NYSFairgroundsEventImage {
   filename: string;
   title: string;
   url: string;
 }
 
-interface Event {
+interface NYSFairgroundsEvent {
   id: string;
   title: string;
   eventBody: string;
-  eventDates: EventDate[];
-  eventImage: EventImage[];
+  eventDates: NYSFairgroundsEventDate[];
+  eventImage: NYSFairgroundsEventImage[];
   eventAdmission: string;
   eventWebSite: string;
   enabled: boolean;
@@ -119,9 +134,9 @@ const dataStore = useDataStore();
 const eventId = decodeURIComponent(route.params.id as string);
 const selectedDate = route.query.date ? decodeURIComponent(route.query.date as string) : null;
 
-const event = computed<Event | undefined>(() => {
+const event = computed<NYSFairgroundsEvent | undefined>(() => {
   return dataStore.data.nysfairgroundsWebsite.events.find(
-    (event: Event) => event.id === eventId
+    (event: NYSFairgroundsEvent) => event.id === eventId
   );
 });
 
@@ -139,21 +154,28 @@ const currentEventDate = computed(() => {
   return event.value.eventDates[0];
 });
 
-const getEventTime = (event: Event): string => {
-  if (!currentEventDate.value) return '';
-
-  const date = format(parseISO(currentEventDate.value.date), 'EEE, MMM d, yyyy');
-  const startTime = currentEventDate.value.startTime;
-  const endTime = currentEventDate.value.endTime;
-
-  let timeStr = '';
-  if (startTime && endTime) {
-    timeStr = `${format(parseISO(startTime), 'h:mm aaa')} - ${format(parseISO(endTime), 'h:mm aaa')}`;
-  } else if (startTime) {
-    timeStr = format(parseISO(startTime), 'h:mm aaa');
+const dateDetails = computed((): EventDate | null => {
+  if (!event.value) {
+    return null;
+  } else if (!currentEventDate.value) {
+    return null;
   }
 
-  return `${date} • ${timeStr}`;
+  return {
+    start_time_date: currentEventDate.value.start_time_date,
+    start_time_unix: currentEventDate.value.start_time_unix,
+    isFavorite: currentEventDate.value?.isFavorite || false,
+    isAddingToFavorites: false,
+    isRemovingFromFavorites: false,
+  };
+});
+
+const getEventTime = (event: NYSFairgroundsEvent): string => {
+  if (!currentEventDate.value) {
+    return '';
+  }
+
+  return currentEventDate.value.date_time_formatted;
 };
 
 const additionalDates = computed(() => {
@@ -164,11 +186,11 @@ const additionalDates = computed(() => {
   );
 });
 
-const hasContactInfo = (event: Event): boolean => {
+const hasContactInfo = (event: NYSFairgroundsEvent): boolean => {
   return !!(event.eventWebSite || event.eventContactPhone || event.eventContactEmail);
 };
 
-const getEventImage = (event: Event): string => {
+const getEventImage = (event: NYSFairgroundsEvent): string => {
   if (event.eventImage && event.eventImage.length > 0 && event.eventImage[0].url) {
     // Return the full URL directly
     return event.eventImage[0].url;
@@ -176,7 +198,7 @@ const getEventImage = (event: Event): string => {
   return '/api/placeholder/400/200';
 };
 
-const formatAdditionalDate = (date: EventDate): string => {
+const formatAdditionalDate = (date: NYSFairgroundsEventDate): string => {
   const eventDate = format(parseISO(date.date), 'E, MMM d, yyyy');
   if (!date.startTime || !date.endTime) return eventDate;
 
