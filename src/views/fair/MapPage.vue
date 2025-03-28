@@ -21,6 +21,9 @@
                 </div>
                 <div class="suggestion-content">
                   <div class="suggestion-name">{{ suggestion.name }}</div>
+                  <span v-if="suggestion.mapName && suggestion.mapId !== currentMapId" class="suggestion-map-badge">
+                    {{ suggestion.mapName }}
+                  </span>
                   <div class="suggestion-description" v-if="suggestion.description">
                     {{ truncateText(suggestion.description, 60) }}
                   </div>
@@ -188,6 +191,8 @@ interface SearchSuggestion {
   longitude: number;
   latitude: number;
   categories?: number[];
+  mapId?: number;
+  mapName?: string;
 }
 
 import { useDataStore } from '@/stores/data';
@@ -334,6 +339,17 @@ function updateMapForSelectedType() {
 
 // Handle search input
 function handleSearch() {
+  // If there's a selected suggestion in the search query, try to focus on it
+  const matchingSuggestion = filteredSuggestions.value.find(s =>
+    s.name.toLowerCase() === searchQuery.value.toLowerCase()
+  );
+
+  if (matchingSuggestion) {
+    selectSuggestion(matchingSuggestion);
+    return;
+  }
+
+  // Otherwise, update the map to show filtered results on current map
   updateMapForSelectedType();
 }
 
@@ -383,28 +399,32 @@ function generateInitialSuggestions() {
     return;
   }
 
-  // Generate suggestions based on current map and category filters
+  // Get map names for lookup
+  const mapNamesById: Record<number, string> = {};
+  allMaps.value.forEach((map: ServiceMap) => {
+    mapNamesById[map.id] = map.name;
+  });
 
-  // Vendor suggestions - get only the ones for current map and filters
+  // Vendor suggestions - get from ALL maps
   const vendorSuggestions = vendors
     .filter((v: any) => {
-      // Filter by current map
-      if (currentMapId.value !== null && (!Array.isArray(v.maps) || !v.maps.includes(currentMapId.value))) {
-        return false;
-      }
-
-      // Filter by category if selected
+      // Only filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
         if (!v.categories || !v.categories.some((catId: number) => selectedCategories.value[catId])) {
           return false;
         }
       }
 
-      return true; // Include all remaining vendors
+      // Make sure it has locations
+      return v.locations && v.locations.length > 0;
     })
     .map((v: any) => {
       // Only take the first location for the suggestion
       const location = v.locations && v.locations.length > 0 ? v.locations[0] : null;
+
+      // Get map ID (first one if multiple)
+      const mapId = Array.isArray(v.maps) && v.maps.length > 0 ? v.maps[0] : null;
+
       return {
         id: v.id,
         name: v.name || 'Unknown Vendor',
@@ -412,36 +432,41 @@ function generateInitialSuggestions() {
         type: 'vendor' as const,
         latitude: location ? parseFloat(location.latitude) : 0,
         longitude: location ? parseFloat(location.longitude) : 0,
-        categories: v.categories || []
+        categories: v.categories || [],
+        mapId: mapId,
+        mapName: mapId ? mapNamesById[mapId] : null
       };
     });
 
-  // Service suggestions - get only the ones for current map and filters
+  // Service suggestions - get from ALL maps
   const serviceSuggestions = services
     .filter((s: any) => {
-      // Filter by current map
-      if (currentMapId.value !== null && (!Array.isArray(s.maps) || !s.maps.includes(currentMapId.value))) {
-        return false;
-      }
-
-      // Filter by category if selected
+      // Only filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
         if (!s.categories || !s.categories.some((catId: number) => selectedCategories.value[catId])) {
           return false;
         }
       }
 
-      return true; // Include all remaining services
+      // Make sure it has coordinates
+      return s.latitude && s.longitude;
     })
-    .map((s: any) => ({
-      id: s.id,
-      name: s.title || 'Unknown Service',
-      description: s.description || '',
-      type: 'service' as const,
-      latitude: parseFloat(s.latitude) || 0,
-      longitude: parseFloat(s.longitude) || 0,
-      categories: s.categories || []
-    }));
+    .map((s: any) => {
+      // Get map ID (first one if multiple)
+      const mapId = Array.isArray(s.maps) && s.maps.length > 0 ? s.maps[0] : null;
+
+      return {
+        id: s.id,
+        name: s.title || 'Unknown Service',
+        description: s.description || '',
+        type: 'service' as const,
+        latitude: parseFloat(s.latitude) || 0,
+        longitude: parseFloat(s.longitude) || 0,
+        categories: s.categories || [],
+        mapId: mapId,
+        mapName: mapId ? mapNamesById[mapId] : null
+      };
+    });
 
   // Combine and limit the suggestions
   // First sort by name for better usability
@@ -615,14 +640,15 @@ function generateSearchSuggestions() {
 
   const query = searchQuery.value.toLowerCase().trim();
 
-  // Generate suggestions from vendors
+  // Get map names for lookup
+  const mapNamesById: Record<number, string> = {};
+  allMaps.value.forEach((map: ServiceMap) => {
+    mapNamesById[map.id] = map.name;
+  });
+
+  // Generate suggestions from vendors - from ALL maps
   const vendorSuggestions = vendors
     .filter((v: any) => {
-      // Filter by current map
-      if (currentMapId.value !== null && (!Array.isArray(v.maps) || !v.maps.includes(currentMapId.value))) {
-        return false;
-      }
-
       // Filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
         if (!v.categories || !v.categories.some((catId: number) => selectedCategories.value[catId])) {
@@ -637,6 +663,10 @@ function generateSearchSuggestions() {
     .map((v: any) => {
       // Only take the first location for the suggestion
       const location = v.locations && v.locations.length > 0 ? v.locations[0] : null;
+
+      // Get map ID (first one if multiple)
+      const mapId = Array.isArray(v.maps) && v.maps.length > 0 ? v.maps[0] : null;
+
       return {
         id: v.id,
         name: v.name || 'Unknown Vendor',
@@ -644,18 +674,15 @@ function generateSearchSuggestions() {
         type: 'vendor' as const,
         latitude: location ? parseFloat(location.latitude) : 0,
         longitude: location ? parseFloat(location.longitude) : 0,
-        categories: v.categories || []
+        categories: v.categories || [],
+        mapId: mapId,
+        mapName: mapId ? mapNamesById[mapId] : null
       };
     });
 
-  // Generate suggestions from services
+  // Generate suggestions from services - from ALL maps
   const serviceSuggestions = services
     .filter((s: any) => {
-      // Filter by current map
-      if (currentMapId.value !== null && (!Array.isArray(s.maps) || !s.maps.includes(currentMapId.value))) {
-        return false;
-      }
-
       // Filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
         if (!s.categories || !s.categories.some((catId: number) => selectedCategories.value[catId])) {
@@ -667,19 +694,55 @@ function generateSearchSuggestions() {
       return (s.title && s.title.toLowerCase().includes(query)) ||
              (s.description && s.description.toLowerCase().includes(query));
     })
-    .map((s: any) => ({
-      id: s.id,
-      name: s.title || 'Unknown Service',
-      description: s.description || '',
-      type: 'service' as const,
-      latitude: parseFloat(s.latitude) || 0,
-      longitude: parseFloat(s.longitude) || 0,
-      categories: s.categories || []
-    }));
+    .map((s: any) => {
+      // Get map ID (first one if multiple)
+      const mapId = Array.isArray(s.maps) && s.maps.length > 0 ? s.maps[0] : null;
 
-  // Combine and limit the suggestions
-  filteredSuggestions.value = [...vendorSuggestions, ...serviceSuggestions]
-    .slice(0, maxSuggestionsToShow);
+      return {
+        id: s.id,
+        name: s.title || 'Unknown Service',
+        description: s.description || '',
+        type: 'service' as const,
+        latitude: parseFloat(s.latitude) || 0,
+        longitude: parseFloat(s.longitude) || 0,
+        categories: s.categories || [],
+        mapId: mapId,
+        mapName: mapId ? mapNamesById[mapId] : null
+      };
+    });
+
+  // Combine, sort by relevance, and limit the suggestions
+  const combinedSuggestions = [...vendorSuggestions, ...serviceSuggestions];
+
+  // Sort suggestions: first current map, then by relevance (exact match > starts with > contains)
+  const sortedSuggestions = combinedSuggestions.sort((a, b) => {
+    // First priority: current map items
+    const aInCurrentMap = a.mapId === currentMapId.value;
+    const bInCurrentMap = b.mapId === currentMapId.value;
+
+    if (aInCurrentMap && !bInCurrentMap) return -1;
+    if (!aInCurrentMap && bInCurrentMap) return 1;
+
+    // Second priority: exact match
+    const aExactMatch = a.name.toLowerCase() === query;
+    const bExactMatch = b.name.toLowerCase() === query;
+
+    if (aExactMatch && !bExactMatch) return -1;
+    if (!aExactMatch && bExactMatch) return 1;
+
+    // Third priority: starts with query
+    const aStartsWith = a.name.toLowerCase().startsWith(query);
+    const bStartsWith = b.name.toLowerCase().startsWith(query);
+
+    if (aStartsWith && !bStartsWith) return -1;
+    if (!aStartsWith && bStartsWith) return 1;
+
+    // Default: alphabetical
+    return a.name.localeCompare(b.name);
+  });
+
+  // Limit to max suggestions to show
+  filteredSuggestions.value = sortedSuggestions.slice(0, maxSuggestionsToShow);
 }
 
 // Select a suggestion
@@ -687,6 +750,29 @@ function selectSuggestion(suggestion: SearchSuggestion) {
   searchQuery.value = suggestion.name;
   showSearchSuggestions.value = false;
 
+  // First check if we need to switch maps
+  if (suggestion.mapId && suggestion.mapId !== currentMapId.value) {
+    // Find the map data
+    const mapData = allMaps.value.find((map: ServiceMap) => map.id === suggestion.mapId);
+    if (mapData) {
+      // Switch to the correct map first
+      currentMapId.value = mapData.id;
+
+      // Need to wait for the map to update before focusing on the point
+      setTimeout(() => {
+        focusOnSuggestion(suggestion);
+      }, 300);
+    } else {
+      // If map not found, just focus on point in current map
+      focusOnSuggestion(suggestion);
+    }
+  } else {
+    // Same map, just focus on the point
+    focusOnSuggestion(suggestion);
+  }
+}
+
+function focusOnSuggestion(suggestion: SearchSuggestion) {
   // Update the map to focus on the selected point
   if (map) {
     map.flyTo({
@@ -703,29 +789,28 @@ function selectSuggestion(suggestion: SearchSuggestion) {
       );
 
       if (features.length > 0) {
-        // Create a synthetic click event
-        const clickEvent = {
-          lngLat: { lng: suggestion.longitude, lat: suggestion.latitude },
-          point: map.project([suggestion.longitude, suggestion.latitude]),
-          features: [features.find(f =>
-            (suggestion.type === 'vendor' &&
-             f.properties &&
-             f.properties.id === suggestion.id &&
-             f.properties.type === 'vendor') ||
-            (suggestion.type === 'service' &&
-             f.properties &&
-             f.properties.id === suggestion.id &&
-             f.properties.type === 'service')
-          )]
-        };
+        // Find the specific feature by ID
+        const feature = features.find(f =>
+          f.properties &&
+          f.properties.id === suggestion.id &&
+          f.properties.type === suggestion.type
+        );
 
-
+        if (feature) {
+          // Trigger a click event on the specific feature
+          map.fire('click', {
+            lngLat: new mapboxgl.LngLat(suggestion.longitude, suggestion.latitude),
+            point: map.project([suggestion.longitude, suggestion.latitude]),
+            features: [feature]
+          } as unknown as mapboxgl.MapMouseEvent);
+        }
       }
-    }, 500); // Small delay to allow the map to finish flying
+    }, 500);
   }
 
   // Also update the map with filtered results
-  handleSearch();
+  // (though this now applies filters to the current map only)
+  updateMapForSelectedType();
 }
 
 // Get Number of currently selected filters for badge
@@ -747,10 +832,13 @@ onMounted(() => {
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
-      touchZoomRotate: true,
+      touchZoomRotate: false,
       renderWorldCopies: false,
       preserveDrawingBuffer: true,
     });
+
+    map.dragRotate.disable();
+    map.touchZoomRotate.disableRotation();
 
     map.addControl(new mapboxgl.NavigationControl());
 
@@ -778,7 +866,7 @@ onMounted(() => {
           type: 'raster',
           source: 'chevy-court-area',
           paint: {
-            'raster-opacity': 0.85
+            'raster-opacity': 0.90
           }
         });
 
@@ -867,6 +955,13 @@ onMounted(() => {
           const coordinates = (feature.geometry as Point).coordinates.slice();
           const { name, description } = feature.properties as VendorProperties;
 
+          // Center the map on the clicked point
+          map.flyTo({
+            center: coordinates as [number, number],
+            zoom: 17,
+            essential: true
+          });
+
           // Create popup content
           const popupContent = `
             <div class="vendor-popup">
@@ -920,6 +1015,13 @@ onMounted(() => {
               console.error('Error parsing categories:', error);
             }
           }
+
+          // Center the map on the clicked point
+          map.flyTo({
+            center: coordinates as [number, number],
+            zoom: 17,
+            essential: true
+          });
 
           // Create popup content
           const popupContent = `
@@ -1531,6 +1633,24 @@ onUnmounted(() => {
   flex-shrink: 0;
   color: white;
   min-width: 60px;
+}
+
+.suggestion-meta {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.suggestion-map-badge {
+  font-size: 10px;
+  background-color: #f0f0f0;
+  color: #555;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-right: 5px;
+  margin-bottom: 2px;
+  display: inline-block;
+  max-width: fit-content;
 }
 
 .suggestion-type-badge.vendor {
