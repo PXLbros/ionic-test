@@ -27,13 +27,17 @@
 
               </div>
             </div>
-            <form class="form" @submit.prevent="handleSubmit">
+            <div v-if="isSubmitted" class="thank-you-message">
+              <h2>Thank you!</h2>
+              <p>Your form has been successfully submitted. We will get back to you shortly.</p>
+            </div>
+            <form v-else class="form" @submit.prevent="handleSubmit">
                 <div class="form__group">
                     <label for="name">Name</label>
                     <input
                         type="text"
                         id="name"
-                        v-model="formData.name"
+                        v-model="formData.contactName"
                         required
                     >
                 </div>
@@ -43,7 +47,7 @@
                     <input
                         type="text"
                         id="title"
-                        v-model="formData.title"
+                        v-model="formData.contactTitle"
                         required
                     >
                 </div>
@@ -58,7 +62,58 @@
                     >
                 </div>
 
-                <button type="submit" class="submit-button">Submit</button>
+                <div class="form__group">
+                    <label for="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        v-model="formData.email"
+                        required
+                    >
+                </div>
+
+                <div class="form__group">
+                    <label for="phone">Phone</label>
+                    <input
+                        type="text"
+                        id="phone"
+                        v-model="formData.phone"
+                        required
+                    >
+                </div>
+
+                <div class="form__group">
+                    <label for="eventType">Event Type</label>
+                    <input
+                        type="text"
+                        id="eventType"
+                        v-model="formData.eventType"
+                        required
+                    >
+                </div>
+
+                <div class="form__group">
+                    <label for="eventDate">Event Date</label>
+                    <input
+                        type="text"
+                        id="eventDate"
+                        v-model="formData.eventDate"
+                        required
+                    >
+                </div>
+
+                <div class="form__group">
+                    <label for="additionalInfo">Additional Information</label>
+                    <input
+                        type="text"
+                        id="additionalInfo"
+                        v-model="formData.additionalInformation"
+                    >
+                </div>
+
+                <button type="submit" class="submit-button" :disabled="isSubmitting">
+                  {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+                </button>
             </form>
 
             <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
@@ -67,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import Fairgrounds from '@/layouts/fairgrounds.vue';
 import { useDataStore } from '@/stores/data';
 import SocialIcons from '@/components/SocialIcons.vue';
@@ -77,21 +132,78 @@ const dataStore = useDataStore();
 const appStore = useAppStore();
 
 interface FormData {
-    name: string;
-    title: string;
+    contactName: string;
+    contactTitle: string;
     company: string;
+    email: string;
+    phone: string;
+    eventType: string;
+    eventDate: string;
+    additionalInformation: string;
 }
 
 const formData = ref<FormData>({
-    name: '',
-    title: '',
-    company: ''
+    contactName: '',
+    contactTitle: '',
+    company: '',
+    email: '',
+    phone: '',
+    eventType: '',
+    eventDate: '',
+    additionalInformation: ''
 });
 
-const handleSubmit = () => {
-    console.log('Form submitted:', formData.value);
-    // Add your form submission logic here
+const isSubmitting = ref(false);
+const isSubmitted = ref(false);
+
+const handleSubmit = async () => {
+    isSubmitting.value = true;
+    try {
+        const response = await fetch('http://nys-fairgrounds.test:8080/api/v1/contact/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData.value)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        if (result.success) {
+            isSubmitted.value = true;
+        } else {
+            alert('Failed to submit the form. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('Failed to submit the form. Please try again.');
+    } finally {
+        isSubmitting.value = false;
+    }
 };
+
+const populateTestData = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('test') === '1') {
+        formData.value = {
+            contactName: 'Test Name',
+            contactTitle: 'Test Title',
+            company: 'Test Company',
+            email: 'test@example.com',
+            phone: '123-456-7890',
+            eventType: 'Test Event',
+            eventDate: '2023-12-31',
+            additionalInformation: 'This is test data.'
+        };
+    }
+};
+
+onMounted(() => {
+    populateTestData();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -222,9 +334,14 @@ const handleSubmit = () => {
   font-weight: 700;
   text-transform: uppercase;
 
-    &:hover {
-        background-color: darken(#3B71CA, 5%);
-    }
+  &:hover {
+      background-color: darken(#3B71CA, 5%);
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: default;
+  }
 }
 
 :deep(ion-content) {
