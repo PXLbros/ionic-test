@@ -17,7 +17,7 @@
                   <h2 id="fg-h2" class="section-title">More Events</h2>
                   <router-link to="/fairgrounds/upcoming-events" class="category-link">
                       <div class="category-card events-card">
-                          <img src="/public/Start_Screen_NYS.png" alt="Events" class="category-img" />
+                          <img src="/Start_Screen_NYS.png" alt="Events" class="category-img" />
                       </div>
                   </router-link>
 
@@ -26,7 +26,7 @@
                           <h2 id="fg-h2" class="section-title">Venues</h2>
                           <router-link to="/fairgrounds/venues" class="category-link">
                               <div class="category-card venues-card">
-                                  <img src="/public/Start_Screen_NYS.png" alt="Venues" class="category-img" />
+                                  <img src="/Start_Screen_NYS.png" alt="Venues" class="category-img" />
                               </div>
                           </router-link>
                       </div>
@@ -35,7 +35,7 @@
                           <h2 id="fg-h2" class="section-title">Rental Opportunities</h2>
                           <router-link to="/fairgrounds/rental-opportunity" class="category-link">
                               <div class="category-card rental-card">
-                                  <img src="/public/Start_Screen_NYS.png" alt="Rental Opportunities" class="category-img" />
+                                  <img src="/Start_Screen_NYS.png" alt="Rental Opportunities" class="category-img" />
                               </div>
                           </router-link>
                       </div>

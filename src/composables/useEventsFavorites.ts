@@ -1,25 +1,42 @@
 // src/composables/useEventFavorites.ts
-import { ref } from 'vue';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { addUserEventFavorite, removeUserEventFavorite } from '@/services/api';
 import { useAppStore } from '@/stores/app';
 import { useDataStore } from '@/stores/data';
 import { storeToRefs } from 'pinia';
-import type { Event, EventDate } from '@/types';
+import type { Event, EventDate, Site } from '@/types';
 
-export function useEventFavorites() {
+export function useEventFavorites({ site }: { site: Site }) {
   const appStore = useAppStore();
   const dataStore = useDataStore();
   const { data } = storeToRefs(dataStore);
-  const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 
-  const findEventDate = (eventId: number, startTimeUnix: number): EventDate | undefined => {
-    const event = eventsData.value.find((event: Event) => event.id === eventId);
-    return event?.dates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
+  const findEventDate = (eventId: number | string, startTimeUnix: number): EventDate | undefined => {
+    const eventsData = computed(() => {
+      switch (site) {
+        case 'nysfair':
+          return data.value?.nysfairWebsite?.events ?? [];
+        case 'nysfairgrounds':
+          return data.value?.nysfairgroundsWebsite?.events ?? [];
+        default:
+          return [];
+      }
+    });
+
+    const event = eventsData.value.find((event: Event) => {
+      return event.id === eventId;
+    });
+
+    switch (site) {
+      case 'nysfair':
+        return event?.dates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
+      case 'nysfairgrounds':
+        return event?.eventDates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
+    }
   };
 
-  const toggleFavorite = async (site: string, eventId: number, dateDetails: EventDate): Promise<void> => {
+  const toggleFavorite = async (site: Site, eventId: number | string, dateDetails: EventDate): Promise<void> => {
     if (!dateDetails) {
       console.warn('No date details provided for the event');
       return;
@@ -34,7 +51,7 @@ export function useEventFavorites() {
     }
   };
 
-  const addEventToFavorites = async (site: string, eventId: number, selectedStartTimeUnix: number): Promise<void> => {
+  const addEventToFavorites = async (site: Site, eventId: number | string, selectedStartTimeUnix: number): Promise<void> => {
     const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
 
     if (!matchingDate) {
@@ -88,7 +105,7 @@ export function useEventFavorites() {
     }
   };
 
-  const removeEventFromFavorites = async (site: string, eventId: number, selectedStartTimeUnix: number): Promise<void> => {
+  const removeEventFromFavorites = async (site: Site, eventId: number | string, selectedStartTimeUnix: number): Promise<void> => {
     const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
 
     if (!matchingDate) {
