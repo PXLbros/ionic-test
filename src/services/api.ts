@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { useDataStore } from '@/stores/data';
 import * as Sentry from '@sentry/capacitor';
 import { Preferences } from '@capacitor/preferences';
+import { Site } from '@/types';
 
 export const fetchData = async () => {
   const dataStore = useDataStore();
@@ -30,7 +31,7 @@ export const fetchData = async () => {
 
     const mobileAppData = data.strapi?.error ? null : data.strapi?.data || null;
     const nysfairWebsiteData = data.nysfairWebsite?.error ? null : await formatNYSFairWebsiteData(data.nysfairWebsite?.data) || null;
-    const nysfairgroundsWebsiteData = data.nysfairgroundsWebsite?.error ? null : data.nysfairgroundsWebsite?.data || null;
+    const nysfairgroundsWebsiteData = data.nysfairgroundsWebsite?.error ? null : await formatNYSFairgroundsData(data.nysfairgroundsWebsite?.data) || null;
 
     const errors = {
       strapi: data.strapi?.error || null,
@@ -184,8 +185,32 @@ const getFakeData = () => {
   };
 };
 
-const formatNYSFairWebsiteData = async (data: any) => {
-  let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+const getFavoriteEventsPreferenceKey = (site: Site) => {
+  switch (site) {
+    case 'nysfair':
+      return 'favoriteNYSFairEvents';
+    case 'nysfairgrounds':
+      return 'favoriteNYSFairgroundsEvents';
+    default:
+      return '';
+  }
+}
+
+const getEventDatesKey = (site: Site) => {
+  switch (site) {
+    case 'nysfair':
+      return 'dates';
+    case 'nysfairgrounds':
+      return 'eventDates';
+    default:
+      return '';
+  }
+}
+
+const formatData = async ({ site, data }: { site: Site; data: any }) => {
+  const favoriteEventsPreferenceKey = getFavoriteEventsPreferenceKey(site);
+
+  let { value: favoriteNYSFairEventIds } = await Preferences.get({ key: favoriteEventsPreferenceKey });
 
   if (!favoriteNYSFairEventIds) {
     favoriteNYSFairEventIds = '[]';
@@ -193,9 +218,13 @@ const formatNYSFairWebsiteData = async (data: any) => {
 
   const favoriteNYSFairEvents: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds);
 
+  console.log('#### favoriteNYSFairEvents:', favoriteNYSFairEvents);
+
   if (data.events) {
+    const eventDatesKey = getEventDatesKey(site);
+
     data.events = data.events.map((event: any) => {
-      event.dates = event.dates?.map((date: any) => {
+      event[eventDatesKey] = event[eventDatesKey]?.map((date: any) => {
         const isFavorite = favoriteNYSFairEvents.some((favoritedEvent) => {
           return favoritedEvent.id === event.id && favoritedEvent.start_time_unix === date.start_time_unix;
         });
@@ -210,7 +239,17 @@ const formatNYSFairWebsiteData = async (data: any) => {
     });
   }
 
+  console.log('#### data:', data);
+
   return data;
+}
+
+const formatNYSFairWebsiteData = async (data: any) => {
+  return formatData({ site: 'nysfair', data });
+};
+
+const formatNYSFairgroundsData = async (data: any) => {
+  return formatData({ site: 'nysfairgrounds', data });
 };
 
 export interface NYSFairFavoriteEventPreferencesApiItem {
@@ -220,21 +259,26 @@ export interface NYSFairFavoriteEventPreferencesApiItem {
 
 export const addUserEventFavorite = async ({
   deviceId,
+  site,
   eventId,
   startTime,
 }: {
   deviceId: string;
-  eventId: number;
+  site: Site;
+  eventId: number | string;
   startTime: number;
 }): Promise<boolean> => {
   try {
-    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+    const favoriteEventsPreferenceKey = getFavoriteEventsPreferenceKey(site);
+
+    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: favoriteEventsPreferenceKey });
 
     const favoriteEventPreferencesApiItems = JSON.parse(favoriteNYSFairEventIds || '[]');
 
     // Save to Strapi API
     const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/create`, {
       deviceId,
+      site,
       eventId,
       startTime,
     });
@@ -253,7 +297,7 @@ export const addUserEventFavorite = async ({
     }
 
     await Preferences.set({
-      key: 'favoriteNYSFairEvents',
+      key: favoriteEventsPreferenceKey,
       value: JSON.stringify(favoriteEventPreferencesApiItems),
     });
 
@@ -275,15 +319,19 @@ export const addUserEventFavorite = async ({
 
 export const removeUserEventFavorite = async ({
   deviceId,
+  site,
   eventId,
   startTime,
 }: {
   deviceId: string;
-  eventId: number;
+  site: Site;
+  eventId: number | string;
   startTime: number;
 }): Promise<boolean> => {
   try {
-    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: 'favoriteNYSFairEvents' });
+    const favoriteEventsPreferenceKey = getFavoriteEventsPreferenceKey(site);
+
+    const { value: favoriteNYSFairEventIds } = await Preferences.get({ key: favoriteEventsPreferenceKey });
 
     const favoriteEventPreferencesApiItems = JSON.parse(favoriteNYSFairEventIds || '[]');
 
@@ -297,7 +345,7 @@ export const removeUserEventFavorite = async ({
     }
 
     await Preferences.set({
-      key: 'favoriteNYSFairEvents',
+      key: favoriteEventsPreferenceKey,
       value: JSON.stringify(favoriteEventPreferencesApiItems),
     });
   } catch (error) {
@@ -310,6 +358,7 @@ export const removeUserEventFavorite = async ({
     // Save to Strapi API
     const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/delete`, {
       deviceId,
+      site,
       eventId,
       startTime,
     });

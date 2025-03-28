@@ -117,10 +117,8 @@
                   <div class="event-card__content">
                     <div class="event-card__meta">
                       <div class="event-card__date">
-                        {{ format(parseISO(event.currentDate.date), 'EEE, MMM d, yyyy') }}
+                        {{ event.currentDate.date_time_formatted }}
                       </div>
-                      <span class="event-card__separator">•</span>
-                      <div class="event-card__time">{{ getEventTime(event) }}</div>
                     </div>
                     <h3 class="event-card__title">{{ event.title }}</h3>
                   </div>
@@ -143,10 +141,8 @@
               <div class="event-card__content">
                 <div class="event-card__meta">
                   <div class="event-card__date">
-                    {{ format(parseISO(event.currentDate.date), 'EEE, MMM d, yyyy') }}
+                    {{ event.currentDate.date_time_formatted }}
                   </div>
-                  <span class="event-card__separator">•</span>
-                  <div class="event-card__time">{{ getEventTime(event) }}</div>
                 </div>
                 <h2 class="event-card__title">{{ event.title }}</h2>
               </div>
@@ -164,6 +160,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue';
+import { IonIcon } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import { listOutline } from 'ionicons/icons';
 import { format, isSameMonth, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from 'date-fns';
@@ -462,15 +459,6 @@ const navigateMonth = (direction: number) => {
   if (newDate >= minDate && newDate <= maxDate) {
     selectedDate.value = newDate;
   }
-};
-
-const getEventTime = (event: EventWithCurrentDate): string => {
-  const startTime = event.currentDate.startTime || '';
-  const endTime = event.currentDate.endTime || '';
-  if (startTime && endTime) {
-    return `${format(parseISO(startTime), 'h:mm aaa')} - ${format(parseISO(endTime), 'h:mm aaa')}`;
-  }
-  return startTime ? format(parseISO(startTime), 'h:mm aaa') : '';
 };
 
 const getEventImage = (event: Event): string => {
