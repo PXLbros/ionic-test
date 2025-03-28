@@ -159,7 +159,7 @@ const isSubmitted = ref(false);
 const handleSubmit = async () => {
     isSubmitting.value = true;
     try {
-        const response = await fetch('http://nys-fairgrounds.test:8080/api/v1/contact/submit', {
+        const response = await fetch(`${import.meta.env.VITE_NYSFAIRGROUNDS_API_URL}/contact/submit`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
