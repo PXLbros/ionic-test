@@ -818,6 +818,87 @@ const selectedFilterCount = computed(() => {
   return Object.values(selectedCategories.value).filter(Boolean).length;
 });
 
+function loadCategoryIcons(map: mapboxgl.Map) {
+  // Create a mapping of category IDs to their icon URLs
+  const categoryIconMap: Record<number, string> = {};
+
+  // Process service categories
+  serviceCategories.forEach((category: Category) => {
+    if (category.icon) {
+      categoryIconMap[category.id] = category.icon;
+    }
+  });
+
+  // Process vendor categories
+  vendorCategories.forEach((category: Category) => {
+    if (category.icon) {
+      categoryIconMap[category.id] = category.icon;
+    }
+  });
+
+  // Load each unique icon as a Mapbox image
+  const loadedImages = new Set<string>();
+
+  Object.entries(categoryIconMap).forEach(([categoryId, iconUrl]) => {
+    // Skip if already loaded or invalid URL
+    if (loadedImages.has(iconUrl) || !iconUrl) return;
+
+    const img = new Image();
+    img.onload = () => {
+      // Create a unique ID for this icon
+      const iconId = `category-icon-${categoryId}`;
+
+      // Add the image to the map
+      if (map.hasImage(iconId)) return; // Avoid duplicates
+
+      // Create a resized canvas for the icon (normalize size to 30x30px)
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      if (context) {
+        // Set canvas size
+        canvas.width = 30;
+        canvas.height = 30;
+
+        // Draw the image resized to fit the canvas
+        context.drawImage(img, 0, 0, 30, 30);
+
+        // Add the image to the map
+        map.addImage(iconId, canvas);
+      }
+    };
+
+    // Handle loading errors
+    img.onerror = () => {
+      console.warn(`Failed to load icon: ${iconUrl}`);
+    };
+
+    // Start loading
+    img.crossOrigin = 'anonymous'; // Important for CORS
+    img.src = iconUrl;
+
+    // Track loaded icons
+    loadedImages.add(iconUrl);
+  });
+
+  // Add default fallback icons for vendors and services
+  const defaultVendorIcon = new Image();
+  defaultVendorIcon.onload = () => {
+    if (!map.hasImage('default-vendor-icon')) {
+      map.addImage('default-vendor-icon', defaultVendorIcon);
+    }
+  };
+  defaultVendorIcon.src = '/icons/pig.png'; // currently only this one works.
+
+  const defaultServiceIcon = new Image();
+  defaultServiceIcon.onload = () => {
+    if (!map.hasImage('default-service-icon')) {
+      map.addImage('default-service-icon', defaultServiceIcon);
+    }
+  };
+  defaultServiceIcon.src = '/icons/pig.png'; // currently only this one works.
+}
+
 onMounted(() => {
   // Setup listener for closing dropdown when clicking outside
   document.addEventListener('click', closeDropdownOnOutsideClick);
@@ -843,6 +924,9 @@ onMounted(() => {
     map.addControl(new mapboxgl.NavigationControl());
 
     map.on('load', () => {
+
+      // load category icons for the map
+      loadCategoryIcons(map);
       // 1. Add image overlay first
       const testImage = new Image();
       testImage.onload = () => {
@@ -913,37 +997,63 @@ onMounted(() => {
         // 4. Add individual point layers with different colors for vendors and services
         // Vendor points (red)
         map.addLayer({
-          id: 'vendor-point',
-          type: 'circle',
+          id: 'vendor-icon',
+          type: 'symbol',
           source: 'points-clustered',
           filter: [
             'all',
             ['!', ['has', 'point_count']],
             ['==', ['get', 'type'], 'vendor']
           ],
-          paint: {
-            'circle-color': '#EE4722',
-            'circle-radius': 7,
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#fff'
+          layout: {
+            // Use a data-driven style to pick the appropriate icon based on the first category
+            'icon-image': [
+              'case',
+              ['has', 'categories'],
+              [
+                'case',
+                // Check if the first category has an icon
+                ['has', ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]]],
+                ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+                // Fallback to default icon
+                'default-vendor-icon'
+              ],
+              'default-vendor-icon'
+            ],
+            'icon-size': 0.1,
+            'icon-allow-overlap': true,
+            'icon-anchor': 'bottom'
           }
         });
 
-        // Service points (blue)
+        // service-point layer:
         map.addLayer({
-          id: 'service-point',
-          type: 'circle',
+          id: 'service-icon',
+          type: 'symbol',
           source: 'points-clustered',
           filter: [
             'all',
             ['!', ['has', 'point_count']],
             ['==', ['get', 'type'], 'service']
           ],
-          paint: {
-            'circle-color': '#1E5EAE',
-            'circle-radius': 7,
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#fff'
+          layout: {
+            // Use a data-driven style to pick the appropriate icon based on the first category
+            'icon-image': [
+              'case',
+              ['has', 'categories'],
+              [
+                'case',
+                // Check if the first category has an icon
+                ['has', ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]]],
+                ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+                // Fallback to default icon
+                'default-service-icon'
+              ],
+              'default-service-icon'
+            ],
+            'icon-size': 0.1,
+            'icon-allow-overlap': true,
+            'icon-anchor': 'bottom'
           }
         });
 

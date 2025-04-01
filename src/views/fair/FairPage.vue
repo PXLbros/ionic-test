@@ -4,7 +4,14 @@
         <!-- Header Nav -->
 
         <!-- Main Content -->
-        <FairNav />
+        <!-- <FairNav /> -->
+        <FloatingNav
+          type="fair"
+          toolbarBackground="#098944"
+          menuBackground="linear-gradient(180deg, #098944 0%, #098944 100%)"
+          :logoSrc="fairLogo"
+          logoAlt="NYSF Logo"
+        />
         <FairBottomNavigation />
         <ion-content :fullscreen="true">
             <div class="main">
@@ -179,6 +186,9 @@ import SocialIcons from '@/components/SocialIcons.vue';
 import { ref, onMounted } from 'vue';
 import Contact from '@/components/Contact.vue';
 import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
+import FloatingNav from '@/components/FloatingNav.vue';
+import fairLogo from '@/imgs/svg/fair-logo-light.svg';
+
 
 
     const dataStore = useDataStore();
@@ -315,7 +325,7 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 40px;
             position: relative; // Add this
             z-index: 10; // Add this to ensure logo stays on top
             margin-bottom: 10px;
