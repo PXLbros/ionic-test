@@ -12,15 +12,15 @@
               class="header-side logo"
             >
           </router-link>
-          <img
+          <!-- <img
             src="/src/imgs/svg/menu.svg"
             alt="menu-open"
             class="header-side menu-icon"
             @click="openMenu"
-          >
-          <!-- <svg class="header-side menu-icon" @click="openMenu" xmlns="http://www.w3.org/2000/svg" width="33" height="20" viewBox="0 0 33 20" fill="none">
-            <path d="M14.85 18.6957C14.85 17.9826 15.411 17.3913 16.0875 17.3913H31.7625C32.439 17.3913 33 17.9826 33 18.6957C33 19.4087 32.439 20 31.7625 20H16.0875C15.411 20 14.85 19.4087 14.85 18.6957ZM0 10C0 9.28696 0.561 8.69565 1.2375 8.69565H31.7625C32.439 8.69565 33 9.28696 33 10C33 10.713 32.439 11.3043 31.7625 11.3043H1.2375C0.561 11.3043 0 10.713 0 10ZM6.6 1.30435C6.6 0.591304 7.161 0 7.8375 0H31.7625C32.439 0 33 0.591304 33 1.30435C33 2.01739 32.439 2.6087 31.7625 2.6087H7.8375C7.161 2.6087 6.6 2.01739 6.6 1.30435Z" fill="#FFD100"/>
-          </svg> -->
+          > -->
+          <svg class="menu-icon" @click="openMenu" width="33" height="20" viewBox="0 0 33 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.85 18.6957C14.85 17.9826 15.411 17.3913 16.0875 17.3913H31.7625C32.439 17.3913 33 17.9826 33 18.6957C33 19.4087 32.439 20 31.7625 20H16.0875C15.411 20 14.85 19.4087 14.85 18.6957ZM0 10C0 9.28696 0.561 8.69565 1.2375 8.69565H31.7625C32.439 8.69565 33 9.28696 33 10C33 10.713 32.439 11.3043 31.7625 11.3043H1.2375C0.561 11.3043 0 10.713 0 10ZM6.6 1.30435C6.6 0.591304 7.161 0 7.8375 0H31.7625C32.439 0 33 0.591304 33 1.30435C33 2.01739 32.439 2.6087 31.7625 2.6087H7.8375C7.161 2.6087 6.6 2.01739 6.6 1.30435Z"/>
+          </svg>
         </div>
       </ion-toolbar>
     </ion-header>
@@ -220,15 +220,18 @@ const toggleNotifications = async () => {
 
   .logo {
     height: 60px;
-
   }
 
   .menu-icon {
     cursor: pointer;
+    margin-right: 25px;
+    color: #F4E8AB;
+    fill: #F4E8AB;
   }
 
   #fairgrounds .menu-icon {
     color: #FFD100;
+    fill: #FFD100;
   }
 
   .nav-wrapper {

@@ -14,7 +14,10 @@
         <!-- Menu button on the right side if showMenuButton is true -->
         <ion-buttons class="menu-button" slot="end" v-if="showMenuButton">
           <ion-button @click="openMenu">
-            <img src="/src/imgs/svg/menu.svg" alt="menu-open" class="menu-icon" />
+            <!-- <img src="/src/imgs/svg/menu.svg" alt="menu-open" class="menu-icon" /> -->
+            <svg class="menu-icon" @click="openMenu" width="33" height="20" viewBox="0 0 33 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14.85 18.6957C14.85 17.9826 15.411 17.3913 16.0875 17.3913H31.7625C32.439 17.3913 33 17.9826 33 18.6957C33 19.4087 32.439 20 31.7625 20H16.0875C15.411 20 14.85 19.4087 14.85 18.6957ZM0 10C0 9.28696 0.561 8.69565 1.2375 8.69565H31.7625C32.439 8.69565 33 9.28696 33 10C33 10.713 32.439 11.3043 31.7625 11.3043H1.2375C0.561 11.3043 0 10.713 0 10ZM6.6 1.30435C6.6 0.591304 7.161 0 7.8375 0H31.7625C32.439 0 33 0.591304 33 1.30435C33 2.01739 32.439 2.6087 31.7625 2.6087H7.8375C7.161 2.6087 6.6 2.01739 6.6 1.30435Z"/>
+            </svg>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -31,7 +34,7 @@
       <div class="nav-menu" :class="{ 'is-open': isMenuOpen }" style="background: #19262D;">
         <div class="nav-header" style="background: #19262D;">
           <img
-            src="/src/imgs/svg/fairgrounds-dark.svg"
+            src="/src/imgs/svg/fg-light.svg"
             alt="Fairgrounds Logo"
             class="nav-logo"
           >
@@ -198,6 +201,8 @@ ion-toolbar {
 .menu-icon {
   width: 24px;
   height: 24px;
+  color: #FFD100;
+  fill: #FFD100;
 }
 
 // Center the title container
@@ -226,7 +231,7 @@ ion-title {
 }
 
 ion-back-button {
-  color: #FFFFFF;
+  color: #FFD100;
   position: relative; // Ensures it stays above the centered title
   z-index: 1;
 }
@@ -295,7 +300,7 @@ ion-back-button {
 .close-button {
   background: none;
   border: none;
-  color: #FFFFFF;
+  color: #FFD100;
   font-size: 36px;
   padding: 0px 0px;
   cursor: pointer;
