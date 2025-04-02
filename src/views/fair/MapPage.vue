@@ -785,7 +785,7 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
     setTimeout(() => {
       const features = map.queryRenderedFeatures(
         map.project([suggestion.longitude, suggestion.latitude]),
-        { layers: suggestion.type === 'vendor' ? ['vendor-point'] : ['service-point'] }
+        { layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon'] }
       );
 
       if (features.length > 0) {
@@ -840,63 +840,60 @@ function loadCategoryIcons(map: mapboxgl.Map) {
   const loadedImages = new Set<string>();
 
   Object.entries(categoryIconMap).forEach(([categoryId, iconUrl]) => {
-    // Skip if already loaded or invalid URL
     if (loadedImages.has(iconUrl) || !iconUrl) return;
 
-    const img = new Image();
-    img.onload = () => {
-      // Create a unique ID for this icon
+
+    console.log('Loading icon for category:', categoryId, 'from URL:', iconUrl);
+    // Use Mapbox's loadImage method
+    map.loadImage(iconUrl, (error, image) => {
+      if (error) {
+        console.warn(`Failed to load icon for category ${categoryId}:`, error);
+        return;
+      }
+
       const iconId = `category-icon-${categoryId}`;
 
-      // Add the image to the map
-      if (map.hasImage(iconId)) return; // Avoid duplicates
-
-      // Create a resized canvas for the icon (normalize size to 30x30px)
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-
-      if (context) {
-        // Set canvas size
-        canvas.width = 30;
-        canvas.height = 30;
-
-        // Draw the image resized to fit the canvas
-        context.drawImage(img, 0, 0, 30, 30);
-
-        // Add the image to the map
-        map.addImage(iconId, canvas);
+      // Add the image to the map style
+      try {
+        map.addImage(iconId, image!);
+        console.log(`Successfully added icon: ${iconId}`);
+      } catch (error) {
+        console.error(`Failed to add icon ${iconId}:`, error);
       }
-    };
+    });
 
-    // Handle loading errors
-    img.onerror = () => {
-      console.warn(`Failed to load icon: ${iconUrl}`);
-    };
-
-    // Start loading
-    img.crossOrigin = 'anonymous'; // Important for CORS
-    img.src = iconUrl;
-
-    // Track loaded icons
     loadedImages.add(iconUrl);
   });
 
-  // Add default fallback icons for vendors and services
-  const defaultVendorIcon = new Image();
-  defaultVendorIcon.onload = () => {
-    if (!map.hasImage('default-vendor-icon')) {
-      map.addImage('default-vendor-icon', defaultVendorIcon);
+  // Add default icons for vendors and services
+  map.loadImage('/icons/pig.png', (error, image) => {
+    if (error) {
+      console.error('Failed to load default vendor icon:', error);
+      return;
     }
-  };
-  defaultVendorIcon.src = '/icons/pig.png'; // currently only this one works.
 
-  const defaultServiceIcon = new Image();
-  defaultServiceIcon.onload = () => {
-    if (!map.hasImage('default-service-icon')) {
-      map.addImage('default-service-icon', defaultServiceIcon);
+    try {
+      map.addImage('default-vendor-icon', image!);
+      console.log('Successfully added default vendor icon');
+    } catch (error) {
+      console.error('Failed to add default vendor icon:', error);
     }
-  };
-  defaultServiceIcon.src = '/icons/pig.png'; // currently only this one works.
+  });
+
+  // Same for service icon
+  map.loadImage('/icons/pig.png', (error, image) => {
+    if (error) {
+      console.error('Failed to load default service icon:', error);
+      return;
+    }
+
+    try {
+      map.addImage('default-service-icon', image!);
+      console.log('Successfully added default service icon');
+    } catch (error) {
+      console.error('Failed to add default service icon:', error);
+    }
+  });
 }
 
 onMounted(() => {
@@ -1006,21 +1003,24 @@ onMounted(() => {
             ['==', ['get', 'type'], 'vendor']
           ],
           layout: {
-            // Use a data-driven style to pick the appropriate icon based on the first category
             'icon-image': [
               'case',
               ['has', 'categories'],
-              [
-                'case',
-                // Check if the first category has an icon
-                ['has', ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]]],
-                ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
-                // Fallback to default icon
-                'default-vendor-icon'
+              // Extract just the ID from the category object
+              ['concat', 'category-icon-',
+                ['to-string',
+                  ['coalesce',
+                    // Try to get the id property if it exists
+                    ['get', 'id', ['at', 0, ['get', 'categories']]],
+                    // Otherwise use the raw value (for simple number IDs)
+                    ['at', 0, ['get', 'categories']]
+                  ]
+                ]
               ],
+              // Fallback
               'default-vendor-icon'
             ],
-            'icon-size': 0.1,
+            'icon-size': 0.5,
             'icon-allow-overlap': true,
             'icon-anchor': 'bottom'
           }
@@ -1037,28 +1037,23 @@ onMounted(() => {
             ['==', ['get', 'type'], 'service']
           ],
           layout: {
-            // Use a data-driven style to pick the appropriate icon based on the first category
+            // Simplify this expression
             'icon-image': [
               'case',
               ['has', 'categories'],
-              [
-                'case',
-                // Check if the first category has an icon
-                ['has', ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]]],
-                ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
-                // Fallback to default icon
-                'default-service-icon'
-              ],
+              // Check if there's at least one category
+              ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+              // Fallback
               'default-service-icon'
             ],
-            'icon-size': 0.1,
+            'icon-size': 0.9,
             'icon-allow-overlap': true,
             'icon-anchor': 'bottom'
           }
         });
 
         // 5. Add click handlers for vendor points
-        map.on('click', 'vendor-point', (e) => {
+        map.on('click', 'vendor-icon', (e) => {
           if (!e.features || e.features.length === 0) return;
 
           const feature = e.features[0];
@@ -1093,7 +1088,7 @@ onMounted(() => {
         });
 
         // 6. Add click handlers for service points
-        map.on('click', 'service-point', (e) => {
+        map.on('click', 'service-icon', (e) => {
           if (!e.features || e.features.length === 0) return;
 
           const feature = e.features[0];
@@ -1153,23 +1148,6 @@ onMounted(() => {
             .setLngLat(coordinates as [number, number])
             .setHTML(popupContent)
             .addTo(map);
-        });
-
-        // 7. Change cursor when hovering over points
-        map.on('mouseenter', 'vendor-point', () => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.on('mouseleave', 'vendor-point', () => {
-          map.getCanvas().style.cursor = '';
-        });
-
-        map.on('mouseenter', 'service-point', () => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.on('mouseleave', 'service-point', () => {
-          map.getCanvas().style.cursor = '';
         });
 
         // Optional: handle clicks on clusters
