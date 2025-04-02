@@ -61,6 +61,7 @@
               </ion-button>
           </div>
         </div>
+        <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
     </div>
   </DefaultLayout>
 </template>
@@ -71,9 +72,9 @@ import { computed } from 'vue';
 import { NewsArticle } from '@/types'
 import DefaultLayout from '@/layouts/default.vue';
 import Loader from '@/components/Loader.vue';
+import { useDataStore } from '@/stores/data';
 
-
-// const dataStore = useDataStore();
+const dataStore = useDataStore();
 
 // const itemsPerPage = 5;
 const currentPage = ref(1);
@@ -325,9 +326,10 @@ a {
   display: flex;
   justify-content: center;
   padding: 20px 0;
+  color: #1F3667;
 
   ion-button {
-      --color: #1E5EAE;
+      --color: #1F3667;
       font-weight: 600;
       text-transform: none;
       width: 100%; // Full width for clickabile area

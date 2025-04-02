@@ -1,23 +1,26 @@
 <template>
       <DefaultLayout title="Real-Time Updates" :showMenuButton="true">
         <div class="main">
-            <div class="main__content">
-                <div class="loading-content" v-if="isLoading">
-                  <Loader />
-                </div>
-                <div v-else-if="loadError">{{ loadError }}</div>
-                <div class="main__content-grid" v-else>
-                    <div
-                      v-for="update in updates"
-                      :key="update.id"
-                      class="main__content-item"
-                      >
-                        <p class="date">{{ formatDate(update.created_at) }}</p>
-                        <h4 class="headline">{{ update.title }}</h4>
-                        <p class="content">{{ update.message }}</p>
-                    </div>
-                </div>
-            </div>
+          <div class="main__content">
+              <div class="loading-content" v-if="isLoading">
+                <Loader />
+              </div>
+              <div v-else-if="loadError">{{ loadError }}</div>
+              <div class="main__content-grid" v-else>
+                  <div
+                    v-for="update in updates"
+                    :key="update.id"
+                    class="main__content-item"
+                    >
+                      <p class="date">{{ formatDate(update.created_at) }}</p>
+                      <h4 class="headline">{{ update.title }}</h4>
+                      <p class="content">{{ update.message }}</p>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="wrapper">
+          <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
         </div>
       </DefaultLayout>
 
@@ -28,6 +31,9 @@ import DefaultLayout from '@/layouts/default.vue';
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import Loader from '@/components/Loader.vue';
+import { useDataStore } from '@/stores/data';
+
+const dataStore = useDataStore();
 
 interface Update {
     id: number;
@@ -84,7 +90,7 @@ fetchUpdates();
 .main {
   background: #FDD456;
   padding: 30px;
-  padding-bottom: 110px;
+
 
     &__header {
         display: flex;
@@ -147,6 +153,10 @@ fetchUpdates();
             }
         }
     }
+}
+
+.wrapper {
+  padding-bottom: 90px;
 }
 
 </style>

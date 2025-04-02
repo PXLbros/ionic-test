@@ -353,6 +353,7 @@ const formatAdditionalDate = (date: NYSFairgroundsEventDate): string => {
   height: 60px;
   display: flex;
   gap: 10px;
+  display: none;
 }
 
 .price {
