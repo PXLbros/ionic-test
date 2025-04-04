@@ -52,7 +52,6 @@
             <!-- Load More Button -->
             <div v-if="hasMorePages" class="load-more">
               <ion-button
-                  fill="clear"
                   @click="loadMore"
                   :disabled="isLoading"
 
@@ -327,12 +326,18 @@ a {
   justify-content: center;
   padding: 20px 0;
   color: #1F3667;
+  width: 100%;
 
   ion-button {
-      --color: #1F3667;
+      --color: #FFF;
+      --background: #1F3667;
       font-weight: 600;
       text-transform: none;
-      width: 100%; // Full width for clickabile area
+      width: fit-content; // Full width for clickabile area
+      --padding-bottom: 20px;
+      --padding-top: 20px;
+      --padding-start: 40px;
+      --padding-end: 40px;
   }
 }
 

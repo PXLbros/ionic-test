@@ -369,6 +369,7 @@ function handleLiveSearch() {
 function handleFocus() {
   showSearchSuggestions.value = true;
 
+
   // Generate initial suggestions without requiring any text input
   generateInitialSuggestions();
 }
@@ -822,13 +823,15 @@ onMounted(() => {
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
-      touchZoomRotate: false,
+      touchZoomRotate: true,
       renderWorldCopies: false,
       preserveDrawingBuffer: true,
+      maxZoom: 17,
+      minZoom: 13,
     });
 
-    map.dragRotate.disable();
-    map.touchZoomRotate.disableRotation();
+    // map.dragRotate.disable();
+    // map.touchZoomRotate.disableRotation();
 
     map.addControl(new mapboxgl.NavigationControl());
 
@@ -860,7 +863,7 @@ onMounted(() => {
           type: 'raster',
           source: 'chevy-court-area',
           paint: {
-            'raster-opacity': 0.90
+            'raster-opacity': 1.0
           }
         });
 
@@ -872,8 +875,8 @@ onMounted(() => {
           type: 'geojson',
           data: combinedGeoJson,
           cluster: true,
-          clusterRadius: 50,
-          clusterMaxZoom: 14
+          clusterRadius: 50, // Radius of each cluster when clustering points (in pixels)
+          clusterMaxZoom: 14 // Max zoom to cluster points on
         });
 
         // 3. Add cluster layers
@@ -931,7 +934,7 @@ onMounted(() => {
 
             map.easeTo({
               center: (features[0].geometry as Point).coordinates as [number, number],
-              zoom: zoom ?? map.getZoom()
+              zoom: 16,
             });
           });
         });

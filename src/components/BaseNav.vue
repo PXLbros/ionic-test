@@ -267,7 +267,7 @@ const toggleNotifications = async () => {
     left: 0;
     // right: -100%;
     width: 100%;
-    height: 95vh; // Changed to viewport height
+    height: 100vh; // Changed to viewport height
     background: linear-gradient(180deg, #7323B4 0%, #540F8C 100%);
     transition: transform 0.3s ease;
     pointer-events: auto;

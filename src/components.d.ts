@@ -25,6 +25,7 @@ declare module 'vue' {
     FloatingNav: typeof import('./components/FloatingNav.vue')['default']
     HomeIcon: typeof import('./components/icons/HomeIcon.vue')['default']
     Loader: typeof import('./components/Loader.vue')['default']
+    MapDetailsPopup: typeof import('./components/MapDetailsPopup.vue')['default']
     MapIcon: typeof import('./components/icons/MapIcon.vue')['default']
     PinIcon: typeof import('./components/icons/PinIcon.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
