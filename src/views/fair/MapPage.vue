@@ -132,57 +132,10 @@ import mapboxgl, { Map } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
 import { loadCategoryIcons, addVendorIconLayer, addServiceIconLayer, setupIconClickHandlers } from '@/utils/MapIconUtils';
+import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
 
 // Access Token for Mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
-
-// Interfaces for our data
-interface VendorProperties {
-  name: string;
-  description: string;
-  id: number;
-  type: 'vendor';
-  categories?: number[];
-}
-
-interface ServiceProperties {
-  title: string;
-  description: string;
-  id: number;
-  is_accessible: boolean;
-  type: 'service';
-  categories: number[];
-}
-
-interface ServiceMap {
-  id: number;
-  name: string;
-  slug: string;
-  num_services?: number;
-  num_vendors?: number;
-}
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  icon: string | null;
-  num_services?: number;
-  num_vendors?: number;
-  maps?: number[];
-}
-
-interface SearchSuggestion {
-  id: number;
-  name: string;
-  description?: string;
-  type: 'vendor' | 'service';
-  longitude: number;
-  latitude: number;
-  categories?: number[];
-  mapId?: number;
-  mapName?: string;
-}
 
 import { useDataStore } from '@/stores/data';
 

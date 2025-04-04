@@ -51,3 +51,55 @@ export interface NewsArticle {
   created_at: string;
   image?: string; // Add the image property
 }
+
+
+// Map Types
+
+// Interfaces for our data
+interface VendorProperties {
+  name: string;
+  description: string;
+  id: number;
+  type: 'vendor';
+  categories?: number[];
+}
+
+interface ServiceProperties {
+  title: string;
+  description: string;
+  id: number;
+  is_accessible: boolean;
+  type: 'service';
+  categories: number[];
+}
+
+interface ServiceMap {
+  id: number;
+  name: string;
+  slug: string;
+  num_services?: number;
+  num_vendors?: number;
+}
+
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  num_services?: number;
+  num_vendors?: number;
+  maps?: number[];
+}
+
+interface SearchSuggestion {
+  id: number;
+  name: string;
+  description?: string;
+  type: 'vendor' | 'service';
+  longitude: number;
+  latitude: number;
+  categories?: number[];
+  mapId?: number;
+  mapName?: string;
+}
+
