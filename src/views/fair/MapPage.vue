@@ -5,7 +5,7 @@
         <div class="wrapper">
           <div class="search-container">
             <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @input="handleLiveSearch" @keyup.enter="handleSearch" @focus="handleFocus" @blur="handleBlur">
-            <ion-icon :icon="searchOutline" class="search-icon" @click="handleSearch"></ion-icon>
+            <ion-icon :icon="showSearchSuggestions ? closeOutline : searchOutline" class="search-icon" @click="clearSearch"></ion-icon>
             <div
               class="search-suggestions"
               v-if="showSearchSuggestions && filteredSuggestions.length > 0"
@@ -31,7 +31,7 @@
               </div>
             </div>
           </div>
-          <div class="group">
+          <div ref="btnGroup" class="group">
             <button class="filter-button" @click="toggleFiltersPanel">
               <ion-icon size="small" :icon="optionsOutline"></ion-icon>
               Filter
@@ -191,6 +191,7 @@ const showMapDropdown = ref(false);
 const currentMapId = ref<number | null>(null);
 const searchQuery = ref('');
 const searchDebounceTimeout = ref<number | null>(null);
+const btnGroup = ref<HTMLElement | null>(null);
 
 // Add new refs for filters modal
 const selectedCategories = ref<Record<number, boolean>>({});
@@ -368,7 +369,7 @@ function handleLiveSearch() {
 
 function handleFocus() {
   showSearchSuggestions.value = true;
-
+  btnGroup.value?.classList.add('search-focused');
 
   // Generate initial suggestions without requiring any text input
   generateInitialSuggestions();
@@ -379,6 +380,7 @@ function handleBlur() {
   // Use setTimeout to allow clicks on suggestions to register before closing
   setTimeout(() => {
     showSearchSuggestions.value = false;
+    btnGroup.value?.classList.remove('search-focused');
   }, 150);
 }
 
@@ -480,6 +482,15 @@ function resetFilters() {
   } else if (allMaps.value.length > 0) {
     currentMapId.value = allMaps.value[0].id;
   }
+  updateMapForSelectedType();
+}
+
+// Function to reset the search input
+function clearSearch() {
+  searchQuery.value = '';
+  showSearchSuggestions.value = false;
+  filteredSuggestions.value = [];
+  // Reset to the currently selected map
   updateMapForSelectedType();
 }
 
@@ -988,6 +999,10 @@ onUnmounted(() => {
     justify-content: center;
     align-items: center;
     gap: 10px;
+
+    &.search-focused {
+      display: none;
+    }
 
     .filter-button {
       background-color: transparent;
