@@ -65,7 +65,7 @@
     }
 
     .logo {
-      animation: bounce 2s ease infinite;
+      // animation: bounce 2s ease infinite;
       margin-bottom: 0px;
     }
 

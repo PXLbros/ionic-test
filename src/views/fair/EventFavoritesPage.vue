@@ -7,10 +7,6 @@
               <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
           </svg>
         </div>
-        <div class="main__header-content">
-          <h1 class="title">Event Favorites</h1>
-          <p class="subtitle">Class ridiculus rhoncus ad suspendisse ridiculus malesuada; litora morbi</p>
-        </div>
       </div>
 
       <!-- <pre>
@@ -60,21 +56,22 @@ const favoriteEventItems = computed(() => {
 <style lang="scss" scoped>
 .main {
   font-family: 'Inter', sans-serif;
-  background: #FDD456;
+  background: #098944;
   min-height: calc(100vh - 7.5vh);
 
   &--event-favorites-page {
-    padding: 25px;
+    padding: 0px;
   }
 
   &__header {
-    padding: 0px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
     position: relative;
+    background: #FDD456;
 
     &-img {
       width: 100%;
@@ -83,7 +80,7 @@ const favoriteEventItems = computed(() => {
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 24px;
+      border-radius: 10px;
     }
 
     &-content {
@@ -112,7 +109,9 @@ const favoriteEventItems = computed(() => {
   }
 
   &__content {
+    padding: 20px;
     padding-top: 10px;
+    background-color: #098944;
   }
 }
 </style>

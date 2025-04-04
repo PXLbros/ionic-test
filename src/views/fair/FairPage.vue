@@ -4,14 +4,14 @@
         <!-- Header Nav -->
 
         <!-- Main Content -->
-        <!-- <FairNav /> -->
-        <FloatingNav
+        <FairNav />
+        <!-- <FloatingNav
           type="fair"
           toolbarBackground="#098944"
           menuBackground="linear-gradient(180deg, #098944 0%, #098944 100%)"
           :logoSrc="fairLogo"
           logoAlt="NYSF Logo"
-        />
+        /> -->
         <FairBottomNavigation />
         <ion-content :fullscreen="true">
             <div class="main">
@@ -325,7 +325,7 @@ import fairLogo from '@/imgs/svg/fair-logo-light.svg';
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-top: 40px;
+            margin-top: 50px;
             position: relative; // Add this
             z-index: 10; // Add this to ensure logo stays on top
             margin-bottom: 10px;

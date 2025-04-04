@@ -161,7 +161,7 @@ export function addServiceIconLayer(map: mapboxgl.Map) {
         // Fallback
         'default-service-icon'
       ],
-      'icon-size': 0.9,
+      'icon-size': 1.1,
       'icon-allow-overlap': true,
       'icon-anchor': 'bottom'
     }
