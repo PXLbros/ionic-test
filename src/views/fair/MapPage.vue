@@ -556,7 +556,7 @@ function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | Ser
   const vendorFeatures = buildVendorGeoJSON(vendors);
   const serviceFeatures = buildServiceGeoJSON(services);
 
-  console.log(`Map ${currentMapId.value}: ${serviceFeatures.length} services, ${vendorFeatures.length} vendors`);
+  // console.log(`Map ${currentMapId.value}: ${serviceFeatures.length} services, ${vendorFeatures.length} vendors`);
 
   return {
     type: 'FeatureCollection' as const,
@@ -833,7 +833,7 @@ onMounted(() => {
 
         // 2. Build combined GeoJSON and add as a clustered source
         const combinedGeoJson = buildCombinedGeoJSON();
-        console.log('Initial GeoJSON feature count:', combinedGeoJson.features.length);
+        // console.log('Initial GeoJSON feature count:', combinedGeoJson.features.length);
 
         map.addSource('points-clustered', {
           type: 'geojson',

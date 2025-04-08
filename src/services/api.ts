@@ -20,8 +20,6 @@ export const fetchData = async () => {
     } else {
       const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data${import.meta.env.VITE_NODE_ENV === 'local' ? '?cache=0' : ''}`);
 
-      console.log('Response data:', response.data);
-
       data = response.data?.data;
 
       if (!data) {
@@ -218,8 +216,6 @@ const formatData = async ({ site, data }: { site: Site; data: any }) => {
 
   const favoriteNYSFairEvents: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds);
 
-  console.log('#### favoriteNYSFairEvents:', favoriteNYSFairEvents);
-
   if (data.events) {
     const eventDatesKey = getEventDatesKey(site);
 
@@ -238,8 +234,6 @@ const formatData = async ({ site, data }: { site: Site; data: any }) => {
       return event;
     });
   }
-
-  console.log('#### data:', data);
 
   return data;
 }

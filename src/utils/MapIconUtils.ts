@@ -46,7 +46,8 @@ export function loadCategoryIcons(
   Object.entries(categoryIconMap).forEach(([categoryId, iconUrl]) => {
     if (loadedImages.has(iconUrl) || !iconUrl) return;
 
-    console.log('Loading icon for category:', categoryId, 'from URL:', iconUrl);
+    // console.log('Loading icon for category:', categoryId, 'from URL:', iconUrl);
+
     // Use Mapbox's loadImage method
     map.loadImage(iconUrl, (error, image) => {
       if (error) {
@@ -59,7 +60,6 @@ export function loadCategoryIcons(
       // Add the image to the map style
       try {
         map.addImage(iconId, image!);
-        console.log(`Successfully added icon: ${iconId}`);
       } catch (error) {
         console.error(`Failed to add icon ${iconId}:`, error);
       }
@@ -77,7 +77,7 @@ export function loadCategoryIcons(
 
     try {
       map.addImage('default-vendor-icon', image!);
-      console.log('Successfully added default vendor icon');
+      // console.log('Successfully added default vendor icon');
     } catch (error) {
       console.error('Failed to add default vendor icon:', error);
     }
@@ -92,7 +92,7 @@ export function loadCategoryIcons(
 
     try {
       map.addImage('default-service-icon', image!);
-      console.log('Successfully added default service icon');
+      // console.log('Successfully added default service icon');
     } catch (error) {
       console.error('Failed to add default service icon:', error);
     }
@@ -214,15 +214,18 @@ export function setupIconClickHandlers(
 
   // Service icon click handler
   map.on('click', 'service-icon', (e) => {
-    if (!e.features || e.features.length === 0) return;
+    if (!e.features || e.features.length === 0) {
+      return;
+    }
+
 
     const feature = e.features[0];
     const coordinates = (feature.geometry as any).coordinates.slice();
     const props = feature.properties as any;
-    console.log('Service properties:', props);
 
     // Get category names for this service if categories exist
     let categoryNames = '';
+    let categoryNamesRaw = '';
 
     // Parse categories properly - they might be stringified in the GeoJSON
     let categoriesArray = [];
@@ -240,11 +243,14 @@ export function setupIconClickHandlers(
         if (categoriesArray.length > 0) {
           const names = categoriesArray.map((id: any) => getCategoryName(Number(id)));
           categoryNames = `<p class="popup-category">${names.join(', ')}</p>`;
+          categoryNamesRaw = names.join(', ');
         }
       } catch (error) {
         console.error('Error parsing categories:', error);
       }
     }
+
+    console.log(`Service icon clicked (Categories: ${categoryNamesRaw})`);
 
     // Center the map on the clicked point
     map.flyTo({
