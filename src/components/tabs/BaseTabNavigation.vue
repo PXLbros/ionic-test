@@ -46,18 +46,18 @@ const isActive = (path: string) => {
   return route.path.startsWith(path);
 };
 
-// Log the tab paths for debugging
-onMounted(() => {
-  console.log('Tab navigation mounted with paths:', props.tabs.map(tab => ({
-    path: tab.path,
-    icon: typeof tab.icon === 'string' ? tab.icon : 'Imported icon'
-  })));
-});
+// // Log the tab paths for debugging
+// onMounted(() => {
+//   console.log('Tab navigation mounted with paths:', props.tabs.map(tab => ({
+//     path: tab.path,
+//     icon: typeof tab.icon === 'string' ? tab.icon : 'Imported icon'
+//   })));
+// });
 
-// Watch for route changes for debugging
-watch(() => route.path, (newPath) => {
-  console.log('Route changed to:', newPath);
-}, { immediate: true });
+// // Watch for route changes for debugging
+// watch(() => route.path, (newPath) => {
+//   console.log('Route changed to:', newPath);
+// }, { immediate: true });
 </script>
 
 <style scoped lang="scss">
@@ -75,7 +75,6 @@ watch(() => route.path, (newPath) => {
   align-items: center;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  padding: 0px 5px 15px;
 }
 
 .tab-item {
