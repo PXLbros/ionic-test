@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="Music" :showMenuButton="false">
+  <FairLayout title="Music" :showMenuButton="false">
     <div v-if="event" class="main">
         <div class="main__image">
             <img v-if="event.featured_image" :src="event.featured_image" alt="">
@@ -20,14 +20,14 @@
 
         </div>
     </div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { useDataStore } from '@/stores/data';
 import { computed } from 'vue';
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 
 
 interface Event {

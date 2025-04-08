@@ -1,5 +1,5 @@
 <template>
-    <DefaultLayout title="Plan Your Visit" :showMenuButton="true">
+    <FairLayout title="Plan Your Visit" :showMenuButton="true">
       <div class="main">
 
           <div class="main__image">
@@ -66,11 +66,11 @@
           <div class="wrapper">
             <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
           </div>
-    </DefaultLayout>
+    </FairLayout>
 </template>
 
 <script setup lang="ts">
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import Contact from '@/components/Contact.vue';
 import { useDataStore } from '@/stores/data';
 

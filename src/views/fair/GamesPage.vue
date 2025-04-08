@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="Activities & Ag Facts" :showMenuButton="true">
+  <FairLayout title="Activities & Ag Facts" :showMenuButton="true">
     <div class="activities-container">
       <div
         v-if="games"
@@ -15,11 +15,11 @@
         </div>
       </div>
     </div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import { ref } from 'vue';
 import { useDataStore } from '@/stores/data';
 import { Browser } from '@capacitor/browser';

@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="Schedule" :showMenuButton="true">
+  <FairLayout title="Schedule" :showMenuButton="true">
     <div class="main">
       <div class="main__header">
         <div class="main__header-img">
@@ -58,11 +58,11 @@
         </div>
       </div>
     </div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import EventsList from '@/components/EventsList.vue';
 import { useDataStore } from '@/stores/data';
 import { storeToRefs } from 'pinia';

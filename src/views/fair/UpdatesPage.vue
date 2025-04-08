@@ -1,5 +1,5 @@
 <template>
-      <DefaultLayout title="Real-Time Updates" :showMenuButton="true">
+      <FairLayout title="Real-Time Updates" :showMenuButton="true">
         <div class="main">
           <div class="main__content">
               <div class="loading-content" v-if="isLoading">
@@ -22,12 +22,12 @@
         <div class="wrapper">
           <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
         </div>
-      </DefaultLayout>
+      </FairLayout>
 
 </template>
 
 <script setup lang="ts">
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import Loader from '@/components/Loader.vue';

@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="Interactive Map" :showMenuButton="true">
+  <FairLayout title="Interactive Map" :showMenuButton="true">
     <div class="main">
       <div class="main__header">
         <div class="wrapper">
@@ -117,11 +117,11 @@
       :class="{ 'filter-backdrop--visible': showFiltersPanel }"
       @click="toggleFiltersPanel"
     ></div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import {
   IonIcon,

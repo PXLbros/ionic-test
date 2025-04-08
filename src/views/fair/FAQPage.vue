@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="FAQ">
+  <FairLayout title="FAQ">
 
       <!-- Notification Banner -->
       <div class="notification" v-if="showNotification">
@@ -42,12 +42,12 @@
           </div>
         </div>
       </div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 
 interface FAQSection {

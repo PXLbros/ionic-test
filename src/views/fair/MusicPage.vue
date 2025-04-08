@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout
+  <FairLayout
     title="Concert"
     :showMenuButton="true"
   >
@@ -112,7 +112,7 @@
         </div>
       </div>
     </div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
@@ -174,7 +174,7 @@ interface DataStore {
   };
 }
 
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import { useDataStore } from '@/stores/data';
 import { ref, computed } from 'vue';

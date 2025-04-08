@@ -103,3 +103,18 @@ interface SearchSuggestion {
   mapName?: string;
 }
 
+interface FairgroundsVenue {
+  id: string;
+  title: string;
+  slug: string;
+  url: string;
+  dateCreated: string;
+  dateUpdated: string;
+  venueDetailBody: string | null;
+  venueDetailHeadline: string | null;
+  venueDetailPreheader: string | null;
+  venueNavTitle: string | null;
+  venueSubheader: string | null;
+  venueMainImage: string | null;
+  venuePreheader: string | null;
+}

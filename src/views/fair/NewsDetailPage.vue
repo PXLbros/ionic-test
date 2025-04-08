@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="News" :showMenuButton="true">
+  <FairLayout title="News" :showMenuButton="true">
     <div v-if="isFetchingArticle" class="loading-article">
         Loading article...
     </div>
@@ -50,14 +50,14 @@
             </a>
         </div>
     </div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 
 
 interface NewsArticle {
