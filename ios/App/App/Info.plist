@@ -54,6 +54,8 @@
 	<true/>
   <key>NSLocationWhenInUseUsageDescription</key>
   <string>The app is using your location to provide accurate event location and map data.</string>
+  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+  <string>We use your location to provide personalized content and enhance your experience at the NY Agriculture Fair.</string>
   <key>NSAppTransportSecurity</key>
   <dict>
       <key>NSAllowsArbitraryLoads</key>
