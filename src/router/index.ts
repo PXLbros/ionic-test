@@ -75,7 +75,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/fair',
-    component: () => import('@/views/fair/FairPage.vue'),
+    component: () => import('@/views/fair/FairHomePage.vue'),
     meta: {
       title: 'Home',
       showInMenu: true,

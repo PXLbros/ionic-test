@@ -86,10 +86,9 @@
 
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { closeCircleOutline } from 'ionicons/icons';
-import { IonToolbar, IonHeader } from '@ionic/vue';
+import { IonToolbar, IonIcon, IonHeader } from '@ionic/vue';
 
 const props = defineProps<{
   type: 'fair' | 'fairgrounds'

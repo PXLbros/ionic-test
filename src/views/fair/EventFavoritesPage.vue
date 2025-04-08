@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="Event Favorites" backButtonHref="/fair/schedule">
+  <FairLayout title="Event Favorites" backButtonHref="/fair/schedule">
     <div class="main main--event-favorites-page">
       <div class="main__header">
         <div class="main__header-img">
@@ -22,12 +22,12 @@
         />
       </div>
     </div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
 import { Category } from '@/types';
-import DefaultLayout from '../../layouts/default.vue';
+import FairLayout from '../../layouts/fair.vue';
 import { formatEvent } from '@/utils/event';
 
 const dataStore = useDataStore();

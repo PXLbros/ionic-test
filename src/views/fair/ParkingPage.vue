@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="Parking">
+  <FairLayout title="Parking">
     <div class="notification" v-if="showNotification && latestParkingUpdate">
       <router-link class="link" :to="{ name: 'updates', params: { updateId: latestParkingUpdate.id } }">
           {{ truncateContent(latestParkingUpdate.message, 75) }}
@@ -47,13 +47,13 @@
             </div>
         </div>
     </div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
 import { useDataStore } from '@/stores/data';
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import axios from 'axios';
 
 interface ParkingSection {

@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout title="News" :showMenuButton="true">
+  <FairLayout title="News" :showMenuButton="true">
     <div class="main">
 
         <div class="wrapper">
@@ -62,14 +62,14 @@
         </div>
         <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
     </div>
-  </DefaultLayout>
+  </FairLayout>
 </template>
 <script setup lang="ts">
 import axios from 'axios';
 import { IonButton } from '@ionic/vue';
 import { computed } from 'vue';
 import { NewsArticle } from '@/types'
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import Loader from '@/components/Loader.vue';
 import { useDataStore } from '@/stores/data';
 

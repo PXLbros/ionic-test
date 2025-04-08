@@ -22,7 +22,6 @@
       </ion-toolbar>
     </ion-header>
 
-    <!-- Slide-out Menu -->
     <div class="nav-wrapper" :class="{ 'is-open': isMenuOpen }" v-if="showMenuButton">
       <div
         class="nav-overlay"

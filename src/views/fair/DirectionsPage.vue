@@ -1,5 +1,5 @@
 <template>
-      <DefaultLayout title="Directions">
+      <FairLayout title="Directions">
             <div class="main">
                 <div class="main__image">
                     <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
@@ -11,11 +11,11 @@
                     <div class="main__content-text" v-if="directionsPageData.content" v-html="directionsPageData.content"></div>
                 </div>
             </div>
-      </DefaultLayout>
+      </FairLayout>
 </template>
 
 <script setup lang="ts">
-import DefaultLayout from '@/layouts/default.vue';
+import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 import { ref } from 'vue';
 

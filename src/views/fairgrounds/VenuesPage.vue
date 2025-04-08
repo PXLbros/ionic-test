@@ -1,70 +1,41 @@
 <template>
-  <FairgroundsLayout
-    title="Venues"
-    :showMenuButton="true"
-  >
+  <FairgroundsLayout title="Venues" :showMenuButton="true">
     <div class="main">
-          <div class="main__header">
-              <img src="/public/Host_Event.png" alt="Venues" class="main__header-image" />
-              <div class="title">Host an Event</div>
-              <div class="description">If you're considering hosting an event, you'll want to first review the different spaces we can offer your organization.</div>
+      <div class="main__header">
+        <img src="/public/Host_Event.png" alt="Venues" class="main__header-image" />
+        <div class="title">Host an Event</div>
+        <div class="description">If you're considering hosting an event, you'll want to first review the different
+          spaces we can offer your organization.</div>
+      </div>
+      <div class="main__venue">
+        <div v-for="venue in venues" :key="venue.id" class="main__venue-card" :class="{ 'no-image': !hasImage(venue) }">
+          <!-- Only show image if venueMainImage exists -->
+          <img v-if="hasImage(venue)" class="image" :src="venue.venueMainImage || ''" alt="venue image">
+          <div class="content">
+            <div class="content__label">{{ venue.venuePreheader || 'Venue' }}</div>
+            <div class="content__title">{{ venue.title }}</div>
+            <div v-if="venue.venueDetailBody" v-html="stripHTML(venue.venueDetailBody?.slice(0, 75) + '...')"
+              class="content__description">
+            </div>
+            <div v-else class="content__description">
+              No Description Available
+            </div>
           </div>
-          <div class="main__venue">
-              <div
-                  v-for="venue in venues"
-                  :key="venue.id"
-                  class="main__venue-card"
-                  :class="{ 'no-image': !hasImage(venue) }"
-              >
-                  <!-- Only show image if venueMainImage exists -->
-                  <img
-                      v-if="hasImage(venue)"
-                      class="image"
-                      :src="venue.venueMainImage || ''"
-                      alt="venue image"
-                  >
-                  <div class="content">
-                      <div class="content__label">{{ venue.venuePreheader || 'Venue' }}</div>
-                      <div class="content__title">{{ venue.title }}</div>
-                      <div v-if="venue.venueDetailBody" v-html="stripHTML(venue.venueDetailBody?.slice(0, 75) + '...')" class="content__description">
-                      </div>
-                      <div v-else class="content__description">
-                          No Description Available
-                      </div>
-                  </div>
-                  <router-link :to="`/fairgrounds/venues/${encodeURIComponent(venue.id)}`" class="cta">Learn More</router-link>
-              </div>
-          </div>
+          <router-link :to="`/fairgrounds/venues/${encodeURIComponent(venue.id)}`" class="cta">Learn More</router-link>
+        </div>
+      </div>
     </div>
   </FairgroundsLayout>
 </template>
 
 <script setup lang="ts">
-import { useDataStore } from '@/stores/data';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
-
-interface Venue {
-  id: string;
-  title: string;
-  slug: string;
-  url: string;
-  dateCreated: string;
-  dateUpdated: string;
-  venueDetailBody: string | null;
-  venueDetailHeadline: string | null;
-  venueDetailPreheader: string | null;
-  venueNavTitle: string | null;
-  venueSubheader: string | null;
-  venueMainImage: string | null;
-  venuePreheader: string | null;
-}
+import type { FairgroundsVenue } from '@/types';
 
 const dataStore = useDataStore();
-const venues = ref<Venue[]>(dataStore.data.nysfairgroundsWebsite.venues);
+const venues = ref<FairgroundsVenue[]>(dataStore.data.nysfairgroundsWebsite.venues);
 
-console.log('venues', venues.value);
-
-const hasImage = (venue: Venue): boolean => {
+const hasImage = (venue: FairgroundsVenue): boolean => {
     return Array.isArray(venue.venueMainImage) && venue.venueMainImage.length > 0;
 };
 
@@ -77,10 +48,7 @@ const stripHTML = (html: string): string => {
 </script>
 
 <style lang="scss" scoped>
-
 .main {
-
-
     &__header {
         padding: 20px;
         padding-bottom: 30px;
@@ -182,5 +150,4 @@ const stripHTML = (html: string): string => {
         }
     }
 }
-
 </style>
