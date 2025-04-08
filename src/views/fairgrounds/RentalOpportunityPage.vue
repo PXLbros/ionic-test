@@ -1,5 +1,5 @@
 <template>
-  <Fairgrounds
+  <FairgroundsLayout
       title="Rental Opportunities"
       :showMenuButton="true"
     >
@@ -118,12 +118,12 @@
 
             <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
         </div>
-    </Fairgrounds>
+    </FairgroundsLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import Fairgrounds from '@/layouts/fairgrounds.vue';
+import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import { useDataStore } from '@/stores/data';
 import SocialIcons from '@/components/SocialIcons.vue';
 import { useAppStore } from '@/stores/app';

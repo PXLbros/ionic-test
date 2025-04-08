@@ -1,4 +1,3 @@
-<!-- layouts/fairgrounds.vue -->
 <template>
   <ion-page id="layout">
     <ion-header :translucent="true">

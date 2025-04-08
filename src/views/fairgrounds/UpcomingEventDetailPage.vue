@@ -1,5 +1,5 @@
 <template>
-  <Fairgrounds
+  <FairgroundsLayout
     title="Upcoming Events"
     :showMenuButton="true"
   >
@@ -86,7 +86,7 @@
       <h2>No Upcoming Events. Check back soon</h2>
     </div>
 
-  </Fairgrounds>
+  </FairgroundsLayout>
 </template>
 
 <script setup lang="ts">
@@ -94,7 +94,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDataStore } from '@/stores/data';
 import { format, parseISO } from 'date-fns';
-import Fairgrounds from '@/layouts/fairgrounds.vue';
+import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import type { EventDate } from '@/types';
 
 interface NYSFairgroundsEventDate {
