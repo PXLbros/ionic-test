@@ -1,5 +1,5 @@
 <template>
-  <Fairgrounds
+  <FairgroundsLayout
     title="Venue Details"
     :showMenuButton="true"
   >
@@ -37,12 +37,12 @@
     <div class="wrapper">
       <FGKeepInTouch />
     </div>
-  </Fairgrounds>
+  </FairgroundsLayout>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import Fairgrounds from '@/layouts/fairgrounds.vue';
+import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import { useDataStore } from '@/stores/data';
 import { computed } from 'vue';
 

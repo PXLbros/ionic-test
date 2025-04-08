@@ -1,4 +1,3 @@
-<!-- layouts/default.vue -->
 <template>
   <ion-page id="layout">
     <ion-header :translucent="true">

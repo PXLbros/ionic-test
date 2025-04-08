@@ -1,5 +1,5 @@
 <template>
-  <Fairgrounds
+  <FairgroundsLayout
     title="Upcoming Events"
     :showMenuButton="true"
   >
@@ -175,7 +175,7 @@
         <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
 
       </div>
-    </Fairgrounds>
+    </FairgroundsLayout>
 </template>
 
 <script setup lang="ts">
@@ -184,7 +184,7 @@ import { IonIcon } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import { listOutline } from 'ionicons/icons';
 import { format, isSameMonth, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from 'date-fns';
-import Fairgrounds from '@/layouts/fairgrounds.vue';
+import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 
 interface EventDate {
   date: string;

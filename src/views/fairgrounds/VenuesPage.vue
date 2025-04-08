@@ -1,5 +1,5 @@
 <template>
-  <Fairgrounds
+  <FairgroundsLayout
     title="Venues"
     :showMenuButton="true"
   >
@@ -36,13 +36,12 @@
               </div>
           </div>
     </div>
-  </Fairgrounds>
+  </FairgroundsLayout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useDataStore } from '@/stores/data';
-import Fairgrounds from '@/layouts/fairgrounds.vue';
+import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 
 interface Venue {
   id: string;
