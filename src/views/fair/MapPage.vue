@@ -833,11 +833,6 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
     // }
   });
 
-  // Find the feature on the map and show its popup after a short delay
-  // setTimeout(() => {
-
-  // }, 500);
-
   // Also update the map with filtered results
   // (though this now applies filters to the current map only)
   updateMapForSelectedType(); // TODO: THIS IS CAUSING THE ICONS TO DISAPPEAR AFTER SLECTING UUGGESTION
@@ -848,135 +843,14 @@ const selectedFilterCount = computed(() => {
   return Object.values(selectedCategories.value).filter(Boolean).length;
 });
 
-function setupMapLayers() {
-  if (!mapboxMap) {
-    return;
-  }
-
-  mapboxMap.addSource('chevy-court-area', {
-    type: 'image',
-    url: '/icons/Map_Design-big-min.png',
-    coordinates: [
-      [-76.21532502658798, 43.055330160826315],   // Top left
-      [-76.23753721914531, 43.07114978353832],    // Top right
-      [-76.22037084830293, 43.08502388194864],    // Bottom right
-      [-76.19757700157899, 43.06982854755563]     // Bottom left
-    ]
-  });
-
-  mapboxMap.addLayer({
-    id: 'chevy-court-overlay',
-    type: 'raster',
-    source: 'chevy-court-area',
-    paint: {
-      'raster-opacity': 1.0
-    }
-  });
-
-  // 1. Build filtered GeoJSON (fresh data)
-  const filteredGeoJson = buildFilteredGeoJSON();
-
-  // 2. Add GeoJSON source with initial data
-  mapboxMap.addSource('points-clustered', {
-    type: 'geojson',
-    data: filteredGeoJson,
-    cluster: true,
-    clusterRadius: 50,
-    clusterMaxZoom: 14
-  });
-
-  // 3. Add cluster layers
-  mapboxMap.addLayer({
-    id: 'point-clusters',
-    type: 'circle',
-    source: 'points-clustered',
-    filter: ['has', 'point_count'],
-    paint: {
-      'circle-color': '#1E5EAE',
-      'circle-radius': 16,
-      'circle-stroke-width': 1,
-      'circle-stroke-color': '#fff'
-    }
-  });
-
-  mapboxMap.addLayer({
-    id: 'point-cluster-count',
-    type: 'symbol',
-    source: 'points-clustered',
-    filter: ['has', 'point_count'],
-    layout: {
-      'text-field': '{point_count_abbreviated}',
-      'text-size': 12
-    },
-    paint: {
-      'text-color': '#ffffff'
-    }
-  });
-
-  // 4. Add icon layers
-  addVendorIconLayer(mapboxMap);
-  addServiceIconLayer(mapboxMap);
-
-  // 5. Setup icon click handlers
-  setupIconClickHandlers(mapboxMap, getCategoryName);
-
-  // 6. Optional: Handle cluster clicks
-  mapboxMap.on('click', 'point-clusters', (e) => {
-    const features = mapboxMap.queryRenderedFeatures(e.point, { layers: ['point-clusters'] });
-    if (!features || features.length === 0 || !features[0].properties) return;
-
-    const clusterId = features[0].properties.cluster_id;
-    if (clusterId === undefined || clusterId === null) {
-      console.error('Cluster ID is null or undefined');
-      return;
-    }
-
-    const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
-    source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-      if (err) return;
-      mapboxMap.easeTo({
-        center: (features[0].geometry as Point).coordinates as [number, number],
-        zoom: 16,
-      });
-    });
-  });
-
-  // 7. Use the 'idle' event to ensure the map is fully rendered
-  mapboxMap.once('idle', finalizeMapSetup);
-}
-
-// New function to finalize map setup after it's fully rendered
-function finalizeMapSetup() {
-  // Resize the map to ensure proper container dimensions
-  mapboxMap.resize();
-
-  // Hide loading indicators
-  isLoadingMap.value = false;
-  dataStore.hideLoader();
-
-  // Log that map is ready
-  logger.info('Map fully rendered and resized');
-}
-
-async function loadMap() {
-  if (!mapboxMap) {
-    return;
-  }
-
-  // Load category icons for the map and wait for them to complete loading
-  await loadCategoryIcons({ map: mapboxMap, serviceCategories, vendorCategories });
-
-  // Now that icons are loaded, proceed with setting up the map
-  const imageOverlayElement = new Image();
-  imageOverlayElement.onload = setupMapLayers;
-  imageOverlayElement.src = '/icons/Map_Design-big-min.png';
-}
-
 // Initialize the map with all required configurations
 function initMap() {
   if (!mapContainer.value) {
     return;
   }
+
+  // Show loading indicator
+  isLoadingMap.value = true;
 
   mapboxMap = new mapboxgl.Map({
     container: mapContainer.value,
@@ -992,18 +866,214 @@ function initMap() {
     preserveDrawingBuffer: true,
     maxZoom: 17,
     minZoom: 13,
+    failIfMajorPerformanceCaveat: true, // Don't load if performance would be poor
   });
 
   // Add navigation controls
   mapboxMap.addControl(new mapboxgl.NavigationControl());
 
-  // Set up map load handler
-  mapboxMap.on('load', loadMap);
+  // Set up map error handling
+  mapboxMap.on('error', (e) => {
+    logger.error('Mapbox error:', e);
+    isLoadingMap.value = false;
+    dataStore.hideLoader();
+  });
+
+  // Wait for style to load before loading other resources
+  mapboxMap.on('style.load', () => {
+    logger.info('Map style loaded');
+    loadMapResources();
+  });
+}
+
+// Load map resources in the proper sequence
+async function loadMapResources() {
+  if (!mapboxMap) {
+    logger.error('Map not initialized when loading resources');
+    return;
+  }
+
+  try {
+    // 1. First load category icons
+    logger.info('Loading category icons...');
+    await loadCategoryIcons({ map: mapboxMap, serviceCategories, vendorCategories });
+    logger.info('Category icons loaded successfully');
+
+    // 2. Then load the map overlay image
+    await loadMapOverlayImage();
+  } catch (error) {
+    logger.error('Error loading map resources:', error);
+    isLoadingMap.value = false;
+    dataStore.hideLoader();
+  }
+}
+
+// Load the map overlay image with proper promise handling
+function loadMapOverlayImage(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const imageOverlayElement = new Image();
+
+    imageOverlayElement.onload = () => {
+      logger.info('Map overlay image loaded');
+      setupMapLayers();
+      resolve();
+    };
+
+    imageOverlayElement.onerror = (error) => {
+      logger.error('Failed to load map overlay image', error);
+      reject(error);
+    };
+
+    // Set the source after setting up event handlers
+    imageOverlayElement.src = '/icons/Map_Design-big-min.png';
+  });
+}
+
+function setupMapLayers() {
+  if (!mapboxMap) {
+    logger.error('Map not initialized when setting up layers');
+    return;
+  }
+
+  try {
+    // 1. Add the map overlay image source
+    mapboxMap.addSource('chevy-court-area', {
+      type: 'image',
+      url: '/icons/Map_Design-big-min.png',
+      coordinates: [
+        [-76.21532502658798, 43.055330160826315],   // Top left
+        [-76.23753721914531, 43.07114978353832],    // Top right
+        [-76.22037084830293, 43.08502388194864],    // Bottom right
+        [-76.19757700157899, 43.06982854755563]     // Bottom left
+      ]
+    });
+
+    mapboxMap.addLayer({
+      id: 'chevy-court-overlay',
+      type: 'raster',
+      source: 'chevy-court-area',
+      paint: {
+        'raster-opacity': 1.0
+      }
+    });
+
+    // 2. Build filtered GeoJSON (fresh data)
+    const filteredGeoJson = buildFilteredGeoJSON();
+
+    // 3. Add GeoJSON source with initial data
+    mapboxMap.addSource('points-clustered', {
+      type: 'geojson',
+      data: filteredGeoJson,
+      cluster: true,
+      clusterRadius: 50,
+      clusterMaxZoom: 14
+    });
+
+    // 4. Add cluster layers
+    mapboxMap.addLayer({
+      id: 'point-clusters',
+      type: 'circle',
+      source: 'points-clustered',
+      filter: ['has', 'point_count'],
+      paint: {
+        'circle-color': '#1E5EAE',
+        'circle-radius': 16,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': '#fff'
+      }
+    });
+
+    mapboxMap.addLayer({
+      id: 'point-cluster-count',
+      type: 'symbol',
+      source: 'points-clustered',
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-size': 12
+      },
+      paint: {
+        'text-color': '#ffffff'
+      }
+    });
+
+    // 5. Add icon layers
+    addVendorIconLayer(mapboxMap);
+    addServiceIconLayer(mapboxMap);
+
+    // 6. Setup icon click handlers
+    setupIconClickHandlers(mapboxMap, getCategoryName);
+
+    // 7. Optional: Handle cluster clicks
+    mapboxMap.on('click', 'point-clusters', (e) => {
+      const features = mapboxMap.queryRenderedFeatures(e.point, { layers: ['point-clusters'] });
+      if (!features || features.length === 0 || !features[0].properties) return;
+
+      const clusterId = features[0].properties.cluster_id;
+      if (clusterId === undefined || clusterId === null) {
+        console.error('Cluster ID is null or undefined');
+        return;
+      }
+
+      const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
+      source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err) return;
+        mapboxMap.easeTo({
+          center: (features[0].geometry as Point).coordinates as [number, number],
+          zoom: 16,
+        });
+      });
+    });
+
+    // 8. Wait for the map to be fully rendered
+    mapboxMap.once('idle', finalizeMapSetup);
+  } catch (error) {
+    logger.error('Error setting up map layers:', error);
+    isLoadingMap.value = false;
+    dataStore.hideLoader();
+  }
+}
+
+// New function to finalize map setup after it's fully rendered
+function finalizeMapSetup() {
+  try {
+    // Ensure the map container is visible and has proper dimensions
+    if (mapContainer.value) {
+      mapContainer.value.style.display = 'block';
+    }
+
+    // Resize the map to ensure proper container dimensions
+    mapboxMap.resize();
+
+    // Hide loading indicators
+    isLoadingMap.value = false;
+    dataStore.hideLoader();
+
+    // Log that map is ready
+    logger.info('Map fully rendered and ready');
+  } catch (error) {
+    logger.error('Error finalizing map setup:', error);
+    isLoadingMap.value = false;
+    dataStore.hideLoader();
+  }
 }
 
 function destroyMap() {
-  if (mapboxMap) {
-    mapboxMap.remove();
+  try {
+    if (mapboxMap) {
+      // // Remove event listeners first
+      // mapboxMap.off('load');
+      // mapboxMap.off('style.load');
+      // mapboxMap.off('idle');
+      // mapboxMap.off('error');
+
+      // Then remove the map
+      mapboxMap.remove();
+
+      logger.info('Map destroyed successfully');
+    }
+  } catch (error) {
+    logger.error('Error destroying map:', error);
   }
 }
 
