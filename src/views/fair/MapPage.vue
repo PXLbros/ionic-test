@@ -400,7 +400,7 @@ function generateInitialSuggestions() {
         type: 'vendor' as const,
         latitude: location ? parseFloat(location.latitude) : 0,
         longitude: location ? parseFloat(location.longitude) : 0,
-        categories: v.categories || [],
+        categories: normalizeCategories(v.categories || []),
         mapId: mapId,
         mapName: mapId ? mapNamesById[mapId] : null
       };
@@ -519,7 +519,7 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
       description: v.description ?? '',
       id: v.id,
       type: 'vendor' as const,
-      categories: v.categories || []
+      categories: normalizeCategories(v.categories || []),
     },
     geometry: {
       type: 'Point' as const,
@@ -530,6 +530,13 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
     }
   })));
 }
+
+function normalizeCategories({ categories }: { categories: any }) {
+  return Array.isArray(categories)
+    ? categories.map((c: any) => typeof c === 'object' && c !== null ? c.id : c)
+    : []
+}
+
 
 // Convert services to GeoJSON features, filtering by map ID if needed
 function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServiceProperties>> {
@@ -581,6 +588,8 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
 function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
   const vendorFeatures = buildVendorGeoJSON(vendors);
   const serviceFeatures = buildServiceGeoJSON(services);
+
+  // console.log('Service feature sample:', JSON.stringify(serviceFeatures.slice(0, 3), null, 2));
 
   // console.log(`Map ${currentMapId.value}: ${serviceFeatures.length} services, ${vendorFeatures.length} vendors`);
 
@@ -654,7 +663,7 @@ function generateSearchSuggestions() {
         type: 'vendor' as const,
         latitude: location ? parseFloat(location.latitude) : 0,
         longitude: location ? parseFloat(location.longitude) : 0,
-        categories: v.categories || [],
+        categories: normalizeCategories(v.categories || []),
         mapId: mapId,
         mapName: mapId ? mapNamesById[mapId] : null
       };
