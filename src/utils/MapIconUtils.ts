@@ -48,29 +48,26 @@ export async function loadCategoryIcons({
   config?: IconLoadingConfig
 }): Promise<void> {
   // Create a mapping of category IDs to their icon URLs
-  const categoryIconMap: Record<number, string> = {};
+  const categoryIconMap: Record<string, string> = {};
   const loadErrors: string[] = [];
 
   // Process service categories
   serviceCategories.forEach((category: Category) => {
     if (category.icon) {
-      categoryIconMap[category.id] = category.icon;
-    } else {
-      console.warn('Service category is missing icon', category.id);
+      const key = `service-category-icon-${category.id}`;
+      categoryIconMap[key] = category.icon;
     }
   });
 
   // Process vendor categories
   vendorCategories.forEach((category: Category) => {
     if (category.icon) {
-      categoryIconMap[category.id] = category.icon;
-    } else {
-      console.warn('Vendor category is missing icon', category.id);
+      const key = `vendor-category-icon-${category.id}`;
+      categoryIconMap[key] = category.icon;
     }
   });
 
   // Create a Set to track unique icon URLs to avoid loading duplicates
-  const loadedImages = new Set<string>();
   const loadPromises: Promise<void>[] = [];
 
   // Helper function to load an image and add it to the map
@@ -96,6 +93,9 @@ export async function loadCategoryIcons({
           // Add the image to the map style
           if (image) {
             map.addImage(imageId, image);
+
+            console.log('loaded image ', imageId);
+
             resolve();
           } else {
             const errorMessage = `Image ${imageId} loaded as null from URL ${url}`;
@@ -125,20 +125,17 @@ export async function loadCategoryIcons({
   };
 
   // Load each unique category icon in parallel
-  Object.entries(categoryIconMap).forEach(([categoryId, iconUrl]) => {
-    if (loadedImages.has(iconUrl) || !iconUrl) {
+  Object.entries(categoryIconMap).forEach(([iconId, iconUrl]) => {
+    if (!iconUrl) {
       return;
     }
 
-    const iconId = `category-icon-${categoryId}`;
-    console.log('iconId', iconId);
     loadPromises.push(loadImage(iconUrl, iconId));
-    loadedImages.add(iconUrl);
   });
 
   // Load default icons
-  loadPromises.push(loadImage('/icons/pig.png', 'default-vendor-icon'));
-  loadPromises.push(loadImage('/icons/pig.png', 'default-service-icon'));
+  loadPromises.push(loadImage('/icons/default-category.png', 'default-vendor-icon'));
+  loadPromises.push(loadImage('/icons/default-category.png', 'default-service-icon'));
 
   // Wait for all icons to load
   try {
@@ -170,22 +167,12 @@ export function addVendorIconLayer(map: mapboxgl.Map) {
       ['==', ['get', 'type'], 'vendor']
     ],
     layout: {
+      // 'icon-image': 'default-vendor-icon',
       'icon-image': [
         'case',
         ['has', 'categories'],
-        // Extract just the ID from the category object
-        ['concat', 'category-icon-',
-          ['to-string',
-            ['coalesce',
-              // Try to get the id property if it exists
-              ['get', 'id', ['at', 0, ['get', 'categories']]],
-              // Otherwise use the raw value (for simple number IDs)
-              ['at', 0, ['get', 'categories']]
-            ]
-          ]
-        ],
-        // Fallback
-        'default-vendor-icon'
+        ['concat', 'vendor-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+        'default-vendor-icon',
       ],
       'icon-size': 0.5,
       'icon-allow-overlap': true,
@@ -209,13 +196,12 @@ export function addServiceIconLayer(map: mapboxgl.Map) {
       ['==', ['get', 'type'], 'service']
     ],
     layout: {
+      // 'icon-image': 'default-service-icon',
       'icon-image': [
         'case',
         ['has', 'categories'],
-        // Check if there's at least one category
-        ['concat', 'category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
-        // Fallback
-        'default-service-icon'
+        ['concat', 'service-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+        'default-service-icon',
       ],
       'icon-size': 1.1,
       'icon-allow-overlap': true,
