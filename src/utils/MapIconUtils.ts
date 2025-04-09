@@ -34,8 +34,8 @@ export interface CategoryIconLoadingConfig {
 
 const defaultCategoryIconLoadingConfig: CategoryIconLoadingConfig = {
   failOnIconError: false,
-  maxWidth: 18,
-  maxHeight: 18,
+  maxWidth: 45,
+  maxHeight: 45,
 };
 
 
