@@ -319,6 +319,11 @@ export function setupIconClickHandlers(
       .setLngLat(coordinates)
       .setHTML(content)
       .addTo(map);
+
+    // Reset activePopup when the popup is closed
+    activePopup.on('close', () => {
+      activePopup = null;
+    });
   };
 
   // Vendor icon click handler
@@ -395,24 +400,26 @@ export function setupIconClickHandlers(
     createPopup(coordinates, popupContent);
   };
 
-  // Automatically reposition the popup when the camera moves
-  map.on('move', () => {
+  // Move event handler
+  const handleMapMove = () => {
     if (activePopup) {
       const popupLngLat = activePopup.getLngLat();
-
       activePopup.setLngLat(popupLngLat); // Reposition the popup to stay anchored
     }
-  });
+  };
 
   // Register click handlers
   map.on('click', 'vendor-icon', handleVendorIconClick);
   map.on('click', 'service-icon', handleServiceIconClick);
 
+  // Register move handler
+  map.on('move', handleMapMove);
+
   // Return a cleanup function that removes all the event handlers
   return () => {
     map.off('click', 'vendor-icon', handleVendorIconClick);
     map.off('click', 'service-icon', handleServiceIconClick);
-    map.off('move'); // Remove the move event listener
+    map.off('move', handleMapMove); // Remove the move event listener
 
     if (activePopup) {
       activePopup.remove();
