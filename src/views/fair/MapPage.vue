@@ -866,7 +866,7 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
   });
 
   mapboxMap.once('moveend', () => {
-    console.log('FlyTo animation complete!');
+    logger.info(`Flied to suggestion (ID: ${suggestion.id} | Type: ${suggestion.type} | Lat: ${suggestion.latitude} | Lng: ${suggestion.longitude})`);
 
     const features = mapboxMap.queryRenderedFeatures(
       mapboxMap.project([suggestion.longitude, suggestion.latitude]),
