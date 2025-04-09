@@ -55,6 +55,9 @@ export async function loadCategoryIcons({
   serviceCategories.forEach((category: Category) => {
     if (category.icon) {
       const key = `service-category-icon-${category.id}`;
+
+      // console.log('service category', key, category.icon);
+
       categoryIconMap[key] = category.icon;
     }
   });
@@ -63,6 +66,9 @@ export async function loadCategoryIcons({
   vendorCategories.forEach((category: Category) => {
     if (category.icon) {
       const key = `vendor-category-icon-${category.id}`;
+
+      // console.log('vendor category', key, category.icon);
+
       categoryIconMap[key] = category.icon;
     }
   });
@@ -94,7 +100,7 @@ export async function loadCategoryIcons({
           if (image) {
             map.addImage(imageId, image);
 
-            console.log('loaded image ', imageId);
+            // console.log('Loaded image', imageId);
 
             resolve();
           } else {
