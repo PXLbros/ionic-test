@@ -13,18 +13,39 @@ interface Category {
 }
 
 // Configuration for icon loading
-export interface IconLoadingConfig {
+export interface CategoryIconLoadingConfig {
   /**
    * If true, will throw an error and stop the application when an icon fails to load
    * If false, will log errors and continue loading other icons
    * @default false
    */
   failOnIconError: boolean;
+
+  /**
+   * Optional max width to resize icons (in pixels)
+   */
+  maxWidth?: number;
+
+  /**
+   * Optional max height to resize icons (in pixels)
+   */
+  maxHeight?: number;
 }
 
-// Default configuration
-const defaultConfig: IconLoadingConfig = {
-  failOnIconError: false
+const defaultCategoryIconLoadingConfig: CategoryIconLoadingConfig = {
+  failOnIconError: false,
+  maxWidth: 18,
+  maxHeight: 18,
+};
+
+
+const resizeImage = (image: HTMLImageElement, width: number, height: number): ImageData => {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(image, 0, 0, width, height);
+  return ctx.getImageData(0, 0, width, height);
 };
 
 /**
@@ -40,12 +61,12 @@ export async function loadCategoryIcons({
   map,
   serviceCategories,
   vendorCategories,
-  config = defaultConfig
+  config = defaultCategoryIconLoadingConfig
 }: {
   map: mapboxgl.Map,
   serviceCategories: Category[],
   vendorCategories: Category[],
-  config?: IconLoadingConfig
+  config?: CategoryIconLoadingConfig
 }): Promise<void> {
   // Create a mapping of category IDs to their icon URLs
   const categoryIconMap: Record<string, string> = {};
@@ -79,54 +100,62 @@ export async function loadCategoryIcons({
   // Helper function to load an image and add it to the map
   const loadImage = (url: string, imageId: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-      map.loadImage(url, (error, image) => {
-        if (error) {
-          const errorMessage = `Failed to load icon ${imageId} from URL ${url}: ${error.message}`;
-          console.error(errorMessage);
-          loadErrors.push(errorMessage);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
 
-          if (config.failOnIconError) {
-            reject(new Error(errorMessage));
-            return;
-          }
-
-          // Resolve anyway if we're continuing on error
-          resolve();
-          return;
-        }
-
+      img.onload = () => {
         try {
-          // Add the image to the map style
-          if (image) {
-            map.addImage(imageId, image);
+          let width = img.width;
+          let height = img.height;
 
-            // console.log('Loaded image', imageId);
+          // Check if resizing is needed
+          const shouldResize = (config.maxWidth && img.width > config.maxWidth) ||
+                               (config.maxHeight && img.height > config.maxHeight);
 
-            resolve();
-          } else {
-            const errorMessage = `Image ${imageId} loaded as null from URL ${url}`;
-            console.error(errorMessage);
-            loadErrors.push(errorMessage);
+          if (shouldResize) {
+            let scale = 1;
 
-            if (config.failOnIconError) {
-              reject(new Error(errorMessage));
-            } else {
-              resolve();
-            }
+            // Calculate scale factor while preserving aspect ratio
+            const widthScale = config.maxWidth ? config.maxWidth / img.width : 1;
+            const heightScale = config.maxHeight ? config.maxHeight / img.height : 1;
+
+            // Use the smaller of the two to ensure both constraints are respected
+            scale = Math.min(widthScale, heightScale);
+
+            width = Math.round(img.width * scale);
+            height = Math.round(img.height * scale);
           }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d')!;
+          ctx.drawImage(img, 0, 0, width, height);
+          const imageData = ctx.getImageData(0, 0, width, height);
+
+          map.addImage(imageId, {
+            width: imageData.width,
+            height: imageData.height,
+            data: imageData.data
+          } as ImageData);
+
+          resolve();
         } catch (err) {
-          const errorMessage = `Failed to add icon ${imageId}: ${err instanceof Error ? err.message : String(err)}`;
+          const errorMessage = `Failed to process icon ${imageId}: ${err instanceof Error ? err.message : String(err)}`;
           console.error(errorMessage);
           loadErrors.push(errorMessage);
-
-          if (config.failOnIconError) {
-            reject(new Error(errorMessage));
-          } else {
-            // Resolve anyway to continue with other icons
-            resolve();
-          }
+          config.failOnIconError ? reject(new Error(errorMessage)) : resolve();
         }
-      });
+      };
+
+      img.onerror = () => {
+        const errorMessage = `Failed to load icon ${imageId} from URL ${url}`;
+        console.error(errorMessage);
+        loadErrors.push(errorMessage);
+        config.failOnIconError ? reject(new Error(errorMessage)) : resolve();
+      };
+
+      img.src = url;
     });
   };
 
@@ -181,8 +210,14 @@ export function addVendorIconLayer(map: mapboxgl.Map) {
         'default-vendor-icon',
       ],
       'icon-size': 0.5,
+      // 'icon-size': [
+      //   'interpolate', ['linear'], ['zoom'],
+      //   13, 0.3,  // At zoom level 13, icons are smaller
+      //   17, 0.5   // At zoom level 17, icons are larger
+      // ],
       'icon-allow-overlap': true,
-      'icon-anchor': 'bottom'
+      'icon-anchor': 'bottom',
+      // 'icon-offset': [0, 0],
     }
   });
 }
@@ -210,8 +245,14 @@ export function addServiceIconLayer(map: mapboxgl.Map) {
         'default-service-icon',
       ],
       'icon-size': 1.1,
+      // 'icon-size': [
+      //   'interpolate', ['linear'], ['zoom'],
+      //   13, 0.7,  // At zoom level 13, icons are smaller
+      //   17, 1.1   // At zoom level 17, icons are larger
+      // ],
       'icon-allow-overlap': true,
-      'icon-anchor': 'bottom'
+      'icon-anchor': 'bottom',
+      // 'icon-offset': [0, 0],
     }
   });
 }
