@@ -219,6 +219,8 @@ const filteredCategories = computed(() => {
 
 // Map reference
 let mapboxMap: Map;
+// Store icon click handler cleanup function
+let iconClickHandlersCleanup: (() => void) | null = null;
 
 // Track map readiness state
 const mapSourcesReady = ref(false);
@@ -937,7 +939,7 @@ function initMap() {
 
   // Set up map error handling
   mapboxMap.on('error', (e) => {
-    logger.error('Mapbox error:', e);
+    logger.error(e);
     isLoadingMap.value = false;
     dataStore.hideLoader();
   });
@@ -989,6 +991,29 @@ function loadMapOverlayImage(): Promise<void> {
 
     // Set the source after setting up event handlers
     imageOverlayElement.src = '/icons/Map_Design-big-min.png';
+  });
+}
+
+// Function to handle cluster clicks
+function handleClusterClick(e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) {
+  if (!mapboxMap || !e.features || e.features.length === 0 || !e.features[0].properties) return;
+
+  const features = mapboxMap.queryRenderedFeatures(e.point, { layers: ['point-clusters'] });
+  if (!features || features.length === 0 || !features[0].properties) return;
+
+  const clusterId = features[0].properties.cluster_id;
+  if (clusterId === undefined || clusterId === null) {
+    console.error('Cluster ID is null or undefined');
+    return;
+  }
+
+  const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
+  source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+    if (err) return;
+    mapboxMap.easeTo({
+      center: (features[0].geometry as Point).coordinates as [number, number],
+      zoom: 16,
+    });
   });
 }
 
@@ -1064,29 +1089,11 @@ function setupMapLayers() {
     addVendorIconLayer(mapboxMap);
     addServiceIconLayer(mapboxMap);
 
-    // 6. Setup icon click handlers
-    setupIconClickHandlers(mapboxMap, getCategoryName);
+    // 6. Setup icon click handlers and store the cleanup function
+    iconClickHandlersCleanup = setupIconClickHandlers(mapboxMap, getCategoryName);
 
     // 7. Optional: Handle cluster clicks
-    mapboxMap.on('click', 'point-clusters', (e) => {
-      const features = mapboxMap.queryRenderedFeatures(e.point, { layers: ['point-clusters'] });
-      if (!features || features.length === 0 || !features[0].properties) return;
-
-      const clusterId = features[0].properties.cluster_id;
-      if (clusterId === undefined || clusterId === null) {
-        console.error('Cluster ID is null or undefined');
-        return;
-      }
-
-      const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
-      source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-        if (err) return;
-        mapboxMap.easeTo({
-          center: (features[0].geometry as Point).coordinates as [number, number],
-          zoom: 16,
-        });
-      });
-    });
+    mapboxMap.on('click', 'point-clusters', handleClusterClick);
 
     // 8. Wait for the map to be fully rendered
     mapboxMap.once('idle', () => {
@@ -1137,7 +1144,16 @@ function destroyMap() {
       pendingMapUpdates.value = [];
       mapSourcesReady.value = false;
 
-      // // Remove event listeners first
+      // Remove event listeners
+      if (iconClickHandlersCleanup) {
+        iconClickHandlersCleanup();
+        iconClickHandlersCleanup = null;
+      }
+
+      // Remove cluster click handler
+      mapboxMap.off('click', 'point-clusters', handleClusterClick);
+
+      // Remove basic map event handlers
       // mapboxMap.off('load');
       // mapboxMap.off('style.load');
       // mapboxMap.off('idle');
