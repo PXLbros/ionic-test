@@ -879,32 +879,61 @@ function selectSuggestion(suggestion: SearchSuggestion) {
   searchQuery.value = suggestion.name;
   showSearchSuggestions.value = false;
 
-  const isSameMapId = suggestion.mapId !== currentMapId.value;
+  const needsMapChange = suggestion.mapId !== currentMapId.value;
 
-  logger.info(`Suggestion clicked (Current Map ID: ${currentMapId.value} | Suggestion Map ID: ${suggestion.mapId} | Is Same Map ID: ${isSameMapId ? 'Yes' : 'No'})`);
+  logger.info(`Suggestion clicked (Current Map ID: ${currentMapId.value} | Suggestion Map ID: ${suggestion.mapId} | Needs Map Change: ${needsMapChange ? 'Yes' : 'No'})`);
 
   // First check if we need to switch maps
-  if (suggestion.mapId && isSameMapId) {
+  if (suggestion.mapId && needsMapChange) {
     // Find the map data
     const mapData = allMaps.value.find((map: ServiceMap) => map.id === suggestion.mapId);
 
     if (mapData) {
       // Switch to the correct map first
       currentMapId.value = mapData.id;
-
       logger.info(`Switched map (Map ID: ${mapData.id} | Map Name: ${mapData.name})`);
 
-      // Need to wait for the map to update before focusing on the point
-      // We'll update the map data first, then focus on the suggestion
+      // Update the map data first
       updateMapForSelectedType();
 
-      // Wait a bit longer for the map data to update before focusing
-      setTimeout(() => {
-        focusOnSuggestion(suggestion);
-      }, 500);
-    } else {
-      logger.warn(`Could not find map to switch to (Map ID: ${currentMapId.value})`);
+      // Listen for the 'sourcedata' event which fires when new data is loaded
+      // Using once ensures we only respond to the first event
+      mapboxMap.once('sourcedata', (e) => {
+        // Check if the source is completely loaded
+        if (e.sourceId === 'points-clustered' && e.isSourceLoaded) {
+          logger.info('Map source data loaded, focusing on suggestion');
+          focusOnSuggestion(suggestion);
+        } else {
+          // If this event didn't indicate completion, wait for another one
+          const checkSourceLoaded = (e: mapboxgl.MapSourceDataEvent) => {
+            if (e.sourceId === 'points-clustered') {
+              if (e.isSourceLoaded) {
+                logger.info('Map source data fully loaded, focusing on suggestion');
 
+                focusOnSuggestion(suggestion);
+
+                // Cleanup the event listener
+                mapboxMap.off('sourcedata', checkSourceLoaded);
+              } else {
+                // console.log('not loaded yet..');
+              }
+            }
+          };
+
+          // Set up listener for complete load
+          mapboxMap.on('sourcedata', checkSourceLoaded);
+
+          // // Safety timeout as a fallback (much longer than before)
+          // setTimeout(() => {
+          //   // If we're still waiting, focus anyway and clean up the listener
+          //   logger.warn('Timeout reached waiting for source data, focusing anyway');
+          //   mapboxMap.off('sourcedata', checkSourceLoaded);
+          //   focusOnSuggestion(suggestion);
+          // }, 2000);
+        }
+      });
+    } else {
+      logger.warn(`Could not find map to switch to (Map ID: ${suggestion.mapId})`);
       // If map not found, just focus on point in current map
       focusOnSuggestion(suggestion);
     }
