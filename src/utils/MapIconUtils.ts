@@ -38,16 +38,6 @@ const defaultCategoryIconLoadingConfig: CategoryIconLoadingConfig = {
   maxHeight: 45,
 };
 
-
-const resizeImage = (image: HTMLImageElement, width: number, height: number): ImageData => {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d')!;
-  ctx.drawImage(image, 0, 0, width, height);
-  return ctx.getImageData(0, 0, width, height);
-};
-
 /**
  * Loads category icons for the map
  * @param map Mapbox map instance
@@ -76,9 +66,6 @@ export async function loadCategoryIcons({
   serviceCategories.forEach((category: Category) => {
     if (category.icon) {
       const key = `service-category-icon-${category.id}`;
-
-      // console.log('service category', key, category.icon);
-
       categoryIconMap[key] = category.icon;
     }
   });
@@ -87,86 +74,112 @@ export async function loadCategoryIcons({
   vendorCategories.forEach((category: Category) => {
     if (category.icon) {
       const key = `vendor-category-icon-${category.id}`;
-
-      // console.log('vendor category', key, category.icon);
-
       categoryIconMap[key] = category.icon;
     }
   });
 
-  // Create a Set to track unique icon URLs to avoid loading duplicates
-  const loadPromises: Promise<void>[] = [];
-
-  // Helper function to load an image and add it to the map
+  // Helper function to load an image with modern Mapbox API
   const loadImage = (url: string, imageId: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
+      // Check if image is already loaded
+      if (map.hasImage(imageId)) {
+        resolve();
+        return;
+      }
 
-      img.onload = () => {
-        try {
-          let width = img.width;
-          let height = img.height;
+      // Modern approach using map.loadImage
+      map.loadImage(url, (error, image) => {
+        if (error) {
+          const errorMessage = `Failed to load icon ${imageId} from URL ${url}: ${error.message}`;
+          console.error(errorMessage);
+          loadErrors.push(errorMessage);
 
-          // Check if resizing is needed
-          const shouldResize = (config.maxWidth && img.width > config.maxWidth) ||
-                               (config.maxHeight && img.height > config.maxHeight);
-
-          if (shouldResize) {
-            let scale = 1;
-
-            // Calculate scale factor while preserving aspect ratio
-            const widthScale = config.maxWidth ? config.maxWidth / img.width : 1;
-            const heightScale = config.maxHeight ? config.maxHeight / img.height : 1;
-
-            // Use the smaller of the two to ensure both constraints are respected
-            scale = Math.min(widthScale, heightScale);
-
-            width = Math.round(img.width * scale);
-            height = Math.round(img.height * scale);
+          if (config.failOnIconError) {
+            reject(new Error(errorMessage));
+          } else {
+            resolve();
           }
+          return;
+        }
 
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d')!;
-          ctx.drawImage(img, 0, 0, width, height);
-          const imageData = ctx.getImageData(0, 0, width, height);
+        if (!image) {
+          const errorMessage = `Image loaded but is null: ${imageId}`;
+          console.error(errorMessage);
+          loadErrors.push(errorMessage);
 
-          map.addImage(imageId, {
-            width: imageData.width,
-            height: imageData.height,
-            data: imageData.data
-          } as ImageData);
+          if (config.failOnIconError) {
+            reject(new Error(errorMessage));
+          } else {
+            resolve();
+          }
+          return;
+        }
+
+        try {
+          // Add the image to the map
+          if (!map.hasImage(imageId)) {
+            // If resizing is requested, use canvas
+            if ((config.maxWidth && image.width > config.maxWidth) ||
+                (config.maxHeight && image.height > config.maxHeight)) {
+
+              // Create a canvas to resize
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+
+              if (!ctx) {
+                throw new Error('Failed to get canvas context for resizing');
+              }
+
+              // Calculate new dimensions
+              let width = image.width;
+              let height = image.height;
+
+              const widthScale = config.maxWidth ? config.maxWidth / image.width : 1;
+              const heightScale = config.maxHeight ? config.maxHeight / image.height : 1;
+              const scale = Math.min(widthScale, heightScale);
+
+              width = Math.round(image.width * scale);
+              height = Math.round(image.height * scale);
+
+              // Set canvas dimensions and draw the resized image
+              canvas.width = width;
+              canvas.height = height;
+              ctx.drawImage(image, 0, 0, width, height);
+
+              // Get image data from canvas
+              const imageData = ctx.getImageData(0, 0, width, height);
+
+              map.addImage(imageId, imageData);
+            } else {
+              // Add original image without resizing
+              map.addImage(imageId, image);
+            }
+          }
 
           resolve();
         } catch (err) {
-          const errorMessage = `Failed to process icon ${imageId}: ${err instanceof Error ? err.message : String(err)}`;
+          const errorMessage = `Error adding image ${imageId} to map: ${err instanceof Error ? err.message : String(err)}`;
           console.error(errorMessage);
           loadErrors.push(errorMessage);
-          config.failOnIconError ? reject(new Error(errorMessage)) : resolve();
+
+          if (config.failOnIconError) {
+            reject(new Error(errorMessage));
+          } else {
+            resolve();
+          }
         }
-      };
-
-      img.onerror = () => {
-        const errorMessage = `Failed to load icon ${imageId} from URL ${url}`;
-        console.error(errorMessage);
-        loadErrors.push(errorMessage);
-        config.failOnIconError ? reject(new Error(errorMessage)) : resolve();
-      };
-
-      img.src = url;
+      });
     });
   };
 
+  // Load all the icons in parallel
+  const loadPromises: Promise<void>[] = [];
 
-  // Load each unique category icon in parallel
+  // Load category icons
   Object.entries(categoryIconMap).forEach(([iconId, iconUrl]) => {
-    if (!iconUrl) {
-      return;
+    if (iconUrl) {
+      loadPromises.push(loadImage(iconUrl, iconId));
     }
-
-    loadPromises.push(loadImage(iconUrl, iconId));
   });
 
   // Load default icons
@@ -203,12 +216,23 @@ export function addVendorIconLayer(map: mapboxgl.Map) {
       ['==', ['get', 'type'], 'vendor']
     ],
     layout: {
-      // 'icon-image': 'default-vendor-icon',
+      // Use a simpler match expression that Mapbox GL supports
       'icon-image': [
-        'case',
-        ['has', 'categories'],
-        ['concat', 'vendor-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+        'match',
+        ['typeof', ['get', 'categories']],
+        'string',
+        // If it's a string, use a default icon
         'default-vendor-icon',
+        // Otherwise check if we have categories
+        [
+          'case',
+          // Check if we have any categories
+          ['>', ['length', ['get', 'categories']], 0],
+          // If yes, use the first category ID for the icon
+          ['concat', 'vendor-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+          // Otherwise use default
+          'default-vendor-icon'
+        ]
       ],
       'icon-size': 0.5,
       // 'icon-size': [
@@ -238,12 +262,23 @@ export function addServiceIconLayer(map: mapboxgl.Map) {
       ['==', ['get', 'type'], 'service']
     ],
     layout: {
-      // 'icon-image': 'default-service-icon',
+      // Use a simpler match expression that Mapbox GL supports
       'icon-image': [
-        'case',
-        ['has', 'categories'],
-        ['concat', 'service-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+        'match',
+        ['typeof', ['get', 'categories']],
+        'string',
+        // If it's a string, use a default icon
         'default-service-icon',
+        // Otherwise check if we have categories
+        [
+          'case',
+          // Check if we have any categories
+          ['>', ['length', ['get', 'categories']], 0],
+          // If yes, use the first category ID for the icon
+          ['concat', 'service-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+          // Otherwise use default
+          'default-service-icon'
+        ]
       ],
       'icon-size': 1.1,
       // 'icon-size': [
@@ -268,7 +303,7 @@ export function setupIconClickHandlers(
   getCategoryName: (categoryId: number) => string
 ) {
   // Vendor icon click handler
-  map.on('click', 'vendor-icon', (e) => {
+  const handleVendorIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
     if (!e.features || e.features.length === 0) return;
 
     const feature = e.features[0];
@@ -300,10 +335,10 @@ export function setupIconClickHandlers(
       .setLngLat(coordinates as [number, number])
       .setHTML(popupContent)
       .addTo(map);
-  });
+  };
 
   // Service icon click handler
-  map.on('click', 'service-icon', (e) => {
+  const handleServiceIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
     if (!e.features || e.features.length === 0) {
       return;
     }
@@ -368,5 +403,15 @@ export function setupIconClickHandlers(
       .setLngLat(coordinates as [number, number])
       .setHTML(popupContent)
       .addTo(map);
-  });
+  };
+
+  // Register click handlers
+  map.on('click', 'vendor-icon', handleVendorIconClick);
+  map.on('click', 'service-icon', handleServiceIconClick);
+
+  // Return a cleanup function that removes all the event handlers
+  return () => {
+    map.off('click', 'vendor-icon', handleVendorIconClick);
+    map.off('click', 'service-icon', handleServiceIconClick);
+  };
 }
