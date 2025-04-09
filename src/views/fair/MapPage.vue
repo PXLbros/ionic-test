@@ -143,6 +143,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285d
 
 import { useDataStore } from '@/stores/data';
 
+// Default map view state to reset to
+const DEFAULT_MAP_CENTER: [number, number] = [-76.2197, 43.073];
+const DEFAULT_MAP_ZOOM = 14;
+const DEFAULT_MAP_BEARING = 222;
+
 const isLoadingMap = ref(true);
 
 const mapContainer = ref<HTMLElement | null>(null);
@@ -522,9 +527,29 @@ function resetFilters() {
   if (masterMap) {
     currentMapId.value = masterMap.id;
   } else if (allMaps.value.length > 0) {
-    currentMapId.value = allMaps
-    .value[0].id;
+    currentMapId.value = allMaps.value[0].id;
   }
+
+  // Close any open popups
+  if (mapboxMap) {
+    // Get all popup elements and remove them
+    const popups = document.querySelectorAll('.mapboxgl-popup');
+    popups.forEach(popup => popup.remove());
+
+    // Reset map view to default state
+    mapboxMap.flyTo({
+      center: DEFAULT_MAP_CENTER,
+      zoom: DEFAULT_MAP_ZOOM,
+      bearing: DEFAULT_MAP_BEARING,
+      essential: true,
+      animate: true,
+      duration: 1000 // 1 second animation
+    });
+
+    logger.info('Map reset to default view');
+  }
+
+  // Update map features with new filters
   updateMapForSelectedType();
 }
 
@@ -977,9 +1002,9 @@ function initMap() {
   mapboxMap = new mapboxgl.Map({
     container: mapContainer.value,
     style: 'mapbox://styles/pxldevops/cm4uef2wm005401sm7ebof1mh',
-    center: [-76.2197, 43.073],
-    zoom: 14,
-    bearing: 222,
+    center: DEFAULT_MAP_CENTER,
+    zoom: DEFAULT_MAP_ZOOM,
+    bearing: DEFAULT_MAP_BEARING,
     dragRotate: false,
     pitchWithRotate: false,
     touchPitch: false,
