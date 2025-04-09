@@ -302,19 +302,38 @@ export function setupIconClickHandlers(
   map: mapboxgl.Map,
   getCategoryName: (categoryId: number) => string
 ) {
+  let activePopup: mapboxgl.Popup | null = null;
+
+  // Helper function to create a popup with dynamic positioning
+  const createPopup = (coordinates: [number, number], content: string) => {
+    // Close any existing popup
+    if (activePopup) {
+      activePopup.remove();
+    }
+
+    // Create a new popup
+    activePopup = new mapboxgl.Popup({
+      offset: 25, // Default offset for better positioning
+      anchor: 'top', // Adjusted to a valid anchor value
+    })
+      .setLngLat(coordinates)
+      .setHTML(content)
+      .addTo(map);
+  };
+
   // Vendor icon click handler
   const handleVendorIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
     if (!e.features || e.features.length === 0) return;
 
     const feature = e.features[0];
-    const coordinates = (feature.geometry as any).coordinates.slice();
+    const coordinates = (feature.geometry as any).coordinates.slice() as [number, number];
     const { name, description } = feature.properties as any;
 
     // Center the map on the clicked point
     map.flyTo({
-      center: coordinates as [number, number],
+      center: coordinates,
       zoom: 17,
-      essential: true
+      essential: true,
     });
 
     // Create popup content
@@ -326,61 +345,39 @@ export function setupIconClickHandlers(
       </div>
     `;
 
-    // Ensure proper positioning
-    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-      coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-    }
-
-    new mapboxgl.Popup()
-      .setLngLat(coordinates as [number, number])
-      .setHTML(popupContent)
-      .addTo(map);
+    // Show the popup
+    createPopup(coordinates, popupContent);
   };
 
   // Service icon click handler
   const handleServiceIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
-    if (!e.features || e.features.length === 0) {
-      return;
-    }
+    if (!e.features || e.features.length === 0) return;
 
     const feature = e.features[0];
-    const coordinates = (feature.geometry as any).coordinates.slice();
+    const coordinates = (feature.geometry as any).coordinates.slice() as [number, number];
     const props = feature.properties as any;
 
     // Get category names for this service if categories exist
     let categoryNames = '';
-    let categoryNamesRaw = '';
-
-    // Parse categories properly - they might be stringified in the GeoJSON
-    let categoriesArray = [];
     if (props.categories) {
       try {
-        // If it's a string, try to parse it as JSON
-        if (typeof props.categories === 'string') {
-          categoriesArray = JSON.parse(props.categories);
-        }
-        // If it's already an array, use it as is
-        else if (Array.isArray(props.categories)) {
-          categoriesArray = props.categories;
-        }
-
+        const categoriesArray = Array.isArray(props.categories)
+          ? props.categories
+          : JSON.parse(props.categories);
         if (categoriesArray.length > 0) {
           const names = categoriesArray.map((id: any) => getCategoryName(Number(id)));
           categoryNames = `<p class="popup-category">${names.join(', ')}</p>`;
-          categoryNamesRaw = names.join(', ');
         }
       } catch (error) {
         console.error('Error parsing categories:', error);
       }
     }
 
-    console.log(`Service icon clicked (Categories: ${categoryNamesRaw})`);
-
     // Center the map on the clicked point
     map.flyTo({
-      center: coordinates as [number, number],
+      center: coordinates,
       zoom: 17,
-      essential: true
+      essential: true,
     });
 
     // Create popup content
@@ -394,16 +391,18 @@ export function setupIconClickHandlers(
       </div>
     `;
 
-    // Ensure proper positioning
-    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-      coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-    }
-
-    new mapboxgl.Popup()
-      .setLngLat(coordinates as [number, number])
-      .setHTML(popupContent)
-      .addTo(map);
+    // Show the popup
+    createPopup(coordinates, popupContent);
   };
+
+  // Automatically reposition the popup when the camera moves
+  map.on('move', () => {
+    if (activePopup) {
+      const popupLngLat = activePopup.getLngLat();
+
+      activePopup.setLngLat(popupLngLat); // Reposition the popup to stay anchored
+    }
+  });
 
   // Register click handlers
   map.on('click', 'vendor-icon', handleVendorIconClick);
@@ -413,5 +412,11 @@ export function setupIconClickHandlers(
   return () => {
     map.off('click', 'vendor-icon', handleVendorIconClick);
     map.off('click', 'service-icon', handleServiceIconClick);
+    map.off('move'); // Remove the move event listener
+
+    if (activePopup) {
+      activePopup.remove();
+      activePopup = null;
+    }
   };
 }
