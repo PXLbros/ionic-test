@@ -76,7 +76,7 @@ export class CustomLogger<LogObj extends Record<string, unknown>> extends Logger
 
   public override warn(...args: unknown[]): LogObj & ILogObjMeta | undefined {
     const [message, ...params] = args;
-    
+
     return super.warn(this.format({ message: message as string | Record<string, unknown>, params }));
   }
 }

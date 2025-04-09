@@ -220,6 +220,10 @@ const filteredCategories = computed(() => {
 // Map reference
 let mapboxMap: Map;
 
+// Track map readiness state
+const mapSourcesReady = ref(false);
+const pendingMapUpdates = ref<(() => void)[]>([]);
+
 // Toggle dropdown visibility
 function toggleMapDropdown() {
   showMapDropdown.value = !showMapDropdown.value;
@@ -233,18 +237,28 @@ function closeDropdownOnOutsideClick(event: MouseEvent) {
   }
 }
 
-// Select a map type and update the display
+// Select a map type and update the display with improved handling
 function selectMap(mapData: ServiceMap) {
+  // Store previous map ID for comparison
+  const previousMapId = currentMapId.value;
+
+  // Update current map ID and close dropdown
   currentMapId.value = mapData.id;
   showMapDropdown.value = false;
 
-  // Reset suggestion
+  // Reset search and filters
   searchQuery.value = '';
-
-  // Reset category filters when changing maps
   clearCategoryFilters();
 
-  // Update the map data based on selected map type
+  // Check if this is a significant map change
+  const isSignificantChange = previousMapId !== mapData.id;
+
+  if (isSignificantChange) {
+    // For significant map changes, track the request in progress
+    logger.info(`Switching to map: ${mapData.name} (ID: ${mapData.id})`);
+  }
+
+  // Request map update
   updateMapForSelectedType();
 }
 
@@ -282,25 +296,73 @@ function applyFilters() {
 
 // Update the map data based on the selected map type and filters
 function updateMapForSelectedType() {
-  if (!mapboxMap || !currentMapId.value) {
+  if (!mapboxMap) {
+    logger.warn('Cannot update map: Map not initialized');
     return;
   }
 
-  // Get the GeoJSON source
-  const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
-
-  console.log('got point-clustered mapbox source: ', source);
-
-  if (!source) {
+  if (!currentMapId.value) {
+    logger.warn('Cannot update map: No map ID selected');
     return;
   }
 
-  // Update the data with filtered GeoJSON
-  const filteredGeoJson = buildFilteredGeoJSON();
+  // If map sources are not ready yet, queue the update for later
+  if (!mapSourcesReady.value) {
+    logger.info('Queueing map update - sources not ready yet');
 
-  console.log('filteredGeoJson', filteredGeoJson);
+    // Add this update request to the queue
+    pendingMapUpdates.value.push(() => {
+      safeUpdateMapSource();
+    });
 
-  source.setData(filteredGeoJson);
+    return;
+  }
+
+  // If we get here, sources are ready so we can update directly
+  safeUpdateMapSource();
+}
+
+// Safely update the map source with error handling
+function safeUpdateMapSource() {
+  try {
+    if (!mapboxMap) return;
+
+    // Check if source exists before updating
+    const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
+
+    if (!source) {
+      logger.warn('Map source "points-clustered" not found');
+      return;
+    }
+
+    // Build new GeoJSON data
+    const filteredGeoJson = buildFilteredGeoJSON();
+    logger.info(`Updating map with ${filteredGeoJson.features.length} features`);
+
+    // Update the data source
+    source.setData(filteredGeoJson);
+  } catch (error) {
+    logger.error('Error updating map source:', error);
+  }
+}
+
+// Process any pending map updates
+function processPendingMapUpdates() {
+  if (pendingMapUpdates.value.length > 0) {
+    logger.info(`Processing ${pendingMapUpdates.value.length} pending map updates`);
+
+    // Execute each queued update function
+    pendingMapUpdates.value.forEach(updateFn => {
+      try {
+        updateFn();
+      } catch (error) {
+        logger.error('Error processing queued map update:', error);
+      }
+    });
+
+    // Clear the queue after processing
+    pendingMapUpdates.value = [];
+  }
 }
 
 // Handle search input
@@ -786,6 +848,7 @@ function selectSuggestion(suggestion: SearchSuggestion) {
   }
 }
 
+// Focus on map point without causing icon disappearance
 function focusOnSuggestion(suggestion: SearchSuggestion) {
   // Update the map to focus on the selected point
   if (!mapboxMap) {
@@ -1026,7 +1089,16 @@ function setupMapLayers() {
     });
 
     // 8. Wait for the map to be fully rendered
-    mapboxMap.once('idle', finalizeMapSetup);
+    mapboxMap.once('idle', () => {
+      // Mark sources as ready so queued updates can proceed
+      mapSourcesReady.value = true;
+
+      // Process any updates that were queued while layers were being set up
+      processPendingMapUpdates();
+
+      // Then finalize setup
+      finalizeMapSetup();
+    });
   } catch (error) {
     logger.error('Error setting up map layers:', error);
     isLoadingMap.value = false;
@@ -1061,6 +1133,10 @@ function finalizeMapSetup() {
 function destroyMap() {
   try {
     if (mapboxMap) {
+      // Clear any pending updates first
+      pendingMapUpdates.value = [];
+      mapSourcesReady.value = false;
+
       // // Remove event listeners first
       // mapboxMap.off('load');
       // mapboxMap.off('style.load');
