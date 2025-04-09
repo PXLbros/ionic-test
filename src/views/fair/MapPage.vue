@@ -803,14 +803,14 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
   mapboxMap.once('moveend', () => {
     console.log('FlyTo animation complete!');
 
-    // const features = mapboxMap.queryRenderedFeatures(
-    //   mapboxMap.project([suggestion.longitude, suggestion.latitude]),
-    //   { layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon'] }
-    // );
+    const features = mapboxMap.queryRenderedFeatures(
+      mapboxMap.project([suggestion.longitude, suggestion.latitude]),
+      { layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon'] }
+    );
 
-    // const numFeatures = features?.length || 0;
+    const numFeatures = features?.length || 0;
 
-    // console.log('features', features);
+    console.log('numFeatures', numFeatures);
 
     // if (numFeatures > 0) {
     //   // Find the specific feature by ID

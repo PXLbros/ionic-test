@@ -267,8 +267,6 @@ export function setupIconClickHandlers(
   map: mapboxgl.Map,
   getCategoryName: (categoryId: number) => string
 ) {
-  console.log('--------------- SETUP ICON CLICK HANDLERS!');
-
   // Vendor icon click handler
   map.on('click', 'vendor-icon', (e) => {
     if (!e.features || e.features.length === 0) return;
