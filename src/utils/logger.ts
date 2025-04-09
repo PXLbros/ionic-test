@@ -1,0 +1,115 @@
+import { Logger, type ILogObjMeta } from 'tslog';
+
+export const LogLevel = {
+  SILLY: 0,
+  TRACE: 1,
+  DEBUG: 2,
+  INFO: 3,
+  WARN: 4,
+  ERROR: 5,
+  FATAL: 6,
+};
+
+interface ILoggerParam {
+  [key: string]: unknown;
+}
+
+interface LogFormatParams {
+  message: string | Record<string, unknown>;
+  params: unknown[];
+}
+
+export class CustomLogger<LogObj extends Record<string, unknown>> extends Logger<LogObj> {
+  private formatMessage(message: string | Record<string, unknown>): string {
+    if (typeof message === 'object') {
+      return JSON.stringify(message);
+    }
+
+    return String(message);
+  }
+
+  private formatParams(params: unknown[]): string {
+    if (!params?.length) {
+      return '';
+    }
+
+    const loggerParam = params[0] as ILoggerParam;
+
+    const formattedParams = Object.entries(loggerParam)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join(' | ');
+
+    return formattedParams ? ` (${formattedParams})` : '';
+  }
+
+  private format({ message, params }: LogFormatParams): string {
+    return `${this.formatMessage(message)}${this.formatParams(params)}`;
+  }
+
+  public override debug(...args: unknown[]): LogObj & ILogObjMeta | undefined {
+    const [message, ...params] = args;
+
+    return super.debug(this.format({ message: message as string | Record<string, unknown>, params }));
+  }
+
+  public override info(...args: unknown[]): LogObj & ILogObjMeta | undefined {
+    const [message, ...params] = args;
+
+    return super.info(this.format({ message: message as string | Record<string, unknown>, params }));
+  }
+
+  public override error(...args: unknown[]): LogObj & ILogObjMeta | undefined {
+    const [firstArg, secondArg, ...params] = args;
+
+    const error = secondArg ?? firstArg;
+
+    if (secondArg) {
+      const formattedError = this.format({ message: firstArg as string | Record<string, unknown>, params });
+
+      return super.error(formattedError);
+    }
+
+    console.error(error);
+
+    return undefined;
+  }
+
+  public override warn(...args: unknown[]): LogObj & ILogObjMeta | undefined {
+    const [message, ...params] = args;
+    
+    return super.warn(this.format({ message: message as string | Record<string, unknown>, params }));
+  }
+}
+
+export const createLogger = ({
+  name,
+  debugEnabled = false,
+}: {
+  name?: string;
+  debugEnabled?: boolean;
+} = {}) => {
+  const spacingStr = '  ';
+  const prettyLogTemplate = `[{{hh}}:{{MM}}:{{ss}}]${
+    name ? `${spacingStr}{{name}}` : ''
+  }${spacingStr}{{logLevelName}}${spacingStr}`;
+
+  return new CustomLogger<Record<string, unknown>>({
+    name,
+    prettyLogTemplate,
+    prettyLogTimeZone: 'local',
+    prettyLogStyles: {
+      name: ['bold', 'green'],
+      logLevelName: {
+        '*': ['bold', 'black', 'bgWhiteBright', 'dim'],
+        SILLY: ['bold', 'white'],
+        TRACE: ['bold', 'whiteBright'],
+        DEBUG: ['bold', 'blackBright'],
+        INFO: ['bold', 'blue'],
+        WARN: ['bold', 'yellow'],
+        ERROR: ['bold', 'red'],
+        FATAL: ['bold', 'redBright'],
+      },
+    },
+    minLevel: debugEnabled ? LogLevel.SILLY : LogLevel.INFO,
+  });
+};

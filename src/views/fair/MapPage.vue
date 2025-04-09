@@ -124,7 +124,7 @@
 
 <script setup lang="ts">
 import FairLayout from '@/layouts/fair.vue';
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+// import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import {
   IonIcon,
   IonContent,
@@ -135,6 +135,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
 import { loadCategoryIcons, addVendorIconLayer, addServiceIconLayer, setupIconClickHandlers } from '@/utils/MapIconUtils';
 import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
+import { useLogger } from '@/composables/useLogger';
 
 // Access Token for Mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
@@ -159,6 +160,8 @@ const hasFilterChanges = ref(false);
 const showSearchSuggestions = ref(false);
 const filteredSuggestions = ref<SearchSuggestion[]>([]);
 const maxSuggestionsToShow = 5; // Reduced for mobile screens
+
+const logger = useLogger();
 
 // Grabbing data from CMS
 const dataStore = useDataStore();
@@ -196,7 +199,9 @@ const currentMapName = computed(() => {
 
 // Filter categories based on the current map
 const filteredCategories = computed(() => {
-  if (!currentMapId.value) return [];
+  if (!currentMapId.value) {
+    return [];
+  }
 
   // Combine service and vendor categories
   const combinedCategories = [
@@ -233,7 +238,6 @@ function selectMap(mapData: ServiceMap) {
   showMapDropdown.value = false;
 
   // Reset suggestion
-  // resetSuggestion();
   searchQuery.value = '';
 
   // Reset category filters when changing maps
@@ -277,14 +281,24 @@ function applyFilters() {
 
 // Update the map data based on the selected map type and filters
 function updateMapForSelectedType() {
-  if (!mapboxMap || !currentMapId.value) return;
+  if (!mapboxMap || !currentMapId.value) {
+    return;
+  }
 
   // Get the GeoJSON source
   const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
-  if (!source) return;
+
+  console.log('got point-clustered mapbox source: ', source);
+
+  if (!source) {
+    return;
+  }
 
   // Update the data with filtered GeoJSON
   const filteredGeoJson = buildFilteredGeoJSON();
+
+  console.log('filteredGeoJson', filteredGeoJson);
+
   source.setData(filteredGeoJson);
 }
 
@@ -349,6 +363,7 @@ function generateInitialSuggestions() {
   // If there's already a search query, use the standard search function
   if (searchQuery.value.trim()) {
     generateSearchSuggestions();
+
     return;
   }
 
@@ -435,13 +450,15 @@ function resetFilters() {
   searchQuery.value = '';
   showSearchSuggestions.value = false;
   filteredSuggestions.value = [];
+
   clearCategoryFilters();
 
   // Reset to master map if it exists, otherwise use the first map
   if (masterMap) {
     currentMapId.value = masterMap.id;
   } else if (allMaps.value.length > 0) {
-    currentMapId.value = allMaps.value[0].id;
+    currentMapId.value = allMaps
+    .value[0].id;
   }
   updateMapForSelectedType();
 }
@@ -451,6 +468,7 @@ function clearSearch() {
   searchQuery.value = '';
   showSearchSuggestions.value = false;
   filteredSuggestions.value = [];
+
   // Reset to the currently selected map
   updateMapForSelectedType();
 }
@@ -725,7 +743,7 @@ function selectSuggestion(suggestion: SearchSuggestion) {
       // Switch to the correct map first
       currentMapId.value = mapData.id;
 
-      console.log(`Switched map (Map ID: ${currentMapId.value})`);
+      console.log(`Switched map (Map ID: ${mapData.id} | Map Name: ${mapData.name})`);
 
       // Need to wait for the map to update before focusing on the point
       setTimeout(() => {
@@ -744,52 +762,60 @@ function selectSuggestion(suggestion: SearchSuggestion) {
 }
 
 function focusOnSuggestion(suggestion: SearchSuggestion) {
-
-  console.log('focusOnSuggestion', suggestion);
-  return;
-
   // Update the map to focus on the selected point
-  if (mapboxMap) {
-    mapboxMap.flyTo({
-      center: [suggestion.longitude, suggestion.latitude],
-      zoom: 17,
-      essential: true
-    });
+  if (!mapboxMap) {
+    console.warn('No Mapbox map when focusing on suggestion');
 
-    // Find the feature on the map and show its popup after a short delay
-    setTimeout(() => {
-      const features = mapboxMap.queryRenderedFeatures(
-        mapboxMap.project([suggestion.longitude, suggestion.latitude]),
-        { layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon'] }
-      );
-
-      const numFeatures = features?.length || 0;
-
-      console.log('features', features);
-
-      if (numFeatures > 0) {
-        // Find the specific feature by ID
-        const feature = features.find(f =>
-          f.properties &&
-          f.properties.id === suggestion.id &&
-          f.properties.type === suggestion.type
-        );
-
-        if (feature) {
-          // Trigger a click event on the specific feature
-          mapboxMap.fire('click', {
-            lngLat: new mapboxgl.LngLat(suggestion.longitude, suggestion.latitude),
-            point: mapboxMap.project([suggestion.longitude, suggestion.latitude]),
-            features: [feature]
-          } as unknown as mapboxgl.MapMouseEvent);
-        }
-      }
-    }, 500);
+    return;
   }
+
+  mapboxMap.flyTo({
+    center: [suggestion.longitude, suggestion.latitude],
+    zoom: 17,
+    essential: true,
+  });
+
+  mapboxMap.once('moveend', () => {
+    console.log('FlyTo animation complete!');
+
+    // const features = mapboxMap.queryRenderedFeatures(
+    //   mapboxMap.project([suggestion.longitude, suggestion.latitude]),
+    //   { layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon'] }
+    // );
+
+    // const numFeatures = features?.length || 0;
+
+    // console.log('features', features);
+
+    // if (numFeatures > 0) {
+    //   // Find the specific feature by ID
+    //   const feature = features.find(f =>
+    //     f.properties &&
+    //     f.properties.id === suggestion.id &&
+    //     f.properties.type === suggestion.type
+    //   );
+
+    //   if (feature) {
+    //     // Trigger a click event on the specific feature
+    //     mapboxMap.fire('click', {
+    //       lngLat: new mapboxgl.LngLat(suggestion.longitude, suggestion.latitude),
+    //       point: mapboxMap.project([suggestion.longitude, suggestion.latitude]),
+    //       features: [feature]
+    //     } as unknown as mapboxgl.MapMouseEvent);
+    //   }
+    // } else {
+    //   logger.warn('No features found when focusing on suggestion');
+    // }
+  });
+
+  // Find the feature on the map and show its popup after a short delay
+  // setTimeout(() => {
+
+  // }, 500);
 
   // Also update the map with filtered results
   // (though this now applies filters to the current map only)
-  updateMapForSelectedType();
+  updateMapForSelectedType(); // TODO: THIS IS CAUSING THE ICONS TO DISAPPEAR AFTER SLECTING UUGGESTION
 }
 
 // Get Number of currently selected filters for badge

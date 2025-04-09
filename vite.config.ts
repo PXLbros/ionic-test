@@ -18,7 +18,11 @@ export default defineConfig({
     vue(),
     legacy(),
     Components({
-      dirs: ['src/components'], // Specify where your components live
+      dirs: [
+        'src/components',
+        'src/composables',
+        'src/stores',
+      ], // Specify where your components live
       extensions: ['vue'],      // File extensions to look for
       deep: true,               // Include subdirectories
       dts: 'src/components.d.ts' // Generate TypeScript definitions
