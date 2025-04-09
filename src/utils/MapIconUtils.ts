@@ -326,6 +326,15 @@ export function setupIconClickHandlers(
     });
   };
 
+  // Helper function to center the map on coordinates
+  const centerMapOnPoint = (coordinates: [number, number]) => {
+    map.flyTo({
+      center: coordinates,
+      zoom: 17,
+      essential: true,
+    });
+  };
+
   // Vendor icon click handler
   const handleVendorIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
     if (!e.features || e.features.length === 0) return;
@@ -335,11 +344,7 @@ export function setupIconClickHandlers(
     const { name, description } = feature.properties as any;
 
     // Center the map on the clicked point
-    map.flyTo({
-      center: coordinates,
-      zoom: 17,
-      essential: true,
-    });
+    centerMapOnPoint(coordinates);
 
     // Create popup content
     const popupContent = `
@@ -379,11 +384,7 @@ export function setupIconClickHandlers(
     }
 
     // Center the map on the clicked point
-    map.flyTo({
-      center: coordinates,
-      zoom: 17,
-      essential: true,
-    });
+    centerMapOnPoint(coordinates);
 
     // Create popup content
     const popupContent = `
