@@ -1,4 +1,8 @@
 <template>
+  <div v-if="props.isLoading" class="loaddder" style="display:flex;justify-content:center;align-items:center;position:fixed;top:0;left:0;width:100%;height:100%;background:black;color:#fff;z-index:9999">
+    Loading...
+  </div>
+
   <ion-page id="layout">
     <ion-header :translucent="true">
       <ion-toolbar>
@@ -126,9 +130,11 @@ const props = withDefaults(defineProps<{
   title: string;
   backButtonHref?: string;
   showMenuButton?: boolean;
+  isLoading?: boolean;
 }>(), {
   backButtonHref: '/fair',
-  showMenuButton: false
+  showMenuButton: false,
+  isLoading: false,
 });
 
 const appStore = useAppStore();
