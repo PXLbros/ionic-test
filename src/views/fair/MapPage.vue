@@ -21,9 +21,11 @@
                 </div>
                 <div class="suggestion-content">
                   <div class="suggestion-name">{{ suggestion.name }}</div>
-                  <span v-if="suggestion.mapName && suggestion.mapId !== currentMapId" class="suggestion-map-badge">
+
+                  <span class="suggestion-map-badge">
                     {{ suggestion.mapName }}
                   </span>
+
                   <div class="suggestion-description" v-if="suggestion.description">
                     {{ truncateText(suggestion.description, 60) }}
                   </div>
@@ -208,7 +210,7 @@ const filteredCategories = computed(() => {
 });
 
 // Map reference
-let map: Map;
+let mapboxMap: Map;
 
 // Toggle dropdown visibility
 function toggleMapDropdown() {
@@ -227,6 +229,10 @@ function closeDropdownOnOutsideClick(event: MouseEvent) {
 function selectMap(mapData: ServiceMap) {
   currentMapId.value = mapData.id;
   showMapDropdown.value = false;
+
+  // Reset suggestion
+  // resetSuggestion();
+  searchQuery.value = '';
 
   // Reset category filters when changing maps
   clearCategoryFilters();
@@ -269,10 +275,10 @@ function applyFilters() {
 
 // Update the map data based on the selected map type and filters
 function updateMapForSelectedType() {
-  if (!map || !currentMapId.value) return;
+  if (!mapboxMap || !currentMapId.value) return;
 
   // Get the GeoJSON source
-  const source = map.getSource('points-clustered') as mapboxgl.GeoJSONSource;
+  const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
   if (!source) return;
 
   // Update the data with filtered GeoJSON
@@ -704,19 +710,28 @@ function selectSuggestion(suggestion: SearchSuggestion) {
   searchQuery.value = suggestion.name;
   showSearchSuggestions.value = false;
 
+  const isSameMapId = suggestion.mapId !== currentMapId.value;
+
+  console.log(`Suggestion clicked (Current Map ID: ${currentMapId.value} | Suggestion Map ID: ${suggestion.mapId} | Is Same Map ID: ${isSameMapId ? 'Yes' : 'No'})`);
+
   // First check if we need to switch maps
-  if (suggestion.mapId && suggestion.mapId !== currentMapId.value) {
+  if (suggestion.mapId && isSameMapId) {
     // Find the map data
     const mapData = allMaps.value.find((map: ServiceMap) => map.id === suggestion.mapId);
+
     if (mapData) {
       // Switch to the correct map first
       currentMapId.value = mapData.id;
+
+      console.log(`Switched map (Map ID: ${currentMapId.value})`);
 
       // Need to wait for the map to update before focusing on the point
       setTimeout(() => {
         focusOnSuggestion(suggestion);
       }, 300);
     } else {
+      console.warn(`Could not find map to switch to (Map ID: ${currentMapId.value})`);
+
       // If map not found, just focus on point in current map
       focusOnSuggestion(suggestion);
     }
@@ -727,9 +742,13 @@ function selectSuggestion(suggestion: SearchSuggestion) {
 }
 
 function focusOnSuggestion(suggestion: SearchSuggestion) {
+
+  console.log('focusOnSuggestion', suggestion);
+  return;
+
   // Update the map to focus on the selected point
-  if (map) {
-    map.flyTo({
+  if (mapboxMap) {
+    mapboxMap.flyTo({
       center: [suggestion.longitude, suggestion.latitude],
       zoom: 17,
       essential: true
@@ -737,12 +756,16 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
 
     // Find the feature on the map and show its popup after a short delay
     setTimeout(() => {
-      const features = map.queryRenderedFeatures(
-        map.project([suggestion.longitude, suggestion.latitude]),
+      const features = mapboxMap.queryRenderedFeatures(
+        mapboxMap.project([suggestion.longitude, suggestion.latitude]),
         { layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon'] }
       );
 
-      if (features.length > 0) {
+      const numFeatures = features?.length || 0;
+
+      console.log('features', features);
+
+      if (numFeatures > 0) {
         // Find the specific feature by ID
         const feature = features.find(f =>
           f.properties &&
@@ -752,9 +775,9 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
 
         if (feature) {
           // Trigger a click event on the specific feature
-          map.fire('click', {
+          mapboxMap.fire('click', {
             lngLat: new mapboxgl.LngLat(suggestion.longitude, suggestion.latitude),
-            point: map.project([suggestion.longitude, suggestion.latitude]),
+            point: mapboxMap.project([suggestion.longitude, suggestion.latitude]),
             features: [feature]
           } as unknown as mapboxgl.MapMouseEvent);
         }
@@ -772,13 +795,129 @@ const selectedFilterCount = computed(() => {
   return Object.values(selectedCategories.value).filter(Boolean).length;
 });
 
+function setupMapLayers() {
+  if (!mapboxMap) return;
+
+  mapboxMap.addSource('chevy-court-area', {
+    type: 'image',
+    url: '/icons/Map_Design-big-min.png',
+    coordinates: [
+      [-76.21532502658798, 43.055330160826315],   // Top left
+      [-76.23753721914531, 43.07114978353832],  // Top right
+      [-76.22037084830293, 43.08502388194864],  // Bottom right
+      [-76.19757700157899, 43.06982854755563]    // Bottom left
+    ]
+  });
+
+  mapboxMap.addLayer({
+    id: 'chevy-court-overlay',
+    type: 'raster',
+    source: 'chevy-court-area',
+    paint: {
+      'raster-opacity': 1.0
+    }
+  });
+
+  // 2. Build combined GeoJSON and add as a clustered source
+  const combinedGeoJson = buildCombinedGeoJSON();
+  // console.log('Initial GeoJSON feature count:', combinedGeoJson.features.length);
+
+  mapboxMap.addSource('points-clustered', {
+    type: 'geojson',
+    data: combinedGeoJson,
+    cluster: true,
+    clusterRadius: 50, // Radius of each cluster when clustering points (in pixels)
+    clusterMaxZoom: 14 // Max zoom to cluster points on
+  });
+
+  // 3. Add cluster layers
+  mapboxMap.addLayer({
+    id: 'point-clusters',
+    type: 'circle',
+    source: 'points-clustered',
+    filter: ['has', 'point_count'],
+    paint: {
+      'circle-color': '#1E5EAE',
+      'circle-radius': 16,
+      'circle-stroke-width': 1,
+      'circle-stroke-color': '#fff'
+    }
+  });
+
+  mapboxMap.addLayer({
+    id: 'point-cluster-count',
+    type: 'symbol',
+    source: 'points-clustered',
+    filter: ['has', 'point_count'],
+    layout: {
+      'text-field': '{point_count_abbreviated}',
+      'text-size': 12
+    },
+    paint: {
+      'text-color': '#ffffff'
+    }
+  });
+
+  // 4. Add individual point layers with different colors for vendors and services
+  // Add vendor and service icon layers
+  addVendorIconLayer(mapboxMap);
+  addServiceIconLayer(mapboxMap);
+
+  // 5. Add click handlers for vendor points
+  // Setup click handlers
+  setupIconClickHandlers(mapboxMap, getCategoryName);
+
+  // Optional: handle clicks on clusters
+  mapboxMap.on('click', 'point-clusters', (e) => {
+    const features = mapboxMap.queryRenderedFeatures(e.point, { layers: ['point-clusters'] });
+    if (!features || features.length === 0 || !features[0].properties) return;
+
+    const clusterId = features[0].properties.cluster_id;
+    if (clusterId === undefined || clusterId === null) {
+      console.error('Cluster ID is null or undefined');
+      return;
+    }
+
+    const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
+
+    source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+      if (err) return;
+
+      mapboxMap.easeTo({
+        center: (features[0].geometry as Point).coordinates as [number, number],
+        zoom: 16,
+      });
+    });
+  });
+
+  // Resize map if needed
+  setTimeout(() => {
+    mapboxMap.resize();
+  }, 100);
+}
+
+async function loadMap() {
+  if (!mapboxMap) {
+    return;
+  }
+
+  // Load category icons for the map and wait for them to complete loading
+  await loadCategoryIcons({ map: mapboxMap, serviceCategories, vendorCategories });
+
+  console.log('category icons loaded!');
+
+  // Now that icons are loaded, proceed with setting up the map
+  const imageOverlayElement = new Image();
+  imageOverlayElement.onload = setupMapLayers;
+  imageOverlayElement.src = '/icons/Map_Design-big-min.png';
+}
 
 onMounted(() => {
   // Setup listener for closing dropdown when clicking outside
   document.addEventListener('click', closeDropdownOnOutsideClick);
 
   if (mapContainer.value) {
-    map = new mapboxgl.Map({
+    mapboxMap = new mapboxgl.Map({
       container: mapContainer.value,
       style: 'mapbox://styles/pxldevops/cm4uef2wm005401sm7ebof1mh',
       center: [-76.2197, 43.073],
@@ -797,121 +936,9 @@ onMounted(() => {
     // map.dragRotate.disable();
     // map.touchZoomRotate.disableRotation();
 
-    map.addControl(new mapboxgl.NavigationControl());
+    mapboxMap.addControl(new mapboxgl.NavigationControl());
 
-    map.on('load', () => {
-
-      // Load category icons for the map
-      loadCategoryIcons(map, serviceCategories, vendorCategories);
-
-      // 1. Add image overlay first
-      const testImage = new Image();
-      testImage.onload = () => {
-        if (!map) {
-          return;
-        }
-
-        map.addSource('chevy-court-area', {
-          type: 'image',
-          url: testImage.src,
-          coordinates: [
-            [-76.21532502658798, 43.055330160826315],   // Top left
-            [-76.23753721914531, 43.07114978353832],  // Top right
-            [-76.22037084830293, 43.08502388194864],  // Bottom right
-            [-76.19757700157899, 43.06982854755563]    // Bottom left
-          ]
-        });
-
-        map.addLayer({
-          id: 'chevy-court-overlay',
-          type: 'raster',
-          source: 'chevy-court-area',
-          paint: {
-            'raster-opacity': 1.0
-          }
-        });
-
-        // 2. Build combined GeoJSON and add as a clustered source
-        const combinedGeoJson = buildCombinedGeoJSON();
-        // console.log('Initial GeoJSON feature count:', combinedGeoJson.features.length);
-
-        map.addSource('points-clustered', {
-          type: 'geojson',
-          data: combinedGeoJson,
-          cluster: true,
-          clusterRadius: 50, // Radius of each cluster when clustering points (in pixels)
-          clusterMaxZoom: 14 // Max zoom to cluster points on
-        });
-
-        // 3. Add cluster layers
-        map.addLayer({
-          id: 'point-clusters',
-          type: 'circle',
-          source: 'points-clustered',
-          filter: ['has', 'point_count'],
-          paint: {
-            'circle-color': '#1E5EAE',
-            'circle-radius': 16,
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#fff'
-          }
-        });
-
-        map.addLayer({
-          id: 'point-cluster-count',
-          type: 'symbol',
-          source: 'points-clustered',
-          filter: ['has', 'point_count'],
-          layout: {
-            'text-field': '{point_count_abbreviated}',
-            'text-size': 12
-          },
-          paint: {
-            'text-color': '#ffffff'
-          }
-        });
-
-        // 4. Add individual point layers with different colors for vendors and services
-        // Add vendor and service icon layers
-        addVendorIconLayer(map);
-        addServiceIconLayer(map);
-
-        // 5. Add click handlers for vendor points
-        // Setup click handlers
-        setupIconClickHandlers(map, getCategoryName);
-
-        // Optional: handle clicks on clusters
-        map.on('click', 'point-clusters', (e) => {
-          const features = map.queryRenderedFeatures(e.point, { layers: ['point-clusters'] });
-          if (!features || features.length === 0 || !features[0].properties) return;
-
-          const clusterId = features[0].properties.cluster_id;
-          if (clusterId === undefined || clusterId === null) {
-            console.error('Cluster ID is null or undefined');
-            return;
-          }
-
-          const source = map.getSource('points-clustered') as mapboxgl.GeoJSONSource;
-
-          source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-            if (err) return;
-
-            map.easeTo({
-              center: (features[0].geometry as Point).coordinates as [number, number],
-              zoom: 16,
-            });
-          });
-        });
-
-        // Resize map if needed
-        setTimeout(() => {
-          map.resize();
-        }, 100);
-      };
-
-      // Make sure the image is valid
-      testImage.src = '/icons/Map_Design-big-min.png';
-    });
+    mapboxMap.on('load', loadMap);
   }
 });
 
@@ -924,8 +951,8 @@ onUnmounted(() => {
   // Clean up event listener
   document.removeEventListener('click', closeDropdownOnOutsideClick);
 
-  if (map) {
-    map.remove();
+  if (mapboxMap) {
+    mapboxMap.remove();
   }
 });
 </script>
