@@ -1,5 +1,5 @@
 <template>
-  <FairLayout title="Interactive Map" :showMenuButton="true" :isLoading="isLoadingMap">
+  <FairLayout title="Interactive Map" :showMenuButton="true" :isLoading="isLoadingMap" loadingText="Loading map...">
     <div class="main">
       <div class="main__header">
         <div class="wrapper">

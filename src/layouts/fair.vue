@@ -1,9 +1,9 @@
 <template>
-  <div v-if="props.isLoading" class="loaddder" style="display:flex;justify-content:center;align-items:center;position:fixed;top:0;left:0;width:100%;height:100%;background:black;color:#fff;z-index:9999">
-    Loading...
-  </div>
-
   <ion-page id="layout">
+    <div v-if="props.isLoading" class="layout-loader">
+      {{ props.loadingText }}
+    </div>
+
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
@@ -131,10 +131,12 @@ const props = withDefaults(defineProps<{
   backButtonHref?: string;
   showMenuButton?: boolean;
   isLoading?: boolean;
+  loadingText?: string;
 }>(), {
   backButtonHref: '/fair',
   showMenuButton: false,
   isLoading: false,
+  loadingText: 'Loading...',
 });
 
 const appStore = useAppStore();
@@ -427,5 +429,21 @@ ion-back-button {
       text-decoration: none;
     }
   }
+}
+
+.layout-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background-color: #{appColor(nysfair, primary)};
+  color: #{appColor(nysfair, secondary)};
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 </style>
