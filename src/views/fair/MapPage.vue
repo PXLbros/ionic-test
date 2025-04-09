@@ -136,6 +136,7 @@ import type { Feature, Point, FeatureCollection } from 'geojson';
 import { loadCategoryIcons, addVendorIconLayer, addServiceIconLayer, setupIconClickHandlers } from '@/utils/MapIconUtils';
 import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
 import { useLogger } from '@/composables/useLogger';
+import { cloneDeep } from '@/utils/clone';
 
 // Access Token for Mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
@@ -400,7 +401,7 @@ function generateInitialSuggestions() {
         type: 'vendor' as const,
         latitude: location ? parseFloat(location.latitude) : 0,
         longitude: location ? parseFloat(location.longitude) : 0,
-        categories: normalizeCategories(v.categories || []),
+        categories: [...normalizeCategories(v.categories || [])],
         mapId: mapId,
         mapName: mapId ? mapNamesById[mapId] : null
       };
@@ -430,7 +431,7 @@ function generateInitialSuggestions() {
         type: 'service' as const,
         latitude: parseFloat(s.latitude) || 0,
         longitude: parseFloat(s.longitude) || 0,
-        categories: s.categories || [],
+        categories: [...normalizeCategories(s.categories || [])],
         mapId: mapId,
         mapName: mapId ? mapNamesById[mapId] : null
       };
@@ -519,7 +520,7 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
       description: v.description ?? '',
       id: v.id,
       type: 'vendor' as const,
-      categories: normalizeCategories(v.categories || []),
+      categories: [...normalizeCategories(v.categories || [])],
     },
     geometry: {
       type: 'Point' as const,
@@ -531,12 +532,23 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
   })));
 }
 
-function normalizeCategories(categories: any[]) {
-  return Array.isArray(categories)
-    ? categories.map((c: any) => typeof c === 'object' && c !== null ? c.id : c)
-    : []
-}
+function normalizeCategories(categories: any) {
+  try {
+    if (!Array.isArray(categories)) {
+      throw new Error('Not valid category');
+    }
 
+    const formattedCategories = categories.map((categoryId: number) => {
+      return categoryId;
+    });
+
+    return formattedCategories;
+  } catch (e) {
+    console.warn('Failed to normalize categories:', categories);
+
+    return [];
+  }
+}
 
 // Convert services to GeoJSON features, filtering by map ID if needed
 function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServiceProperties>> {
@@ -564,30 +576,34 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
 
   return filteredServices
     .filter((s) => s.latitude && s.longitude) // Make sure latitude and longitude exist
-    .map((s) => ({
-      type: 'Feature' as const,
-      properties: {
-        title: s.title ?? 'Unknown Service',
-        description: s.description ?? '',
-        id: s.id,
-        is_accessible: Boolean(s.is_accessible),
-        type: 'service' as const,
-        categories: normalizeCategories(s.categories || []), // Make sure categories is an array
-      },
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [
-          parseFloat(s.longitude),
-          parseFloat(s.latitude)
-        ]
-      }
-    }));
+    .map((s) => {
+      const normalizedCategories = normalizeCategories(s.categories);
+
+      return {
+        type: 'Feature' as const,
+        properties: {
+          title: s.title ?? 'Unknown Service',
+          description: s.description ?? '',
+          id: s.id,
+          is_accessible: Boolean(s.is_accessible),
+          type: 'service' as const,
+          categories: normalizedCategories,
+        },
+        geometry: {
+          type: 'Point' as const,
+          coordinates: [
+            parseFloat(s.longitude),
+            parseFloat(s.latitude)
+          ]
+        }
+      };
+    });
 }
 
 // Build GeoJSON for the currently selected map type
 function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
-  const vendorFeatures = buildVendorGeoJSON(vendors);
-  const serviceFeatures = buildServiceGeoJSON(services);
+  const vendorFeatures = buildVendorGeoJSON(cloneDeep(vendors));
+  const serviceFeatures = buildServiceGeoJSON(cloneDeep(services));
 
   // console.log('vendorFeatures feature sample:', JSON.stringify(vendorFeatures, null, 2));
   // console.log('Service feature sample:', JSON.stringify(serviceFeatures, null, 2));
@@ -598,26 +614,10 @@ function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | Ser
     'Vendors': vendorFeatures.length,
   });
 
-  // // Check here if there is any vendor features with vendor category 143
-  // const vendorCategory143Features = vendorFeatures.filter(feature =>
-  //   feature.properties.categories.includes(143)
-  // );
-
-  // if (vendorCategory143Features.length > 0) {
-  //   console.log(`Found ${vendorCategory143Features.length} vendor features with category 143.`);
-  // } else {
-  //   console.log('No vendor features found with category 143.');
-  // }
-
   return {
     type: 'FeatureCollection' as const,
     features: [...vendorFeatures, ...serviceFeatures]
   };
-}
-
-// Initial GeoJSON build for map initialization
-function buildCombinedGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
-  return buildFilteredGeoJSON();
 }
 
 // Get service category name by ID
@@ -679,7 +679,7 @@ function generateSearchSuggestions() {
         type: 'vendor' as const,
         latitude: location ? parseFloat(location.latitude) : 0,
         longitude: location ? parseFloat(location.longitude) : 0,
-        categories: normalizeCategories(v.categories || []),
+        categories: [...normalizeCategories(v.categories || [])],
         mapId: mapId,
         mapName: mapId ? mapNamesById[mapId] : null
       };
@@ -710,7 +710,7 @@ function generateSearchSuggestions() {
         type: 'service' as const,
         latitude: parseFloat(s.latitude) || 0,
         longitude: parseFloat(s.longitude) || 0,
-        categories: s.categories || [],
+        categories: [...normalizeCategories(s.categories || [])],
         mapId: mapId,
         mapName: mapId ? mapNamesById[mapId] : null
       };
@@ -858,9 +858,9 @@ function setupMapLayers() {
     url: '/icons/Map_Design-big-min.png',
     coordinates: [
       [-76.21532502658798, 43.055330160826315],   // Top left
-      [-76.23753721914531, 43.07114978353832],  // Top right
-      [-76.22037084830293, 43.08502388194864],  // Bottom right
-      [-76.19757700157899, 43.06982854755563]    // Bottom left
+      [-76.23753721914531, 43.07114978353832],    // Top right
+      [-76.22037084830293, 43.08502388194864],    // Bottom right
+      [-76.19757700157899, 43.06982854755563]     // Bottom left
     ]
   });
 
@@ -873,16 +873,16 @@ function setupMapLayers() {
     }
   });
 
-  // 2. Build combined GeoJSON and add as a clustered source
-  const combinedGeoJson = buildCombinedGeoJSON();
-  // console.log('Initial GeoJSON feature count:', combinedGeoJson.features.length);
+  // 1. Build filtered GeoJSON (fresh data)
+  const filteredGeoJson = buildFilteredGeoJSON();
 
+  // 2. Add GeoJSON source with initial data
   mapboxMap.addSource('points-clustered', {
     type: 'geojson',
-    data: combinedGeoJson,
+    data: filteredGeoJson,
     cluster: true,
-    clusterRadius: 50, // Radius of each cluster when clustering points (in pixels)
-    clusterMaxZoom: 14 // Max zoom to cluster points on
+    clusterRadius: 50,
+    clusterMaxZoom: 14
   });
 
   // 3. Add cluster layers
@@ -913,16 +913,14 @@ function setupMapLayers() {
     }
   });
 
-  // 4. Add individual point layers with different colors for vendors and services
-  // Add vendor and service icon layers
+  // 4. Add icon layers
   addVendorIconLayer(mapboxMap);
   addServiceIconLayer(mapboxMap);
 
-  // 5. Add click handlers for vendor points
-  // Setup click handlers
+  // 5. Setup icon click handlers
   setupIconClickHandlers(mapboxMap, getCategoryName);
 
-  // Optional: handle clicks on clusters
+  // 6. Optional: Handle cluster clicks
   mapboxMap.on('click', 'point-clusters', (e) => {
     const features = mapboxMap.queryRenderedFeatures(e.point, { layers: ['point-clusters'] });
     if (!features || features.length === 0 || !features[0].properties) return;
@@ -934,10 +932,8 @@ function setupMapLayers() {
     }
 
     const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
-
     source.getClusterExpansionZoom(clusterId, (err, zoom) => {
       if (err) return;
-
       mapboxMap.easeTo({
         center: (features[0].geometry as Point).coordinates as [number, number],
         zoom: 16,
@@ -945,15 +941,21 @@ function setupMapLayers() {
     });
   });
 
-  // Resize map if needed
-  setTimeout(() => {
-    mapboxMap.resize();
+  // 7. Use the 'idle' event to ensure the map is fully rendered
+  mapboxMap.once('idle', finalizeMapSetup);
+}
 
-    isLoadingMap.value = false;
+// New function to finalize map setup after it's fully rendered
+function finalizeMapSetup() {
+  // Resize the map to ensure proper container dimensions
+  mapboxMap.resize();
 
-    // TODO: HERE IS THE MAP FULLY LOADED (double check async/await promises above though)
-    dataStore.hideLoader();
-  }, 100);
+  // Hide loading indicators
+  isLoadingMap.value = false;
+  dataStore.hideLoader();
+
+  // Log that map is ready
+  logger.info('Map fully rendered and resized');
 }
 
 async function loadMap() {
