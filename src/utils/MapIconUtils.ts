@@ -313,7 +313,7 @@ export function setupIconClickHandlers(
 
     // Create a new popup
     activePopup = new mapboxgl.Popup({
-      offset: 25, // Default offset for better positioning
+      offset: [0, 0], // Adjusted offset to make the popup touch the icon's bottom
       anchor: 'top', // Adjusted to a valid anchor value
     })
       .setLngLat(coordinates)
