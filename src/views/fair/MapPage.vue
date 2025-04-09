@@ -551,6 +551,52 @@ function matchesCategoryFilters(categories: number[] = []): boolean {
   return categories.some(categoryId => selectedCategories.value[categoryId]);
 }
 
+function normalizeCategories(categories: any) {
+  try {
+    // Handle empty or nullish cases
+    if (!categories) {
+      return [];
+    }
+
+    // If it's already an array, ensure all elements are clean numbers
+    if (Array.isArray(categories)) {
+      return categories.map((categoryId: any) => {
+        // If the category is an object with an id property (case seen in the error), extract just the id
+        if (categoryId && typeof categoryId === 'object' && 'id' in categoryId) {
+          return Number(categoryId.id);
+        }
+        // Otherwise ensure it's a number
+        return Number(categoryId);
+      });
+    }
+
+    // If it's a JSON string, try to parse it
+    if (typeof categories === 'string') {
+      try {
+        const parsed = JSON.parse(categories);
+        if (Array.isArray(parsed)) {
+          return parsed.map((item: any) => {
+            if (typeof item === 'object' && item !== null && 'id' in item) {
+              return Number(item.id);
+            }
+            return Number(item);
+          });
+        }
+      } catch (e) {
+        // Parsing failed, log and return empty array
+        console.warn('Failed to parse category JSON string:', categories);
+        return [];
+      }
+    }
+
+    // If we reach here, the format is unsupported
+    throw new Error('Unsupported category format');
+  } catch (e) {
+    console.warn('Failed to normalize categories:', categories, e);
+    return [];
+  }
+}
+
 // Convert vendors to GeoJSON features
 function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperties>> {
   // Apply filtering by map ID and search query
@@ -577,41 +623,29 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
   // Apply category filtering
   filteredVendors = filteredVendors.filter(v => matchesCategoryFilters(v.categories));
 
-  return filteredVendors.flatMap((v) => v.locations.map((location: any) => ({
-    type: 'Feature' as const,
-    properties: {
-      name: v.name ?? 'Unknown Vendor',
-      description: v.description ?? '',
-      id: v.id,
-      type: 'vendor' as const,
-      categories: [...normalizeCategories(v.categories || [])],
-    },
-    geometry: {
-      type: 'Point' as const,
-      coordinates: [
-        parseFloat(location.longitude),
-        parseFloat(location.latitude)
-      ]
-    }
-  })));
-}
+  return filteredVendors.flatMap((v) => v.locations.map((location: any) => {
+    // Ensure categories are properly normalized before adding to properties
+    const normalizedCategories = normalizeCategories(v.categories || []);
 
-function normalizeCategories(categories: any) {
-  try {
-    if (!Array.isArray(categories)) {
-      throw new Error('Not valid category');
-    }
-
-    const formattedCategories = categories.map((categoryId: number) => {
-      return categoryId;
-    });
-
-    return formattedCategories;
-  } catch (e) {
-    console.warn('Failed to normalize categories:', categories);
-
-    return [];
-  }
+    return {
+      type: 'Feature' as const,
+      properties: {
+        name: v.name ?? 'Unknown Vendor',
+        description: v.description ?? '',
+        id: v.id,
+        type: 'vendor' as const,
+        // Use the normalized array directly
+        categories: normalizedCategories,
+      },
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [
+          parseFloat(location.longitude),
+          parseFloat(location.latitude)
+        ]
+      }
+    };
+  }));
 }
 
 // Convert services to GeoJSON features, filtering by map ID if needed
@@ -641,6 +675,7 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
   return filteredServices
     .filter((s) => s.latitude && s.longitude) // Make sure latitude and longitude exist
     .map((s) => {
+      // Ensure categories are properly normalized
       const normalizedCategories = normalizeCategories(s.categories);
 
       return {
@@ -821,7 +856,7 @@ function selectSuggestion(suggestion: SearchSuggestion) {
 
   const isSameMapId = suggestion.mapId !== currentMapId.value;
 
-  console.log(`Suggestion clicked (Current Map ID: ${currentMapId.value} | Suggestion Map ID: ${suggestion.mapId} | Is Same Map ID: ${isSameMapId ? 'Yes' : 'No'})`);
+  logger.info(`Suggestion clicked (Current Map ID: ${currentMapId.value} | Suggestion Map ID: ${suggestion.mapId} | Is Same Map ID: ${isSameMapId ? 'Yes' : 'No'})`);
 
   // First check if we need to switch maps
   if (suggestion.mapId && isSameMapId) {
@@ -832,14 +867,18 @@ function selectSuggestion(suggestion: SearchSuggestion) {
       // Switch to the correct map first
       currentMapId.value = mapData.id;
 
-      console.log(`Switched map (Map ID: ${mapData.id} | Map Name: ${mapData.name})`);
+      logger.info(`Switched map (Map ID: ${mapData.id} | Map Name: ${mapData.name})`);
 
       // Need to wait for the map to update before focusing on the point
+      // We'll update the map data first, then focus on the suggestion
+      updateMapForSelectedType();
+
+      // Wait a bit longer for the map data to update before focusing
       setTimeout(() => {
         focusOnSuggestion(suggestion);
-      }, 300);
+      }, 500);
     } else {
-      console.warn(`Could not find map to switch to (Map ID: ${currentMapId.value})`);
+      logger.warn(`Could not find map to switch to (Map ID: ${currentMapId.value})`);
 
       // If map not found, just focus on point in current map
       focusOnSuggestion(suggestion);
@@ -855,52 +894,70 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
   // Update the map to focus on the selected point
   if (!mapboxMap) {
     console.warn('No Mapbox map when focusing on suggestion');
-
     return;
   }
 
+  // Flag to track if we're currently focusing on a suggestion
+  // This prevents race conditions with data updates
+  const isFocusing = true;
+
+  // Fly to the suggestion location
   mapboxMap.flyTo({
     center: [suggestion.longitude, suggestion.latitude],
     zoom: 17,
     essential: true,
   });
 
-  mapboxMap.once('moveend', () => {
-    logger.info(`Flied to suggestion (ID: ${suggestion.id} | Type: ${suggestion.type} | Lat: ${suggestion.latitude} | Lng: ${suggestion.longitude})`);
+  // Wait for the map to be completely idle (all tiles and layers loaded)
+  mapboxMap.once('idle', () => {
+    logger.info(`Map idle after flying to suggestion (ID: ${suggestion.id} | Type: ${suggestion.type} | Lat: ${suggestion.latitude} | Lng: ${suggestion.longitude})`);
 
-    const features = mapboxMap.queryRenderedFeatures(
-      mapboxMap.project([suggestion.longitude, suggestion.latitude]),
-      { layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon'] }
-    );
+    // Log the actual suggestion categories to help debug
+    if (suggestion.categories && suggestion.categories.length > 0) {
+      logger.info(`Suggestion categories: ${JSON.stringify(suggestion.categories)}`);
+    }
 
-    const numFeatures = features?.length || 0;
+    // Add a small delay to ensure all features have had time to render
+    setTimeout(() => {
+      // Query for features at the suggestion location
+      const features = mapboxMap.queryRenderedFeatures(
+        mapboxMap.project([suggestion.longitude, suggestion.latitude]),
+        { layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon'] }
+      );
 
-    console.log('numFeatures', numFeatures);
+      const numFeatures = features?.length || 0;
+      logger.info(`Found ${numFeatures} features at suggestion location`);
 
-    // if (numFeatures > 0) {
-    //   // Find the specific feature by ID
-    //   const feature = features.find(f =>
-    //     f.properties &&
-    //     f.properties.id === suggestion.id &&
-    //     f.properties.type === suggestion.type
-    //   );
+      // If features are found, try to log their categories to help debug
+      if (numFeatures > 0) {
+        logger.info(`Feature categories: ${JSON.stringify(features[0].properties?.categories)}`);
+      }
 
-    //   if (feature) {
-    //     // Trigger a click event on the specific feature
-    //     mapboxMap.fire('click', {
-    //       lngLat: new mapboxgl.LngLat(suggestion.longitude, suggestion.latitude),
-    //       point: mapboxMap.project([suggestion.longitude, suggestion.latitude]),
-    //       features: [feature]
-    //     } as unknown as mapboxgl.MapMouseEvent);
-    //   }
-    // } else {
-    //   logger.warn('No features found when focusing on suggestion');
-    // }
+      if (numFeatures > 0) {
+        // Find the specific feature by ID
+        const feature = features.find(f =>
+          f.properties &&
+          f.properties.id === suggestion.id &&
+          f.properties.type === suggestion.type
+        );
+
+        if (feature) {
+          // Trigger a click event on the specific feature
+          mapboxMap.fire('click', {
+            lngLat: new mapboxgl.LngLat(suggestion.longitude, suggestion.latitude),
+            point: mapboxMap.project([suggestion.longitude, suggestion.latitude]),
+            features: [feature]
+          } as unknown as mapboxgl.MapMouseEvent);
+        }
+      } else {
+        logger.warn('No features found when focusing on suggestion');
+      }
+    }, 150);
   });
 
-  // Also update the map with filtered results
-  // (though this now applies filters to the current map only)
-  updateMapForSelectedType(); // TODO: THIS IS CAUSING THE ICONS TO DISAPPEAR AFTER SLECTING UUGGESTION
+  // IMPORTANT: Don't update the map source here as it causes icons to disappear
+  // Comment out this line to prevent the race condition:
+  // updateMapForSelectedType(); // TODO: THIS IS CAUSING THE ICONS TO DISAPPEAR AFTER SELECTING SUGGESTION
 }
 
 // Get Number of currently selected filters for badge

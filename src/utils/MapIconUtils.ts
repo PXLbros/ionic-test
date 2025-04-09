@@ -216,7 +216,7 @@ export function addVendorIconLayer(map: mapboxgl.Map) {
       ['==', ['get', 'type'], 'vendor']
     ],
     layout: {
-      // Use a simpler match expression that Mapbox GL supports
+      // Simplified expression with better type handling
       'icon-image': [
         'match',
         ['typeof', ['get', 'categories']],
