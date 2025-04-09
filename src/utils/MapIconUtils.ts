@@ -159,6 +159,7 @@ export async function loadCategoryIcons({
     });
   };
 
+
   // Load each unique category icon in parallel
   Object.entries(categoryIconMap).forEach(([iconId, iconUrl]) => {
     if (!iconUrl) {
@@ -266,6 +267,8 @@ export function setupIconClickHandlers(
   map: mapboxgl.Map,
   getCategoryName: (categoryId: number) => string
 ) {
+  console.log('--------------- SETUP ICON CLICK HANDLERS!');
+
   // Vendor icon click handler
   map.on('click', 'vendor-icon', (e) => {
     if (!e.features || e.features.length === 0) return;
@@ -306,7 +309,6 @@ export function setupIconClickHandlers(
     if (!e.features || e.features.length === 0) {
       return;
     }
-
 
     const feature = e.features[0];
     const coordinates = (feature.geometry as any).coordinates.slice();
