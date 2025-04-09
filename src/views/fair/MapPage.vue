@@ -1,5 +1,5 @@
 <template>
-  <FairLayout title="Interactive Map" :showMenuButton="true">
+  <FairLayout title="Interactive Map" :showMenuButton="true" :isLoading="isLoadingMap">
     <div class="main">
       <div class="main__header">
         <div class="wrapper">
@@ -140,6 +140,8 @@ import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSugges
 mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
 
 import { useDataStore } from '@/stores/data';
+
+const isLoadingMap = ref(true);
 
 const mapContainer = ref<HTMLElement | null>(null);
 const showMapDropdown = ref(false);
@@ -796,7 +798,9 @@ const selectedFilterCount = computed(() => {
 });
 
 function setupMapLayers() {
-  if (!mapboxMap) return;
+  if (!mapboxMap) {
+    return;
+  }
 
   mapboxMap.addSource('chevy-court-area', {
     type: 'image',
@@ -893,6 +897,11 @@ function setupMapLayers() {
   // Resize map if needed
   setTimeout(() => {
     mapboxMap.resize();
+
+    isLoadingMap.value = false;
+
+    // TODO: HERE IS THE MAP FULLY LOADED (double check async/await promises above though)
+    dataStore.hideLoader();
   }, 100);
 }
 
@@ -904,42 +913,53 @@ async function loadMap() {
   // Load category icons for the map and wait for them to complete loading
   await loadCategoryIcons({ map: mapboxMap, serviceCategories, vendorCategories });
 
-  console.log('category icons loaded!');
-
   // Now that icons are loaded, proceed with setting up the map
   const imageOverlayElement = new Image();
   imageOverlayElement.onload = setupMapLayers;
   imageOverlayElement.src = '/icons/Map_Design-big-min.png';
 }
 
+// Initialize the map with all required configurations
+function initMap() {
+  if (!mapContainer.value) {
+    return;
+  }
+
+  mapboxMap = new mapboxgl.Map({
+    container: mapContainer.value,
+    style: 'mapbox://styles/pxldevops/cm4uef2wm005401sm7ebof1mh',
+    center: [-76.2197, 43.073],
+    zoom: 14,
+    bearing: 222,
+    dragRotate: false,
+    pitchWithRotate: false,
+    touchPitch: false,
+    touchZoomRotate: true,
+    renderWorldCopies: false,
+    preserveDrawingBuffer: true,
+    maxZoom: 17,
+    minZoom: 13,
+  });
+
+  // Add navigation controls
+  mapboxMap.addControl(new mapboxgl.NavigationControl());
+
+  // Set up map load handler
+  mapboxMap.on('load', loadMap);
+}
+
+function destroyMap() {
+  if (mapboxMap) {
+    mapboxMap.remove();
+  }
+}
+
 onMounted(() => {
   // Setup listener for closing dropdown when clicking outside
   document.addEventListener('click', closeDropdownOnOutsideClick);
 
-  if (mapContainer.value) {
-    mapboxMap = new mapboxgl.Map({
-      container: mapContainer.value,
-      style: 'mapbox://styles/pxldevops/cm4uef2wm005401sm7ebof1mh',
-      center: [-76.2197, 43.073],
-      zoom: 14,
-      bearing: 222,
-      dragRotate: false,
-      pitchWithRotate: false,
-      touchPitch: false,
-      touchZoomRotate: true,
-      renderWorldCopies: false,
-      preserveDrawingBuffer: true,
-      maxZoom: 17,
-      minZoom: 13,
-    });
-
-    // map.dragRotate.disable();
-    // map.touchZoomRotate.disableRotation();
-
-    mapboxMap.addControl(new mapboxgl.NavigationControl());
-
-    mapboxMap.on('load', loadMap);
-  }
+  // Initialize the map
+  initMap();
 });
 
 onUnmounted(() => {
@@ -951,9 +971,8 @@ onUnmounted(() => {
   // Clean up event listener
   document.removeEventListener('click', closeDropdownOnOutsideClick);
 
-  if (mapboxMap) {
-    mapboxMap.remove();
-  }
+  // Destroy map
+  destroyMap();
 });
 </script>
 
