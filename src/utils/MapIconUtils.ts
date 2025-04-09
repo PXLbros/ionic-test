@@ -12,29 +12,51 @@ interface Category {
   maps?: number[];
 }
 
+// Configuration for icon loading
+export interface IconLoadingConfig {
+  /**
+   * If true, will throw an error and stop the application when an icon fails to load
+   * If false, will log errors and continue loading other icons
+   * @default false
+   */
+  failOnIconError: boolean;
+}
+
+// Default configuration
+const defaultConfig: IconLoadingConfig = {
+  failOnIconError: false
+};
+
 /**
  * Loads category icons for the map
  * @param map Mapbox map instance
  * @param serviceCategories Array of service categories
  * @param vendorCategories Array of vendor categories
+ * @param config Configuration for icon loading behavior
  * @returns Promise that resolves when all icons are loaded
+ * @throws Error if failOnIconError is true and any icon fails to load
  */
 export async function loadCategoryIcons({
   map,
   serviceCategories,
   vendorCategories,
+  config = defaultConfig
 }: {
   map: mapboxgl.Map,
   serviceCategories: Category[],
-  vendorCategories: Category[]
+  vendorCategories: Category[],
+  config?: IconLoadingConfig
 }): Promise<void> {
   // Create a mapping of category IDs to their icon URLs
   const categoryIconMap: Record<number, string> = {};
+  const loadErrors: string[] = [];
 
   // Process service categories
   serviceCategories.forEach((category: Category) => {
     if (category.icon) {
       categoryIconMap[category.id] = category.icon;
+    } else {
+      console.warn('Service category is missing icon', category.id);
     }
   });
 
@@ -42,6 +64,8 @@ export async function loadCategoryIcons({
   vendorCategories.forEach((category: Category) => {
     if (category.icon) {
       categoryIconMap[category.id] = category.icon;
+    } else {
+      console.warn('Vendor category is missing icon', category.id);
     }
   });
 
@@ -54,8 +78,16 @@ export async function loadCategoryIcons({
     return new Promise((resolve, reject) => {
       map.loadImage(url, (error, image) => {
         if (error) {
-          console.warn(`Failed to load icon ${imageId}:`, error);
-          // Resolve anyway to continue with other icons
+          const errorMessage = `Failed to load icon ${imageId} from URL ${url}: ${error.message}`;
+          console.error(errorMessage);
+          loadErrors.push(errorMessage);
+
+          if (config.failOnIconError) {
+            reject(new Error(errorMessage));
+            return;
+          }
+
+          // Resolve anyway if we're continuing on error
           resolve();
           return;
         }
@@ -64,12 +96,29 @@ export async function loadCategoryIcons({
           // Add the image to the map style
           if (image) {
             map.addImage(imageId, image);
+            resolve();
+          } else {
+            const errorMessage = `Image ${imageId} loaded as null from URL ${url}`;
+            console.error(errorMessage);
+            loadErrors.push(errorMessage);
+
+            if (config.failOnIconError) {
+              reject(new Error(errorMessage));
+            } else {
+              resolve();
+            }
           }
-          resolve();
         } catch (err) {
-          console.error(`Failed to add icon ${imageId}:`, err);
-          // Resolve anyway to continue with other icons
-          resolve();
+          const errorMessage = `Failed to add icon ${imageId}: ${err instanceof Error ? err.message : String(err)}`;
+          console.error(errorMessage);
+          loadErrors.push(errorMessage);
+
+          if (config.failOnIconError) {
+            reject(new Error(errorMessage));
+          } else {
+            // Resolve anyway to continue with other icons
+            resolve();
+          }
         }
       });
     });
@@ -77,9 +126,12 @@ export async function loadCategoryIcons({
 
   // Load each unique category icon in parallel
   Object.entries(categoryIconMap).forEach(([categoryId, iconUrl]) => {
-    if (loadedImages.has(iconUrl) || !iconUrl) return;
+    if (loadedImages.has(iconUrl) || !iconUrl) {
+      return;
+    }
 
     const iconId = `category-icon-${categoryId}`;
+    console.log('iconId', iconId);
     loadPromises.push(loadImage(iconUrl, iconId));
     loadedImages.add(iconUrl);
   });
@@ -89,7 +141,18 @@ export async function loadCategoryIcons({
   loadPromises.push(loadImage('/icons/pig.png', 'default-service-icon'));
 
   // Wait for all icons to load
-  await Promise.all(loadPromises);
+  try {
+    await Promise.all(loadPromises);
+
+    // If there were errors but we didn't fail fast, still report them
+    if (loadErrors.length > 0) {
+      console.warn(`Completed icon loading with ${loadErrors.length} errors:`, loadErrors);
+    }
+  } catch (error) {
+    // This will only be reached if failOnIconError is true
+    console.error('Icon loading failed:', error);
+    throw new Error(`Failed to load map icons: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 /**
