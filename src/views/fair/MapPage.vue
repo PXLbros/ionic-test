@@ -531,7 +531,7 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
   })));
 }
 
-function normalizeCategories({ categories }: { categories: any }) {
+function normalizeCategories(categories: any[]) {
   return Array.isArray(categories)
     ? categories.map((c: any) => typeof c === 'object' && c !== null ? c.id : c)
     : []
@@ -572,7 +572,7 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
         id: s.id,
         is_accessible: Boolean(s.is_accessible),
         type: 'service' as const,
-        categories: s.categories || [] // Make sure categories is an array
+        categories: normalizeCategories(s.categories || []), // Make sure categories is an array
       },
       geometry: {
         type: 'Point' as const,
@@ -589,9 +589,25 @@ function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | Ser
   const vendorFeatures = buildVendorGeoJSON(vendors);
   const serviceFeatures = buildServiceGeoJSON(services);
 
-  // console.log('Service feature sample:', JSON.stringify(serviceFeatures.slice(0, 3), null, 2));
+  // console.log('vendorFeatures feature sample:', JSON.stringify(vendorFeatures, null, 2));
+  // console.log('Service feature sample:', JSON.stringify(serviceFeatures, null, 2));
 
   // console.log(`Map ${currentMapId.value}: ${serviceFeatures.length} services, ${vendorFeatures.length} vendors`);
+  logger.info('Re-built map JSON', {
+    'Services': serviceFeatures.length,
+    'Vendors': vendorFeatures.length,
+  });
+
+  // // Check here if there is any vendor features with vendor category 143
+  // const vendorCategory143Features = vendorFeatures.filter(feature =>
+  //   feature.properties.categories.includes(143)
+  // );
+
+  // if (vendorCategory143Features.length > 0) {
+  //   console.log(`Found ${vendorCategory143Features.length} vendor features with category 143.`);
+  // } else {
+  //   console.log('No vendor features found with category 143.');
+  // }
 
   return {
     type: 'FeatureCollection' as const,
