@@ -133,7 +133,7 @@ import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline, clos
 import mapboxgl, { Map } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
-import { loadCategoryIcons, addVendorIconLayer, addServiceIconLayer, setupIconClickHandlers } from '@/utils/MapIconUtils';
+import { loadCategoryIcons, addVendorIconLayer, addServiceIconLayer, setupIconClickHandlers, addServiceMapClusterIconLayer, addServiceMapIconLayer } from '@/utils/MapIconUtils';
 import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
 import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
@@ -555,12 +555,15 @@ function resetFilters() {
 
 // Function to reset the search input
 function clearSearch() {
+  // Clear search-specific state
   searchQuery.value = '';
   showSearchSuggestions.value = false;
   filteredSuggestions.value = [];
+  btnGroup.value?.classList.remove('search-focused');
 
-  // Reset to the currently selected map
-  updateMapForSelectedType();
+  // Simply call the resetFilters function to handle the rest
+  // This ensures consistent behavior between search clear and reset button
+  resetFilters();
 }
 
 // Check if an item matches the category filters
@@ -726,16 +729,18 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
 
 // Build GeoJSON for the currently selected map type
 function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
-  const vendorFeatures = buildVendorGeoJSON(cloneDeep(vendors));
-  const serviceFeatures = buildServiceGeoJSON(cloneDeep(services));
+  const rawVendors = cloneDeep(vendors);
+  const rawServices = cloneDeep(services);
 
-  // console.log('vendorFeatures feature sample:', JSON.stringify(vendorFeatures, null, 2));
-  // console.log('Service feature sample:', JSON.stringify(serviceFeatures, null, 2));
+  const vendorFeatures = buildVendorGeoJSON(rawVendors);
+  const serviceFeatures = buildServiceGeoJSON(rawServices);
 
-  // console.log(`Map ${currentMapId.value}: ${serviceFeatures.length} services, ${vendorFeatures.length} vendors`);
+  const numVendorFeatures = vendorFeatures.length;
+  const numServiceFeatures = serviceFeatures.length;
+
   logger.info('Re-built map JSON', {
-    'Services': serviceFeatures.length,
-    'Vendors': vendorFeatures.length,
+    'Vendors': numVendorFeatures,
+    'Services': numServiceFeatures,
   });
 
   return {
@@ -1045,6 +1050,8 @@ function initMap() {
     failIfMajorPerformanceCaveat: true, // Don't load if performance would be poor
   });
 
+  mapboxMap.showCollisionBoxes = true;
+
   // Add navigation controls
   mapboxMap.addControl(new mapboxgl.NavigationControl());
 
@@ -1070,16 +1077,28 @@ async function loadMapResources() {
   }
 
   try {
-    // 1. First load category icons
-    logger.info('Loading category icons...');
-    await loadCategoryIcons({ map: mapboxMap, serviceCategories, vendorCategories });
-    logger.info('Category icons loaded successfully');
+    const numServiceMaps = serviceMaps?.length || 0;
+    const numVendorMaps = vendorMaps?.length || 0;
+    const numServiceCategories = serviceCategories?.length || 0;
+    const numVendorCategories = vendorCategories?.length || 0;
 
-    // 2. Then load the map overlay image
+    logger.info('Loading category icons...', {
+      'Service Maps': numServiceMaps,
+      'Vendor Maps': numVendorMaps,
+      'Service Categories': numServiceCategories,
+      'Vendor Categories': numVendorCategories,
+    });
+
+    // Load category icons
+    await loadCategoryIcons({ map: mapboxMap, serviceMaps, vendorMaps, serviceCategories, vendorCategories });
+
+    // Load map overlay image
     await loadMapOverlayImage();
   } catch (error) {
-    logger.error('Error loading map resources:', error);
+    logger.error(error);
+
     isLoadingMap.value = false;
+
     dataStore.hideLoader();
   }
 }
@@ -1199,6 +1218,8 @@ function setupMapLayers() {
     // 5. Add icon layers
     addVendorIconLayer(mapboxMap);
     addServiceIconLayer(mapboxMap);
+    addServiceMapClusterIconLayer(mapboxMap);
+    addServiceMapIconLayer(mapboxMap);
 
     // 6. Setup icon click handlers and store the cleanup function
     iconClickHandlersCleanup = setupIconClickHandlers(mapboxMap, getCategoryName);

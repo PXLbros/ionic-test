@@ -1,5 +1,8 @@
 // mapIconUtils.ts
 import mapboxgl from 'mapbox-gl';
+import { useLogger } from '@/composables/useLogger';
+
+const logger = useLogger();
 
 // Interface for category
 interface Category {
@@ -49,11 +52,15 @@ const defaultCategoryIconLoadingConfig: CategoryIconLoadingConfig = {
  */
 export async function loadCategoryIcons({
   map,
+  serviceMaps,
+  vendorMaps,
   serviceCategories,
   vendorCategories,
   config = defaultCategoryIconLoadingConfig
 }: {
   map: mapboxgl.Map,
+  serviceMaps: any[],
+  vendorMaps: any[],
   serviceCategories: Category[],
   vendorCategories: Category[],
   config?: CategoryIconLoadingConfig
@@ -78,6 +85,34 @@ export async function loadCategoryIcons({
     }
   });
 
+  serviceMaps.forEach((map: any) => {
+    if (map.map_cluster_icon) {
+      const key = `service-map-cluster-icon-${map.id}`;
+
+      categoryIconMap[key] = map.map_cluster_icon;
+    }
+
+    if (map.map_icon) {
+      const key = `service-map-icon-${map.id}`;
+
+      categoryIconMap[key] = map.map_icon;
+    }
+  });
+
+  vendorMaps.forEach((map: any) => {
+    if (map.map_cluster_icon) {
+      const key = `vendor-map-cluster-icon-${map.id}`;
+
+      categoryIconMap[key] = map.map_cluster_icon;
+    }
+
+    if (map.map_icon) {
+      const key = `vendor-map-icon-${map.id}`;
+
+      categoryIconMap[key] = map.map_icon;
+    }
+  });
+
   // Helper function to load an image with modern Mapbox API
   const loadImage = (url: string, imageId: string): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -87,11 +122,12 @@ export async function loadCategoryIcons({
         return;
       }
 
-      // Modern approach using map.loadImage
       map.loadImage(url, (error, image) => {
         if (error) {
           const errorMessage = `Failed to load icon ${imageId} from URL ${url}: ${error.message}`;
+
           console.error(errorMessage);
+
           loadErrors.push(errorMessage);
 
           if (config.failOnIconError) {
@@ -104,7 +140,9 @@ export async function loadCategoryIcons({
 
         if (!image) {
           const errorMessage = `Image loaded but is null: ${imageId}`;
+
           console.error(errorMessage);
+
           loadErrors.push(errorMessage);
 
           if (config.failOnIconError) {
@@ -112,6 +150,7 @@ export async function loadCategoryIcons({
           } else {
             resolve();
           }
+
           return;
         }
 
@@ -144,7 +183,12 @@ export async function loadCategoryIcons({
               // Set canvas dimensions and draw the resized image
               canvas.width = width;
               canvas.height = height;
-              ctx.drawImage(image, 0, 0, width, height);
+
+              if (image instanceof HTMLImageElement || image instanceof ImageBitmap) {
+                ctx.drawImage(image, 0, 0, width, height);
+              } else {
+                throw new Error('Unsupported image type for drawing on canvas');
+              }
 
               // Get image data from canvas
               const imageData = ctx.getImageData(0, 0, width, height);
@@ -154,12 +198,16 @@ export async function loadCategoryIcons({
               // Add original image without resizing
               map.addImage(imageId, image);
             }
+
+            // console.log(`Added image ${imageId} to map`);
           }
 
           resolve();
         } catch (err) {
           const errorMessage = `Error adding image ${imageId} to map: ${err instanceof Error ? err.message : String(err)}`;
+
           console.error(errorMessage);
+
           loadErrors.push(errorMessage);
 
           if (config.failOnIconError) {
@@ -185,20 +233,73 @@ export async function loadCategoryIcons({
   // Load default icons
   loadPromises.push(loadImage('/icons/default-category.png', 'default-vendor-icon'));
   loadPromises.push(loadImage('/icons/default-category.png', 'default-service-icon'));
+  loadPromises.push(loadImage('/icons/default-map-cluster-icon.png', 'default-map-cluster-icon'));
+  loadPromises.push(loadImage('/icons/default-map-icon.png', 'default-map-icon'));
+
+  const numCategoryIcons = Object.keys(categoryIconMap).length;
 
   // Wait for all icons to load
   try {
     await Promise.all(loadPromises);
 
-    // If there were errors but we didn't fail fast, still report them
-    if (loadErrors.length > 0) {
-      console.warn(`Completed icon loading with ${loadErrors.length} errors:`, loadErrors);
+    const numLoadErrors = loadErrors.length || 0;
+    const allFailed = numLoadErrors === numCategoryIcons;
+
+    if (allFailed) {
+      throw new Error(`Failed to load all ${numCategoryIcons} category icons`);
+    } else if (numLoadErrors > 0) {
+      const numLoadedCategoryIcons = numCategoryIcons - numLoadErrors;
+
+      logger.warn('Some category icons failed to load', {
+        'Total Count': numCategoryIcons,
+        'Loaded Count': numLoadedCategoryIcons,
+        'Failed Count': numLoadErrors,
+      });
+    } else {
+      logger.info('Category icons loaded successfully', {
+        'Count': numCategoryIcons,
+      });
     }
   } catch (error) {
     // This will only be reached if failOnIconError is true
     console.error('Icon loading failed:', error);
+
     throw new Error(`Failed to load map icons: ${error instanceof Error ? error.message : String(error)}`);
   }
+}
+
+export function addServiceMapClusterIconLayer(map: mapboxgl.Map) {
+  map.addLayer({
+    id: 'service-map-cluster-icon',
+    type: 'symbol',
+    source: 'points-clustered',
+    filter: ['has', 'point_count'],
+    layout: {
+      'icon-image': 'default-map-cluster-icon',
+      'icon-size': 0.5,
+      'icon-allow-overlap': true,
+      'icon-anchor': 'bottom',
+    }
+  });
+}
+
+export function addServiceMapIconLayer(map: mapboxgl.Map) {
+  map.addLayer({
+    id: 'service-map-icon',
+    type: 'symbol',
+    source: 'points-clustered',
+    filter: [
+      'all',
+      ['!', ['has', 'point_count']],
+      ['==', ['get', 'type'], 'service']
+    ],
+    layout: {
+      'icon-image': 'default-map-icon',
+      'icon-size': 0.5,
+      'icon-allow-overlap': true,
+      'icon-anchor': 'bottom',
+    }
+  });
 }
 
 /**
