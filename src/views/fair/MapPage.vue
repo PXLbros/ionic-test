@@ -182,6 +182,77 @@ const serviceCategories = dataStore.data.nysfairWebsite.service_categories;
 const vendorCategories = dataStore.data.nysfairWebsite.vendor_categories;
 const serviceMaps = dataStore.data.nysfairWebsite.service_maps;
 const vendorMaps = dataStore.data.nysfairWebsite.vendor_maps;
+const maps = dataStore.data.nysfairWebsite.maps;
+
+console.log('maps', maps);
+
+// maps example:
+// [
+//     {
+//         "name": "Accessibility (ADA)",
+//         "slug": "accessibility-ada",
+//         "num_features": 91,
+//         "map_cluster_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Cluster_Pins_Accessibility-2.png",
+//         "map_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Map_Icons_Accessibility-2.png",
+//         "type": "service"
+//     },
+//     {
+//         "name": "Entertainment",
+//         "slug": "entertainment",
+//         "num_features": 34,
+//         "map_cluster_icon": null,
+//         "map_icon": null,
+//         "type": "service"
+//     },
+//     {
+//         "name": "Guest & Emergency Services",
+//         "slug": "guest-emergency-services",
+//         "num_features": 107,
+//         "map_cluster_icon": null,
+//         "map_icon": null,
+//         "type": "service"
+//     },
+//     {
+//         "name": "Master",
+//         "slug": "master",
+//         "num_features": 182,
+//         "map_cluster_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Category_Pins_Master.png",
+//         "map_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Map_Icons_Master-1.png",
+//         "type": "service"
+//     },
+//     {
+//         "name": "Parking",
+//         "slug": "parking",
+//         "num_features": 21,
+//         "map_cluster_icon": null,
+//         "map_icon": null,
+//         "type": "service"
+//     },
+//     {
+//         "name": "Where To Cool Off",
+//         "slug": "where-to-cool-off",
+//         "num_features": 24,
+//         "map_cluster_icon": null,
+//         "map_icon": null,
+//         "type": "service"
+//     },
+//     {
+//         "name": "Food & Beverage",
+//         "slug": "food-beverage",
+//         "num_features": 864,
+//         "map_cluster_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Cluster_Pins_Food_Beverage-1.png",
+//         "map_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Map_Icons_Food_Beverage-1.png",
+//         "type": "vendor"
+//     },
+//     {
+//         "name": "Vendors & Exhibitors",
+//         "slug": "vendors-exhibitors",
+//         "num_features": 1196,
+//         "map_cluster_icon": null,
+//         "map_icon": null,
+//         "type": "vendor"
+//     }
+// ]
 
 // Combine service maps and vendor maps for the dropdown, deduplicating by slug
 const allMaps = computed(() => {
@@ -344,6 +415,17 @@ function updateMapForSelectedType() {
 
   // If we get here, sources are ready so we can update directly
   safeUpdateMapSource();
+
+  // // Remove and re-add the cluster icon layer to update the icon
+  // if (mapboxMap.getLayer(MapLayer.MapClusterCount)) {
+  //   mapboxMap.removeLayer(MapLayer.MapClusterCount);
+  // }
+
+  // if (mapboxMap.getLayer(MapLayer.MapClusterIcon)) {
+  //   mapboxMap.removeLayer(MapLayer.MapClusterIcon);
+  // }
+
+  // addMapClusterIconLayer(mapboxMap, currentMapSlug.value);
 }
 
 // Safely update the map source with error handling
@@ -744,7 +826,7 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
 }
 
 // Convert services to GeoJSON features using map slug instead of ID
-function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServiceProperties>> {
+function filterAndTransformServicesToGeoJSON(services: any[]): Array<Feature<Point, ServiceProperties>> {
   let filteredServices = services;
 
   // Filter services by map slug for all maps
@@ -798,25 +880,49 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
     });
 }
 
-// Build GeoJSON for the currently selected map type
-function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
+// Build GeoJSON for vendors only
+function buildVendorGeoJSONCollection(): FeatureCollection<Point, VendorProperties> {
   const rawVendors = cloneDeep(vendors);
-  const rawServices = cloneDeep(services);
-
   const vendorFeatures = buildVendorGeoJSON(rawVendors);
-  const serviceFeatures = buildServiceGeoJSON(rawServices);
 
-  const numVendorFeatures = vendorFeatures.length;
-  const numServiceFeatures = serviceFeatures.length;
-
-  logger.info('Re-built map JSON', {
-    'Vendors': numVendorFeatures,
-    'Services': numServiceFeatures,
+  logger.info('Re-built vendor map JSON', {
+    'Vendors': vendorFeatures.length,
   });
 
   return {
     type: 'FeatureCollection' as const,
-    features: [...vendorFeatures, ...serviceFeatures]
+    features: vendorFeatures,
+  };
+}
+
+// Build GeoJSON for services only
+function buildServiceGeoJSONCollection(): FeatureCollection<Point, ServiceProperties> {
+  const rawServices = cloneDeep(services);
+  const serviceFeatures = filterAndTransformServicesToGeoJSON(rawServices);
+
+  logger.info('Re-built service map JSON', {
+    'Services': serviceFeatures.length,
+  });
+
+  return {
+    type: 'FeatureCollection' as const,
+    features: serviceFeatures,
+  };
+}
+
+// Build GeoJSON for both vendors and services
+function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
+  const vendorGeoJSON = buildVendorGeoJSONCollection();
+  const serviceGeoJSON = buildServiceGeoJSONCollection();
+
+  logger.info('Re-built combined map JSON', {
+    'Vendors': vendorGeoJSON.features.length,
+    'Services': serviceGeoJSON.features.length,
+  });
+
+  return {
+    type: 'FeatureCollection' as const,
+    features: [...vendorGeoJSON.features, ...serviceGeoJSON.features],
   };
 }
 
@@ -1286,6 +1392,8 @@ function setupMapLayers() {
       clusterRadius: 50,
       clusterMaxZoom: 14
     });
+
+    // TODO: If we want separate cluster icons for services and vendors, we need to have two separate data sources?
 
     // // 4. Add cluster layers
     // mapboxMap.addLayer({

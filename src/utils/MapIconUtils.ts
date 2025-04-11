@@ -106,13 +106,13 @@ export async function loadCategoryIcons({
 
   serviceMaps.forEach((map: any) => {
     if (map.map_cluster_icon) {
-      const key = `service-map-cluster-icon-${map.id}`;
+      const key = `map-cluster-icon-${map.slug}`;
 
       categoryIconMap[key] = map.map_cluster_icon;
     }
 
     if (map.map_icon) {
-      const key = `service-map-icon-${map.id}`;
+      const key = `map-icon-${map.slug}`;
 
       categoryIconMap[key] = map.map_icon;
     }
@@ -120,15 +120,19 @@ export async function loadCategoryIcons({
 
   vendorMaps.forEach((map: any) => {
     if (map.map_cluster_icon) {
-      const key = `vendor-map-cluster-icon-${map.id}`;
+      const key = `map-cluster-icon-${map.slug}`;
 
-      categoryIconMap[key] = map.map_cluster_icon;
+      if (!categoryIconMap[key]) {
+        categoryIconMap[key] = map.map_cluster_icon;
+      }
     }
 
     if (map.map_icon) {
-      const key = `vendor-map-icon-${map.id}`;
+      const key = `map-icon-${map.slug}`;
 
-      categoryIconMap[key] = map.map_icon;
+      if (!categoryIconMap[key]) {
+        categoryIconMap[key] = map.map_icon;
+      }
     }
   });
 
