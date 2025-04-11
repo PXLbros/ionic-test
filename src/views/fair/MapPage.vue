@@ -171,6 +171,10 @@ const logger = useLogger();
 
 // Grabbing data from CMS
 const dataStore = useDataStore();
+
+// isdebug mode if ?debug=1
+const isDebugMode = ref(new URLSearchParams(window.location.search).get('debug') === '1');
+
 const vendors = dataStore.data.nysfairWebsite.vendors;
 const services = dataStore.data.nysfairWebsite.services;
 const serviceCategories = dataStore.data.nysfairWebsite.service_categories;
@@ -258,23 +262,22 @@ function selectMap(mapData: ServiceMap) {
   clearCategoryFilters();
 
   // Check if this is a significant map change
-  const isSignificantChange = previousMapId !== mapData.id;
+  const isDifferentMap = previousMapId !== mapData.id;
 
-  if (isSignificantChange) {
-    // For significant map changes, track the request in progress
-    logger.info(`Switching to map: ${mapData.name} (ID: ${mapData.id})`);
+  if (isDifferentMap) {
+    logger.info('Switching map', {
+      'ID': mapData.id,
+      'Name': mapData.name,
+    });
   }
 
   // Request map update
   updateMapForSelectedType();
 }
 
-// Functions for filters modal
-
 // Toggle filters panel
 function toggleFiltersPanel() {
   showFiltersPanel.value = !showFiltersPanel.value;
-  console.log('Show filters panel:', showFiltersPanel.value);
 
   // If closing the panel after changes were made, apply the filters
   if (!showFiltersPanel.value && hasFilterChanges.value) {
@@ -332,22 +335,29 @@ function updateMapForSelectedType() {
 // Safely update the map source with error handling
 function safeUpdateMapSource() {
   try {
-    if (!mapboxMap) return;
+    if (!mapboxMap) {
+      return;
+    }
 
     // Check if source exists before updating
     const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
 
     if (!source) {
       logger.warn('Map source "points-clustered" not found');
+
       return;
     }
 
     // Build new GeoJSON data
     const filteredGeoJson = buildFilteredGeoJSON();
-    logger.info(`Updating map with ${filteredGeoJson.features.length} features`);
 
     // Update the data source
     source.setData(filteredGeoJson);
+
+    logger.info('Updated map source with new data', {
+      'Map ID': currentMapId.value,
+      'Features': filteredGeoJson.features.length,
+    });
   } catch (error) {
     logger.error('Error updating map source:', error);
   }
@@ -629,14 +639,24 @@ function normalizeCategories(categories: any) {
 function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperties>> {
   // Apply filtering by map ID and search query
   let filteredVendors = vendors
-    .filter((v) => v.locations && v.locations.length > 0);
+    .filter((vendor) => vendor.locations && vendor.locations.length > 0);
+
+  console.log('filteredVendors', filteredVendors);
 
   // Filter by map ID for all maps, including master
+  // TODO: PROBLEM HERE WITH USING currentMapId because currentMapId will be a vendor OR service.
+  // Either also save the name of the map, or save both the service and vendor map ids as current maps (if they have)
+  // ...
   if (currentMapId.value !== null) {
-    filteredVendors = filteredVendors.filter((v) => {
+    console.log('currentMapId.value: ', currentMapId.value);
+
+    filteredVendors = filteredVendors.filter((vendor) => {
+      console.log('vendor.maps', vendor.maps);
       // Check if the vendor has maps array and it includes the current map ID
-      return Array.isArray(v.maps) && v.maps.includes(currentMapId.value);
+      return Array.isArray(vendor.maps) && vendor.maps.includes(currentMapId.value);
     });
+
+    console.log ('filteredVendors #2', filteredVendors);
   }
 
   // Apply search filtering
@@ -730,6 +750,7 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
 // Build GeoJSON for the currently selected map type
 function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
   const rawVendors = cloneDeep(vendors);
+  console.log('rawVendors', rawVendors);
   const rawServices = cloneDeep(services);
 
   const vendorFeatures = buildVendorGeoJSON(rawVendors);
@@ -753,9 +774,14 @@ function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | Ser
 function getCategoryName(categoryId: number): string {
   // Check service categories first
   const serviceCategory = serviceCategories.find((cat: any) => cat.id === categoryId);
-  if (serviceCategory) return serviceCategory.name;
+
+  if (serviceCategory) {
+     return serviceCategory.name;
+  }
+
   // Then check vendor categories
   const vendorCategory = vendorCategories.find((cat: any) => cat.id === categoryId);
+
   return vendorCategory ? vendorCategory.name : 'Unknown Category';
 }
 
@@ -956,10 +982,6 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
     return;
   }
 
-  // Flag to track if we're currently focusing on a suggestion
-  // This prevents race conditions with data updates
-  const isFocusing = true;
-
   // Fly to the suggestion location
   mapboxMap.flyTo({
     center: [suggestion.longitude, suggestion.latitude],
@@ -981,7 +1003,9 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
       // Query for features at the suggestion location
       const features = mapboxMap.queryRenderedFeatures(
         mapboxMap.project([suggestion.longitude, suggestion.latitude]),
-        { layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon'] }
+        {
+          layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon']
+        },
       );
 
       const numFeatures = features?.length || 0;
@@ -1013,10 +1037,6 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
       }
     }, 150);
   });
-
-  // IMPORTANT: Don't update the map source here as it causes icons to disappear
-  // Comment out this line to prevent the race condition:
-  // updateMapForSelectedType(); // TODO: THIS IS CAUSING THE ICONS TO DISAPPEAR AFTER SELECTING SUGGESTION
 }
 
 // Get Number of currently selected filters for badge
@@ -1050,7 +1070,14 @@ function initMap() {
     failIfMajorPerformanceCaveat: true, // Don't load if performance would be poor
   });
 
-  mapboxMap.showCollisionBoxes = true;
+  // Enable debug features if debug mode is active
+  if (isDebugMode.value) {
+    mapboxMap.showCollisionBoxes = true;
+    mapboxMap.showTileBoundaries = true;
+    mapboxMap.showTerrainWireframe = true;
+
+    logger.debug('Debug mode enabled');
+  }
 
   // Add navigation controls
   mapboxMap.addControl(new mapboxgl.NavigationControl());
@@ -1058,13 +1085,16 @@ function initMap() {
   // Set up map error handling
   mapboxMap.on('error', (e) => {
     logger.error(e);
+
     isLoadingMap.value = false;
+
     dataStore.hideLoader();
   });
 
   // Wait for style to load before loading other resources
   mapboxMap.on('style.load', () => {
     logger.info('Map style loaded');
+
     loadMapResources();
   });
 }
