@@ -557,9 +557,19 @@ function generateInitialSuggestions() {
     })
     .filter(v => v && v.latitude && v.longitude); // Only include vendors with valid coordinates
 
+  const query = searchQuery.value.toLowerCase().trim();
+
   // Service suggestions - get from ALL maps
   const serviceSuggestions = services
     .filter((s: any) => {
+      // Only include services that match the search query
+      const titleMatch = s.title && s.title.toLowerCase().includes(query);
+      const descriptionMatch = s.description && s.description.toLowerCase().includes(query);
+
+      if (!titleMatch && !descriptionMatch) {
+        return false;
+      }
+
       // Only include services that belong to at least one map
       const hasMapSlug = Array.isArray(s.map_slugs) && s.map_slugs.length > 0;
       const hasMapId = Array.isArray(s.maps) && s.maps.length > 0;
@@ -903,14 +913,27 @@ function generateSearchSuggestions() {
     mapNamesBySlug[map.slug] = map.name;
   });
 
-  // Generate suggestions from vendors - from ALL maps
+  // Vendor suggestions - get from ALL maps
   const vendorSuggestions = vendors
     .filter((v: any) => {
-      // Only include vendors that belong to at least one map
+      // Only include vendors that match the search query
+      const nameMatch = v.name && v.name.toLowerCase().includes(query);
+      const descriptionMatch = v.description && v.description.toLowerCase().includes(query);
+
+      if (!nameMatch && !descriptionMatch) {
+        return false;
+      }
+
+      // Check if vendor belongs to at least one map
       const hasMapSlug = Array.isArray(v.map_slugs) && v.map_slugs.length > 0;
       const hasMapId = Array.isArray(v.maps) && v.maps.length > 0;
 
       if (!hasMapSlug && !hasMapId) {
+        return false;
+      }
+
+      // Check if vendor has valid locations
+      if (!v.locations || v.locations.length === 0) {
         return false;
       }
 
@@ -921,9 +944,7 @@ function generateSearchSuggestions() {
         }
       }
 
-      // Check if vendor name or description matches the query
-      return (v.name && v.name.toLowerCase().includes(query)) ||
-             (v.description && v.description.toLowerCase().includes(query));
+      return true;
     })
     .map((v: any) => {
       // Only take the first location for the suggestion
@@ -934,23 +955,35 @@ function generateSearchSuggestions() {
                      (Array.isArray(v.maps) && v.maps.length > 0 ?
                       (allMaps.value.find(m => m.id === v.maps[0])?.slug || null) : null);
 
+      // If no map is associated, use the current map as fallback
+      const effectiveMapSlug = mapSlug || currentMapSlug.value;
+      const effectiveMapName = effectiveMapSlug ? mapNamesBySlug[effectiveMapSlug] : 'General Map';
+
       return {
         id: v.id,
         name: v.name || 'Unknown Vendor',
         description: v.description || '',
         type: 'vendor' as const,
-        latitude: location ? parseFloat(location.latitude) : 0,
-        longitude: location ? parseFloat(location.longitude) : 0,
+        latitude: parseFloat(location.latitude) || 0,
+        longitude: parseFloat(location.longitude) || 0,
         categories: [...normalizeCategories(v.categories || [])],
-        mapSlug: mapSlug,
-        mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
+        mapSlug: effectiveMapSlug,
+        mapName: effectiveMapName
       };
     })
-    .filter(v => v.mapSlug && v.mapName); // Final check to ensure only vendors with valid map info are included
+    .filter(v => v && v.latitude && v.longitude); // Only include vendors with valid coordinates
 
-  // Generate suggestions from services - from ALL maps
+  // Service suggestions - get from ALL maps
   const serviceSuggestions = services
     .filter((s: any) => {
+      // Only include services that match the search query
+      const titleMatch = s.title && s.title.toLowerCase().includes(query);
+      const descriptionMatch = s.description && s.description.toLowerCase().includes(query);
+
+      if (!titleMatch && !descriptionMatch) {
+        return false;
+      }
+
       // Only include services that belong to at least one map
       const hasMapSlug = Array.isArray(s.map_slugs) && s.map_slugs.length > 0;
       const hasMapId = Array.isArray(s.maps) && s.maps.length > 0;
@@ -959,16 +992,15 @@ function generateSearchSuggestions() {
         return false;
       }
 
-      // Filter by category if selected
+      // Only filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
         if (!s.categories || !s.categories.some((catId: number) => selectedCategories.value[catId])) {
           return false;
         }
       }
 
-      // Check if service title or description matches the query
-      return (s.title && s.title.toLowerCase().includes(query)) ||
-             (s.description && s.description.toLowerCase().includes(query));
+      // Make sure it has coordinates
+      return s.latitude && s.longitude;
     })
     .map((s: any) => {
       // Get map slug (first one if multiple)
@@ -988,7 +1020,7 @@ function generateSearchSuggestions() {
         mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
     })
-    .filter(s => s.mapSlug && s.mapName); // Final check to ensure only services with valid map info are included
+    .filter(s => s.mapSlug && s.mapName); // Ensure only services with valid map info are included
 
   // Combine, sort by relevance, and limit the suggestions
   const combinedSuggestions = [...vendorSuggestions, ...serviceSuggestions];
