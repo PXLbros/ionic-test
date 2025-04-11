@@ -13,6 +13,7 @@ interface Category {
   num_services?: number;
   num_vendors?: number;
   maps?: number[];
+  map_slugs?: string[]; // Added for slug-based lookup
 }
 
 // Configuration for icon loading
