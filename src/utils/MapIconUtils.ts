@@ -317,7 +317,7 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map) {
   mapboxMap.addLayer({
     id: MapLayer.MapClusterIcon,
     type: 'symbol',
-    source: 'points-clustered',
+    source: MapSource.PointsClustered,
     filter: ['has', 'point_count'],
     layout: {
       'icon-image': 'default-map-cluster-icon',
@@ -330,14 +330,15 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map) {
   mapboxMap.addLayer({
     id: MapLayer.MapClusterCount,
     type: 'symbol',
-    source: 'points-clustered',
+    source: MapSource.PointsClustered,
     filter: ['has', 'point_count'],
     layout: {
       'text-field': '{point_count_abbreviated}',
-      'text-size': 20,
+      'text-size': 14,
+      'text-offset': [0, -2.5],
     },
     paint: {
-      'text-color': '#ff00ff'
+      'text-color': '#ffffff'
     }
   });
 }
@@ -346,7 +347,7 @@ export function addMapIconLayer(map: mapboxgl.Map) {
   map.addLayer({
     id: MapLayer.MapIcon,
     type: 'symbol',
-    source: 'points-clustered',
+    source: MapSource.PointsClustered,
     filter: [
       'all',
       ['!', ['has', 'point_count']],
