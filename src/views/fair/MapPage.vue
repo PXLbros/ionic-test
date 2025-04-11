@@ -530,24 +530,32 @@ function generateInitialSuggestions() {
       // Only take the first location for the suggestion
       const location = v.locations && v.locations.length > 0 ? v.locations[0] : null;
 
+      if (!location) {
+        return null; // Skip vendors without valid location
+      }
+
       // Get map slug (first one if multiple)
       const mapSlug = Array.isArray(v.map_slugs) && v.map_slugs.length > 0 ? v.map_slugs[0] :
                      (Array.isArray(v.maps) && v.maps.length > 0 ?
                       (allMaps.value.find(m => m.id === v.maps[0])?.slug || null) : null);
+
+      // If no map is associated, use the current map as fallback
+      const effectiveMapSlug = mapSlug || currentMapSlug.value;
+      const effectiveMapName = effectiveMapSlug ? mapNamesBySlug[effectiveMapSlug] : 'General Map';
 
       return {
         id: v.id,
         name: v.name || 'Unknown Vendor',
         description: v.description || '',
         type: 'vendor' as const,
-        latitude: location ? parseFloat(location.latitude) : 0,
-        longitude: location ? parseFloat(location.longitude) : 0,
+        latitude: parseFloat(location.latitude) || 0,
+        longitude: parseFloat(location.longitude) || 0,
         categories: [...normalizeCategories(v.categories || [])],
-        mapSlug: mapSlug,
-        mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
+        mapSlug: effectiveMapSlug,
+        mapName: effectiveMapName
       };
     })
-    .filter(v => v.mapSlug && v.mapName); // Ensure only vendors with valid map info are included
+    .filter(v => v && v.latitude && v.longitude); // Only include vendors with valid coordinates
 
   // Service suggestions - get from ALL maps
   const serviceSuggestions = services
