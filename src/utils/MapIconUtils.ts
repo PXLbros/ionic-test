@@ -28,35 +28,40 @@ interface Category {
   map_slugs?: string[]; // Added for slug-based lookup
 }
 
-// Configuration for icon loading
+// Update the CategoryIconLoadingConfig interface to support separate settings for clusters and icons
 export interface CategoryIconLoadingConfig {
-  /**
-   * If true, will throw an error and stop the application when an icon fails to load
-   * If false, will log errors and continue loading other icons
-   * @default false
-   */
   failOnIconError: boolean;
 
   /**
-   * Optional max width to resize icons (in pixels)
+   * Configuration for cluster icons
    */
-  maxWidth?: number;
+  cluster: {
+    maxWidth: number;
+    maxHeight: number;
+  };
 
   /**
-   * Optional max height to resize icons (in pixels)
+   * Configuration for regular icons
    */
-  maxHeight?: number;
+  icon: {
+    maxWidth: number;
+    maxHeight: number;
+  };
 
-  /**
-   * If true, will resize icons to fit within the max width and height
-   */
   upsizeToMax?: boolean;
 }
 
+// Update the default configuration
 const defaultCategoryIconLoadingConfig: CategoryIconLoadingConfig = {
   failOnIconError: false,
-  maxWidth: 100, // 45
-  maxHeight: 100, // TODO: Add support for different settings depending on type (cluster vs icon)
+  cluster: {
+    maxWidth: 125,
+    maxHeight: 125,
+  },
+  icon: {
+    maxWidth: 75,
+    maxHeight: 75,
+  },
   upsizeToMax: true,
 };
 
@@ -178,16 +183,19 @@ export async function loadCategoryIcons({
         }
 
         try {
-          // Add the image to the map
           if (!map.hasImage(imageId)) {
             let newImageWidth;
             let newImageHeight;
             let resizedImage = false;
 
-            // If resizing is requested, use canvas
+            // Determine if this is a cluster icon or a regular icon
+            const isClusterIcon = imageId.includes('map-cluster-icon');
+            const maxWidth = isClusterIcon ? config.cluster.maxWidth : config.icon.maxWidth;
+            const maxHeight = isClusterIcon ? config.cluster.maxHeight : config.icon.maxHeight;
+
             if (
-              (config.maxWidth && image.width > config.maxWidth) ||
-              (config.maxHeight && image.height > config.maxHeight) ||
+              (maxWidth && image.width > maxWidth) ||
+              (maxHeight && image.height > maxHeight) ||
               config.upsizeToMax
             ) {
               // Create a canvas to resize
@@ -202,16 +210,15 @@ export async function loadCategoryIcons({
               let width = image.width;
               let height = image.height;
 
-              // Determine the scale factor
               const scale = config.upsizeToMax
                 ? Math.min(
-                    config.maxWidth ? config.maxWidth / image.width : 1,
-                    config.maxHeight ? config.maxHeight / image.height : 1
-                  ) // Ensure dimensions do not exceed maxWidth or maxHeight
+                    maxWidth ? maxWidth / image.width : 1,
+                    maxHeight ? maxHeight / image.height : 1
+                  )
                 : Math.min(
-                    config.maxWidth ? config.maxWidth / image.width : 1,
-                    config.maxHeight ? config.maxHeight / image.height : 1
-                  ); // Downscale to fit within max dimensions
+                    maxWidth ? maxWidth / image.width : 1,
+                    maxHeight ? maxHeight / image.height : 1
+                  );
 
               width = Math.round(image.width * scale);
               height = Math.round(image.height * scale);
@@ -226,9 +233,7 @@ export async function loadCategoryIcons({
                 throw new Error('Unsupported image type for drawing on canvas');
               }
 
-              // Get image data from canvas
               const imageData = ctx.getImageData(0, 0, width, height);
-
               map.addImage(imageId, imageData);
 
               newImageWidth = width;
@@ -245,6 +250,7 @@ export async function loadCategoryIcons({
             logger.debug('Added image to map', {
               'Image ID': imageId,
               'Size': `${newImageWidth}x${newImageHeight}`,
+              'Type': isClusterIcon ? 'Cluster Icon' : 'Regular Icon',
               'Resized': resizedImage ? `Yes (from ${image.width}x${image.height})` : 'No',
               'URL': url,
             });
@@ -338,8 +344,8 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map) {
     filter: ['has', 'point_count'],
     layout: {
       'text-field': '{point_count_abbreviated}',
-      'text-size': 14,
-      'text-offset': [0, -2.5],
+      'text-size': 15,
+      'text-offset': [-0.1, -2.9],
     },
     paint: {
       'text-color': '#ffffff'
