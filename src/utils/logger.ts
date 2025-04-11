@@ -61,17 +61,26 @@ export class CustomLogger<LogObj extends Record<string, unknown>> extends Logger
   public override error(...args: unknown[]): LogObj & ILogObjMeta | undefined {
     const [firstArg, secondArg, ...params] = args;
 
-    const error = secondArg ?? firstArg;
-
     if (secondArg) {
-      const formattedError = this.format({ message: firstArg as string | Record<string, unknown>, params });
+      // If both title and error are provided
+      const formattedError = this.format({
+        message: firstArg as string | Record<string, unknown>,
+        params: [secondArg, ...params]
+      });
 
-      return super.error(formattedError);
+      const result = super.error(formattedError);
+
+      // Log the raw error separately
+      console.error(secondArg);
+
+      return result;
+    } else {
+      // If only the error is provided
+      const error = firstArg;
+      console.error(error);
+
+      return undefined;
     }
-
-    console.error(error);
-
-    return undefined;
   }
 
   public override warn(...args: unknown[]): LogObj & ILogObjMeta | undefined {
