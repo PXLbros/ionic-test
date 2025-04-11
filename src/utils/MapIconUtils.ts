@@ -4,6 +4,18 @@ import { useLogger } from '@/composables/useLogger';
 
 const logger = useLogger();
 
+export enum MapLayer {
+  MapClusterIcon = 'map-cluster-icon',
+  MapClusterCount = 'map-cluster-count',
+  MapIcon = 'map-icon',
+  ChevyCourtOverlay = 'chevy-court-overlay',
+}
+
+export enum MapSource {
+  PointsClustered = 'points-clustered',
+  ChevyCourtArea = 'chevy-court-area',
+}
+
 // Interface for category
 interface Category {
   id: number;
@@ -34,12 +46,18 @@ export interface CategoryIconLoadingConfig {
    * Optional max height to resize icons (in pixels)
    */
   maxHeight?: number;
+
+  /**
+   * If true, will resize icons to fit within the max width and height
+   */
+  upsizeToMax?: boolean;
 }
 
 const defaultCategoryIconLoadingConfig: CategoryIconLoadingConfig = {
   failOnIconError: false,
-  maxWidth: 45,
-  maxHeight: 45,
+  maxWidth: 100, // 45
+  maxHeight: 100, // TODO: Add support for different settings depending on type (cluster vs icon)
+  upsizeToMax: true,
 };
 
 /**
@@ -163,9 +181,11 @@ export async function loadCategoryIcons({
             let resizedImage = false;
 
             // If resizing is requested, use canvas
-            if ((config.maxWidth && image.width > config.maxWidth) ||
-                (config.maxHeight && image.height > config.maxHeight)) {
-
+            if (
+              (config.maxWidth && image.width > config.maxWidth) ||
+              (config.maxHeight && image.height > config.maxHeight) ||
+              config.upsizeToMax
+            ) {
               // Create a canvas to resize
               const canvas = document.createElement('canvas');
               const ctx = canvas.getContext('2d');
@@ -178,9 +198,16 @@ export async function loadCategoryIcons({
               let width = image.width;
               let height = image.height;
 
-              const widthScale = config.maxWidth ? config.maxWidth / image.width : 1;
-              const heightScale = config.maxHeight ? config.maxHeight / image.height : 1;
-              const scale = Math.min(widthScale, heightScale);
+              // Determine the scale factor
+              const scale = config.upsizeToMax
+                ? Math.min(
+                    config.maxWidth ? config.maxWidth / image.width : 1,
+                    config.maxHeight ? config.maxHeight / image.height : 1
+                  ) // Ensure dimensions do not exceed maxWidth or maxHeight
+                : Math.min(
+                    config.maxWidth ? config.maxWidth / image.width : 1,
+                    config.maxHeight ? config.maxHeight / image.height : 1
+                  ); // Downscale to fit within max dimensions
 
               width = Math.round(image.width * scale);
               height = Math.round(image.height * scale);
@@ -214,7 +241,8 @@ export async function loadCategoryIcons({
             logger.debug('Added image to map', {
               'Image ID': imageId,
               'Size': `${newImageWidth}x${newImageHeight}`,
-              'Resized': resizedImage ? 'Yes' : 'No',
+              'Resized': resizedImage ? `Yes (from ${image.width}x${image.height})` : 'No',
+              'URL': url,
             });
           }
 
@@ -247,8 +275,9 @@ export async function loadCategoryIcons({
   });
 
   // Load default icons
-  loadPromises.push(loadImage('/icons/default-category.png', 'default-vendor-icon'));
-  loadPromises.push(loadImage('/icons/default-category.png', 'default-service-icon'));
+  // loadPromises.push(loadImage('/icons/default-category.png', 'default-vendor-icon'));
+  // loadPromises.push(loadImage('/icons/default-category.png', 'default-service-icon'));
+
   loadPromises.push(loadImage('/icons/default-map-cluster-icon.png', 'default-map-cluster-icon'));
   loadPromises.push(loadImage('/icons/default-map-icon.png', 'default-map-icon'));
 
@@ -284,9 +313,9 @@ export async function loadCategoryIcons({
   }
 }
 
-export function addServiceMapClusterIconLayer(map: mapboxgl.Map) {
-  map.addLayer({
-    id: 'service-map-cluster-icon',
+export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map) {
+  mapboxMap.addLayer({
+    id: MapLayer.MapClusterIcon,
     type: 'symbol',
     source: 'points-clustered',
     filter: ['has', 'point_count'],
@@ -297,51 +326,31 @@ export function addServiceMapClusterIconLayer(map: mapboxgl.Map) {
       'icon-anchor': 'bottom',
     }
   });
-}
 
-export function addServiceMapIconLayer(map: mapboxgl.Map) {
-  map.addLayer({
-    id: 'service-map-icon',
-    type: 'symbol',
-    source: 'points-clustered',
-    filter: [
-      'all',
-      ['!', ['has', 'point_count']],
-      ['==', ['get', 'type'], 'service']
-    ],
-    layout: {
-      'icon-image': 'default-map-icon',
-      'icon-size': 0.5,
-      'icon-allow-overlap': true,
-      'icon-anchor': 'bottom',
-    }
-  });
-}
-
-export function addVendorMapClusterIconLayer(map: mapboxgl.Map) {
-  map.addLayer({
-    id: 'vendor-map-cluster-icon',
+  mapboxMap.addLayer({
+    id: MapLayer.MapClusterCount,
     type: 'symbol',
     source: 'points-clustered',
     filter: ['has', 'point_count'],
     layout: {
-      'icon-image': 'default-map-cluster-icon',
-      'icon-size': 0.5,
-      'icon-allow-overlap': true,
-      'icon-anchor': 'bottom',
+      'text-field': '{point_count_abbreviated}',
+      'text-size': 20,
+    },
+    paint: {
+      'text-color': '#ff00ff'
     }
   });
 }
 
-export function addVendorMapIconLayer(map: mapboxgl.Map) {
+export function addMapIconLayer(map: mapboxgl.Map) {
   map.addLayer({
-    id: 'vendor-map-icon',
+    id: MapLayer.MapIcon,
     type: 'symbol',
     source: 'points-clustered',
     filter: [
       'all',
       ['!', ['has', 'point_count']],
-      ['==', ['get', 'type'], 'vendor']
+      // ['==', ['get', 'type'], 'service']
     ],
     layout: {
       'icon-image': 'default-map-icon',
@@ -351,6 +360,40 @@ export function addVendorMapIconLayer(map: mapboxgl.Map) {
     }
   });
 }
+
+// export function addVendorMapClusterIconLayer(map: mapboxgl.Map) {
+//   map.addLayer({
+//     id: 'vendor-map-cluster-icon',
+//     type: 'symbol',
+//     source: 'points-clustered',
+//     filter: ['has', 'point_count'],
+//     layout: {
+//       'icon-image': 'default-map-cluster-icon',
+//       'icon-size': 0.5,
+//       'icon-allow-overlap': true,
+//       'icon-anchor': 'bottom',
+//     }
+//   });
+// }
+
+// export function addVendorMapIconLayer(map: mapboxgl.Map) {
+//   map.addLayer({
+//     id: 'vendor-map-icon',
+//     type: 'symbol',
+//     source: 'points-clustered',
+//     filter: [
+//       'all',
+//       ['!', ['has', 'point_count']],
+//       ['==', ['get', 'type'], 'vendor']
+//     ],
+//     layout: {
+//       'icon-image': 'default-map-icon',
+//       'icon-size': 0.5,
+//       'icon-allow-overlap': true,
+//       'icon-anchor': 'bottom',
+//     }
+//   });
+// }
 
 // /**
 //  * Creates the vendor icon layer

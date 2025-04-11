@@ -133,7 +133,7 @@ import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline, clos
 import mapboxgl, { Map as MapboxMap } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
-import { loadCategoryIcons, setupIconClickHandlers, addServiceMapClusterIconLayer, addServiceMapIconLayer, addVendorMapClusterIconLayer, addVendorMapIconLayer } from '@/utils/MapIconUtils';
+import { loadCategoryIcons, setupIconClickHandlers, addMapClusterIconLayer, addMapIconLayer, MapLayer, MapSource } from '@/utils/MapIconUtils';
 import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
 import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
@@ -354,7 +354,7 @@ function safeUpdateMapSource() {
     }
 
     // Check if source exists before updating
-    const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
+    const source = mapboxMap.getSource(MapSource.PointsClustered) as mapboxgl.GeoJSONSource;
 
     if (!source) {
       logger.warn('Map source "points-clustered" not found');
@@ -1007,13 +1007,13 @@ function selectSuggestion(suggestion: SearchSuggestion) {
       // Using once ensures we only respond to the first event
       mapboxMap.once('sourcedata', (e) => {
         // Check if the source is completely loaded
-        if (e.sourceId === 'points-clustered' && e.isSourceLoaded) {
+        if (e.sourceId === MapSource.PointsClustered && e.isSourceLoaded) {
           logger.info('Map source data loaded, focusing on suggestion');
           focusOnSuggestion(suggestion);
         } else {
           // If this event didn't indicate completion, wait for another one
           const checkSourceLoaded = (e: mapboxgl.MapSourceDataEvent) => {
-            if (e.sourceId === 'points-clustered') {
+            if (e.sourceId === MapSource.PointsClustered) {
               if (e.isSourceLoaded) {
                 logger.info('Map source data fully loaded, focusing on suggestion');
 
@@ -1227,7 +1227,7 @@ function loadMapOverlayImage(): Promise<void> {
 function handleClusterClick(e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) {
   if (!mapboxMap || !e.features || e.features.length === 0 || !e.features[0].properties) return;
 
-  const features = mapboxMap.queryRenderedFeatures(e.point, { layers: ['point-clusters'] });
+  const features = mapboxMap.queryRenderedFeatures(e.point, { layers: [MapLayer.MapClusterIcon] });
   if (!features || features.length === 0 || !features[0].properties) return;
 
   const clusterId = features[0].properties.cluster_id;
@@ -1236,7 +1236,8 @@ function handleClusterClick(e: mapboxgl.MapLayerEventType['click'] & mapboxgl.Ev
     return;
   }
 
-  const source = mapboxMap.getSource('points-clustered') as mapboxgl.GeoJSONSource;
+  const source = mapboxMap.getSource(MapSource.PointsClustered) as mapboxgl.GeoJSONSource;
+
   source.getClusterExpansionZoom(clusterId, (err, zoom) => {
     if (err) return;
     mapboxMap.easeTo({
@@ -1254,7 +1255,7 @@ function setupMapLayers() {
 
   try {
     // 1. Add the map overlay image source
-    mapboxMap.addSource('chevy-court-area', {
+    mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'image',
       url: '/icons/Map_Design-big-min.png',
       coordinates: [
@@ -1266,9 +1267,9 @@ function setupMapLayers() {
     });
 
     mapboxMap.addLayer({
-      id: 'chevy-court-overlay',
+      id: MapLayer.ChevyCourtOverlay,
       type: 'raster',
-      source: 'chevy-court-area',
+      source: MapSource.ChevyCourtArea,
       paint: {
         'raster-opacity': 1.0
       }
@@ -1278,7 +1279,7 @@ function setupMapLayers() {
     const filteredGeoJson = buildFilteredGeoJSON();
 
     // 3. Add GeoJSON source with initial data
-    mapboxMap.addSource('points-clustered', {
+    mapboxMap.addSource(MapSource.PointsClustered, {
       type: 'geojson',
       data: filteredGeoJson,
       cluster: true,
@@ -1286,48 +1287,49 @@ function setupMapLayers() {
       clusterMaxZoom: 14
     });
 
-    // 4. Add cluster layers
-    mapboxMap.addLayer({
-      id: 'point-clusters',
-      type: 'circle',
-      source: 'points-clustered',
-      filter: ['has', 'point_count'],
-      paint: {
-        'circle-color': '#1E5EAE',
-        'circle-radius': 16,
-        'circle-stroke-width': 1,
-        'circle-stroke-color': '#fff'
-      }
-    });
+    // // 4. Add cluster layers
+    // mapboxMap.addLayer({
+    //   id: MapLayer.MapClusterIcon,
+    //   type: 'circle',
+    //   source: MapSource.PointsClustered,
+    //   filter: ['has', 'point_count'],
+    //   paint: {
+    //     'circle-color': '#1E5EAE',
+    //     'circle-radius': 16,
+    //     'circle-stroke-width': 1,
+    //     'circle-stroke-color': '#fff'
+    //   }
+    // });
 
-    mapboxMap.addLayer({
-      id: 'point-cluster-count',
-      type: 'symbol',
-      source: 'points-clustered',
-      filter: ['has', 'point_count'],
-      layout: {
-        'text-field': '{point_count_abbreviated}',
-        'text-size': 12
-      },
-      paint: {
-        'text-color': '#ffffff'
-      }
-    });
+    // mapboxMap.addLayer({
+    //   id: MapLayer.MapClusterCount,
+    //   type: 'symbol',
+    //   source: MapSource.PointsClustered,
+    //   filter: ['has', 'point_count'],
+    //   layout: {
+    //     'text-field': '{point_count_abbreviated}',
+    //     'text-size': 12
+    //   },
+    //   paint: {
+    //     'text-color': '#ffffff'
+    //   }
+    // });
 
     // 5. Add icon layers
     // addVendorIconLayer(mapboxMap);
     // addServiceIconLayer(mapboxMap);
 
-    addServiceMapClusterIconLayer(mapboxMap);
-    addServiceMapIconLayer(mapboxMap);
-    addVendorMapClusterIconLayer(mapboxMap);
-    addVendorMapIconLayer(mapboxMap);
+    addMapClusterIconLayer(mapboxMap);
+    // addVendorMapClusterIconLayer(mapboxMap);
+
+    addMapIconLayer(mapboxMap);
+    // addVendorMapIconLayer(mapboxMap);
 
     // 6. Setup icon click handlers and store the cleanup function
     iconClickHandlersCleanup = setupIconClickHandlers(mapboxMap, getCategoryName);
 
     // 7. Optional: Handle cluster clicks
-    mapboxMap.on('click', 'point-clusters', handleClusterClick);
+    mapboxMap.on('click', MapLayer.MapClusterIcon, handleClusterClick);
 
     // 8. Wait for the map to be fully rendered
     mapboxMap.once('idle', () => {
@@ -1385,7 +1387,7 @@ function destroyMap() {
       }
 
       // Remove cluster click handler
-      mapboxMap.off('click', 'point-clusters', handleClusterClick);
+      mapboxMap.off('click', MapLayer.MapClusterIcon, handleClusterClick);
 
       // Remove basic map event handlers
       // mapboxMap.off('load');
