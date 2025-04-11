@@ -59,7 +59,7 @@
                 v-for="map in allMaps"
                 :key="map.id"
                 class="dropdown-item"
-                :class="{ 'active': map.id === currentMapId }"
+                :class="{ 'active': map.slug === currentMapSlug }"
                 @click="selectMap(map)"
               >
                 {{ map.name }}
@@ -130,7 +130,7 @@ import {
   IonContent,
 } from '@ionic/vue';
 import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline, closeOutline } from 'ionicons/icons';
-import mapboxgl, { Map } from 'mapbox-gl';
+import mapboxgl, { Map as MapboxMap } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
 import { loadCategoryIcons, addVendorIconLayer, addServiceIconLayer, setupIconClickHandlers, addServiceMapClusterIconLayer, addServiceMapIconLayer } from '@/utils/MapIconUtils';
@@ -151,8 +151,9 @@ const DEFAULT_MAP_BEARING = 222;
 const isLoadingMap = ref(true);
 
 const mapContainer = ref<HTMLElement | null>(null);
+
 const showMapDropdown = ref(false);
-const currentMapId = ref<number | null>(null);
+const currentMapSlug = ref<string | null>(null);
 const searchQuery = ref('');
 const searchDebounceTimeout = ref<number | null>(null);
 const btnGroup = ref<HTMLElement | null>(null);
@@ -182,34 +183,75 @@ const vendorCategories = dataStore.data.nysfairWebsite.vendor_categories;
 const serviceMaps = dataStore.data.nysfairWebsite.service_maps;
 const vendorMaps = dataStore.data.nysfairWebsite.vendor_maps;
 
-// Combine service maps and vendor maps for the dropdown
+// Combine service maps and vendor maps for the dropdown, deduplicating by slug
 const allMaps = computed(() => {
-  // Start with service maps
-  const combinedMaps = [...serviceMaps];
+  // Create a Map to track unique slugs - rename to avoid conflict with mapboxgl.Map
+  const uniqueSlugsMap = new Map<string, ServiceMap>();
 
-  // Add vendor maps if they don't already exist in the combined list
-  vendorMaps.forEach((vendorMap: ServiceMap) => {
-    if (!combinedMaps.some(map => map.id === vendorMap.id)) {
-      combinedMaps.push(vendorMap);
+  // First add all service maps - these take precedence
+  serviceMaps.forEach((serviceMap: ServiceMap) => {
+    if (serviceMap.slug) {
+      uniqueSlugsMap.set(serviceMap.slug, serviceMap);
     }
   });
+
+  // Then add vendor maps only if their slug isn't already used
+  vendorMaps.forEach((vendorMap: ServiceMap) => {
+    if (vendorMap.slug && !uniqueSlugsMap.has(vendorMap.slug)) {
+      uniqueSlugsMap.set(vendorMap.slug, vendorMap);
+    }
+  });
+
+  // Convert the Map values back to array
+  const combinedMaps = Array.from(uniqueSlugsMap.values());
+
+  console.log('combinedMaps', combinedMaps);
 
   return combinedMaps;
 });
 
-// Find the master map ID
-const masterMap = allMaps.value.find((map: any) => map.slug === 'master');
-currentMapId.value = masterMap?.id ?? allMaps.value[0]?.id ?? null;
+// Store all maps (both vendor and service) keyed by slug for reference
+const allMapsBySlug = computed(() => {
+  const mapsBySlug: Record<string, ServiceMap[]> = {};
 
-// Get the current map name for display
+  // Add all service maps
+  serviceMaps.forEach((map: ServiceMap) => {
+    if (!map.slug) return;
+
+    if (!mapsBySlug[map.slug]) {
+      mapsBySlug[map.slug] = [];
+    }
+    mapsBySlug[map.slug].push(map);
+  });
+
+  // Add all vendor maps
+  vendorMaps.forEach((map: ServiceMap) => {
+    if (!map.slug) return;
+
+    if (!mapsBySlug[map.slug]) {
+      mapsBySlug[map.slug] = [];
+    }
+    mapsBySlug[map.slug].push(map);
+  });
+
+  console.log('mapsBySlug', mapsBySlug);
+
+  return mapsBySlug;
+});
+
+// Find the master map by its slug
+const masterMap = allMaps.value.find((map: any) => map.slug === 'master');
+currentMapSlug.value = masterMap?.slug ?? allMaps.value[0]?.slug ?? null;
+
+// Get the current map name for display using the slug
 const currentMapName = computed(() => {
-  const map = allMaps.value.find((m: any) => m.id === currentMapId.value);
+  const map = allMaps.value.find((m: any) => m.slug === currentMapSlug.value);
   return map ? map.name : 'Maps';
 });
 
-// Filter categories based on the current map
+// Filter categories based on the current map slug
 const filteredCategories = computed(() => {
-  if (!currentMapId.value) {
+  if (!currentMapSlug.value) {
     return [];
   }
 
@@ -219,15 +261,24 @@ const filteredCategories = computed(() => {
     ...vendorCategories
   ];
 
-  // Filter to only show categories related to the current map
+  // Filter to only show categories related to the current map by slug
   return combinedCategories.filter((category: Category) => {
-    // Check if the category has a maps array and includes the current map ID
-    return Array.isArray(category.maps) && category.maps.includes(currentMapId.value as number);
+    // Check if the category has a map_slugs array and includes the current map slug
+    return (
+      (Array.isArray(category.map_slugs) && category.map_slugs.includes(currentMapSlug.value as string)) ||
+      // For backward compatibility, also check map IDs
+      (Array.isArray(category.maps) &&
+        category.maps.some(mapId => {
+          const matchingMap = allMaps.value.find(m => m.id === mapId && m.slug === currentMapSlug.value);
+          return !!matchingMap;
+        })
+      )
+    );
   });
 });
 
-// Map reference
-let mapboxMap: Map;
+// Map reference - update the type to use the renamed import
+let mapboxMap: MapboxMap;
 // Store icon click handler cleanup function
 let iconClickHandlersCleanup: (() => void) | null = null;
 
@@ -248,13 +299,13 @@ function closeDropdownOnOutsideClick(event: MouseEvent) {
   }
 }
 
-// Select a map type and update the display with improved handling
+// Select a map type using slug instead of ID
 function selectMap(mapData: ServiceMap) {
-  // Store previous map ID for comparison
-  const previousMapId = currentMapId.value;
+  // Store previous map slug for comparison
+  const previousMapSlug = currentMapSlug.value;
 
-  // Update current map ID and close dropdown
-  currentMapId.value = mapData.id;
+  // Update current map slug and close dropdown
+  currentMapSlug.value = mapData.slug;
   showMapDropdown.value = false;
 
   // Reset search and filters
@@ -262,11 +313,12 @@ function selectMap(mapData: ServiceMap) {
   clearCategoryFilters();
 
   // Check if this is a significant map change
-  const isDifferentMap = previousMapId !== mapData.id;
+  const isDifferentMap = previousMapSlug !== mapData.slug;
 
   if (isDifferentMap) {
     logger.info('Switching map', {
       'ID': mapData.id,
+      'Slug': mapData.slug,
       'Name': mapData.name,
     });
   }
@@ -304,15 +356,15 @@ function applyFilters() {
   showFiltersPanel.value = false;
 }
 
-// Update the map data based on the selected map type and filters
+// Update the map data based on the selected map slug and filters
 function updateMapForSelectedType() {
   if (!mapboxMap) {
     logger.warn('Cannot update map: Map not initialized');
     return;
   }
 
-  if (!currentMapId.value) {
-    logger.warn('Cannot update map: No map ID selected');
+  if (!currentMapSlug.value) {
+    logger.warn('Cannot update map: No map slug selected');
     return;
   }
 
@@ -344,7 +396,6 @@ function safeUpdateMapSource() {
 
     if (!source) {
       logger.warn('Map source "points-clustered" not found');
-
       return;
     }
 
@@ -355,7 +406,7 @@ function safeUpdateMapSource() {
     source.setData(filteredGeoJson);
 
     logger.info('Updated map source with new data', {
-      'Map ID': currentMapId.value,
+      'Map Slug': currentMapSlug.value,
       'Features': filteredGeoJson.features.length,
     });
   } catch (error) {
@@ -448,9 +499,10 @@ function generateInitialSuggestions() {
   }
 
   // Get map names for lookup
-  const mapNamesById: Record<number, string> = {};
+  const mapNamesBySlug: Record<string, string> = {};
+
   allMaps.value.forEach((map: ServiceMap) => {
-    mapNamesById[map.id] = map.name;
+    mapNamesBySlug[map.slug] = map.name;
   });
 
   // Vendor suggestions - get from ALL maps
@@ -470,8 +522,10 @@ function generateInitialSuggestions() {
       // Only take the first location for the suggestion
       const location = v.locations && v.locations.length > 0 ? v.locations[0] : null;
 
-      // Get map ID (first one if multiple)
-      const mapId = Array.isArray(v.maps) && v.maps.length > 0 ? v.maps[0] : null;
+      // Get map slug (first one if multiple)
+      const mapSlug = Array.isArray(v.map_slugs) && v.map_slugs.length > 0 ? v.map_slugs[0] :
+                     (Array.isArray(v.maps) && v.maps.length > 0 ?
+                      (allMaps.value.find(m => m.id === v.maps[0])?.slug || null) : null);
 
       return {
         id: v.id,
@@ -481,8 +535,8 @@ function generateInitialSuggestions() {
         latitude: location ? parseFloat(location.latitude) : 0,
         longitude: location ? parseFloat(location.longitude) : 0,
         categories: [...normalizeCategories(v.categories || [])],
-        mapId: mapId,
-        mapName: mapId ? mapNamesById[mapId] : null
+        mapSlug: mapSlug,
+        mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
     });
 
@@ -500,8 +554,10 @@ function generateInitialSuggestions() {
       return s.latitude && s.longitude;
     })
     .map((s: any) => {
-      // Get map ID (first one if multiple)
-      const mapId = Array.isArray(s.maps) && s.maps.length > 0 ? s.maps[0] : null;
+      // Get map slug (first one if multiple)
+      const mapSlug = Array.isArray(s.map_slugs) && s.map_slugs.length > 0 ? s.map_slugs[0] :
+                     (Array.isArray(s.maps) && s.maps.length > 0 ?
+                      (allMaps.value.find(m => m.id === s.maps[0])?.slug || null) : null);
 
       return {
         id: s.id,
@@ -511,8 +567,8 @@ function generateInitialSuggestions() {
         latitude: parseFloat(s.latitude) || 0,
         longitude: parseFloat(s.longitude) || 0,
         categories: [...normalizeCategories(s.categories || [])],
-        mapId: mapId,
-        mapName: mapId ? mapNamesById[mapId] : null
+        mapSlug: mapSlug,
+        mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
     });
 
@@ -525,7 +581,7 @@ function generateInitialSuggestions() {
   filteredSuggestions.value = sortedSuggestions.slice(0, maxSuggestionsToShow);
 }
 
-// Reset search and filters
+// Reset search and filters - fix the slug-based reset
 function resetFilters() {
   searchQuery.value = '';
   showSearchSuggestions.value = false;
@@ -535,9 +591,9 @@ function resetFilters() {
 
   // Reset to master map if it exists, otherwise use the first map
   if (masterMap) {
-    currentMapId.value = masterMap.id;
+    currentMapSlug.value = masterMap.slug;
   } else if (allMaps.value.length > 0) {
-    currentMapId.value = allMaps.value[0].id;
+    currentMapSlug.value = allMaps.value[0].slug;
   }
 
   // Close any open popups
@@ -635,28 +691,31 @@ function normalizeCategories(categories: any) {
   }
 }
 
-// Convert vendors to GeoJSON features
+// Convert vendors to GeoJSON features using map slug instead of ID
 function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperties>> {
-  // Apply filtering by map ID and search query
+  // Apply filtering by map slug and search query
   let filteredVendors = vendors
     .filter((vendor) => vendor.locations && vendor.locations.length > 0);
 
-  console.log('filteredVendors', filteredVendors);
-
-  // Filter by map ID for all maps, including master
-  // TODO: PROBLEM HERE WITH USING currentMapId because currentMapId will be a vendor OR service.
-  // Either also save the name of the map, or save both the service and vendor map ids as current maps (if they have)
-  // ...
-  if (currentMapId.value !== null) {
-    console.log('currentMapId.value: ', currentMapId.value);
-
+  // Filter by map slug for all maps, including master
+  if (currentMapSlug.value !== null) {
     filteredVendors = filteredVendors.filter((vendor) => {
-      console.log('vendor.maps', vendor.maps);
-      // Check if the vendor has maps array and it includes the current map ID
-      return Array.isArray(vendor.maps) && vendor.maps.includes(currentMapId.value);
-    });
+      // Check if the vendor has map_slugs array and it includes the current map slug
+      if (Array.isArray(vendor.map_slugs) && vendor.map_slugs.includes(currentMapSlug.value)) {
+        return true;
+      }
 
-    console.log ('filteredVendors #2', filteredVendors);
+      // Fallback to checking map IDs against maps with matching slugs
+      if (Array.isArray(vendor.maps)) {
+        // Get all maps with current slug (both vendor and service maps)
+        const mapsWithSlug = allMapsBySlug.value[currentMapSlug.value] || [];
+
+        // Check if vendor maps array includes any of these map IDs
+        return mapsWithSlug.some(map => vendor.maps.includes(map.id));
+      }
+
+      return false;
+    });
   }
 
   // Apply search filtering
@@ -696,15 +755,28 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
   }));
 }
 
-// Convert services to GeoJSON features, filtering by map ID if needed
+// Convert services to GeoJSON features using map slug instead of ID
 function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServiceProperties>> {
   let filteredServices = services;
 
-  // Filter services by map ID for all maps, including master
-  if (currentMapId.value !== null) {
+  // Filter services by map slug for all maps
+  if (currentMapSlug.value !== null) {
     filteredServices = services.filter((s) => {
-      // Check if the service is in the selected map
-      return Array.isArray(s.maps) && s.maps.includes(currentMapId.value);
+      // Check if the service has map_slugs array and it includes the current map slug
+      if (Array.isArray(s.map_slugs) && s.map_slugs.includes(currentMapSlug.value)) {
+        return true;
+      }
+
+      // Fallback to checking map IDs against maps with matching slugs
+      if (Array.isArray(s.maps)) {
+        // Get all maps with current slug (both vendor and service maps)
+        const mapsWithSlug = allMapsBySlug.value[currentMapSlug.value] || [];
+
+        // Check if service maps array includes any of these map IDs
+        return mapsWithSlug.some(map => s.maps.includes(map.id));
+      }
+
+      return false;
     });
   }
 
@@ -750,7 +822,6 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
 // Build GeoJSON for the currently selected map type
 function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
   const rawVendors = cloneDeep(vendors);
-  console.log('rawVendors', rawVendors);
   const rawServices = cloneDeep(services);
 
   const vendorFeatures = buildVendorGeoJSON(rawVendors);
@@ -801,9 +872,9 @@ function generateSearchSuggestions() {
   const query = searchQuery.value.toLowerCase().trim();
 
   // Get map names for lookup
-  const mapNamesById: Record<number, string> = {};
+  const mapNamesBySlug: Record<string, string> = {};
   allMaps.value.forEach((map: ServiceMap) => {
-    mapNamesById[map.id] = map.name;
+    mapNamesBySlug[map.slug] = map.name;
   });
 
   // Generate suggestions from vendors - from ALL maps
@@ -824,8 +895,10 @@ function generateSearchSuggestions() {
       // Only take the first location for the suggestion
       const location = v.locations && v.locations.length > 0 ? v.locations[0] : null;
 
-      // Get map ID (first one if multiple)
-      const mapId = Array.isArray(v.maps) && v.maps.length > 0 ? v.maps[0] : null;
+      // Get map slug (first one if multiple)
+      const mapSlug = Array.isArray(v.map_slugs) && v.map_slugs.length > 0 ? v.map_slugs[0] :
+                     (Array.isArray(v.maps) && v.maps.length > 0 ?
+                      (allMaps.value.find(m => m.id === v.maps[0])?.slug || null) : null);
 
       return {
         id: v.id,
@@ -835,8 +908,8 @@ function generateSearchSuggestions() {
         latitude: location ? parseFloat(location.latitude) : 0,
         longitude: location ? parseFloat(location.longitude) : 0,
         categories: [...normalizeCategories(v.categories || [])],
-        mapId: mapId,
-        mapName: mapId ? mapNamesById[mapId] : null
+        mapSlug: mapSlug,
+        mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
     });
 
@@ -855,8 +928,10 @@ function generateSearchSuggestions() {
              (s.description && s.description.toLowerCase().includes(query));
     })
     .map((s: any) => {
-      // Get map ID (first one if multiple)
-      const mapId = Array.isArray(s.maps) && s.maps.length > 0 ? s.maps[0] : null;
+      // Get map slug (first one if multiple)
+      const mapSlug = Array.isArray(s.map_slugs) && s.map_slugs.length > 0 ? s.map_slugs[0] :
+                     (Array.isArray(s.maps) && s.maps.length > 0 ?
+                      (allMaps.value.find(m => m.id === s.maps[0])?.slug || null) : null);
 
       return {
         id: s.id,
@@ -866,8 +941,8 @@ function generateSearchSuggestions() {
         latitude: parseFloat(s.latitude) || 0,
         longitude: parseFloat(s.longitude) || 0,
         categories: [...normalizeCategories(s.categories || [])],
-        mapId: mapId,
-        mapName: mapId ? mapNamesById[mapId] : null
+        mapSlug: mapSlug,
+        mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
     });
 
@@ -877,8 +952,8 @@ function generateSearchSuggestions() {
   // Sort suggestions: first current map, then by relevance (exact match > starts with > contains)
   const sortedSuggestions = combinedSuggestions.sort((a, b) => {
     // First priority: current map items
-    const aInCurrentMap = a.mapId === currentMapId.value;
-    const bInCurrentMap = b.mapId === currentMapId.value;
+    const aInCurrentMap = a.mapSlug === currentMapSlug.value;
+    const bInCurrentMap = b.mapSlug === currentMapSlug.value;
 
     if (aInCurrentMap && !bInCurrentMap) return -1;
     if (!aInCurrentMap && bInCurrentMap) return 1;
@@ -905,24 +980,24 @@ function generateSearchSuggestions() {
   filteredSuggestions.value = sortedSuggestions.slice(0, maxSuggestionsToShow);
 }
 
-// Select a suggestion
+// Select a suggestion - with slug-based logic
 function selectSuggestion(suggestion: SearchSuggestion) {
   searchQuery.value = suggestion.name;
   showSearchSuggestions.value = false;
 
-  const needsMapChange = suggestion.mapId !== currentMapId.value;
+  const needsMapChange = suggestion.mapSlug !== currentMapSlug.value;
 
-  logger.info(`Suggestion clicked (Current Map ID: ${currentMapId.value} | Suggestion Map ID: ${suggestion.mapId} | Needs Map Change: ${needsMapChange ? 'Yes' : 'No'})`);
+  logger.info(`Suggestion clicked (Current Map Slug: ${currentMapSlug.value} | Suggestion Map Slug: ${suggestion.mapSlug} | Needs Map Change: ${needsMapChange ? 'Yes' : 'No'})`);
 
   // First check if we need to switch maps
-  if (suggestion.mapId && needsMapChange) {
+  if (suggestion.mapSlug && needsMapChange) {
     // Find the map data
-    const mapData = allMaps.value.find((map: ServiceMap) => map.id === suggestion.mapId);
+    const mapData = allMaps.value.find((map: ServiceMap) => map.slug === suggestion.mapSlug);
 
     if (mapData) {
       // Switch to the correct map first
-      currentMapId.value = mapData.id;
-      logger.info(`Switched map (Map ID: ${mapData.id} | Map Name: ${mapData.name})`);
+      currentMapSlug.value = mapData.slug;
+      logger.info(`Switched map (Map ID: ${mapData.id} | Map Slug: ${mapData.slug} | Map Name: ${mapData.name})`);
 
       // Update the map data first
       updateMapForSelectedType();
@@ -945,26 +1020,16 @@ function selectSuggestion(suggestion: SearchSuggestion) {
 
                 // Cleanup the event listener
                 mapboxMap.off('sourcedata', checkSourceLoaded);
-              } else {
-                // console.log('not loaded yet..');
               }
             }
           };
 
           // Set up listener for complete load
           mapboxMap.on('sourcedata', checkSourceLoaded);
-
-          // // Safety timeout as a fallback (much longer than before)
-          // setTimeout(() => {
-          //   // If we're still waiting, focus anyway and clean up the listener
-          //   logger.warn('Timeout reached waiting for source data, focusing anyway');
-          //   mapboxMap.off('sourcedata', checkSourceLoaded);
-          //   focusOnSuggestion(suggestion);
-          // }, 2000);
         }
       });
     } else {
-      logger.warn(`Could not find map to switch to (Map ID: ${suggestion.mapId})`);
+      logger.warn(`Could not find map to switch to (Map Slug: ${suggestion.mapSlug})`);
       // If map not found, just focus on point in current map
       focusOnSuggestion(suggestion);
     }
@@ -1269,7 +1334,7 @@ function setupMapLayers() {
       finalizeMapSetup();
     });
   } catch (error) {
-    logger.error('Error setting up map layers:', error);
+    logger.error(error);
     isLoadingMap.value = false;
     dataStore.hideLoader();
   }
