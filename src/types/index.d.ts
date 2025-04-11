@@ -89,6 +89,7 @@ interface Category {
   num_services?: number;
   num_vendors?: number;
   maps?: number[];
+  map_slugs: string[];
 }
 
 interface SearchSuggestion {
@@ -101,6 +102,7 @@ interface SearchSuggestion {
   categories?: number[];
   mapId?: number;
   mapName?: string;
+  mapSlug?: string;
 }
 
 interface FairgroundsVenue {

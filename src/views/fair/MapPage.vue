@@ -133,7 +133,7 @@ import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline, clos
 import mapboxgl, { Map as MapboxMap } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
-import { loadCategoryIcons, addVendorIconLayer, addServiceIconLayer, setupIconClickHandlers, addServiceMapClusterIconLayer, addServiceMapIconLayer } from '@/utils/MapIconUtils';
+import { loadCategoryIcons, setupIconClickHandlers, addServiceMapClusterIconLayer, addServiceMapIconLayer, addVendorMapClusterIconLayer, addVendorMapIconLayer } from '@/utils/MapIconUtils';
 import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
 import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
@@ -205,38 +205,7 @@ const allMaps = computed(() => {
   // Convert the Map values back to array
   const combinedMaps = Array.from(uniqueSlugsMap.values());
 
-  console.log('combinedMaps', combinedMaps);
-
   return combinedMaps;
-});
-
-// Store all maps (both vendor and service) keyed by slug for reference
-const allMapsBySlug = computed(() => {
-  const mapsBySlug: Record<string, ServiceMap[]> = {};
-
-  // Add all service maps
-  serviceMaps.forEach((map: ServiceMap) => {
-    if (!map.slug) return;
-
-    if (!mapsBySlug[map.slug]) {
-      mapsBySlug[map.slug] = [];
-    }
-    mapsBySlug[map.slug].push(map);
-  });
-
-  // Add all vendor maps
-  vendorMaps.forEach((map: ServiceMap) => {
-    if (!map.slug) return;
-
-    if (!mapsBySlug[map.slug]) {
-      mapsBySlug[map.slug] = [];
-    }
-    mapsBySlug[map.slug].push(map);
-  });
-
-  console.log('mapsBySlug', mapsBySlug);
-
-  return mapsBySlug;
 });
 
 // Find the master map by its slug
@@ -265,14 +234,7 @@ const filteredCategories = computed(() => {
   return combinedCategories.filter((category: Category) => {
     // Check if the category has a map_slugs array and includes the current map slug
     return (
-      (Array.isArray(category.map_slugs) && category.map_slugs.includes(currentMapSlug.value as string)) ||
-      // For backward compatibility, also check map IDs
-      (Array.isArray(category.maps) &&
-        category.maps.some(mapId => {
-          const matchingMap = allMaps.value.find(m => m.id === mapId && m.slug === currentMapSlug.value);
-          return !!matchingMap;
-        })
-      )
+      (Array.isArray(category.map_slugs) && category.map_slugs.includes(currentMapSlug.value as string))
     );
   });
 });
@@ -555,18 +517,17 @@ function generateInitialSuggestions() {
         mapName: effectiveMapName
       };
     })
-    .filter(v => v && v.latitude && v.longitude); // Only include vendors with valid coordinates
+    .filter((v: any) => v && v.latitude && v.longitude); // Only include vendors with valid coordinates
 
   const query = searchQuery.value.toLowerCase().trim();
 
-  // Service suggestions - get from ALL maps
   const serviceSuggestions = services
     .filter((s: any) => {
       // Only include services that match the search query
-      const titleMatch = s.title && s.title.toLowerCase().includes(query);
+      const nameMatch = s.name && s.name.toLowerCase().includes(query);
       const descriptionMatch = s.description && s.description.toLowerCase().includes(query);
 
-      if (!titleMatch && !descriptionMatch) {
+      if (!nameMatch && !descriptionMatch) {
         return false;
       }
 
@@ -596,7 +557,7 @@ function generateInitialSuggestions() {
 
       return {
         id: s.id,
-        name: s.title || 'Unknown Service',
+        name: s.name || 'Unknown Service',
         description: s.description || '',
         type: 'service' as const,
         latitude: parseFloat(s.latitude) || 0,
@@ -606,7 +567,7 @@ function generateInitialSuggestions() {
         mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
     })
-    .filter(s => s.mapSlug && s.mapName); // Ensure only services with valid map info are included
+    .filter((s: any) => s.mapSlug && s.mapName); // Ensure only services with valid map info are included
 
   // Combine and limit the suggestions
   // First sort by name for better usability
@@ -741,15 +702,6 @@ function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperti
         return true;
       }
 
-      // Fallback to checking map IDs against maps with matching slugs
-      if (Array.isArray(vendor.maps)) {
-        // Get all maps with current slug (both vendor and service maps)
-        const mapsWithSlug = allMapsBySlug.value[currentMapSlug.value] || [];
-
-        // Check if vendor maps array includes any of these map IDs
-        return mapsWithSlug.some(map => vendor.maps.includes(map.id));
-      }
-
       return false;
     });
   }
@@ -797,19 +749,10 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
 
   // Filter services by map slug for all maps
   if (currentMapSlug.value !== null) {
-    filteredServices = services.filter((s) => {
+    filteredServices = services.filter((service) => {
       // Check if the service has map_slugs array and it includes the current map slug
-      if (Array.isArray(s.map_slugs) && s.map_slugs.includes(currentMapSlug.value)) {
+      if (Array.isArray(service.map_slugs) && service.map_slugs.includes(currentMapSlug.value)) {
         return true;
-      }
-
-      // Fallback to checking map IDs against maps with matching slugs
-      if (Array.isArray(s.maps)) {
-        // Get all maps with current slug (both vendor and service maps)
-        const mapsWithSlug = allMapsBySlug.value[currentMapSlug.value] || [];
-
-        // Check if service maps array includes any of these map IDs
-        return mapsWithSlug.some(map => s.maps.includes(map.id));
       }
 
       return false;
@@ -819,9 +762,9 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
   // Apply search filtering
   if (searchQuery.value.trim() !== '') {
     const query = searchQuery.value.toLowerCase();
-    filteredServices = filteredServices.filter(s =>
-      (s.title && s.title.toLowerCase().includes(query)) ||
-      (s.description && s.description.toLowerCase().includes(query))
+    filteredServices = filteredServices.filter(service =>
+      (service.name && service.name.toLowerCase().includes(query)) ||
+      (service.description && service.description.toLowerCase().includes(query))
     );
   }
 
@@ -837,7 +780,7 @@ function buildServiceGeoJSON(services: any[]): Array<Feature<Point, ServicePrope
       return {
         type: 'Feature' as const,
         properties: {
-          title: s.title ?? 'Unknown Service',
+          title: s.name ?? 'Unknown Service',
           description: s.description ?? '',
           id: s.id,
           is_accessible: Boolean(s.is_accessible),
@@ -913,114 +856,96 @@ function generateSearchSuggestions() {
     mapNamesBySlug[map.slug] = map.name;
   });
 
-  // Vendor suggestions - get from ALL maps
-  const vendorSuggestions = vendors
-    .filter((v: any) => {
-      // Only include vendors that match the search query
-      const nameMatch = v.name && v.name.toLowerCase().includes(query);
-      const descriptionMatch = v.description && v.description.toLowerCase().includes(query);
+  // Generic filtering function that works for both vendors and services
+  const filterItems = (items: any[], isVendor: boolean) => {
+    return items.filter(item => {
+      // Check if name/title or description matches the query
+      const nameMatch = item.name && item.name.toLowerCase().includes(query);
+      const descriptionMatch = item.description && item.description.toLowerCase().includes(query);
 
       if (!nameMatch && !descriptionMatch) {
         return false;
       }
 
-      // Check if vendor belongs to at least one map
-      const hasMapSlug = Array.isArray(v.map_slugs) && v.map_slugs.length > 0;
-      const hasMapId = Array.isArray(v.maps) && v.maps.length > 0;
+      // Check if item belongs to at least one map
+      const hasMapSlug = Array.isArray(item.map_slugs) && item.map_slugs.length > 0;
+      const hasMapId = Array.isArray(item.maps) && item.maps.length > 0;
 
       if (!hasMapSlug && !hasMapId) {
         return false;
       }
 
-      // Check if vendor has valid locations
-      if (!v.locations || v.locations.length === 0) {
-        return false;
+      // Check coordinates validity
+      if (isVendor) {
+        // Vendors need valid locations array
+        if (!item.locations || item.locations.length === 0) {
+          return false;
+        }
+      } else {
+        // Services need latitude and longitude
+        if (!item.latitude || !item.longitude) {
+          return false;
+        }
       }
 
       // Filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
-        if (!v.categories || !v.categories.some((catId: number) => selectedCategories.value[catId])) {
+        if (!item.categories || !item.categories.some((catId: number) => selectedCategories.value[catId])) {
           return false;
         }
       }
 
       return true;
-    })
-    .map((v: any) => {
-      // Only take the first location for the suggestion
-      const location = v.locations && v.locations.length > 0 ? v.locations[0] : null;
+    });
+  };
 
-      // Get map slug (first one if multiple)
-      const mapSlug = Array.isArray(v.map_slugs) && v.map_slugs.length > 0 ? v.map_slugs[0] :
-                     (Array.isArray(v.maps) && v.maps.length > 0 ?
-                      (allMaps.value.find(m => m.id === v.maps[0])?.slug || null) : null);
+  // Generic mapping function that works for both vendors and services
+  const mapToSuggestion = (item: any, isVendor: boolean): SearchSuggestion | null => {
+    // Get location data
+    let lat = 0, lng = 0;
+    if (isVendor) {
+      const location = item.locations && item.locations.length > 0 ? item.locations[0] : null;
+      if (!location) return null;
+      lat = parseFloat(location.latitude) || 0;
+      lng = parseFloat(location.longitude) || 0;
+    } else {
+      lat = parseFloat(item.latitude) || 0;
+      lng = parseFloat(item.longitude) || 0;
+    }
 
-      // If no map is associated, use the current map as fallback
-      const effectiveMapSlug = mapSlug || currentMapSlug.value;
-      const effectiveMapName = effectiveMapSlug ? mapNamesBySlug[effectiveMapSlug] : 'General Map';
+    // Get map slug
+    const mapSlug = Array.isArray(item.map_slugs) && item.map_slugs.length > 0 ? item.map_slugs[0] :
+                   (Array.isArray(item.maps) && item.maps.length > 0 ?
+                    (allMaps.value.find(m => m.id === item.maps[0])?.slug || null) : null);
 
-      return {
-        id: v.id,
-        name: v.name || 'Unknown Vendor',
-        description: v.description || '',
-        type: 'vendor' as const,
-        latitude: parseFloat(location.latitude) || 0,
-        longitude: parseFloat(location.longitude) || 0,
-        categories: [...normalizeCategories(v.categories || [])],
-        mapSlug: effectiveMapSlug,
-        mapName: effectiveMapName
-      };
-    })
-    .filter(v => v && v.latitude && v.longitude); // Only include vendors with valid coordinates
+    // Get map name
+    const effectiveMapSlug = mapSlug || currentMapSlug.value;
+    const effectiveMapName = effectiveMapSlug ? mapNamesBySlug[effectiveMapSlug] : 'General Map';
 
-  // Service suggestions - get from ALL maps
-  const serviceSuggestions = services
-    .filter((s: any) => {
-      // Only include services that match the search query
-      const titleMatch = s.title && s.title.toLowerCase().includes(query);
-      const descriptionMatch = s.description && s.description.toLowerCase().includes(query);
+    return {
+      id: item.id,
+      name: (item.name || (isVendor ? 'Unknown Vendor' : 'Unknown Service')),
+      description: item.description || '',
+      type: isVendor ? 'vendor' : 'service',
+      latitude: lat,
+      longitude: lng,
+      categories: [...normalizeCategories(item.categories || [])],
+      mapSlug: effectiveMapSlug,
+      mapName: effectiveMapName
+    };
+  };
 
-      if (!titleMatch && !descriptionMatch) {
-        return false;
-      }
+  // Process vendors
+  const filteredVendors = filterItems(vendors, true);
+  const vendorSuggestions = filteredVendors
+    .map(v => mapToSuggestion(v, true))
+    .filter(Boolean) as SearchSuggestion[];
 
-      // Only include services that belong to at least one map
-      const hasMapSlug = Array.isArray(s.map_slugs) && s.map_slugs.length > 0;
-      const hasMapId = Array.isArray(s.maps) && s.maps.length > 0;
-
-      if (!hasMapSlug && !hasMapId) {
-        return false;
-      }
-
-      // Only filter by category if selected
-      if (Object.values(selectedCategories.value).some(selected => selected)) {
-        if (!s.categories || !s.categories.some((catId: number) => selectedCategories.value[catId])) {
-          return false;
-        }
-      }
-
-      // Make sure it has coordinates
-      return s.latitude && s.longitude;
-    })
-    .map((s: any) => {
-      // Get map slug (first one if multiple)
-      const mapSlug = Array.isArray(s.map_slugs) && s.map_slugs.length > 0 ? s.map_slugs[0] :
-                     (Array.isArray(s.maps) && s.maps.length > 0 ?
-                      (allMaps.value.find(m => m.id === s.maps[0])?.slug || null) : null);
-
-      return {
-        id: s.id,
-        name: s.title || 'Unknown Service',
-        description: s.description || '',
-        type: 'service' as const,
-        latitude: parseFloat(s.latitude) || 0,
-        longitude: parseFloat(s.longitude) || 0,
-        categories: [...normalizeCategories(s.categories || [])],
-        mapSlug: mapSlug,
-        mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
-      };
-    })
-    .filter(s => s.mapSlug && s.mapName); // Ensure only services with valid map info are included
+  // Process services
+  const filteredServices = filterItems(services, false);
+  const serviceSuggestions = filteredServices
+    .map(s => mapToSuggestion(s, false))
+    .filter(s => s && s.mapSlug && s.mapName) as SearchSuggestion[];
 
   // Combine, sort by relevance, and limit the suggestions
   const combinedSuggestions = [...vendorSuggestions, ...serviceSuggestions];
@@ -1145,11 +1070,12 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
       const features = mapboxMap.queryRenderedFeatures(
         mapboxMap.project([suggestion.longitude, suggestion.latitude]),
         {
-          layers: suggestion.type === 'vendor' ? ['vendor-icon'] : ['service-icon']
+          layers: suggestion.type === 'vendor' ? ['vendor-map-icon'] : ['service-map-icon']
         },
       );
 
       const numFeatures = features?.length || 0;
+
       logger.info(`Found ${numFeatures} features at suggestion location`);
 
       // If features are found, try to log their categories to help debug
@@ -1172,6 +1098,8 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
             point: mapboxMap.project([suggestion.longitude, suggestion.latitude]),
             features: [feature]
           } as unknown as mapboxgl.MapMouseEvent);
+        } else {
+          logger.warn('No matching feature found when focusing on suggestion');
         }
       } else {
         logger.warn('No features found when focusing on suggestion');
@@ -1387,10 +1315,13 @@ function setupMapLayers() {
     });
 
     // 5. Add icon layers
-    addVendorIconLayer(mapboxMap);
-    addServiceIconLayer(mapboxMap);
+    // addVendorIconLayer(mapboxMap);
+    // addServiceIconLayer(mapboxMap);
+
     addServiceMapClusterIconLayer(mapboxMap);
     addServiceMapIconLayer(mapboxMap);
+    addVendorMapClusterIconLayer(mapboxMap);
+    addVendorMapIconLayer(mapboxMap);
 
     // 6. Setup icon click handlers and store the cleanup function
     iconClickHandlersCleanup = setupIconClickHandlers(mapboxMap, getCategoryName);

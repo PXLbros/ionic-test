@@ -127,7 +127,7 @@ export async function loadCategoryIcons({
         if (error) {
           const errorMessage = `Failed to load icon ${imageId} from URL ${url}: ${error.message}`;
 
-          console.error(errorMessage);
+          logger.error(errorMessage);
 
           loadErrors.push(errorMessage);
 
@@ -142,7 +142,7 @@ export async function loadCategoryIcons({
         if (!image) {
           const errorMessage = `Image loaded but is null: ${imageId}`;
 
-          console.error(errorMessage);
+          logger.error(errorMessage);
 
           loadErrors.push(errorMessage);
 
@@ -158,6 +158,10 @@ export async function loadCategoryIcons({
         try {
           // Add the image to the map
           if (!map.hasImage(imageId)) {
+            let newImageWidth;
+            let newImageHeight;
+            let resizedImage = false;
+
             // If resizing is requested, use canvas
             if ((config.maxWidth && image.width > config.maxWidth) ||
                 (config.maxHeight && image.height > config.maxHeight)) {
@@ -195,19 +199,30 @@ export async function loadCategoryIcons({
               const imageData = ctx.getImageData(0, 0, width, height);
 
               map.addImage(imageId, imageData);
+
+              newImageWidth = width;
+              newImageHeight = height;
+              resizedImage = true;
             } else {
               // Add original image without resizing
               map.addImage(imageId, image);
+
+              newImageWidth = image.width;
+              newImageHeight = image.height;
             }
 
-            // console.log(`Added image ${imageId} to map`);
+            logger.debug('Added image to map', {
+              'Image ID': imageId,
+              'Size': `${newImageWidth}x${newImageHeight}`,
+              'Resized': resizedImage ? 'Yes' : 'No',
+            });
           }
 
           resolve();
         } catch (err) {
           const errorMessage = `Error adding image ${imageId} to map: ${err instanceof Error ? err.message : String(err)}`;
 
-          console.error(errorMessage);
+          logger.error(errorMessage);
 
           loadErrors.push(errorMessage);
 
@@ -263,7 +278,7 @@ export async function loadCategoryIcons({
     }
   } catch (error) {
     // This will only be reached if failOnIconError is true
-    console.error('Icon loading failed:', error);
+    logger.error('Icon loading failed:', error);
 
     throw new Error(`Failed to load map icons: ${error instanceof Error ? error.message : String(error)}`);
   }
@@ -303,13 +318,24 @@ export function addServiceMapIconLayer(map: mapboxgl.Map) {
   });
 }
 
-/**
- * Creates the vendor icon layer
- * @param map Mapbox map instance
- */
-export function addVendorIconLayer(map: mapboxgl.Map) {
+export function addVendorMapClusterIconLayer(map: mapboxgl.Map) {
   map.addLayer({
-    id: 'vendor-icon',
+    id: 'vendor-map-cluster-icon',
+    type: 'symbol',
+    source: 'points-clustered',
+    filter: ['has', 'point_count'],
+    layout: {
+      'icon-image': 'default-map-cluster-icon',
+      'icon-size': 0.5,
+      'icon-allow-overlap': true,
+      'icon-anchor': 'bottom',
+    }
+  });
+}
+
+export function addVendorMapIconLayer(map: mapboxgl.Map) {
+  map.addLayer({
+    id: 'vendor-map-icon',
     type: 'symbol',
     source: 'points-clustered',
     filter: [
@@ -318,82 +344,105 @@ export function addVendorIconLayer(map: mapboxgl.Map) {
       ['==', ['get', 'type'], 'vendor']
     ],
     layout: {
-      // Simplified expression with better type handling
-      'icon-image': [
-        'match',
-        ['typeof', ['get', 'categories']],
-        'string',
-        // If it's a string, use a default icon
-        'default-vendor-icon',
-        // Otherwise check if we have categories
-        [
-          'case',
-          // Check if we have any categories
-          ['>', ['length', ['get', 'categories']], 0],
-          // If yes, use the first category ID for the icon
-          ['concat', 'vendor-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
-          // Otherwise use default
-          'default-vendor-icon'
-        ]
-      ],
+      'icon-image': 'default-map-icon',
       'icon-size': 0.5,
-      // 'icon-size': [
-      //   'interpolate', ['linear'], ['zoom'],
-      //   13, 0.3,  // At zoom level 13, icons are smaller
-      //   17, 0.5   // At zoom level 17, icons are larger
-      // ],
       'icon-allow-overlap': true,
       'icon-anchor': 'bottom',
-      // 'icon-offset': [0, 0],
     }
   });
 }
 
-/**
- * Creates the service icon layer
- * @param map Mapbox map instance
- */
-export function addServiceIconLayer(map: mapboxgl.Map) {
-  map.addLayer({
-    id: 'service-icon',
-    type: 'symbol',
-    source: 'points-clustered',
-    filter: [
-      'all',
-      ['!', ['has', 'point_count']],
-      ['==', ['get', 'type'], 'service']
-    ],
-    layout: {
-      // Use a simpler match expression that Mapbox GL supports
-      'icon-image': [
-        'match',
-        ['typeof', ['get', 'categories']],
-        'string',
-        // If it's a string, use a default icon
-        'default-service-icon',
-        // Otherwise check if we have categories
-        [
-          'case',
-          // Check if we have any categories
-          ['>', ['length', ['get', 'categories']], 0],
-          // If yes, use the first category ID for the icon
-          ['concat', 'service-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
-          // Otherwise use default
-          'default-service-icon'
-        ]
-      ],
-      'icon-size': 1.1,
-      // 'icon-size': [
-      //   'interpolate', ['linear'], ['zoom'],
-      //   13, 0.7,  // At zoom level 13, icons are smaller
-      //   17, 1.1   // At zoom level 17, icons are larger
-      // ],
-      'icon-allow-overlap': true,
-      'icon-anchor': 'bottom',
-      // 'icon-offset': [0, 0],
-    }
-  });
-}
+// /**
+//  * Creates the vendor icon layer
+//  * @param map Mapbox map instance
+//  */
+// export function addVendorIconLayer(map: mapboxgl.Map) {
+//   map.addLayer({
+//     id: 'vendor-icon',
+//     type: 'symbol',
+//     source: 'points-clustered',
+//     filter: [
+//       'all',
+//       ['!', ['has', 'point_count']],
+//       ['==', ['get', 'type'], 'vendor']
+//     ],
+//     layout: {
+//       // Simplified expression with better type handling
+//       'icon-image': [
+//         'match',
+//         ['typeof', ['get', 'categories']],
+//         'string',
+//         // If it's a string, use a default icon
+//         'default-vendor-icon',
+//         // Otherwise check if we have categories
+//         [
+//           'case',
+//           // Check if we have any categories
+//           ['>', ['length', ['get', 'categories']], 0],
+//           // If yes, use the first category ID for the icon
+//           ['concat', 'vendor-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+//           // Otherwise use default
+//           'default-vendor-icon'
+//         ]
+//       ],
+//       'icon-size': 0.5,
+//       // 'icon-size': [
+//       //   'interpolate', ['linear'], ['zoom'],
+//       //   13, 0.3,  // At zoom level 13, icons are smaller
+//       //   17, 0.5   // At zoom level 17, icons are larger
+//       // ],
+//       'icon-allow-overlap': true,
+//       'icon-anchor': 'bottom',
+//       // 'icon-offset': [0, 0],
+//     }
+//   });
+// }
+
+// /**
+//  * Creates the service icon layer
+//  * @param map Mapbox map instance
+//  */
+// export function addServiceIconLayer(map: mapboxgl.Map) {
+//   map.addLayer({
+//     id: 'service-icon',
+//     type: 'symbol',
+//     source: 'points-clustered',
+//     filter: [
+//       'all',
+//       ['!', ['has', 'point_count']],
+//       ['==', ['get', 'type'], 'service']
+//     ],
+//     layout: {
+//       // Use a simpler match expression that Mapbox GL supports
+//       'icon-image': [
+//         'match',
+//         ['typeof', ['get', 'categories']],
+//         'string',
+//         // If it's a string, use a default icon
+//         'default-service-icon',
+//         // Otherwise check if we have categories
+//         [
+//           'case',
+//           // Check if we have any categories
+//           ['>', ['length', ['get', 'categories']], 0],
+//           // If yes, use the first category ID for the icon
+//           ['concat', 'service-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
+//           // Otherwise use default
+//           'default-service-icon'
+//         ]
+//       ],
+//       'icon-size': 1.1,
+//       // 'icon-size': [
+//       //   'interpolate', ['linear'], ['zoom'],
+//       //   13, 0.7,  // At zoom level 13, icons are smaller
+//       //   17, 1.1   // At zoom level 17, icons are larger
+//       // ],
+//       'icon-allow-overlap': true,
+//       'icon-anchor': 'bottom',
+//       // 'icon-offset': [0, 0],
+//     }
+//   });
+// }
 
 /**
  * Creates handlers for icon click events
@@ -481,7 +530,7 @@ export function setupIconClickHandlers(
           categoryNames = `<p class="popup-category">${names.join(', ')}</p>`;
         }
       } catch (error) {
-        console.error('Error parsing categories:', error);
+        logger.error('Error parsing categories:', error);
       }
     }
 
@@ -512,16 +561,16 @@ export function setupIconClickHandlers(
   };
 
   // Register click handlers
-  map.on('click', 'vendor-icon', handleVendorIconClick);
-  map.on('click', 'service-icon', handleServiceIconClick);
+  map.on('click', 'vendor-map-icon', handleVendorIconClick);
+  map.on('click', 'service-map-icon', handleServiceIconClick);
 
   // Register move handler
   map.on('move', handleMapMove);
 
   // Return a cleanup function that removes all the event handlers
   return () => {
-    map.off('click', 'vendor-icon', handleVendorIconClick);
-    map.off('click', 'service-icon', handleServiceIconClick);
+    map.off('click', 'vendor-map-icon', handleVendorIconClick);
+    map.off('click', 'service-map-icon', handleServiceIconClick);
     map.off('move', handleMapMove); // Remove the move event listener
 
     if (activePopup) {
