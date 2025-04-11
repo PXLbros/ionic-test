@@ -508,6 +508,14 @@ function generateInitialSuggestions() {
   // Vendor suggestions - get from ALL maps
   const vendorSuggestions = vendors
     .filter((v: any) => {
+      // Only include vendors that belong to at least one map
+      const hasMapSlug = Array.isArray(v.map_slugs) && v.map_slugs.length > 0;
+      const hasMapId = Array.isArray(v.maps) && v.maps.length > 0;
+
+      if (!hasMapSlug && !hasMapId) {
+        return false;
+      }
+
       // Only filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
         if (!v.categories || !v.categories.some((catId: number) => selectedCategories.value[catId])) {
@@ -538,11 +546,20 @@ function generateInitialSuggestions() {
         mapSlug: mapSlug,
         mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
-    });
+    })
+    .filter(v => v.mapSlug && v.mapName); // Ensure only vendors with valid map info are included
 
   // Service suggestions - get from ALL maps
   const serviceSuggestions = services
     .filter((s: any) => {
+      // Only include services that belong to at least one map
+      const hasMapSlug = Array.isArray(s.map_slugs) && s.map_slugs.length > 0;
+      const hasMapId = Array.isArray(s.maps) && s.maps.length > 0;
+
+      if (!hasMapSlug && !hasMapId) {
+        return false;
+      }
+
       // Only filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
         if (!s.categories || !s.categories.some((catId: number) => selectedCategories.value[catId])) {
@@ -570,7 +587,8 @@ function generateInitialSuggestions() {
         mapSlug: mapSlug,
         mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
-    });
+    })
+    .filter(s => s.mapSlug && s.mapName); // Ensure only services with valid map info are included
 
   // Combine and limit the suggestions
   // First sort by name for better usability
@@ -880,6 +898,14 @@ function generateSearchSuggestions() {
   // Generate suggestions from vendors - from ALL maps
   const vendorSuggestions = vendors
     .filter((v: any) => {
+      // Only include vendors that belong to at least one map
+      const hasMapSlug = Array.isArray(v.map_slugs) && v.map_slugs.length > 0;
+      const hasMapId = Array.isArray(v.maps) && v.maps.length > 0;
+
+      if (!hasMapSlug && !hasMapId) {
+        return false;
+      }
+
       // Filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
         if (!v.categories || !v.categories.some((catId: number) => selectedCategories.value[catId])) {
@@ -911,11 +937,20 @@ function generateSearchSuggestions() {
         mapSlug: mapSlug,
         mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
-    });
+    })
+    .filter(v => v.mapSlug && v.mapName); // Final check to ensure only vendors with valid map info are included
 
   // Generate suggestions from services - from ALL maps
   const serviceSuggestions = services
     .filter((s: any) => {
+      // Only include services that belong to at least one map
+      const hasMapSlug = Array.isArray(s.map_slugs) && s.map_slugs.length > 0;
+      const hasMapId = Array.isArray(s.maps) && s.maps.length > 0;
+
+      if (!hasMapSlug && !hasMapId) {
+        return false;
+      }
+
       // Filter by category if selected
       if (Object.values(selectedCategories.value).some(selected => selected)) {
         if (!s.categories || !s.categories.some((catId: number) => selectedCategories.value[catId])) {
@@ -944,7 +979,8 @@ function generateSearchSuggestions() {
         mapSlug: mapSlug,
         mapName: mapSlug ? mapNamesBySlug[mapSlug] : null
       };
-    });
+    })
+    .filter(s => s.mapSlug && s.mapName); // Final check to ensure only services with valid map info are included
 
   // Combine, sort by relevance, and limit the suggestions
   const combinedSuggestions = [...vendorSuggestions, ...serviceSuggestions];
