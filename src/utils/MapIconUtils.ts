@@ -1,5 +1,5 @@
 // mapIconUtils.ts
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { DataDrivenPropertyValueSpecification } from 'mapbox-gl';
 import { useLogger } from '@/composables/useLogger';
 
 const logger = useLogger();
@@ -355,29 +355,23 @@ export async function loadCategoryIcons({
 //   }
 // }
 
-export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], currentMapIndex: number) {
-  mapboxMap.on('click', MapLayer.MapClusterIcon, (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
-    // console log properties
-    console.log('MapClusterIcon clicked:', e.features[0].properties);
-  });
-
-  // Dynamically build the 'match' expression for icon-image based on maps
-  const iconImageExpression: any = [
+export function getMapClusterIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
+  return [
     'match',
-    ['get', 'currentMapIndex'],
+    currentMapIndex, // <<-- Direct value
     ...maps.flatMap((map, index) => [index, `map-cluster-icon-${map.slug}`]),
-    'default-map-cluster-icon' // Fallback
+    'default-map-cluster-icon'
   ];
+}
 
-  console.log('iconImageExpression', iconImageExpression);
-
+export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], currentMapIndex: number) {
   mapboxMap.addLayer({
     id: MapLayer.MapClusterIcon,
     type: 'symbol',
     source: MapSource.PointsClustered,
     filter: ['has', 'point_count'],
     layout: {
-      'icon-image': iconImageExpression,
+      'icon-image': getMapClusterIconImageExpression({ maps, currentMapIndex }),
       'icon-size': 0.5,
       'icon-allow-overlap': true,
       'icon-anchor': 'bottom',

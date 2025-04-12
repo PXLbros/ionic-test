@@ -77,6 +77,7 @@ interface ServiceMap {
   id: number;
   name: string;
   slug: string;
+  type: 'service' | 'vendor';
   num_services?: number;
   num_vendors?: number;
 }

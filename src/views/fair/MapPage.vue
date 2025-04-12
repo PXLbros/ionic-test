@@ -133,7 +133,7 @@ import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline, clos
 import mapboxgl, { Map as MapboxMap } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
-import { loadCategoryIcons, setupIconClickHandlers, addMapClusterIconLayer, addMapIconLayer, MapLayer, MapSource } from '@/utils/MapIconUtils';
+import { loadCategoryIcons, setupIconClickHandlers, addMapClusterIconLayer, addMapIconLayer, MapLayer, MapSource, getMapClusterIconImageExpression } from '@/utils/MapIconUtils';
 import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
 import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
@@ -184,121 +184,6 @@ const vendorCategories = dataStore.data.nysfairWebsite.vendor_categories;
 // const vendorMaps = dataStore.data.nysfairWebsite.vendor_maps;
 const maps = dataStore.data.nysfairWebsite.maps;
 
-const slugToId: Record<string, number> = {};
-const idToSlug: Record<number, string> = {};
-
-function getSlugId(slug: string | null): number {
-  if (!slug) {
-    return 0;
-  }
-
-  if (!(slug in slugToId)) {
-    const newId = Object.keys(slugToId).length + 1;
-
-    slugToId[slug] = newId;
-    idToSlug[newId] = slug;
-  }
-
-  console.log('getSlugId', slug, slugToId[slug]);
-
-  return slugToId[slug];
-}
-
-console.log('maps', maps);
-
-// maps example:
-// [
-//     {
-//         "name": "Accessibility (ADA)",
-//         "slug": "accessibility-ada",
-//         "num_features": 91,
-//         "map_cluster_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Cluster_Pins_Accessibility-2.png",
-//         "map_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Map_Icons_Accessibility-2.png",
-//         "type": "service"
-//     },
-//     {
-//         "name": "Entertainment",
-//         "slug": "entertainment",
-//         "num_features": 34,
-//         "map_cluster_icon": null,
-//         "map_icon": null,
-//         "type": "service"
-//     },
-//     {
-//         "name": "Guest & Emergency Services",
-//         "slug": "guest-emergency-services",
-//         "num_features": 107,
-//         "map_cluster_icon": null,
-//         "map_icon": null,
-//         "type": "service"
-//     },
-//     {
-//         "name": "Master",
-//         "slug": "master",
-//         "num_features": 182,
-//         "map_cluster_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Category_Pins_Master.png",
-//         "map_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Map_Icons_Master-1.png",
-//         "type": "service"
-//     },
-//     {
-//         "name": "Parking",
-//         "slug": "parking",
-//         "num_features": 21,
-//         "map_cluster_icon": null,
-//         "map_icon": null,
-//         "type": "service"
-//     },
-//     {
-//         "name": "Where To Cool Off",
-//         "slug": "where-to-cool-off",
-//         "num_features": 24,
-//         "map_cluster_icon": null,
-//         "map_icon": null,
-//         "type": "service"
-//     },
-//     {
-//         "name": "Food & Beverage",
-//         "slug": "food-beverage",
-//         "num_features": 864,
-//         "map_cluster_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Cluster_Pins_Food_Beverage-1.png",
-//         "map_icon": "http://nys-fair.test:8001/serve-asset.php?asset=2025/04/Map_Icons_Food_Beverage-1.png",
-//         "type": "vendor"
-//     },
-//     {
-//         "name": "Vendors & Exhibitors",
-//         "slug": "vendors-exhibitors",
-//         "num_features": 1196,
-//         "map_cluster_icon": null,
-//         "map_icon": null,
-//         "type": "vendor"
-//     }
-// ]
-
-// // Combine service maps and vendor maps for the dropdown, deduplicating by slug - fixme: not used?
-// const allMaps = computed(() => {
-//   // Create a Map to track unique slugs - rename to avoid conflict with mapboxgl.Map
-//   const uniqueSlugsMap = new Map<string, ServiceMap>();
-
-//   // First add all service maps - these take precedence
-//   serviceMaps.forEach((serviceMap: ServiceMap) => {
-//     if (serviceMap.slug) {
-//       uniqueSlugsMap.set(serviceMap.slug, serviceMap);
-//     }
-//   });
-
-//   // Then add vendor maps only if their slug isn't already used
-//   vendorMaps.forEach((vendorMap: ServiceMap) => {
-//     if (vendorMap.slug && !uniqueSlugsMap.has(vendorMap.slug)) {
-//       uniqueSlugsMap.set(vendorMap.slug, vendorMap);
-//     }
-//   });
-
-//   // Convert the Map values back to array
-//   const combinedMaps = Array.from(uniqueSlugsMap.values());
-
-//   return combinedMaps;
-// });
-
 const allMaps = computed(() => maps);
 
 // Find the master map by its slug
@@ -335,9 +220,17 @@ const filteredCategories = computed(() => {
 const currentMapIndex = computed(() => {
   const currentMapIndex = allMaps.value.findIndex((map: any) => map.slug === currentMapSlug.value);
 
-  console.log('currentMapSlug.value', currentMapSlug.value, ' - currentMapIndex', currentMapIndex);
-
   return currentMapIndex;
+});
+
+watch(currentMapIndex, (newIndex, oldIndex) => {
+  if (mapboxMap.getLayer(MapLayer.MapClusterIcon)) {
+    mapboxMap.setLayoutProperty(
+      MapLayer.MapClusterIcon,
+      'icon-image',
+      getMapClusterIconImageExpression({ maps: allMaps.value, currentMapIndex: newIndex }),
+    );
+  }
 });
 
 // Map reference - update the type to use the renamed import
@@ -380,9 +273,9 @@ function selectMap(mapData: ServiceMap) {
 
   if (isDifferentMap) {
     logger.info('Switching map', {
-      'ID': mapData.id,
       'Slug': mapData.slug,
       'Name': mapData.name,
+      'Type': mapData.type,
     });
   }
 
@@ -857,7 +750,6 @@ function buildItemGeoJSON<T extends 'vendor' | 'service'>(
           categories: normalizedCategories,
           mapSlugs: v.map_slugs || [],
           currentMapSlug: currentMapSlug.value,
-          // currentMapSlugId: getSlugId(currentMapSlug.value),
           currentMapIndex: currentMapIndex.value,
         },
         geometry: {
@@ -886,7 +778,6 @@ function buildItemGeoJSON<T extends 'vendor' | 'service'>(
             categories: normalizedCategories,
             mapSlugs: s.map_slugs || [],
             currentMapSlug: currentMapSlug.value,
-            // currentMapSlugId: getSlugId(currentMapSlug.value),
             currentMapIndex: currentMapIndex.value,
           },
           geometry: {
@@ -1418,9 +1309,9 @@ function setupMapLayers() {
       cluster: true,
       clusterRadius: 50,
       clusterMaxZoom: 14,
-      clusterProperties: {
-        currentMapIndex: ['+', ['get', 'currentMapIndex']]
-      },
+      // clusterProperties: {
+      //   currentMapIndex: ['+', ['get', 'currentMapIndex']]
+      // },
     });
 
     // 4. Add cluster layers
@@ -1442,26 +1333,26 @@ function setupMapLayers() {
       finalizeMapSetup();
     });
 
-    mapboxMap.on('sourcedata', (e) => {
-      if (e.sourceId === MapSource.PointsClustered && e.isSourceLoaded) {
-        const features = mapboxMap.querySourceFeatures(MapSource.PointsClustered, {
-          sourceLayer: '',
-          filter: ['has', 'point_count']
-        });
+    // mapboxMap.on('sourcedata', (e) => {
+    //   if (e.sourceId === MapSource.PointsClustered && e.isSourceLoaded) {
+    //     const features = mapboxMap.querySourceFeatures(MapSource.PointsClustered, {
+    //       sourceLayer: '',
+    //       filter: ['has', 'point_count']
+    //     });
 
-        features.forEach((feature: any) => {
-          mapboxMap.setFeatureState(
-            {
-              source: MapSource.PointsClustered,
-              id: feature.id as number
-            },
-            {
-              currentMapIndex: currentMapIndex.value
-            },
-          );
-        });
-      }
-    });
+    //     features.forEach((feature: any) => {
+    //       mapboxMap.setFeatureState(
+    //         {
+    //           source: MapSource.PointsClustered,
+    //           id: feature.id as number
+    //         },
+    //         {
+    //           currentMapIndex: currentMapIndex.value
+    //         },
+    //       );
+    //     });
+    //   }
+    // });
   } catch (error) {
     logger.error(error);
     isLoadingMap.value = false;
