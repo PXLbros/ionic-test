@@ -91,22 +91,6 @@ export async function loadCategoryIcons({
   const categoryIconMap: Record<string, string> = {};
   const loadErrors: string[] = [];
 
-  // // Process service categories
-  // serviceCategories.forEach((category: Category) => {
-  //   if (category.icon) {
-  //     const key = `service-category-icon-${category.id}`;
-  //     categoryIconMap[key] = category.icon;
-  //   }
-  // });
-
-  // // Process vendor categories
-  // vendorCategories.forEach((category: Category) => {
-  //   if (category.icon) {
-  //     const key = `vendor-category-icon-${category.id}`;
-  //     categoryIconMap[key] = category.icon;
-  //   }
-  // });
-
   maps.forEach((map: any) => {
     // if (map.map_cluster_icon) {
     //   const key = `map-cluster-icon-${map.slug}`;
@@ -128,24 +112,6 @@ export async function loadCategoryIcons({
     categoryIconMap[clusterKey] = map.map_cluster_icon || '/icons/default-map-cluster-icon.png';
     categoryIconMap[iconKey] = map.map_icon || '/icons/default-map-icon.png';
   });
-
-  // vendorMaps.forEach((map: any) => {
-  //   if (map.map_cluster_icon) {
-  //     const key = `map-cluster-icon-${map.slug}`;
-
-  //     if (!categoryIconMap[key]) {
-  //       categoryIconMap[key] = map.map_cluster_icon;
-  //     }
-  //   }
-
-  //   if (map.map_icon) {
-  //     const key = `map-icon-${map.slug}`;
-
-  //     if (!categoryIconMap[key]) {
-  //       categoryIconMap[key] = map.map_icon;
-  //     }
-  //   }
-  // });
 
   // Helper function to load an image with modern Mapbox API
   const loadImage = (url: string, imageId: string): Promise<void> => {
