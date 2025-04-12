@@ -8,6 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
+    "app:build": "npx npm run build && npx cap copy && npx cap sync --inline",
+    "ios:open": "npx cap open ios",
     "android:run": "npx npm run build && npx cap copy && npx cap sync --inline && $HOME/Downloads/android-studio/bin/studio.sh android &"
   },
   "dependencies": {
