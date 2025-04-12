@@ -294,7 +294,7 @@ export async function loadCategoryIcons({
 export function getMapClusterIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
   return [
     'match',
-    currentMapIndex, // <<-- Direct value
+    currentMapIndex,
     ...maps.flatMap((map, index) => [index, `map-cluster-icon-${map.slug}`]),
     'default-map-cluster-icon'
   ];
