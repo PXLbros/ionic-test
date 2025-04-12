@@ -76,15 +76,13 @@ const defaultCategoryIconLoadingConfig: CategoryIconLoadingConfig = {
  */
 export async function loadCategoryIcons({
   map,
-  serviceMaps,
-  vendorMaps,
+  maps,
   serviceCategories,
   vendorCategories,
   config = defaultCategoryIconLoadingConfig
 }: {
   map: mapboxgl.Map,
-  serviceMaps: any[],
-  vendorMaps: any[],
+  maps: any[],
   serviceCategories: Category[],
   vendorCategories: Category[],
   config?: CategoryIconLoadingConfig
@@ -93,53 +91,61 @@ export async function loadCategoryIcons({
   const categoryIconMap: Record<string, string> = {};
   const loadErrors: string[] = [];
 
-  // Process service categories
-  serviceCategories.forEach((category: Category) => {
-    if (category.icon) {
-      const key = `service-category-icon-${category.id}`;
-      categoryIconMap[key] = category.icon;
-    }
+  // // Process service categories
+  // serviceCategories.forEach((category: Category) => {
+  //   if (category.icon) {
+  //     const key = `service-category-icon-${category.id}`;
+  //     categoryIconMap[key] = category.icon;
+  //   }
+  // });
+
+  // // Process vendor categories
+  // vendorCategories.forEach((category: Category) => {
+  //   if (category.icon) {
+  //     const key = `vendor-category-icon-${category.id}`;
+  //     categoryIconMap[key] = category.icon;
+  //   }
+  // });
+
+  maps.forEach((map: any) => {
+    // if (map.map_cluster_icon) {
+    //   const key = `map-cluster-icon-${map.slug}`;
+
+    //   categoryIconMap[key] = map.map_cluster_icon;
+    // }
+
+    // if (map.map_icon) {
+    //   const key = `map-icon-${map.slug}`;
+
+    //   categoryIconMap[key] = map.map_icon;
+    // }
+
+    const slug = map.slug;
+
+    const clusterKey = `map-cluster-icon-${slug}`;
+    const iconKey = `map-icon-${slug}`;
+
+    categoryIconMap[clusterKey] = map.map_cluster_icon || '/icons/default-map-cluster-icon.png';
+    categoryIconMap[iconKey] = map.map_icon || '/icons/default-map-icon.png';
   });
 
-  // Process vendor categories
-  vendorCategories.forEach((category: Category) => {
-    if (category.icon) {
-      const key = `vendor-category-icon-${category.id}`;
-      categoryIconMap[key] = category.icon;
-    }
-  });
+  // vendorMaps.forEach((map: any) => {
+  //   if (map.map_cluster_icon) {
+  //     const key = `map-cluster-icon-${map.slug}`;
 
-  serviceMaps.forEach((map: any) => {
-    if (map.map_cluster_icon) {
-      const key = `map-cluster-icon-${map.slug}`;
+  //     if (!categoryIconMap[key]) {
+  //       categoryIconMap[key] = map.map_cluster_icon;
+  //     }
+  //   }
 
-      categoryIconMap[key] = map.map_cluster_icon;
-    }
+  //   if (map.map_icon) {
+  //     const key = `map-icon-${map.slug}`;
 
-    if (map.map_icon) {
-      const key = `map-icon-${map.slug}`;
-
-      categoryIconMap[key] = map.map_icon;
-    }
-  });
-
-  vendorMaps.forEach((map: any) => {
-    if (map.map_cluster_icon) {
-      const key = `map-cluster-icon-${map.slug}`;
-
-      if (!categoryIconMap[key]) {
-        categoryIconMap[key] = map.map_cluster_icon;
-      }
-    }
-
-    if (map.map_icon) {
-      const key = `map-icon-${map.slug}`;
-
-      if (!categoryIconMap[key]) {
-        categoryIconMap[key] = map.map_icon;
-      }
-    }
-  });
+  //     if (!categoryIconMap[key]) {
+  //       categoryIconMap[key] = map.map_icon;
+  //     }
+  //   }
+  // });
 
   // Helper function to load an image with modern Mapbox API
   const loadImage = (url: string, imageId: string): Promise<void> => {
@@ -323,14 +329,55 @@ export async function loadCategoryIcons({
   }
 }
 
-export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map) {
+// feature example:
+// {
+//   "type": "Feature",
+//   "properties": {
+//       "name": "Valley Post American Legion",
+//       "description": "Vet Group",
+//       "id": 52013,
+//       "type": "vendor",
+//       "categories": [
+//           144
+//       ],
+//       "mapSlugs": [
+//           "master",
+//           "vendors-exhibitors"
+//       ],
+//       currentMapSlug: 'master',
+//   },
+//   "geometry": {
+//       "type": "Point",
+//       "coordinates": [
+//           -76.217346,
+//           43.070567
+//       ]
+//   }
+// }
+
+export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], currentMapIndex: number) {
+  mapboxMap.on('click', MapLayer.MapClusterIcon, (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
+    // console log properties
+    console.log('MapClusterIcon clicked:', e.features[0].properties);
+  });
+
+  // Dynamically build the 'match' expression for icon-image based on maps
+  const iconImageExpression: any = [
+    'match',
+    ['get', 'currentMapIndex'],
+    ...maps.flatMap((map, index) => [index, `map-cluster-icon-${map.slug}`]),
+    'default-map-cluster-icon' // Fallback
+  ];
+
+  console.log('iconImageExpression', iconImageExpression);
+
   mapboxMap.addLayer({
     id: MapLayer.MapClusterIcon,
     type: 'symbol',
     source: MapSource.PointsClustered,
     filter: ['has', 'point_count'],
     layout: {
-      'icon-image': 'default-map-cluster-icon',
+      'icon-image': iconImageExpression,
       'icon-size': 0.5,
       'icon-allow-overlap': true,
       'icon-anchor': 'bottom',
@@ -346,11 +393,27 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map) {
       'text-field': '{point_count_abbreviated}',
       'text-size': 15,
       'text-offset': [-0.1, -2.9],
+      'text-anchor': 'center',
+      'text-justify': 'center',
     },
     paint: {
       'text-color': '#ffffff'
     }
   });
+
+  // Update the icon-image dynamically when the current map index changes
+  watch(
+    () => currentMapIndex,
+    () => {
+      if (mapboxMap.getLayer(MapLayer.MapClusterIcon)) {
+        mapboxMap.setLayoutProperty(
+          MapLayer.MapClusterIcon,
+          'icon-image',
+          iconImageExpression
+        );
+      }
+    }
+  );
 }
 
 export function addMapIconLayer(map: mapboxgl.Map) {
@@ -361,10 +424,25 @@ export function addMapIconLayer(map: mapboxgl.Map) {
     filter: [
       'all',
       ['!', ['has', 'point_count']],
-      // ['==', ['get', 'type'], 'service']
     ],
     layout: {
-      'icon-image': 'default-map-icon',
+      // Use currentMapSlug from feature properties instead of mapSlugs array
+      'icon-image': [
+        'case',
+        ['has', 'currentMapSlug'],
+        [
+          'case',
+          ['!=', ['get', 'currentMapSlug'], ''],
+          [
+            'case',
+            ['has', ['concat', 'map-icon-', ['get', 'currentMapSlug']]],
+            ['concat', 'map-icon-', ['get', 'currentMapSlug']],
+            'default-map-icon'
+          ],
+          'default-map-icon'
+        ],
+        'default-map-icon'
+      ],
       'icon-size': 0.5,
       'icon-allow-overlap': true,
       'icon-anchor': 'bottom',
