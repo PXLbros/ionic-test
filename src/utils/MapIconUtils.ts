@@ -77,14 +77,10 @@ const defaultCategoryIconLoadingConfig: CategoryIconLoadingConfig = {
 export async function loadCategoryIcons({
   map,
   maps,
-  serviceCategories,
-  vendorCategories,
   config = defaultCategoryIconLoadingConfig
 }: {
   map: mapboxgl.Map,
   maps: any[],
-  serviceCategories: Category[],
-  vendorCategories: Category[],
   config?: CategoryIconLoadingConfig
 }): Promise<void> {
   // Create a mapping of category IDs to their icon URLs
@@ -295,32 +291,6 @@ export async function loadCategoryIcons({
   }
 }
 
-// feature example:
-// {
-//   "type": "Feature",
-//   "properties": {
-//       "name": "Valley Post American Legion",
-//       "description": "Vet Group",
-//       "id": 52013,
-//       "type": "vendor",
-//       "categories": [
-//           144
-//       ],
-//       "mapSlugs": [
-//           "master",
-//           "vendors-exhibitors"
-//       ],
-//       currentMapSlug: 'master',
-//   },
-//   "geometry": {
-//       "type": "Point",
-//       "coordinates": [
-//           -76.217346,
-//           43.070567
-//       ]
-//   }
-// }
-
 export function getMapClusterIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
   return [
     'match',
@@ -363,22 +333,6 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], cur
 }
 
 export function getMapIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
-  // return [
-  //   'case',
-  //   ['has', 'currentMapSlug'],
-  //   [
-  //     'case',
-  //     ['!=', ['get', 'currentMapSlug'], ''],
-  //     [
-  //       'case',
-  //       ['has', ['concat', 'map-icon-', ['get', 'currentMapSlug']]],
-  //       ['concat', 'map-icon-', ['get', 'currentMapSlug']],
-  //       'default-map-icon'
-  //     ],
-  //     'default-map-icon'
-  //   ],
-  //   'default-map-icon'
-  // ];
   return [
     'match',
     currentMapIndex, // <<-- Direct value
@@ -449,6 +403,14 @@ export function setupIconClickHandlers(
     });
   };
 
+  // Move event handler
+  const handleMapMove = () => {
+    if (activePopup) {
+      const popupLngLat = activePopup.getLngLat();
+      activePopup.setLngLat(popupLngLat); // Reposition the popup to stay anchored
+    }
+  };
+
   // Vendor icon click handler
   const handleVendorIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
     if (!e.features || e.features.length === 0) return;
@@ -483,6 +445,7 @@ export function setupIconClickHandlers(
 
     // Get category names for this service if categories exist
     let categoryNames = '';
+
     if (props.categories) {
       try {
         const categoriesArray = Array.isArray(props.categories)
@@ -515,25 +478,49 @@ export function setupIconClickHandlers(
     createPopup(coordinates, popupContent);
   };
 
-  // Move event handler
-  const handleMapMove = () => {
-    if (activePopup) {
-      const popupLngLat = activePopup.getLngLat();
-      activePopup.setLngLat(popupLngLat); // Reposition the popup to stay anchored
+  const handleMapIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
+    if (!e.features || e.features.length === 0) {
+      return;
+    }
+
+    const feature = e.features[0];
+
+    console.log('feature', feature);
+    switch (feature.properties.type) {
+      case 'vendor': {
+        handleVendorIconClick(e);
+
+        break;
+      }
+      case 'service': {
+        handleServiceIconClick(e);
+
+        break;
+      }
+      default: {
+        logger.warn('Unknown feature type', {
+          'Type': feature.properties.type,
+        });
+
+        break;
+      }
     }
   };
 
   // Register click handlers
-  map.on('click', 'vendor-map-icon', handleVendorIconClick);
-  map.on('click', 'service-map-icon', handleServiceIconClick);
+  // map.on('click', 'vendor-map-icon', handleVendorIconClick);
+  // map.on('click', 'service-map-icon', handleServiceIconClick);
+  map.on('click', MapLayer.MapIcon, handleMapIconClick);
 
   // Register move handler
   map.on('move', handleMapMove);
 
   // Return a cleanup function that removes all the event handlers
   return () => {
-    map.off('click', 'vendor-map-icon', handleVendorIconClick);
-    map.off('click', 'service-map-icon', handleServiceIconClick);
+    // map.off('click', 'vendor-map-icon', handleVendorIconClick);
+    // map.off('click', 'service-map-icon', handleServiceIconClick);
+    map.off('click', MapLayer.MapIcon, handleMapIconClick);
+
     map.off('move', handleMapMove); // Remove the move event listener
 
     if (activePopup) {
