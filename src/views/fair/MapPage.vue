@@ -1095,7 +1095,7 @@ function focusOnSuggestion(suggestion: SearchSuggestion) {
       const features = mapboxMap.queryRenderedFeatures(
         mapboxMap.project([suggestion.longitude, suggestion.latitude]),
         {
-          layers: suggestion.type === 'vendor' ? ['vendor-map-icon'] : ['service-map-icon']
+          layers: [MapLayer.MapIcon], // suggestion.type === 'vendor' ? ['vendor-map-icon'] : ['service-map-icon']
         },
       );
 
@@ -1215,7 +1215,7 @@ async function loadMapResources() {
     });
 
     // Load category icons
-    await loadCategoryIcons({ map: mapboxMap, maps, serviceCategories, vendorCategories });
+    await loadCategoryIcons({ map: mapboxMap, maps });
 
     // Load map overlay image
     await loadMapOverlayImage();
