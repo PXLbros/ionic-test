@@ -367,7 +367,7 @@ function safeUpdateMapSource() {
     }
 
     // Build new GeoJSON data
-    const filteredGeoJson = buildFilteredGeoJSON();
+    const filteredGeoJson = buildCombinedGeoJSONCollection();
 
     // Update the data source
     source.setData(filteredGeoJson);
@@ -797,9 +797,9 @@ function buildVendorGeoJSONCollection(): FeatureCollection<Point, VendorProperti
   const rawVendors = cloneDeep(vendors);
   const vendorFeatures = buildItemGeoJSON(rawVendors, 'vendor');
 
-  logger.info('Re-built vendor map JSON', {
-    'Vendors': vendorFeatures.length,
-  });
+  // logger.info('Re-built vendor map JSON', {
+  //   'Vendors': vendorFeatures.length,
+  // });
 
   return {
     type: 'FeatureCollection' as const,
@@ -811,9 +811,9 @@ function buildServiceGeoJSONCollection(): FeatureCollection<Point, ServiceProper
   const rawServices = cloneDeep(services);
   const serviceFeatures = buildItemGeoJSON(rawServices, 'service');
 
-  logger.info('Re-built service map JSON', {
-    'Services': serviceFeatures.length,
-  });
+  // logger.info('Re-built service map JSON', {
+  //   'Services': serviceFeatures.length,
+  // });
 
   return {
     type: 'FeatureCollection' as const,
@@ -822,7 +822,7 @@ function buildServiceGeoJSONCollection(): FeatureCollection<Point, ServiceProper
 }
 
 // Build GeoJSON for both vendors and services
-function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
+function buildCombinedGeoJSONCollection(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
   const vendorGeoJSON = buildVendorGeoJSONCollection();
   const serviceGeoJSON = buildServiceGeoJSONCollection();
 
@@ -1300,7 +1300,7 @@ function setupMapLayers() {
     });
 
     // 2. Build filtered GeoJSON (fresh data)
-    const filteredGeoJson = buildFilteredGeoJSON();
+    const filteredGeoJson = buildCombinedGeoJSONCollection();
 
     // 3. Add GeoJSON source with initial data
     mapboxMap.addSource(MapSource.PointsClustered, {
