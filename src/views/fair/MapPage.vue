@@ -180,9 +180,29 @@ const vendors = dataStore.data.nysfairWebsite.vendors;
 const services = dataStore.data.nysfairWebsite.services;
 const serviceCategories = dataStore.data.nysfairWebsite.service_categories;
 const vendorCategories = dataStore.data.nysfairWebsite.vendor_categories;
-const serviceMaps = dataStore.data.nysfairWebsite.service_maps;
-const vendorMaps = dataStore.data.nysfairWebsite.vendor_maps;
+// const serviceMaps = dataStore.data.nysfairWebsite.service_maps;
+// const vendorMaps = dataStore.data.nysfairWebsite.vendor_maps;
 const maps = dataStore.data.nysfairWebsite.maps;
+
+const slugToId: Record<string, number> = {};
+const idToSlug: Record<number, string> = {};
+
+function getSlugId(slug: string | null): number {
+  if (!slug) {
+    return 0;
+  }
+
+  if (!(slug in slugToId)) {
+    const newId = Object.keys(slugToId).length + 1;
+
+    slugToId[slug] = newId;
+    idToSlug[newId] = slug;
+  }
+
+  console.log('getSlugId', slug, slugToId[slug]);
+
+  return slugToId[slug];
+}
 
 console.log('maps', maps);
 
@@ -254,33 +274,35 @@ console.log('maps', maps);
 //     }
 // ]
 
-// Combine service maps and vendor maps for the dropdown, deduplicating by slug
-const allMaps = computed(() => {
-  // Create a Map to track unique slugs - rename to avoid conflict with mapboxgl.Map
-  const uniqueSlugsMap = new Map<string, ServiceMap>();
+// // Combine service maps and vendor maps for the dropdown, deduplicating by slug - fixme: not used?
+// const allMaps = computed(() => {
+//   // Create a Map to track unique slugs - rename to avoid conflict with mapboxgl.Map
+//   const uniqueSlugsMap = new Map<string, ServiceMap>();
 
-  // First add all service maps - these take precedence
-  serviceMaps.forEach((serviceMap: ServiceMap) => {
-    if (serviceMap.slug) {
-      uniqueSlugsMap.set(serviceMap.slug, serviceMap);
-    }
-  });
+//   // First add all service maps - these take precedence
+//   serviceMaps.forEach((serviceMap: ServiceMap) => {
+//     if (serviceMap.slug) {
+//       uniqueSlugsMap.set(serviceMap.slug, serviceMap);
+//     }
+//   });
 
-  // Then add vendor maps only if their slug isn't already used
-  vendorMaps.forEach((vendorMap: ServiceMap) => {
-    if (vendorMap.slug && !uniqueSlugsMap.has(vendorMap.slug)) {
-      uniqueSlugsMap.set(vendorMap.slug, vendorMap);
-    }
-  });
+//   // Then add vendor maps only if their slug isn't already used
+//   vendorMaps.forEach((vendorMap: ServiceMap) => {
+//     if (vendorMap.slug && !uniqueSlugsMap.has(vendorMap.slug)) {
+//       uniqueSlugsMap.set(vendorMap.slug, vendorMap);
+//     }
+//   });
 
-  // Convert the Map values back to array
-  const combinedMaps = Array.from(uniqueSlugsMap.values());
+//   // Convert the Map values back to array
+//   const combinedMaps = Array.from(uniqueSlugsMap.values());
 
-  return combinedMaps;
-});
+//   return combinedMaps;
+// });
+
+const allMaps = computed(() => maps);
 
 // Find the master map by its slug
-const masterMap = allMaps.value.find((map: any) => map.slug === 'master');
+const masterMap = allMaps.value.find((map: any) => map.slug.startsWith('master'));
 currentMapSlug.value = masterMap?.slug ?? allMaps.value[0]?.slug ?? null;
 
 // Get the current map name for display using the slug
@@ -308,6 +330,14 @@ const filteredCategories = computed(() => {
       (Array.isArray(category.map_slugs) && category.map_slugs.includes(currentMapSlug.value as string))
     );
   });
+});
+
+const currentMapIndex = computed(() => {
+  const currentMapIndex = allMaps.value.findIndex((map: any) => map.slug === currentMapSlug.value);
+
+  console.log('currentMapSlug.value', currentMapSlug.value, ' - currentMapIndex', currentMapIndex);
+
+  return currentMapIndex;
 });
 
 // Map reference - update the type to use the renamed import
@@ -581,7 +611,7 @@ function generateInitialSuggestions() {
       // Get map slug (first one if multiple)
       const mapSlug = Array.isArray(v.map_slugs) && v.map_slugs.length > 0 ? v.map_slugs[0] :
                      (Array.isArray(v.maps) && v.maps.length > 0 ?
-                      (allMaps.value.find(m => m.id === v.maps[0])?.slug || null) : null);
+                      (allMaps.value.find((m: any) => m.id === v.maps[0])?.slug || null) : null);
 
       // If no map is associated, use the current map as fallback
       const effectiveMapSlug = mapSlug || currentMapSlug.value;
@@ -635,7 +665,7 @@ function generateInitialSuggestions() {
       // Get map slug (first one if multiple)
       const mapSlug = Array.isArray(s.map_slugs) && s.map_slugs.length > 0 ? s.map_slugs[0] :
                      (Array.isArray(s.maps) && s.maps.length > 0 ?
-                      (allMaps.value.find(m => m.id === s.maps[0])?.slug || null) : null);
+                      (allMaps.value.find((m: any) => m.id === s.maps[0])?.slug || null) : null);
 
       return {
         id: s.id,
@@ -770,120 +800,111 @@ function normalizeCategories(categories: any) {
   }
 }
 
-// Convert vendors to GeoJSON features using map slug instead of ID
-function buildVendorGeoJSON(vendors: any[]): Array<Feature<Point, VendorProperties>> {
-  // Apply filtering by map slug and search query
-  let filteredVendors = vendors
-    .filter((vendor) => vendor.locations && vendor.locations.length > 0);
-
-  // Filter by map slug for all maps, including master
-  if (currentMapSlug.value !== null) {
-    filteredVendors = filteredVendors.filter((vendor) => {
-      // Check if the vendor has map_slugs array and it includes the current map slug
-      if (Array.isArray(vendor.map_slugs) && vendor.map_slugs.includes(currentMapSlug.value)) {
-        return true;
+// Replace the separate vendor and service GeoJSON building functions with a unified function
+function buildItemGeoJSON<T extends 'vendor' | 'service'>(
+  items: any[],
+  type: T
+): Array<Feature<Point, T extends 'vendor' ? VendorProperties : ServiceProperties>> {
+  // Apply common filtering by map slug and search query
+  let filteredItems = items.filter((item) => {
+    // Check if the item has valid coordinates
+    if (type === 'vendor') {
+      // Vendors need valid locations array
+      if (!item.locations || item.locations.length === 0) {
+        return false;
       }
+    } else {
+      // Services need latitude and longitude
+      if (!item.latitude || !item.longitude) {
+        return false;
+      }
+    }
 
-      return false;
-    });
-  }
+    // Filter by map slug for all maps
+    if (currentMapSlug.value !== null) {
+      // Check if the item has map_slugs array and it includes the current map slug
+      return Array.isArray(item.map_slugs) && item.map_slugs.includes(currentMapSlug.value);
+    }
+
+    return true;
+  });
 
   // Apply search filtering
   if (searchQuery.value.trim() !== '') {
     const query = searchQuery.value.toLowerCase();
-    filteredVendors = filteredVendors.filter(v =>
-      (v.name && v.name.toLowerCase().includes(query)) ||
-      (v.description && v.description.toLowerCase().includes(query))
+    filteredItems = filteredItems.filter(item =>
+      (item.name && item.name.toLowerCase().includes(query)) ||
+      (item.description && item.description.toLowerCase().includes(query))
     );
   }
 
   // Apply category filtering
-  filteredVendors = filteredVendors.filter(v => matchesCategoryFilters(v.categories));
+  filteredItems = filteredItems.filter(item => matchesCategoryFilters(item.categories));
 
-  return filteredVendors.flatMap((v) => v.locations.map((location: any) => {
-    // Ensure categories are properly normalized before adding to properties
-    const normalizedCategories = normalizeCategories(v.categories || []);
-
-    return {
-      type: 'Feature' as const,
-      properties: {
-        name: v.name ?? 'Unknown Vendor',
-        description: v.description ?? '',
-        id: v.id,
-        type: 'vendor' as const,
-        // Use the normalized array directly
-        categories: normalizedCategories,
-      },
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [
-          parseFloat(location.longitude),
-          parseFloat(location.latitude)
-        ]
-      }
-    };
-  }));
-}
-
-// Convert services to GeoJSON features using map slug instead of ID
-function filterAndTransformServicesToGeoJSON(services: any[]): Array<Feature<Point, ServiceProperties>> {
-  let filteredServices = services;
-
-  // Filter services by map slug for all maps
-  if (currentMapSlug.value !== null) {
-    filteredServices = services.filter((service) => {
-      // Check if the service has map_slugs array and it includes the current map slug
-      if (Array.isArray(service.map_slugs) && service.map_slugs.includes(currentMapSlug.value)) {
-        return true;
-      }
-
-      return false;
-    });
-  }
-
-  // Apply search filtering
-  if (searchQuery.value.trim() !== '') {
-    const query = searchQuery.value.toLowerCase();
-    filteredServices = filteredServices.filter(service =>
-      (service.name && service.name.toLowerCase().includes(query)) ||
-      (service.description && service.description.toLowerCase().includes(query))
-    );
-  }
-
-  // Apply category filtering
-  filteredServices = filteredServices.filter(s => matchesCategoryFilters(s.categories));
-
-  return filteredServices
-    .filter((s) => s.latitude && s.longitude) // Make sure latitude and longitude exist
-    .map((s) => {
-      // Ensure categories are properly normalized
-      const normalizedCategories = normalizeCategories(s.categories);
+  // Convert to GeoJSON features
+  if (type === 'vendor') {
+    return filteredItems.flatMap((v) => v.locations.map((location: any) => {
+      // Ensure categories are properly normalized before adding to properties
+      const normalizedCategories = normalizeCategories(v.categories || []);
 
       return {
         type: 'Feature' as const,
         properties: {
-          title: s.name ?? 'Unknown Service',
-          description: s.description ?? '',
-          id: s.id,
-          is_accessible: Boolean(s.is_accessible),
-          type: 'service' as const,
+          name: v.name ?? 'Unknown Vendor',
+          description: v.description ?? '',
+          id: v.id,
+          type: 'vendor' as const,
           categories: normalizedCategories,
+          mapSlugs: v.map_slugs || [],
+          currentMapSlug: currentMapSlug.value,
+          // currentMapSlugId: getSlugId(currentMapSlug.value),
+          currentMapIndex: currentMapIndex.value,
         },
         geometry: {
           type: 'Point' as const,
           coordinates: [
-            parseFloat(s.longitude),
-            parseFloat(s.latitude)
+            parseFloat(location.longitude),
+            parseFloat(location.latitude)
           ]
         }
       };
-    });
+    })) as any;
+  } else {
+    return filteredItems
+      .map((s) => {
+        // Ensure categories are properly normalized
+        const normalizedCategories = normalizeCategories(s.categories);
+
+        return {
+          type: 'Feature' as const,
+          properties: {
+            title: s.name ?? 'Unknown Service',
+            description: s.description ?? '',
+            id: s.id,
+            is_accessible: Boolean(s.is_accessible),
+            type: 'service' as const,
+            categories: normalizedCategories,
+            mapSlugs: s.map_slugs || [],
+            currentMapSlug: currentMapSlug.value,
+            // currentMapSlugId: getSlugId(currentMapSlug.value),
+            currentMapIndex: currentMapIndex.value,
+          },
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [
+              parseFloat(s.longitude),
+              parseFloat(s.latitude)
+            ]
+          }
+        };
+      }) as any;
+  }
 }
 
-// Build GeoJSON for vendors only
+// Update the collection building functions to use the new unified function
 function buildVendorGeoJSONCollection(): FeatureCollection<Point, VendorProperties> {
   const rawVendors = cloneDeep(vendors);
-  const vendorFeatures = buildVendorGeoJSON(rawVendors);
+  const vendorFeatures = buildItemGeoJSON(rawVendors, 'vendor');
 
   logger.info('Re-built vendor map JSON', {
     'Vendors': vendorFeatures.length,
@@ -895,10 +916,9 @@ function buildVendorGeoJSONCollection(): FeatureCollection<Point, VendorProperti
   };
 }
 
-// Build GeoJSON for services only
 function buildServiceGeoJSONCollection(): FeatureCollection<Point, ServiceProperties> {
   const rawServices = cloneDeep(services);
-  const serviceFeatures = filterAndTransformServicesToGeoJSON(rawServices);
+  const serviceFeatures = buildItemGeoJSON(rawServices, 'service');
 
   logger.info('Re-built service map JSON', {
     'Services': serviceFeatures.length,
@@ -920,9 +940,11 @@ function buildFilteredGeoJSON(): FeatureCollection<Point, VendorProperties | Ser
     'Services': serviceGeoJSON.features.length,
   });
 
+  const combinedFeatures = [...vendorGeoJSON.features, ...serviceGeoJSON.features];
+
   return {
     type: 'FeatureCollection' as const,
-    features: [...vendorGeoJSON.features, ...serviceGeoJSON.features],
+    features: combinedFeatures,
   };
 }
 
@@ -1022,7 +1044,7 @@ function generateSearchSuggestions() {
     // Get map slug
     const mapSlug = Array.isArray(item.map_slugs) && item.map_slugs.length > 0 ? item.map_slugs[0] :
                    (Array.isArray(item.maps) && item.maps.length > 0 ?
-                    (allMaps.value.find(m => m.id === item.maps[0])?.slug || null) : null);
+                    (allMaps.value.find((m: any) => m.id === item.maps[0])?.slug || null) : null);
 
     // Get map name
     const effectiveMapSlug = mapSlug || currentMapSlug.value;
@@ -1282,8 +1304,9 @@ async function loadMapResources() {
   }
 
   try {
-    const numServiceMaps = serviceMaps?.length || 0;
-    const numVendorMaps = vendorMaps?.length || 0;
+    // const numMaps = maps?.length || 0;
+    const numServiceMaps = maps?.filter((m: any) => m.type === 'service')?.length || 0;
+    const numVendorMaps = maps?.filter((m: any) => m.type === 'vendor')?.length || 0;
     const numServiceCategories = serviceCategories?.length || 0;
     const numVendorCategories = vendorCategories?.length || 0;
 
@@ -1295,7 +1318,7 @@ async function loadMapResources() {
     });
 
     // Load category icons
-    await loadCategoryIcons({ map: mapboxMap, serviceMaps, vendorMaps, serviceCategories, vendorCategories });
+    await loadCategoryIcons({ map: mapboxMap, maps, serviceCategories, vendorCategories });
 
     // Load map overlay image
     await loadMapOverlayImage();
@@ -1337,6 +1360,7 @@ function handleClusterClick(e: mapboxgl.MapLayerEventType['click'] & mapboxgl.Ev
   if (!features || features.length === 0 || !features[0].properties) return;
 
   const clusterId = features[0].properties.cluster_id;
+
   if (clusterId === undefined || clusterId === null) {
     console.error('Cluster ID is null or undefined');
     return;
@@ -1344,8 +1368,11 @@ function handleClusterClick(e: mapboxgl.MapLayerEventType['click'] & mapboxgl.Ev
 
   const source = mapboxMap.getSource(MapSource.PointsClustered) as mapboxgl.GeoJSONSource;
 
-  source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-    if (err) return;
+  source.getClusterExpansionZoom(clusterId, (error, zoom) => {
+    if (error) {
+      return;
+    }
+
     mapboxMap.easeTo({
       center: (features[0].geometry as Point).coordinates as [number, number],
       zoom: 16,
@@ -1390,48 +1417,17 @@ function setupMapLayers() {
       data: filteredGeoJson,
       cluster: true,
       clusterRadius: 50,
-      clusterMaxZoom: 14
+      clusterMaxZoom: 14,
+      clusterProperties: {
+        currentMapIndex: ['+', ['get', 'currentMapIndex']]
+      },
     });
 
-    // TODO: If we want separate cluster icons for services and vendors, we need to have two separate data sources?
-
-    // // 4. Add cluster layers
-    // mapboxMap.addLayer({
-    //   id: MapLayer.MapClusterIcon,
-    //   type: 'circle',
-    //   source: MapSource.PointsClustered,
-    //   filter: ['has', 'point_count'],
-    //   paint: {
-    //     'circle-color': '#1E5EAE',
-    //     'circle-radius': 16,
-    //     'circle-stroke-width': 1,
-    //     'circle-stroke-color': '#fff'
-    //   }
-    // });
-
-    // mapboxMap.addLayer({
-    //   id: MapLayer.MapClusterCount,
-    //   type: 'symbol',
-    //   source: MapSource.PointsClustered,
-    //   filter: ['has', 'point_count'],
-    //   layout: {
-    //     'text-field': '{point_count_abbreviated}',
-    //     'text-size': 12
-    //   },
-    //   paint: {
-    //     'text-color': '#ffffff'
-    //   }
-    // });
+    // 4. Add cluster layers
+    addMapClusterIconLayer(mapboxMap, allMaps.value, currentMapIndex.value);
 
     // 5. Add icon layers
-    // addVendorIconLayer(mapboxMap);
-    // addServiceIconLayer(mapboxMap);
-
-    addMapClusterIconLayer(mapboxMap);
-    // addVendorMapClusterIconLayer(mapboxMap);
-
     addMapIconLayer(mapboxMap);
-    // addVendorMapIconLayer(mapboxMap);
 
     // 6. Setup icon click handlers and store the cleanup function
     iconClickHandlersCleanup = setupIconClickHandlers(mapboxMap, getCategoryName);
@@ -1441,14 +1437,30 @@ function setupMapLayers() {
 
     // 8. Wait for the map to be fully rendered
     mapboxMap.once('idle', () => {
-      // Mark sources as ready so queued updates can proceed
       mapSourcesReady.value = true;
-
-      // Process any updates that were queued while layers were being set up
       processPendingMapUpdates();
-
-      // Then finalize setup
       finalizeMapSetup();
+    });
+
+    mapboxMap.on('sourcedata', (e) => {
+      if (e.sourceId === MapSource.PointsClustered && e.isSourceLoaded) {
+        const features = mapboxMap.querySourceFeatures(MapSource.PointsClustered, {
+          sourceLayer: '',
+          filter: ['has', 'point_count']
+        });
+
+        features.forEach((feature: any) => {
+          mapboxMap.setFeatureState(
+            {
+              source: MapSource.PointsClustered,
+              id: feature.id as number
+            },
+            {
+              currentMapIndex: currentMapIndex.value
+            },
+          );
+        });
+      }
     });
   } catch (error) {
     logger.error(error);
