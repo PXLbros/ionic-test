@@ -133,7 +133,7 @@ import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline, clos
 import mapboxgl, { Map as MapboxMap } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
-import { loadCategoryIcons, setupIconClickHandlers, addMapClusterIconLayer, addMapIconLayer, MapLayer, MapSource, getMapClusterIconImageExpression } from '@/utils/MapIconUtils';
+import { loadCategoryIcons, setupIconClickHandlers, addMapClusterIconLayer, addMapIconLayer, MapLayer, MapSource, getMapClusterIconImageExpression, getMapIconImageExpression } from '@/utils/MapIconUtils';
 import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
 import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
@@ -223,12 +223,18 @@ const currentMapIndex = computed(() => {
   return currentMapIndex;
 });
 
-watch(currentMapIndex, (newIndex, oldIndex) => {
+watch(currentMapIndex, (newMapIndex) => {
   if (mapboxMap.getLayer(MapLayer.MapClusterIcon)) {
     mapboxMap.setLayoutProperty(
       MapLayer.MapClusterIcon,
       'icon-image',
-      getMapClusterIconImageExpression({ maps: allMaps.value, currentMapIndex: newIndex }),
+      getMapClusterIconImageExpression({ maps: allMaps.value, currentMapIndex: newMapIndex }),
+    );
+
+    mapboxMap.setLayoutProperty(
+      MapLayer.MapIcon,
+      'icon-image',
+      getMapIconImageExpression({ maps: allMaps.value, currentMapIndex: newMapIndex }),
     );
   }
 });
@@ -1318,7 +1324,7 @@ function setupMapLayers() {
     addMapClusterIconLayer(mapboxMap, allMaps.value, currentMapIndex.value);
 
     // 5. Add icon layers
-    addMapIconLayer(mapboxMap);
+    addMapIconLayer(mapboxMap, allMaps.value, currentMapIndex.value);
 
     // 6. Setup icon click handlers and store the cleanup function
     iconClickHandlersCleanup = setupIconClickHandlers(mapboxMap, getCategoryName);

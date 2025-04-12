@@ -360,23 +360,36 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], cur
       'text-color': '#ffffff'
     }
   });
-
-  // Update the icon-image dynamically when the current map index changes
-  watch(
-    () => currentMapIndex,
-    () => {
-      if (mapboxMap.getLayer(MapLayer.MapClusterIcon)) {
-        mapboxMap.setLayoutProperty(
-          MapLayer.MapClusterIcon,
-          'icon-image',
-          iconImageExpression
-        );
-      }
-    }
-  );
 }
 
-export function addMapIconLayer(map: mapboxgl.Map) {
+export function getMapIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
+  // return [
+  //   'case',
+  //   ['has', 'currentMapSlug'],
+  //   [
+  //     'case',
+  //     ['!=', ['get', 'currentMapSlug'], ''],
+  //     [
+  //       'case',
+  //       ['has', ['concat', 'map-icon-', ['get', 'currentMapSlug']]],
+  //       ['concat', 'map-icon-', ['get', 'currentMapSlug']],
+  //       'default-map-icon'
+  //     ],
+  //     'default-map-icon'
+  //   ],
+  //   'default-map-icon'
+  // ];
+  return [
+    'match',
+    currentMapIndex, // <<-- Direct value
+    ...maps.flatMap((map, index) => [index, `map-icon-${map.slug}`]),
+    'default-map-icon'
+  ];
+}
+
+export function addMapIconLayer(map: mapboxgl.Map, maps: any[], currentMapIndex: number) {
+  console.log(getMapIconImageExpression({ maps, currentMapIndex }));
+
   map.addLayer({
     id: MapLayer.MapIcon,
     type: 'symbol',
@@ -386,155 +399,13 @@ export function addMapIconLayer(map: mapboxgl.Map) {
       ['!', ['has', 'point_count']],
     ],
     layout: {
-      // Use currentMapSlug from feature properties instead of mapSlugs array
-      'icon-image': [
-        'case',
-        ['has', 'currentMapSlug'],
-        [
-          'case',
-          ['!=', ['get', 'currentMapSlug'], ''],
-          [
-            'case',
-            ['has', ['concat', 'map-icon-', ['get', 'currentMapSlug']]],
-            ['concat', 'map-icon-', ['get', 'currentMapSlug']],
-            'default-map-icon'
-          ],
-          'default-map-icon'
-        ],
-        'default-map-icon'
-      ],
+      'icon-image': getMapIconImageExpression({ maps, currentMapIndex }),
       'icon-size': 0.5,
       'icon-allow-overlap': true,
       'icon-anchor': 'bottom',
     }
   });
 }
-
-// export function addVendorMapClusterIconLayer(map: mapboxgl.Map) {
-//   map.addLayer({
-//     id: 'vendor-map-cluster-icon',
-//     type: 'symbol',
-//     source: 'points-clustered',
-//     filter: ['has', 'point_count'],
-//     layout: {
-//       'icon-image': 'default-map-cluster-icon',
-//       'icon-size': 0.5,
-//       'icon-allow-overlap': true,
-//       'icon-anchor': 'bottom',
-//     }
-//   });
-// }
-
-// export function addVendorMapIconLayer(map: mapboxgl.Map) {
-//   map.addLayer({
-//     id: 'vendor-map-icon',
-//     type: 'symbol',
-//     source: 'points-clustered',
-//     filter: [
-//       'all',
-//       ['!', ['has', 'point_count']],
-//       ['==', ['get', 'type'], 'vendor']
-//     ],
-//     layout: {
-//       'icon-image': 'default-map-icon',
-//       'icon-size': 0.5,
-//       'icon-allow-overlap': true,
-//       'icon-anchor': 'bottom',
-//     }
-//   });
-// }
-
-// /**
-//  * Creates the vendor icon layer
-//  * @param map Mapbox map instance
-//  */
-// export function addVendorIconLayer(map: mapboxgl.Map) {
-//   map.addLayer({
-//     id: 'vendor-icon',
-//     type: 'symbol',
-//     source: 'points-clustered',
-//     filter: [
-//       'all',
-//       ['!', ['has', 'point_count']],
-//       ['==', ['get', 'type'], 'vendor']
-//     ],
-//     layout: {
-//       // Simplified expression with better type handling
-//       'icon-image': [
-//         'match',
-//         ['typeof', ['get', 'categories']],
-//         'string',
-//         // If it's a string, use a default icon
-//         'default-vendor-icon',
-//         // Otherwise check if we have categories
-//         [
-//           'case',
-//           // Check if we have any categories
-//           ['>', ['length', ['get', 'categories']], 0],
-//           // If yes, use the first category ID for the icon
-//           ['concat', 'vendor-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
-//           // Otherwise use default
-//           'default-vendor-icon'
-//         ]
-//       ],
-//       'icon-size': 0.5,
-//       // 'icon-size': [
-//       //   'interpolate', ['linear'], ['zoom'],
-//       //   13, 0.3,  // At zoom level 13, icons are smaller
-//       //   17, 0.5   // At zoom level 17, icons are larger
-//       // ],
-//       'icon-allow-overlap': true,
-//       'icon-anchor': 'bottom',
-//       // 'icon-offset': [0, 0],
-//     }
-//   });
-// }
-
-// /**
-//  * Creates the service icon layer
-//  * @param map Mapbox map instance
-//  */
-// export function addServiceIconLayer(map: mapboxgl.Map) {
-//   map.addLayer({
-//     id: 'service-icon',
-//     type: 'symbol',
-//     source: 'points-clustered',
-//     filter: [
-//       'all',
-//       ['!', ['has', 'point_count']],
-//       ['==', ['get', 'type'], 'service']
-//     ],
-//     layout: {
-//       // Use a simpler match expression that Mapbox GL supports
-//       'icon-image': [
-//         'match',
-//         ['typeof', ['get', 'categories']],
-//         'string',
-//         // If it's a string, use a default icon
-//         'default-service-icon',
-//         // Otherwise check if we have categories
-//         [
-//           'case',
-//           // Check if we have any categories
-//           ['>', ['length', ['get', 'categories']], 0],
-//           // If yes, use the first category ID for the icon
-//           ['concat', 'service-category-icon-', ['to-string', ['at', 0, ['get', 'categories']]]],
-//           // Otherwise use default
-//           'default-service-icon'
-//         ]
-//       ],
-//       'icon-size': 1.1,
-//       // 'icon-size': [
-//       //   'interpolate', ['linear'], ['zoom'],
-//       //   13, 0.7,  // At zoom level 13, icons are smaller
-//       //   17, 1.1   // At zoom level 17, icons are larger
-//       // ],
-//       'icon-allow-overlap': true,
-//       'icon-anchor': 'bottom',
-//       // 'icon-offset': [0, 0],
-//     }
-//   });
-// }
 
 /**
  * Creates handlers for icon click events
