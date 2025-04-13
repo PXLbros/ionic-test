@@ -16,18 +16,6 @@ export enum MapSource {
   ChevyCourtArea = 'chevy-court-area',
 }
 
-// Interface for category
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  icon: string | null;
-  num_services?: number;
-  num_vendors?: number;
-  maps?: number[];
-  map_slugs?: string[]; // Added for slug-based lookup
-}
-
 // Update the CategoryIconLoadingConfig interface to support separate settings for clusters and icons
 export interface CategoryIconLoadingConfig {
   failOnIconError: boolean;
@@ -215,13 +203,13 @@ export async function loadCategoryIcons({
               newImageHeight = image.height;
             }
 
-            logger.debug('Added image to map', {
-              'Image ID': imageId,
-              'Size': `${newImageWidth}x${newImageHeight}`,
-              'Type': isClusterIcon ? 'Cluster Icon' : 'Regular Icon',
-              'Resized': resizedImage ? `Yes (from ${image.width}x${image.height})` : 'No',
-              'URL': url,
-            });
+            // logger.debug('Added image to map', {
+            //   'Image ID': imageId,
+            //   'Size': `${newImageWidth}x${newImageHeight}`,
+            //   'Type': isClusterIcon ? 'Cluster Icon' : 'Regular Icon',
+            //   'Resized': resizedImage ? `Yes (from ${image.width}x${image.height})` : 'No',
+            //   'URL': url,
+            // });
           }
 
           resolve();
@@ -333,17 +321,26 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], cur
 }
 
 export function getMapIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
-  return [
-    'match',
-    currentMapIndex, // <<-- Direct value
-    ...maps.flatMap((map, index) => [index, `map-icon-${map.slug}`]),
-    'default-map-icon'
-  ];
+  const newMap = maps[currentMapIndex];
+  const isMasterMap = newMap.slug === 'master';
+  const defaultMapIcon = 'default-map-icon';
+
+  return isMasterMap
+    ? [
+        'match',
+        ['get', 'primaryMapSlug'],
+        ...maps.flatMap((map) => [map.slug, `map-icon-${map.slug}`]),
+        defaultMapIcon,
+      ]
+    : [
+        'match',
+        currentMapIndex,
+        ...maps.flatMap((map, index) => [index, `map-icon-${map.slug}`]),
+        defaultMapIcon,
+      ];
 }
 
 export function addMapIconLayer(map: mapboxgl.Map, maps: any[], currentMapIndex: number) {
-  console.log(getMapIconImageExpression({ maps, currentMapIndex }));
-
   map.addLayer({
     id: MapLayer.MapIcon,
     type: 'symbol',
@@ -485,7 +482,6 @@ export function setupIconClickHandlers(
 
     const feature = e.features[0];
 
-    console.log('feature', feature);
     switch (feature.properties.type) {
       case 'vendor': {
         handleVendorIconClick(e);
