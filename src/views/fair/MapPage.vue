@@ -757,6 +757,7 @@ function buildItemGeoJSON<T extends 'vendor' | 'service'>(
           mapSlugs: v.map_slugs || [],
           currentMapSlug: currentMapSlug.value,
           currentMapIndex: currentMapIndex.value,
+          primaryMapSlug: v.primary_map_slug || null,
         },
         geometry: {
           type: 'Point' as const,
@@ -785,6 +786,7 @@ function buildItemGeoJSON<T extends 'vendor' | 'service'>(
             mapSlugs: s.map_slugs || [],
             currentMapSlug: currentMapSlug.value,
             currentMapIndex: currentMapIndex.value,
+            primaryMapSlug: s.primary_map_slug || null,
           },
           geometry: {
             type: 'Point' as const,
