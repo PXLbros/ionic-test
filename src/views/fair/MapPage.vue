@@ -176,8 +176,6 @@ const dataStore = useDataStore();
 // isdebug mode if ?debug=1
 const isDebugMode = ref(new URLSearchParams(window.location.search).get('debug') === '1');
 
-const isWebPSupported = ref(false);
-
 const vendors = dataStore.data.nysfairWebsite.vendors;
 const services = dataStore.data.nysfairWebsite.services;
 const serviceCategories = dataStore.data.nysfairWebsite.service_categories;
@@ -1253,12 +1251,6 @@ function loadMapOverlayImage(): Promise<void> {
   });
 }
 
-function checkWebPSupport(): boolean {
-  const canvas = document.createElement('canvas');
-
-  return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-}
-
 // Function to handle cluster clicks
 function handleClusterClick(e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) {
   if (!mapboxMap || !e.features || e.features.length === 0 || !e.features[0].properties) return;
@@ -1293,14 +1285,11 @@ function setupMapLayers() {
     return;
   }
 
-  // const imageUrl = webpSupported ? '/icons/Map_Design_3x.webp' : '/icons/Map_Design_3x.png';
-  const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
-
   try {
     // 1. Add the map overlay image source
     mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'image',
-      url: mapOverlayImageUrl,
+      url: '/icons/Map_Design-big-min.png',
       coordinates: [
         [-76.21532502658798, 43.055330160826315],   // Top left
         [-76.23753721914531, 43.07114978353832],    // Top right
@@ -1447,12 +1436,9 @@ function destroyMap() {
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
   // Setup listener for closing dropdown when clicking outside
   document.addEventListener('click', closeDropdownOnOutsideClick);
-
-  // Check if WebP is supported
-  isWebPSupported.value = await checkWebPSupport();
 
   // Initialize the map
   initMap();
