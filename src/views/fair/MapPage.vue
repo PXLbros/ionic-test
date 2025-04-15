@@ -146,7 +146,7 @@ import { useDataStore } from '@/stores/data';
 // Default map view state to reset to
 const DEFAULT_MAP_CENTER: [number, number] = [-76.2197, 43.073];
 const DEFAULT_MAP_ZOOM = 14;
-const DEFAULT_MAP_BEARING = 222;
+const DEFAULT_MAP_BEARING = 222; // In degrees
 
 const isLoadingMap = ref(true);
 
@@ -175,6 +175,8 @@ const dataStore = useDataStore();
 
 // isdebug mode if ?debug=1
 const isDebugMode = ref(new URLSearchParams(window.location.search).get('debug') === '1');
+
+const isWebPSupported = ref(false);
 
 const vendors = dataStore.data.nysfairWebsite.vendors;
 const services = dataStore.data.nysfairWebsite.services;
@@ -1163,7 +1165,7 @@ function initMap() {
     preserveDrawingBuffer: true,
     maxZoom: 17,
     minZoom: 13,
-    failIfMajorPerformanceCaveat: true, // Don't load if performance would be poor
+    // failIfMajorPerformanceCaveat: true, // Don't load if performance would be poor
   });
 
   // Enable debug features if debug mode is active
@@ -1251,6 +1253,12 @@ function loadMapOverlayImage(): Promise<void> {
   });
 }
 
+function checkWebPSupport(): boolean {
+  const canvas = document.createElement('canvas');
+
+  return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+}
+
 // Function to handle cluster clicks
 function handleClusterClick(e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) {
   if (!mapboxMap || !e.features || e.features.length === 0 || !e.features[0].properties) return;
@@ -1285,11 +1293,14 @@ function setupMapLayers() {
     return;
   }
 
+  // const imageUrl = webpSupported ? '/icons/Map_Design_3x.webp' : '/icons/Map_Design_3x.png';
+  const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
+
   try {
     // 1. Add the map overlay image source
     mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'image',
-      url: '/icons/Map_Design-big-min.png',
+      url: mapOverlayImageUrl,
       coordinates: [
         [-76.21532502658798, 43.055330160826315],   // Top left
         [-76.23753721914531, 43.07114978353832],    // Top right
@@ -1297,6 +1308,18 @@ function setupMapLayers() {
         [-76.19757700157899, 43.06982854755563]     // Bottom left
       ]
     });
+
+    // mapboxMap.addSource(MapSource.ChevyCourtArea, {
+    //   type: 'raster',
+    //   tiles: [
+    //     // '/icons/tiles/{z}/{x}/{y}.png'
+    //     'http://nys-fair.test:8001/serve-asset.php?asset=tiles/{z}/{x}/{y}.png',
+    //   ],
+    //   tileSize: 256, // or 512 if you created @2x tiles
+    //   minzoom: 15,
+    //   maxzoom: 20,
+    //   bounds: [-76.237, 43.055, -76.197, 43.085],
+    // });
 
     mapboxMap.addLayer({
       id: MapLayer.ChevyCourtOverlay,
@@ -1424,9 +1447,12 @@ function destroyMap() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   // Setup listener for closing dropdown when clicking outside
   document.addEventListener('click', closeDropdownOnOutsideClick);
+
+  // Check if WebP is supported
+  isWebPSupported.value = await checkWebPSupport();
 
   // Initialize the map
   initMap();
