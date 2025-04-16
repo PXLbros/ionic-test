@@ -34,9 +34,9 @@ Enable Allow from this source.
 ```sh
 gdal2tiles.py \
   --profile=mercator \
-  -z 13-17 \
-  -r near \
-  -w none \
+  --zoom=13-17 \
+  --resampling=lanczos \
+  --webviewer=none \
   georeferenced-overlay.tif \
-  ./tiles
+  ./map-tiles
 ```

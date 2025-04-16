@@ -1306,7 +1306,8 @@ function setupMapLayers() {
     return;
   }
 
-  const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
+  // const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
+  const mapOverlayImageUrl = '/icons/Map_Design-big-min.png';
 
   try {
     // // 1. Add the map overlay image source
@@ -1325,21 +1326,22 @@ function setupMapLayers() {
       type: 'raster',
       tiles: [
         // '/map/tiles/{z}/{x}/{y}.png',
-        'http://nys-fair.test:8001/serve-asset.php?asset=tiles2/{z}/{x}/{y}.png',
+        'http://nys-fair.test:8001/serve-asset.php?asset=tiles-new2/{z}/{x}/{y}.png',
       ],
       tileSize: 256,
       scheme: 'tms',
-      minzoom: mapboxMap.getMinZoom(),
-      maxzoom: mapboxMap.getMaxZoom(),
+      // minzoom: mapboxMap.getMinZoom(),
+      // maxzoom: mapboxMap.getMaxZoom(),
       // bounds: [-76.237, 43.055, -76.197, 43.085],
     });
 
+    // TOOD: Add a slider form control on top of the map that controls the raster-opacity of the MapLayer.ChevyCourtOverlay
     mapboxMap.addLayer({
       id: MapLayer.ChevyCourtOverlay,
       type: 'raster',
       source: MapSource.ChevyCourtArea,
       paint: {
-        // 'raster-opacity': 1.0
+        'raster-opacity': 1
       }
     });
 
