@@ -34,3 +34,4 @@ npm-debug.log*
 .tmuxp.yaml
 
 .venv
+scripts/generate-map-tiles/input/georeferenced-overlay.tif
