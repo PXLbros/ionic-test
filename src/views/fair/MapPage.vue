@@ -73,6 +73,19 @@
       <ion-content class="map-container">
         <div class="map" ref="mapContainer"></div>
 
+        <!-- Map Opacity Slider -->
+        <div class="opacity-control">
+          <div class="opacity-label">Map Overlay Opacity</div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            :value="mapOpacity * 100"
+            @input="updateMapOpacity($event)"
+            class="opacity-slider"
+          />
+          <div class="opacity-value">{{ Math.round(mapOpacity * 100) }}%</div>
+        </div>
       </ion-content>
     </div>
 
@@ -162,6 +175,9 @@ const btnGroup = ref<HTMLElement | null>(null);
 const selectedCategories = ref<Record<number, boolean>>({});
 const showFiltersPanel = ref(false);
 const hasFilterChanges = ref(false);
+
+// Add map opacity state variable
+const mapOpacity = ref(1); // Default to fully visible (100%)
 
 // Refs for search suggestions
 const showSearchSuggestions = ref(false);
@@ -1306,8 +1322,8 @@ function setupMapLayers() {
     return;
   }
 
-  // const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
-  const mapOverlayImageUrl = '/icons/Map_Design-big-min.png';
+  const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
+  // const mapOverlayImageUrl = '/icons/Map_Design-big-min.png';
 
   try {
     // // 1. Add the map overlay image source
@@ -1326,10 +1342,10 @@ function setupMapLayers() {
       type: 'raster',
       tiles: [
         // '/map/tiles/{z}/{x}/{y}.png',
-        'http://nys-fair.test:8001/serve-asset.php?asset=tiles-new2/{z}/{x}/{y}.png',
+        'http://nysfair-staging.pxlagency.com/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png',
       ],
-      tileSize: 256,
-      scheme: 'tms',
+      tileSize: 512,
+      // scheme: 'tms',
       // minzoom: mapboxMap.getMinZoom(),
       // maxzoom: mapboxMap.getMaxZoom(),
       // bounds: [-76.237, 43.055, -76.197, 43.085],
@@ -1341,7 +1357,7 @@ function setupMapLayers() {
       type: 'raster',
       source: MapSource.ChevyCourtArea,
       paint: {
-        'raster-opacity': 1
+        'raster-opacity': mapOpacity.value
       }
     });
 
@@ -1485,6 +1501,21 @@ onUnmounted(() => {
   // Destroy map
   destroyMap();
 });
+
+// Function to update map opacity
+function updateMapOpacity(event: Event) {
+  const value = parseInt((event.target as HTMLInputElement).value);
+  mapOpacity.value = value / 100;
+
+  // Update map layer opacity if map is initialized
+  if (mapboxMap && mapboxMap.getLayer(MapLayer.ChevyCourtOverlay)) {
+    mapboxMap.setPaintProperty(
+      MapLayer.ChevyCourtOverlay,
+      'raster-opacity',
+      mapOpacity.value
+    );
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -2017,5 +2048,79 @@ onUnmounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Opacity slider control */
+.opacity-control {
+  position: absolute;
+  bottom: 25px;
+  left: 15px;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 10px 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 5;
+  min-width: 180px;
+  backdrop-filter: blur(4px);
+
+  .opacity-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 2px;
+  }
+
+  .opacity-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    outline: none;
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1F3667;
+      cursor: pointer;
+    }
+
+    &::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1F3667;
+      cursor: pointer;
+      border: none;
+    }
+  }
+
+  .opacity-value {
+    font-size: 12px;
+    color: #555;
+    text-align: right;
+  }
+}
+
+/* Make sure the opacity control is visible on both light and dark maps */
+@media (prefers-color-scheme: dark) {
+  .opacity-control {
+    background-color: rgba(50, 50, 50, 0.9);
+
+    .opacity-label {
+      color: #f0f0f0;
+    }
+
+    .opacity-value {
+      color: #e0e0e0;
+    }
+  }
 }
 </style>

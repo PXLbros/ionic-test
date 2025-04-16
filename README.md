@@ -31,6 +31,27 @@ Enable Allow from this source.
 
 ### Convert .tif to Raster Tiles (XYZ format)
 
+From `scripts/generate-map-tiles` directory, run:
+
+```sh
+docker build -f Dockerfile.gdal2tiles -t gdal2tiles-gdal38 .
+```
+
+```
+docker run --rm \
+  -v $PWD:/data \
+  gdal2tiles-gdal38 \
+  gdal2tiles.py \
+    --profile=mercator \
+    --xyz \
+    --tilesize=512 \
+    --resampling=lanczos \
+    --zoom=13-17 \
+    input/georeferenced-overlay.tif \
+    output/tiles
+```
+
+<!-- 
 ```sh
 gdal2tiles.py \
   --profile=mercator \
@@ -39,4 +60,4 @@ gdal2tiles.py \
   --webviewer=none \
   georeferenced-overlay.tif \
   ./map-tiles
-```
+``` -->
