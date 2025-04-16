@@ -21,3 +21,22 @@ Tap Install unknown apps.
 Select the app (like Chrome or File Manager) you'll use to install the APK.
 Enable Allow from this source.
 ```
+
+## Generate map
+
+### Georeference and generate .tif file in QGIS
+  - Transformation Type: Linear
+  - Resampling method: Nearest neighbour
+  - Target SRS: EPSG:3857 – Web Mercator:
+
+### Convert .tif to Raster Tiles (XYZ format)
+
+```sh
+gdal2tiles.py \
+  --profile=mercator \
+  -z 13-17 \
+  -r near \
+  -w none \
+  georeferenced-overlay.tif \
+  ./tiles
+```

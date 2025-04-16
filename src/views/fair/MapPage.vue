@@ -1306,40 +1306,40 @@ function setupMapLayers() {
     return;
   }
 
-  // const imageUrl = webpSupported ? '/icons/Map_Design_3x.webp' : '/icons/Map_Design_3x.png';
   const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
 
   try {
-    // 1. Add the map overlay image source
-    mapboxMap.addSource(MapSource.ChevyCourtArea, {
-      type: 'image',
-      url: mapOverlayImageUrl,
-      coordinates: [
-        [-76.21532502658798, 43.055330160826315],   // Top left
-        [-76.23753721914531, 43.07114978353832],    // Top right
-        [-76.22037084830293, 43.08502388194864],    // Bottom right
-        [-76.19757700157899, 43.06982854755563]     // Bottom left
-      ]
-    });
-
+    // // 1. Add the map overlay image source
     // mapboxMap.addSource(MapSource.ChevyCourtArea, {
-    //   type: 'raster',
-    //   tiles: [
-    //     // '/icons/tiles/{z}/{x}/{y}.png'
-    //     'http://nys-fair.test:8001/serve-asset.php?asset=tiles/{z}/{x}/{y}.png',
-    //   ],
-    //   tileSize: 256, // or 512 if you created @2x tiles
-    //   minzoom: 15,
-    //   maxzoom: 20,
-    //   bounds: [-76.237, 43.055, -76.197, 43.085],
+    //   type: 'image',
+    //   url: mapOverlayImageUrl,
+    //   coordinates: [
+    //     [-76.21532502658798, 43.055330160826315],   // Top left
+    //     [-76.23753721914531, 43.07114978353832],    // Top right
+    //     [-76.22037084830293, 43.08502388194864],    // Bottom right
+    //     [-76.19757700157899, 43.06982854755563]     // Bottom left
+    //   ]
     // });
+
+    mapboxMap.addSource(MapSource.ChevyCourtArea, {
+      type: 'raster',
+      tiles: [
+        // '/map/tiles/{z}/{x}/{y}.png',
+        'http://nys-fair.test:8001/serve-asset.php?asset=tiles2/{z}/{x}/{y}.png',
+      ],
+      tileSize: 256,
+      scheme: 'tms',
+      minzoom: mapboxMap.getMinZoom(),
+      maxzoom: mapboxMap.getMaxZoom(),
+      // bounds: [-76.237, 43.055, -76.197, 43.085],
+    });
 
     mapboxMap.addLayer({
       id: MapLayer.ChevyCourtOverlay,
       type: 'raster',
       source: MapSource.ChevyCourtArea,
       paint: {
-        'raster-opacity': 1.0
+        // 'raster-opacity': 1.0
       }
     });
 
