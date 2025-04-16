@@ -35,3 +35,4 @@ npm-debug.log*
 
 .venv
 scripts/generate-map-tiles/input/georeferenced-overlay.tif
+.tif
