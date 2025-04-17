@@ -29,13 +29,17 @@
       </div>
 
       <div class="filter-section">
-        <div class="category-filter">
-          <select v-model="selectedCategory" class="category-select">
-            <option value="all">All Categories</option>
-            <option v-for="category in categories" :key="category.id" :value="category.id">
+        <div class="filter-dropdown">
+          <button class="filter-btn" :class="{ 'filter-btn--active': showCategoryDropdown }" @click="toggleCategoryDropdown">
+            {{ selectedCategoryName || 'Category' }}
+            <span>▼</span>
+          </button>
+          <div v-if="showCategoryDropdown" class="dropdown-content">
+            <div @click="selectCategory('all')">All Categories</div>
+            <div v-for="category in categories" :key="category.id" @click="selectCategory(category.id)">
               {{ category.name }}
-            </option>
-          </select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -101,6 +105,7 @@ const findCurrentDayIndex = (dates: DateObject[]): number => {
 const selectedDateIndex = ref(0);
 const isDateChanging = ref(false);
 const selectedCategory = ref<string | number>('all');
+const showCategoryDropdown = ref(false);
 
 const dates = computed<DateObject[]>(() => {
   if (!eventsData.value || !eventsData.value.length) return [];
@@ -216,6 +221,25 @@ const selectDate = (index: number): void => {
     isDateChanging.value = false;
   }, 0);
 };
+
+const selectCategory = (categoryId: string | number): void => {
+  selectedCategory.value = categoryId;
+  showCategoryDropdown.value = false;
+};
+
+const toggleCategoryDropdown = (): void => {
+  showCategoryDropdown.value = !showCategoryDropdown.value;
+};
+
+const selectedCategoryName = computed(() => {
+  if (selectedCategory.value === 'all') {
+    return 'All Categories';
+  }
+
+  const category = categories.value.find(c => c.id === selectedCategory.value);
+
+  return category ? category.name : 'Category';
+});
 </script>
 
 <style lang="scss" scoped>
@@ -330,21 +354,65 @@ const selectDate = (index: number): void => {
     justify-content: flex-end;
     width: 100%;
     margin-bottom: 50px;
+}
 
-    .category-filter {
+// Filter dropdown styling to match MusicPage.vue
+.filter-dropdown {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-basis: 100%;
+
+    .filter-btn {
+        background-color: #1F3667;
+        border: none;
+        padding: 15px 20px;
+        border-radius: 12px;
+        font-size: 16px;
+        cursor: pointer;
+        font-weight: 700;
         width: 100%;
+        color: #F1F1F1;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: transform 0.3s ease;
 
-        .category-select {
-            width: 100%;
-            padding: 13px 10px;
-            border-radius: 15px;
-            font-size: 16px;
+        &.filter-btn--active {
+            span {
+                transform: rotate(180deg);
+                transition: transform 0.3s ease;
+            }
+        }
+
+        span {
+          transform: rotate(0deg);
+          transition: transform 0.3s ease;
+          color: #F4E8AB;
+        }
+    }
+
+    .dropdown-content {
+        position: absolute;
+        top: 110%;
+        left: 0;
+        width: 100%;
+        background-color: #F4E8AB;
+        border-radius: 12px;
+        box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.4);
+        z-index: 10;
+        max-height: 30vh;
+        overflow-y: auto;
+        padding: 10px;
+
+        div {
+            padding: 10px;
             cursor: pointer;
-            background-color: #1F3667;
-            color: #F1F1F1;
-            transition: border-color 0.3s ease;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
+
+            &:hover {
+              background-color: #f3e59c;
+            }
         }
     }
 }
