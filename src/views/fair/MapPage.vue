@@ -161,6 +161,12 @@ const DEFAULT_MAP_CENTER: [number, number] = [-76.2197, 43.073];
 const DEFAULT_MAP_ZOOM = 14;
 const DEFAULT_MAP_BEARING = 222; // In degrees
 
+const MAP_MIN_ZOOM = 13;
+const MAP_MAX_ZOOM = 17;
+
+const MAP_CLUSTER_RADIUS = 50;
+const MAP_CLUSTER_MIN_POINTS = 10;
+
 const isLoadingMap = ref(true);
 
 const mapContainer = ref<HTMLElement | null>(null);
@@ -1176,11 +1182,11 @@ function initMap() {
     dragRotate: false,
     pitchWithRotate: false,
     touchPitch: false,
-    touchZoomRotate: true,
+    touchZoomRotate: false,
     renderWorldCopies: false,
     preserveDrawingBuffer: true,
-    maxZoom: 17,
-    minZoom: 13,
+    minZoom: MAP_MIN_ZOOM,
+    maxZoom: MAP_MAX_ZOOM,
     // failIfMajorPerformanceCaveat: true, // Don't load if performance would be poor
   });
 
@@ -1326,7 +1332,7 @@ function setupMapLayers() {
   // const mapOverlayImageUrl = '/icons/Map_Design-big-min.png';
 
   try {
-    // // 1. Add the map overlay image source
+    // 1. Add the map overlay image source
     // mapboxMap.addSource(MapSource.ChevyCourtArea, {
     //   type: 'image',
     //   url: mapOverlayImageUrl,
@@ -1369,11 +1375,9 @@ function setupMapLayers() {
       type: 'geojson',
       data: filteredGeoJson,
       cluster: true,
-      clusterRadius: 50,
-      clusterMaxZoom: 14,
-      // clusterProperties: {
-      //   currentMapIndex: ['+', ['get', 'currentMapIndex']]
-      // },
+      clusterRadius: MAP_CLUSTER_RADIUS,
+      clusterMaxZoom: MAP_MAX_ZOOM - 1,
+      clusterMinPoints: MAP_CLUSTER_MIN_POINTS,
     });
 
     // 4. Add cluster layers
