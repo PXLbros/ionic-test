@@ -10,7 +10,8 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@use "@/theme/global" as *;`
+        additionalData: `@use "@/theme/global" as *;
+@use "@/theme/form" as *;`,
       }
     }
   },
