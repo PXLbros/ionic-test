@@ -31,7 +31,7 @@
       <div class="filter-section">
         <div class="filter-dropdown">
           <button class="filter-btn" :class="{ 'filter-btn--active': showCategoryDropdown }" @click="toggleCategoryDropdown">
-            {{ selectedCategoryName || 'Category' }}
+            {{ selectedCategoryName }}
             <span>▼</span>
           </button>
           <div v-if="showCategoryDropdown" class="dropdown-content">
@@ -238,7 +238,13 @@ const selectedCategoryName = computed(() => {
 
   const category = categories.value.find(c => c.id === selectedCategory.value);
 
-  return category ? category.name : 'Category';
+  if (!category) {
+    selectedCategory.value = 'all';
+
+    return 'All Categories';
+  }
+
+  return category.name;
 });
 </script>
 
