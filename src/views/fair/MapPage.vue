@@ -160,6 +160,7 @@ import { useDataStore } from '@/stores/data';
 const DEFAULT_MAP_CENTER: [number, number] = [-76.2197, 43.073];
 const DEFAULT_MAP_ZOOM = 14;
 const DEFAULT_MAP_BEARING = 222; // In degrees
+const DEFAULT_MAP_NAME = 'food-beverage';
 
 const MAP_MIN_ZOOM = 13;
 const MAP_MAX_ZOOM = 17;
@@ -211,8 +212,8 @@ const maps = dataStore.data.nysfairWebsite.maps;
 const allMaps = computed(() => maps);
 
 // Find the master map by its slug
-const masterMap = allMaps.value.find((map: any) => map.slug.startsWith('master'));
-currentMapSlug.value = masterMap?.slug ?? allMaps.value[0]?.slug ?? null;
+const defaultMap = allMaps.value.find((map: any) => map.slug === DEFAULT_MAP_NAME);
+currentMapSlug.value = defaultMap?.slug ?? allMaps.value[0]?.slug ?? null;
 
 // Get the current map name for display using the slug
 const currentMapName = computed(() => {
@@ -622,8 +623,8 @@ function resetFilters() {
   clearCategoryFilters();
 
   // Reset to master map if it exists, otherwise use the first map
-  if (masterMap) {
-    currentMapSlug.value = masterMap.slug;
+  if (defaultMap) {
+    currentMapSlug.value = defaultMap.slug;
   } else if (allMaps.value.length > 0) {
     currentMapSlug.value = allMaps.value[0].slug;
   }
