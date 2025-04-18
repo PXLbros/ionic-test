@@ -73,9 +73,10 @@
       <ion-content class="map-container">
         <div class="map" ref="mapContainer"></div>
 
-        <!-- Map Opacity Slider -->
+        <!-- Debug Control Panel -->
         <div class="opacity-control">
-          <div class="opacity-label">Map Overlay Opacity</div>
+          <div class="debug-title">Map Debug</div>
+          <div class="opacity-label">Overlay Opacity</div>
           <input
             type="range"
             min="0"
@@ -85,6 +86,7 @@
             class="opacity-slider"
           />
           <div class="opacity-value">{{ Math.round(mapOpacity * 100) }}%</div>
+          <div class="zoom-level"><strong>Zoom Level:</strong> {{ currentZoomLevel.toFixed(2) }}</div>
         </div>
       </ion-content>
     </div>
@@ -152,7 +154,7 @@ import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
 
 // Access Token for Mapbox
-mapboxgl.accessToken = 'pk.eyJ1IjoicHhsZGV2b3BzIiwiYSI6ImNqZjA2bmpiYjBrNTkzM285dnJobjY5aGMifQ.jw168py37rli1OcHuyI9aw';
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_ACCESS_TOKEN as string;
 
 import { useDataStore } from '@/stores/data';
 
@@ -1165,7 +1167,8 @@ const selectedFilterCount = computed(() => {
   return Object.values(selectedCategories.value).filter(Boolean).length;
 });
 
-// Initialize the map with all required configurations
+const currentZoomLevel = ref(DEFAULT_MAP_ZOOM); // Track current map zoom level
+
 function initMap() {
   if (!mapContainer.value) {
     return;
@@ -1219,6 +1222,14 @@ function initMap() {
     logger.info('Map style loaded');
 
     loadMapResources();
+  });
+
+  // Initialize current zoom level
+  currentZoomLevel.value = mapboxMap.getZoom();
+
+  // Update zoom level on zoom events
+  mapboxMap.on('zoom', () => {
+    currentZoomLevel.value = mapboxMap.getZoom();
   });
 }
 
@@ -2060,7 +2071,7 @@ function updateMapOpacity(event: Event) {
 /* Opacity slider control */
 .opacity-control {
   position: absolute;
-  bottom: 25px;
+  bottom: 15px;
   left: 15px;
   background-color: rgba(255, 255, 255, 0.85);
   padding: 10px 15px;
@@ -2072,6 +2083,15 @@ function updateMapOpacity(event: Event) {
   z-index: 5;
   min-width: 180px;
   backdrop-filter: blur(4px);
+
+  .debug-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 6px;
+  }
 
   .opacity-label {
     font-size: 13px;
@@ -2114,14 +2134,24 @@ function updateMapOpacity(event: Event) {
     color: #555;
     text-align: right;
   }
+
+  .zoom-level {
+    font-size: 12px;
+    font-weight: 500;
+    color: #333;
+    margin-top: 4px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: 6px;
+  }
 }
 
-/* Make sure the opacity control is visible on both light and dark maps */
 @media (prefers-color-scheme: dark) {
   .opacity-control {
     background-color: rgba(50, 50, 50, 0.9);
 
-    .opacity-label {
+    .debug-title,
+    .opacity-label,
+    .zoom-level {
       color: #f0f0f0;
     }
 
