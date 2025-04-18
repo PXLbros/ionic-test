@@ -23,6 +23,7 @@ declare module 'vue' {
     FavoriteButton: typeof import('./components/FavoriteButton.vue')['default']
     FGKeepInTouch: typeof import('./components/FGKeepInTouch.vue')['default']
     FloatingNav: typeof import('./components/FloatingNav.vue')['default']
+    HamburgerIcon: typeof import('./components/icons/HamburgerIcon.vue')['default']
     HomeIcon: typeof import('./components/icons/HomeIcon.vue')['default']
     Loader: typeof import('./components/Loader.vue')['default']
     MapDetailsPopup: typeof import('./components/MapDetailsPopup.vue')['default']

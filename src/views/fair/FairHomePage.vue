@@ -1,27 +1,17 @@
 <template>
   <ion-page id="main-content" class="main-content--fair-page">
-    <!-- Header Nav -->
-
-    <!-- Main Content -->
     <BaseNav
       type="fair"
       toolbarBackground="#098944"
       menuBackground="linear-gradient(180deg, #098944 0%, #098944 100%)"
       :logoSrc="fairLogo"
       logoAlt="NYSF Logo"
+      :headerVisible="isHeaderVisible"
     />
-
-    <!-- <FloatingNav
-      type="fair"
-      toolbarBackground="#098944"
-      menuBackground="linear-gradient(180deg, #098944 0%, #098944 100%)"
-      :logoSrc="fairLogo"
-      logoAlt="NYSF Logo"
-    /> -->
 
     <FairBottomNavigation />
 
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scroll-events="true" @ion-scroll="handleScroll($event)">
       <div class="main">
         <div class="main-logo">
           <img src="/src/imgs/svg/fair-main-logo.svg" alt="NYSF Logo">
@@ -207,6 +197,9 @@ import fairLogo from '@/imgs/svg/fair-logo-light.svg';
 const dataStore = useDataStore();
 // console.log('fair page data store', dataStore.data);
 
+const isHeaderVisible = ref(false);
+let lastScrollY = 0;
+
 const email = ref('');
 const carouselContainer = ref<HTMLElement | null>(null);
 
@@ -252,6 +245,26 @@ const openTicketsWebsite = () => {
   window.open(ticketsUrl.value);
 };
 
+const handleScroll = (event: CustomEvent) => {
+  const currentY = event.detail.currentY;
+
+  const isScrollingDown = currentY > lastScrollY;
+  const isScrollingUp = currentY < lastScrollY;
+
+  // Only trigger if scrolled past 10px
+  if (currentY > 10) {
+    if (isScrollingDown) {
+      isHeaderVisible.value = true; // Show header when scrolling down
+    } else if (isScrollingUp) {
+      isHeaderVisible.value = false; // Hide header when scrolling up
+    }
+  } else {
+    isHeaderVisible.value = false; // At top, keep it hidden
+  }
+
+  lastScrollY = currentY;
+};
+
 onMounted(() => {
   const container = carouselContainer.value;
   if (!container) return;
@@ -278,8 +291,6 @@ onMounted(() => {
     container.scrollLeft = scrollLeft - walk;
   });
 });
-
-
 </script>
 
 <style scoped lang="scss">
@@ -339,7 +350,7 @@ ion-col {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 50px;
+    margin-top: 30px;
     position: relative; // Add this
     z-index: 10; // Add this to ensure logo stays on top
     margin-bottom: 10px;

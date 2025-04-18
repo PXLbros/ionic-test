@@ -2,7 +2,7 @@
 <template>
   <div :id="sectionId" class="base-nav">
     <!-- Main Navbar -->
-    <ion-header>
+    <ion-header :class="{ 'nav-visible': props.headerVisible }">
       <ion-toolbar :style="{ '--background': toolbarBackground }">
         <div  class="nav-container">
           <router-link :to="`/${type}`">
@@ -18,12 +18,14 @@
             class="header-side menu-icon"
             @click="openMenu"
           > -->
-          <svg class="menu-icon" @click="openMenu" width="33" height="20" viewBox="0 0 33 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14.85 18.6957C14.85 17.9826 15.411 17.3913 16.0875 17.3913H31.7625C32.439 17.3913 33 17.9826 33 18.6957C33 19.4087 32.439 20 31.7625 20H16.0875C15.411 20 14.85 19.4087 14.85 18.6957ZM0 10C0 9.28696 0.561 8.69565 1.2375 8.69565H31.7625C32.439 8.69565 33 9.28696 33 10C33 10.713 32.439 11.3043 31.7625 11.3043H1.2375C0.561 11.3043 0 10.713 0 10ZM6.6 1.30435C6.6 0.591304 7.161 0 7.8375 0H31.7625C32.439 0 33 0.591304 33 1.30435C33 2.01739 32.439 2.6087 31.7625 2.6087H7.8375C7.161 2.6087 6.6 2.01739 6.6 1.30435Z"/>
-          </svg>
+          <HamburgerIcon class="menu-icon" @click="toggleMenu" />
         </div>
       </ion-toolbar>
     </ion-header>
+
+    <div class="hamburger-toggle" @click="toggleMenu">
+      <HamburgerIcon class="menu-icon" />
+    </div>
 
     <!-- Slide-out Menu -->
     <div :id="sectionId" class="nav-wrapper" :class="{ 'is-open': isMenuOpen }">
@@ -106,6 +108,7 @@ import { useRouter } from 'vue-router';
 import { IonToolbar, IonHeader } from '@ionic/vue';
 import { closeCircleOutline } from 'ionicons/icons';
 import { IonIcon } from '@ionic/vue';
+import HamburgerIcon from './icons/HamburgerIcon.vue';
 
 const props = defineProps<{
   type: 'fair' | 'fairgrounds'
@@ -113,6 +116,7 @@ const props = defineProps<{
   menuBackground: string
   logoSrc: string
   logoAlt: string
+  headerVisible?: boolean
 }>();
 
 const appStore = useAppStore();
@@ -167,6 +171,16 @@ const closeMenu = () => {
   document.body.style.overflow = '';
 };
 
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+
+  if (isMenuOpen.value) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+};
+
 const notificationsButtonText = computed(() => {
   return appStore.pushNotifications.permissionStatus === 'granted'
     ? 'Disable'
@@ -195,199 +209,232 @@ const toggleNotifications = async () => {
 </script>
 
 <style scoped lang="scss">
+ion-header {
+  box-shadow: none;
+}
 
-  ion-header {
-    box-shadow: none;
-  }
+ion-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10000;
+  transform: translateY(-100%); /* Hidden by default */
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
 
-  ion-toolbar {
-    --background: #49027fe9;
-    -webkit-backdrop-filter: blur(7px);
-    backdrop-filter: blur(7px);
-  }
-
-  .nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-  }
-
-  .header-side {
-    padding: 0px 25px 10px 25px;
-  }
-
-  .logo {
-    height: 60px;
+  &.nav-visible {
+    transform: translateY(0); /* Slide in */
+    opacity: 1;
   }
 
   .menu-icon {
-    cursor: pointer;
     margin-right: 25px;
-    color: #F4E8AB;
-    fill: #F4E8AB;
   }
+}
 
-  #fairgrounds .menu-icon {
-    color: #FFD100;
-    fill: #FFD100;
-  }
+ion-toolbar {
+  --background: #49027fe9;
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
 
-  .nav-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw; // Changed to viewport width
-    height: 100vh; // Changed to viewport height
-    pointer-events: none;
-    z-index: 9999; // Increased z-index to ensure it's above everything
-  }
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-  .nav-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw; // Changed to viewport width
-    height: 100vh; // Changed to viewport height
-    background: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
+}
 
-    &.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-  }
+.header-side {
+  padding: 0px 25px 10px 25px;
+}
 
-  .nav-menu {
-    position: fixed;
-    top: -100%;
-    left: 0;
-    // right: -100%;
-    width: 100%;
-    height: 100vh; // Changed to viewport height
-    background: linear-gradient(180deg, #7323B4 0%, #540F8C 100%);
-    transition: transform 0.3s ease;
+.logo {
+  height: 60px;
+}
+
+.menu-icon {
+  cursor: pointer;
+  color: #F4E8AB;
+  fill: #F4E8AB;
+}
+
+#fairgrounds .menu-icon {
+  color: #FFD100;
+  fill: #FFD100;
+}
+
+.nav-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw; // Changed to viewport width
+  height: 100vh; // Changed to viewport height
+  pointer-events: none;
+  z-index: 9999; // Increased z-index to ensure it's above everything
+}
+
+.nav-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw; // Changed to viewport width
+  height: 100vh; // Changed to viewport height
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+
+  &.is-visible {
+    opacity: 1;
     pointer-events: auto;
-    overflow-y: auto;
-    z-index: 10000; // Ensure menu is above overlay
-    border-bottom-left-radius: 15px; /* Added rounded corners */
-    border-bottom-right-radius: 15px; /* Added rounded corners */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Added shadow for better visual separation */
-
-    &.is-open {
-      // transform: translateX(-100%);
-      transform: translateY(100%);
-    }
   }
+}
 
-  .nav-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.nav-menu {
+  position: fixed;
+  top: -100%;
+  left: 0;
+  // right: -100%;
+  width: 100%;
+  height: 100vh; // Changed to viewport height
+  background: linear-gradient(180deg, #7323B4 0%, #540F8C 100%);
+  transition: transform 0.3s ease;
+  pointer-events: auto;
+  overflow-y: auto;
+  z-index: 10000; // Ensure menu is above overlay
+  border-bottom-left-radius: 15px; /* Added rounded corners */
+  border-bottom-right-radius: 15px; /* Added rounded corners */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Added shadow for better visual separation */
+
+  &.is-open {
+    // transform: translateX(-100%);
+    transform: translateY(100%);
+  }
+}
+
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  // padding-top: 40px;
+  padding-top: 90px;
+  background: #48027FE5;
+}
+
+.nav-logo {
+  height: 40px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #FDD252;
+  font-size: 36px;
+  padding: 0px 0px;
+  cursor: pointer;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  //padding: 20px;
+  min-height: calc(100vh - 100px); // Changed to viewport height
+  // min-height: calc(90vh - 100px); /* Adjusted for 90vh height */
+  justify-content: space-between;
+
+  .primary-links {
     padding: 20px;
-    // padding-top: 40px;
-    padding-top: 90px;
-    background: #48027FE5;
+  }
+}
+
+.nav-link {
+  color: #FFF;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  line-height: 45px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &.secondary {
+    font-size: 18px;
+    line-height: 40px;
   }
 
-  .nav-logo {
-    height: 40px;
+  &:last-child {
+    border-bottom: none;
   }
 
-  .close-button {
-    background: none;
-    border: none;
+  // fairgrounds specific active state
+  #fairgrounds &.router-link-active {
     color: #FDD252;
-    font-size: 36px;
-    padding: 0px 0px;
-    cursor: pointer;
+    font-weight: 500;
   }
 
-  .nav-links {
-    display: flex;
-    flex-direction: column;
-    //padding: 20px;
-    min-height: calc(100vh - 100px); // Changed to viewport height
-    // min-height: calc(90vh - 100px); /* Adjusted for 90vh height */
-    justify-content: space-between;
-
-    .primary-links {
-      padding: 20px;
-    }
+  &.router-link-active {
+    color: #000000;
+    font-weight: 500;
   }
 
-  .nav-link {
-    color: #FFF;
-    text-decoration: none;
-    font-family: 'Inter', sans-serif;
-    font-size: 20px;
-    line-height: 45px;
-    font-weight: 600;
+  .arrow {
+    font-size: 24px;
+  }
+}
+
+.separator {
+  height: 1px;
+  background: rgba(20, 20, 20, 0.1);
+  margin: 40px 0;
+}
+
+#fairgrounds .secondary-links .notifications {
+  color: #FFF;
+}
+
+.secondary-links {
+  padding: 0px 20px 30px 20px;
+
+
+  .notifications {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 15px 0;
+    color: black;
+    font-weight: 500;
+    font-size: 20px;
 
-    &.secondary {
-      font-size: 18px;
-      line-height: 40px;
-    }
 
-    &:last-child {
-      border-bottom: none;
-    }
-
-    // fairgrounds specific active state
-    #fairgrounds &.router-link-active {
-      color: #FDD252;
+    .enable-btn {
+      background: none;
+      border: none;
+      color: #7323B4;
+      font-size: 16px;
       font-weight: 500;
-    }
-
-    &.router-link-active {
-      color: #000000;
-      font-weight: 500;
-    }
-
-    .arrow {
-      font-size: 24px;
+      cursor: pointer;
     }
   }
+}
 
-  .separator {
-    height: 1px;
-    background: rgba(20, 20, 20, 0.1);
-    margin: 40px 0;
-  }
+.hamburger-toggle {
+  $size: 70px;
 
-  #fairgrounds .secondary-links .notifications {
-    color: #FFF;
-  }
-
-  .secondary-links {
-    padding: 0px 20px 30px 20px;
-
-
-    .notifications {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 0;
-      color: black;
-      font-weight: 500;
-      font-size: 20px;
-
-
-      .enable-btn {
-        background: none;
-        border: none;
-        color: #7323B4;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-      }
-    }
-  }
-  </style>
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: $size;
+  height: $size;
+  background-color: #0a8944;
+  z-index: 1;
+  border-bottom-left-radius: 10px;
+}
+</style>
 
 
