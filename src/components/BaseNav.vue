@@ -247,6 +247,11 @@ ion-toolbar {
 
 .header-side {
   padding: 0px 25px 10px 25px;
+
+  &.logo {
+    position: relative;
+    top: 2px;
+  }
 }
 
 .logo {
