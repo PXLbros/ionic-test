@@ -2,7 +2,7 @@
 <template>
   <div class="events-list">
     <template v-if="props.events && props.events.length > 0">
-      <div v-for="event in props.events" :key="event.id" class="events-list__event-item">
+      <div v-for="event in props.events" :key="`${event.id}-${event.dateDetails.start_time_unix}`" class="events-list__event-item">
         <div class="content">
           <h3>{{ event.title }}</h3>
           <p>{{ props.showEventDate ? event.eventDate.start_time_formatted : event.start_time }}</p>

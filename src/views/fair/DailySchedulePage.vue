@@ -36,7 +36,7 @@
           </button>
           <div v-if="showCategoryDropdown" class="dropdown-content">
             <div @click="selectCategory('all')">All Categories</div>
-            <div v-for="category in categories" :key="category.id" @click="selectCategory(category.id)">
+            <div v-for="category in availableCategoriesForSelectedDay" :key="category.id" @click="selectCategory(category.id)">
               {{ category.name }}
             </div>
           </div>
@@ -143,6 +143,36 @@ const categories = computed<Category[]>(() => {
   return categoriesData.value || [];
 });
 
+const availableCategoriesForSelectedDay = computed<Category[]>(() => {
+  if (!eventsData.value || !eventsData.value.length || !dates.value.length) {
+    return [];
+  }
+
+  const selectedDate = dates.value[selectedDateIndex.value];
+
+  if (!selectedDate) {
+    return [];
+  }
+
+  const selectedDateStr = convertToEasternTime(selectedDate.timestamp).toDateString();
+
+  const categoryIds = new Set<number>();
+
+  eventsData.value.forEach((event: Event) => {
+    const hasEventOnSelectedDay = event.dates.some(date =>
+      convertToEasternTime(date.start_time_unix).toDateString() === selectedDateStr
+    );
+
+    if (hasEventOnSelectedDay) {
+      event.categories.forEach(catId => categoryIds.add(catId));
+    }
+  });
+
+  const filteredCategories = categories.value.filter(category => categoryIds.has(Number(category.id)));
+
+  return filteredCategories;
+});
+
 const filteredEvents = computed((): FormattedEvent[] => {
   if (!eventsData.value || !eventsData.value.length || !dates.value.length) return [];
 
@@ -207,10 +237,24 @@ const selectDate = (index: number): void => {
   isDateChanging.value = true;
   selectedDateIndex.value = index;
 
-  // Add scroll behavior when selecting dates
+  showCategoryDropdown.value = false;
+
   setTimeout(() => {
+    if (selectedCategory.value !== 'all') {
+      const stillExists = availableCategoriesForSelectedDay.value.some(
+        category => category.id === selectedCategory.value
+      );
+
+      if (!stillExists) {
+        selectedCategory.value = 'all';
+      }
+    }
+
+    // Add scroll behavior when selecting dates
     const container = document.querySelector('.date-selector__container');
+
     const activeButton = container?.children[index] as HTMLElement;
+
     if (activeButton) {
       activeButton.scrollIntoView({
         behavior: 'smooth',
@@ -218,6 +262,7 @@ const selectDate = (index: number): void => {
         inline: 'center'
       });
     }
+
     isDateChanging.value = false;
   }, 0);
 };
