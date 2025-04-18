@@ -1182,13 +1182,15 @@ function initMap() {
     dragRotate: false,
     pitchWithRotate: false,
     touchPitch: false,
-    touchZoomRotate: false,
+    touchZoomRotate: true,
     renderWorldCopies: false,
     preserveDrawingBuffer: true,
     minZoom: MAP_MIN_ZOOM,
     maxZoom: MAP_MAX_ZOOM,
     // failIfMajorPerformanceCaveat: true, // Don't load if performance would be poor
   });
+
+  mapboxMap.touchZoomRotate.disableRotation();
 
   // Enable debug features if debug mode is active
   if (isDebugMode.value) {

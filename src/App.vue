@@ -6,7 +6,7 @@
       {{ dataStore.loadError }}
     </div>
 
-    <ion-router-outlet v-if="!dataStore.isLoading && !dataStore.loadError && dataStore.data" />
+    <ion-router-outlet v-if="!dataStore.isLoading && !dataStore.loadError && dataStore.data" swipeGesture="false" />
   </ion-app>
 </template>
 
