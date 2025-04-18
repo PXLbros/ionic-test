@@ -181,10 +181,8 @@ const toggleNotifications = async () => {
 
 const goBack = () => {
   if (window.history.length > 1) {
-    console.log('History length:', window.history.length);
     router.back();
   } else {
-    console.log('No history, redirecting to:', props.backButtonHref);
     router.push('/fairgrounds');
   }
 };
