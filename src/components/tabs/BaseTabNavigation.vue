@@ -1,25 +1,26 @@
-<!-- components/tabs/BaseTabNavigation.vue -->
 <template>
   <div class="tab-navigation">
-    <router-link
-      v-for="tab in tabs"
+    <component
+      v-for="tab in props.tabs"
       :key="tab.path"
-      :to="tab.path"
+      :is="isExternal(tab.path) ? 'a' : 'router-link'"
+      :to="!isExternal(tab.path) ? tab.path : undefined"
+      :href="isExternal(tab.path) ? tab.path : undefined"
       class="tab-item"
       :class="{ active: isActive(tab.path) }"
+      v-bind="isExternal(tab.path) ? externalLinkAttrs : {}"
     >
       <div class="tab-icon">
         <img v-if="typeof tab.icon === 'string'" :src="tab.icon" :alt="tab.label">
-        <component v-else :is="tab.icon"></component>
+        <component v-else :is="tab.icon" />
       </div>
       <div class="tab-label">{{ tab.label }}</div>
-    </router-link>
+    </component>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { computed, watch, onMounted } from 'vue';
 
 const props = defineProps<{
   tabs: Array<{
@@ -31,33 +32,31 @@ const props = defineProps<{
 
 const route = useRoute();
 
-// Improved active state detection to properly match routes
-const isActive = (path: string) => {
+const isExternal = (path: string): boolean => {
+  return /^(http|https):\/\//.test(path);
+};
+
+const isActive = (path: string): boolean => {
+  if (isExternal(path)) {
+    return false;
+  }
+
   if (path === '/') {
     return route.path === '/';
   }
 
-  // For section home pages
   if (path === '/fair' || path === '/fairgrounds') {
     return route.path === path;
   }
 
-  // For nested routes
   return route.path.startsWith(path);
 };
 
-// // Log the tab paths for debugging
-// onMounted(() => {
-//   console.log('Tab navigation mounted with paths:', props.tabs.map(tab => ({
-//     path: tab.path,
-//     icon: typeof tab.icon === 'string' ? tab.icon : 'Imported icon'
-//   })));
-// });
-
-// // Watch for route changes for debugging
-// watch(() => route.path, (newPath) => {
-//   console.log('Route changed to:', newPath);
-// }, { immediate: true });
+// Static attributes for external links
+const externalLinkAttrs = {
+  target: '_blank',
+  rel: 'noopener noreferrer'
+};
 </script>
 
 <style scoped lang="scss">

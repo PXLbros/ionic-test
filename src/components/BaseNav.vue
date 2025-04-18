@@ -12,18 +12,18 @@
               class="header-side logo"
             >
           </router-link>
-          <!-- <img
-            src="/src/imgs/svg/menu.svg"
-            alt="menu-open"
-            class="header-side menu-icon"
-            @click="openMenu"
-          > -->
+
           <HamburgerIcon class="menu-icon" @click="toggleMenu" />
         </div>
       </ion-toolbar>
     </ion-header>
 
-    <div class="hamburger-toggle" :class="{ 'toggle-hidden': props.headerVisible || isMenuOpen }" @click="toggleMenu">
+    <div
+      v-if="type === 'fair'"
+      class="hamburger-toggle"
+      :class="{ 'toggle-hidden': props.headerVisible || isMenuOpen }"
+      @click="toggleMenu"
+    >
       <HamburgerIcon class="menu-icon" />
     </div>
 

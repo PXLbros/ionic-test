@@ -191,16 +191,13 @@ import SocialIcons from '@/components/SocialIcons.vue';
 import { ref, onMounted } from 'vue';
 import Contact from '@/components/Contact.vue';
 import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
-// import FloatingNav from '@/components/FloatingNav.vue';
 import fairLogo from '@/imgs/svg/fair-logo-light.svg';
 
 const dataStore = useDataStore();
-// console.log('fair page data store', dataStore.data);
 
 const isHeaderVisible = ref(false);
 let lastScrollY = 0;
 
-const email = ref('');
 const carouselContainer = ref<HTMLElement | null>(null);
 
 // Sample sponsors data - replace with your actual data
@@ -221,28 +218,12 @@ let startX = 0;
 let scrollLeft = 0;
 let isDown = false;
 
-const ticketsUrl = computed(() => {
-  let url = dataStore.data.nysfairWebsite?.tickets?.etix_ticket_url || null;
-
-  if (!url) {
-    return null;
-  }
-
-  const partnerId = dataStore.data.nysfairWebsite?.tickets?.partner_id || null;
-
-  if (partnerId) {
-    url = `${url}?partner_id=${partnerId}`;
-  }
-
-  return url;
-});
-
 const openTicketsWebsite = () => {
-  if (!ticketsUrl.value) {
+  if (!dataStore.nysfairTicketsUrl) {
     return;
   }
 
-  window.open(ticketsUrl.value);
+  window.open(dataStore.nysfairTicketsUrl);
 };
 
 const handleScroll = (event: CustomEvent) => {

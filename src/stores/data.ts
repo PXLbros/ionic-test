@@ -21,6 +21,24 @@ export const useDataStore = defineStore('data', {
     errors: null,
   }),
 
+  getters: {
+    nysfairTicketsUrl(state): string | null {
+      let url = state.data.nysfairWebsite?.tickets?.etix_ticket_url || null;
+
+      if (!url) {
+        return null;
+      }
+
+      const partnerId = state.data.nysfairWebsite?.tickets?.partner_id || null;
+
+      if (partnerId) {
+        url = `${url}?partner_id=${partnerId}`;
+      }
+
+      return url;
+    },
+  },
+
   actions: {
     showLoader() {
       this.isLoading = true;
