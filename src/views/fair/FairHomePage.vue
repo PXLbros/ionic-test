@@ -3,7 +3,13 @@
     <!-- Header Nav -->
 
     <!-- Main Content -->
-    <FairNav />
+    <BaseNav
+      type="fair"
+      toolbarBackground="#098944"
+      menuBackground="linear-gradient(180deg, #098944 0%, #098944 100%)"
+      :logoSrc="fairLogo"
+      logoAlt="NYSF Logo"
+    />
 
     <!-- <FloatingNav
       type="fair"
@@ -190,12 +196,12 @@ xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAA
 <script setup lang="ts">
 import { IonContent, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
-import FairNav from '@/components/FairNav.vue';
+import BaseNav from '@/components/BaseNav.vue';
 import SocialIcons from '@/components/SocialIcons.vue';
 import { ref, onMounted } from 'vue';
 import Contact from '@/components/Contact.vue';
 import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
-import FloatingNav from '@/components/FloatingNav.vue';
+// import FloatingNav from '@/components/FloatingNav.vue';
 import fairLogo from '@/imgs/svg/fair-logo-light.svg';
 
 const dataStore = useDataStore();
