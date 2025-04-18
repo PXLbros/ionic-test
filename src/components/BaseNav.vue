@@ -23,7 +23,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <div class="hamburger-toggle" @click="toggleMenu">
+    <div class="hamburger-toggle" :class="{ 'toggle-hidden': props.headerVisible }" @click="toggleMenu">
       <HamburgerIcon class="menu-icon" />
     </div>
 
@@ -434,6 +434,12 @@ ion-toolbar {
   background-color: #0a8944;
   z-index: 1;
   border-bottom-left-radius: 10px;
+  transition: transform 0.4s ease, opacity 0.4s ease; /* Match ion-header transition */
+
+  &.toggle-hidden {
+    transform: translateX(100%); /* Slide out to the right */
+    opacity: 0;
+  }
 }
 </style>
 
