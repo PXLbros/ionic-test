@@ -2,7 +2,7 @@
 <template>
   <div :id="sectionId" class="base-nav">
     <!-- Main Navbar -->
-    <ion-header :class="{ 'nav-visible': props.headerVisible }">
+    <ion-header :class="{ 'nav-visible': props.headerVisible && !isMenuOpen }">
       <ion-toolbar :style="{ '--background': toolbarBackground }">
         <div  class="nav-container">
           <router-link :to="`/${type}`">
@@ -23,7 +23,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <div class="hamburger-toggle" :class="{ 'toggle-hidden': props.headerVisible }" @click="toggleMenu">
+    <div class="hamburger-toggle" :class="{ 'toggle-hidden': props.headerVisible || isMenuOpen }" @click="toggleMenu">
       <HamburgerIcon class="menu-icon" />
     </div>
 
