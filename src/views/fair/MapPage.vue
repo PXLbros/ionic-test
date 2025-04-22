@@ -73,8 +73,7 @@
       <ion-content class="map-container">
         <div class="map" ref="mapContainer"></div>
 
-        <!-- Debug Control Panel -->
-        <div class="opacity-control">
+        <div v-if="isDebugMode" class="opacity-control">
           <div class="debug-title">Map Debug</div>
           <div class="opacity-label">Overlay Opacity</div>
           <input
@@ -196,6 +195,7 @@ const maxSuggestionsToShow = 5; // Reduced for mobile screens
 const logger = useLogger();
 
 // Grabbing data from CMS
+const appStore = useAppStore();
 const dataStore = useDataStore();
 
 // isdebug mode if ?debug=1
@@ -264,6 +264,11 @@ watch(currentMapIndex, (newMapIndex) => {
       getMapIconImageExpression({ maps: allMaps.value, currentMapIndex: newMapIndex }),
     );
   }
+});
+
+// Hide bottom bar when search suggestions are shown
+watch(showSearchSuggestions, (newShowSearchSuggestionsValue) => {
+  appStore.bottomBar.isVisible = !newShowSearchSuggestionsValue;
 });
 
 // Map reference - update the type to use the renamed import
@@ -371,17 +376,6 @@ function updateMapForSelectedType() {
 
   // If we get here, sources are ready so we can update directly
   safeUpdateMapSource();
-
-  // // Remove and re-add the cluster icon layer to update the icon
-  // if (mapboxMap.getLayer(MapLayer.MapClusterCount)) {
-  //   mapboxMap.removeLayer(MapLayer.MapClusterCount);
-  // }
-
-  // if (mapboxMap.getLayer(MapLayer.MapClusterIcon)) {
-  //   mapboxMap.removeLayer(MapLayer.MapClusterIcon);
-  // }
-
-  // addMapClusterIconLayer(mapboxMap, currentMapSlug.value);
 }
 
 // Safely update the map source with error handling
@@ -435,6 +429,9 @@ function processPendingMapUpdates() {
 
 // Handle search input
 function handleSearch() {
+  // Hide suggestions immediately on Enter
+  showSearchSuggestions.value = false;
+
   // If there's a selected suggestion in the search query, try to focus on it
   const matchingSuggestion = filteredSuggestions.value.find(s =>
     s.name.toLowerCase() === searchQuery.value.toLowerCase()
@@ -1167,7 +1164,7 @@ const selectedFilterCount = computed(() => {
   return Object.values(selectedCategories.value).filter(Boolean).length;
 });
 
-const currentZoomLevel = ref(DEFAULT_MAP_ZOOM); // Track current map zoom level
+const currentZoomLevel = ref(DEFAULT_MAP_ZOOM);
 
 function initMap() {
   if (!mapContainer.value) {
@@ -1205,8 +1202,8 @@ function initMap() {
     logger.debug('Debug mode enabled');
   }
 
-  // Add navigation controls
-  mapboxMap.addControl(new mapboxgl.NavigationControl());
+  // // Add navigation controls
+  // mapboxMap.addControl(new mapboxgl.NavigationControl());
 
   // Set up map error handling
   mapboxMap.on('error', (e) => {
@@ -1309,29 +1306,42 @@ function checkWebPSupport(): Promise<boolean> {
 }
 
 // Function to handle cluster clicks
-function handleClusterClick(e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) {
-  if (!mapboxMap || !e.features || e.features.length === 0 || !e.features[0].properties) return;
+function handleClusterClick(e: mapboxgl.MapMouseEvent) {
+  if (!mapboxMap || !e.point) return;
 
-  const features = mapboxMap.queryRenderedFeatures(e.point, { layers: [MapLayer.MapClusterIcon] });
-  if (!features || features.length === 0 || !features[0].properties) return;
+  const features = mapboxMap.queryRenderedFeatures(e.point, {
+    layers: [MapLayer.MapClusterIcon],
+  });
 
-  const clusterId = features[0].properties.cluster_id;
+  if (!features.length) {
+    return;
+  }
 
-  if (clusterId === undefined || clusterId === null) {
-    console.error('Cluster ID is null or undefined');
+  const cluster = features[0];
+  const clusterId = cluster.properties?.cluster_id;
+
+  if (typeof clusterId === 'undefined' || clusterId === null) {
+    console.warn('No cluster_id found on cluster feature');
     return;
   }
 
   const source = mapboxMap.getSource(MapSource.PointsClustered) as mapboxgl.GeoJSONSource;
 
-  source.getClusterExpansionZoom(clusterId, (error, zoom) => {
-    if (error) {
+  source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+    if (typeof zoom !== 'number') {
+      console.warn('Expansion zoom level is invalid:', zoom);
+      return;
+    } else if (err) {
+      console.error('Error expanding cluster:', err);
       return;
     }
 
+    const [lng, lat] = (cluster.geometry as Point).coordinates;
+
     mapboxMap.easeTo({
-      center: (features[0].geometry as Point).coordinates as [number, number],
-      zoom: 16,
+      center: [lng, lat],
+      zoom: Math.min(zoom + 0.5, MAP_MAX_ZOOM), // Zoom in slightly past the expansion level
+      duration: 500,
     });
   });
 }
@@ -1342,7 +1352,7 @@ function setupMapLayers() {
     return;
   }
 
-  const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
+  // const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
   // const mapOverlayImageUrl = '/icons/Map_Design-big-min.png';
 
   try {
@@ -1358,11 +1368,13 @@ function setupMapLayers() {
     //   ]
     // });
 
+    const nysfairWebsiteBaseUrl = import.meta.env.VITE_NYSFAIR_WEBSITE_BASE_URL;
+
     mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'raster',
       tiles: [
         // '/map/tiles/{z}/{x}/{y}.png',
-        'http://nysfair-staging.pxlagency.com/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png',
+        `${nysfairWebsiteBaseUrl}/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png`,
       ],
       tileSize: 512,
       // scheme: 'tms',
@@ -1394,11 +1406,11 @@ function setupMapLayers() {
       clusterMinPoints: MAP_CLUSTER_MIN_POINTS,
     });
 
-    // 4. Add cluster layers
-    addMapClusterIconLayer(mapboxMap, allMaps.value, currentMapIndex.value);
-
-    // 5. Add icon layers
+    // 4. Add icon layers
     addMapIconLayer(mapboxMap, allMaps.value, currentMapIndex.value);
+
+    // 5. Add cluster layers
+    addMapClusterIconLayer(mapboxMap, allMaps.value, currentMapIndex.value);
 
     // 6. Setup icon click handlers and store the cleanup function
     iconClickHandlersCleanup = setupIconClickHandlers(mapboxMap, getCategoryName);
@@ -1409,30 +1421,10 @@ function setupMapLayers() {
     // 8. Wait for the map to be fully rendered
     mapboxMap.once('idle', () => {
       mapSourcesReady.value = true;
+
       processPendingMapUpdates();
       finalizeMapSetup();
     });
-
-    // mapboxMap.on('sourcedata', (e) => {
-    //   if (e.sourceId === MapSource.PointsClustered && e.isSourceLoaded) {
-    //     const features = mapboxMap.querySourceFeatures(MapSource.PointsClustered, {
-    //       sourceLayer: '',
-    //       filter: ['has', 'point_count']
-    //     });
-
-    //     features.forEach((feature: any) => {
-    //       mapboxMap.setFeatureState(
-    //         {
-    //           source: MapSource.PointsClustered,
-    //           id: feature.id as number
-    //         },
-    //         {
-    //           currentMapIndex: currentMapIndex.value
-    //         },
-    //       );
-    //     });
-    //   }
-    // });
   } catch (error) {
     logger.error(error);
     isLoadingMap.value = false;
@@ -1496,6 +1488,20 @@ function destroyMap() {
   }
 }
 
+function updateMapOpacity(event: Event) {
+  const value = parseInt((event.target as HTMLInputElement).value);
+  mapOpacity.value = value / 100;
+
+  // Update map layer opacity if map is initialized
+  if (mapboxMap && mapboxMap.getLayer(MapLayer.ChevyCourtOverlay)) {
+    mapboxMap.setPaintProperty(
+      MapLayer.ChevyCourtOverlay,
+      'raster-opacity',
+      mapOpacity.value
+    );
+  }
+}
+
 onMounted(async () => {
   // Setup listener for closing dropdown when clicking outside
   document.addEventListener('click', closeDropdownOnOutsideClick);
@@ -1519,21 +1525,6 @@ onUnmounted(() => {
   // Destroy map
   destroyMap();
 });
-
-// Function to update map opacity
-function updateMapOpacity(event: Event) {
-  const value = parseInt((event.target as HTMLInputElement).value);
-  mapOpacity.value = value / 100;
-
-  // Update map layer opacity if map is initialized
-  if (mapboxMap && mapboxMap.getLayer(MapLayer.ChevyCourtOverlay)) {
-    mapboxMap.setPaintProperty(
-      MapLayer.ChevyCourtOverlay,
-      'raster-opacity',
-      mapOpacity.value
-    );
-  }
-}
 </script>
 
 <style scoped lang="scss">
@@ -1656,7 +1647,7 @@ function updateMapOpacity(event: Event) {
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       margin-top: 6px;
-      max-height: 300px;
+      max-height: 350px;
       overflow-y: auto;
 
       .dropdown-item {
@@ -1711,12 +1702,13 @@ function updateMapOpacity(event: Event) {
 
 /* Customize popups */
 :deep .mapboxgl-popup-content {
-  background-color: white;
+  background-color: #f4e8ab;
   padding: 20px;
   border-radius: 8px;
   max-height: 30vh;
   overflow-y: auto;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  color: #343434;
 
   .vendor-popup, .service-popup {
     h3 {
@@ -1785,11 +1777,14 @@ function updateMapOpacity(event: Event) {
   }
 }
 
+:deep .mapboxgl-popup-tip {
+  border-bottom-color: #f4e8ab;
+}
 
 /* Filter Panel Styles */
 .filter-panel {
   position: absolute;
-  top: 55px;
+  top: 10px;
   left: 0;
   right: 0;
   background-color: #F4E8AB;
@@ -1799,7 +1794,7 @@ function updateMapOpacity(event: Event) {
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  max-height: 75vh;
+  max-height: 78vh;
   display: flex;
   flex-direction: column;
   padding-top: 45px;
@@ -1812,7 +1807,7 @@ function updateMapOpacity(event: Event) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: 16px 20px 8px;
     border-bottom: 1px solid #F4E8AB;
 
     h3 {
@@ -1844,6 +1839,7 @@ function updateMapOpacity(event: Event) {
   &__content {
     padding: 16px 20px;
     overflow-y: auto;
+    // height: 360px;
 
     h4 {
       margin: 0 0 16px 0;

@@ -424,7 +424,6 @@ export function setupIconClickHandlers(
       <div class="vendor-popup">
         <h3>${name}</h3>
         ${description ? `<p>${description}</p>` : ''}
-        <p class="popup-type">Vendor</p>
       </div>
     `;
 
@@ -467,7 +466,6 @@ export function setupIconClickHandlers(
         ${props.description ? `<p>${props.description}</p>` : ''}
         ${props.is_accessible ? `<p><strong>Accessible</strong></p>` : ''}
         ${categoryNames}
-        <p class="popup-type">Service</p>
       </div>
     `;
 
@@ -503,21 +501,13 @@ export function setupIconClickHandlers(
     }
   };
 
-  // Register click handlers
-  // map.on('click', 'vendor-map-icon', handleVendorIconClick);
-  // map.on('click', 'service-map-icon', handleServiceIconClick);
   map.on('click', MapLayer.MapIcon, handleMapIconClick);
-
-  // Register move handler
   map.on('move', handleMapMove);
 
   // Return a cleanup function that removes all the event handlers
   return () => {
-    // map.off('click', 'vendor-map-icon', handleVendorIconClick);
-    // map.off('click', 'service-map-icon', handleServiceIconClick);
     map.off('click', MapLayer.MapIcon, handleMapIconClick);
-
-    map.off('move', handleMapMove); // Remove the move event listener
+    map.off('move', handleMapMove);
 
     if (activePopup) {
       activePopup.remove();

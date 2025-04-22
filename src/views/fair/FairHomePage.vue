@@ -158,7 +158,7 @@ xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAA
 
       <!-- Sponsors Section -->
       <div class="wrapper">
-        <div class="section sponsors">
+        <div v-if="sponsors" class="section sponsors">
           <div class="section-header">
             <h2 class="section-header__text">App Sponsors</h2>
           </div>
@@ -201,12 +201,7 @@ let lastScrollY = 0;
 const carouselContainer = ref<HTMLElement | null>(null);
 
 // Sample sponsors data - replace with your actual data
-const sponsors = ref([
-  { name: 'Sponsor 1', image: '/modal-img/placeholder.svg' },
-  { name: 'Sponsor 2', image: '/modal-img/placeholder.svg' },
-  { name: 'Sponsor 3', image: '/modal-img/placeholder.svg' },
-  { name: 'Sponsor 4', image: '/modal-img/placeholder.svg' },
-]);
+const sponsors = computed(() => dataStore.data.nysfairWebsite.sponsors || []);
 
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement;

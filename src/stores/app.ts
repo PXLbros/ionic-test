@@ -21,9 +21,14 @@ export interface PushNotificationsData {
   listenersInitialized: boolean;
 }
 
+export interface BottomBarConfig {
+  isVisible: boolean;
+}
+
 interface AppStoreState {
   toast: AppStoreToastConfig;
   pushNotifications: PushNotificationsData;
+  bottomBar: BottomBarConfig;
 }
 
 export const useAppStore = defineStore('app', {
@@ -40,6 +45,10 @@ export const useAppStore = defineStore('app', {
       deviceId: null,
       getDeviceIdError: null,
       listenersInitialized: false,
+    },
+
+    bottomBar: {
+      isVisible: true,
     },
   }),
 

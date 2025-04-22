@@ -32,11 +32,11 @@
 
       <div class="nav-menu" :class="{ 'is-open': isMenuOpen }">
         <div class="nav-header">
-          <img
+          <!-- <img
             src="/src/imgs/svg/fair-logo-light.svg"
             alt="NYSF Logo"
             class="nav-logo"
-          >
+          > -->
           <button class="close-button" @click="closeMenu">
             <ion-icon :icon="closeCircleOutline"></ion-icon>
           </button>
@@ -97,8 +97,8 @@
       <slot />
     </ion-content>
 
-    <FairBottomNavigation v-if="isFairRoute" />
-    <FairgroundsBottomNavigation v-if="isFairgroundsRoute" />
+    <FairBottomNavigation v-if="isFairRoute" v-show="appStore.bottomBar.isVisible" />
+    <FairgroundsBottomNavigation v-if="isFairgroundsRoute" v-show="appStore.bottomBar.isVisible" />
 
     <ion-toast
       :isOpen="appStore.toast.isOpen"
@@ -302,10 +302,10 @@ ion-back-button {
 
 .nav-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  padding: 20px;
-  padding-top: 90px;
+  padding: 20px 20px 0;
+  padding-top: 60px;
   background: #098944;
 }
 
@@ -438,8 +438,8 @@ ion-back-button {
   width: 100%;
   height: 100%;
   z-index: 9999;
-  background-color: #{appColor(nysfair, primary)};
-  color: #{appColor(nysfair, secondary)};
+  background-color: #{appColor(nysfair, yellow, medium)};
+  color: #{appColor(nysfair, blue, medium)};
   font-weight: bold;
   font-size: 1.2rem;
 }

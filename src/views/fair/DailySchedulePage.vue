@@ -3,10 +3,9 @@
     <div class="main">
       <div class="main__header">
         <div class="main__header-img">
-          <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
-              <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
-          </svg>
+          <PlaceholderIcon />
         </div>
+
         <div class="main__header-content">
           <h2 class="title">Daily Schedule</h2>
           <p class="subtitle">Class ridiculus rhoncus ad suspendisse ridiculus malesuada; litora morbi</p>
@@ -58,7 +57,7 @@
             :events="filteredEvents"
             :categories="categories"
             noEventsText="No events scheduled for this day"
-            />
+          />
         </div>
       </div>
     </div>
@@ -73,7 +72,7 @@ import { storeToRefs } from 'pinia';
 import { Category, DateObject, Event } from '@/types';
 import { convertToEasternTime } from '@/utils/time';
 import { formatEvent, FormattedEvent } from '@/utils/event';
-import { ref, computed, watch } from 'vue';
+import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
@@ -144,33 +143,8 @@ const categories = computed<Category[]>(() => {
 });
 
 const availableCategoriesForSelectedDay = computed<Category[]>(() => {
-  if (!eventsData.value || !eventsData.value.length || !dates.value.length) {
-    return [];
-  }
-
-  const selectedDate = dates.value[selectedDateIndex.value];
-
-  if (!selectedDate) {
-    return [];
-  }
-
-  const selectedDateStr = convertToEasternTime(selectedDate.timestamp).toDateString();
-
-  const categoryIds = new Set<number>();
-
-  eventsData.value.forEach((event: Event) => {
-    const hasEventOnSelectedDay = event.dates.some(date =>
-      convertToEasternTime(date.start_time_unix).toDateString() === selectedDateStr
-    );
-
-    if (hasEventOnSelectedDay) {
-      event.categories.forEach(catId => categoryIds.add(catId));
-    }
-  });
-
-  const filteredCategories = categories.value.filter(category => categoryIds.has(Number(category.id)));
-
-  return filteredCategories;
+  // Return all categories instead of filtering by the selected day
+  return categories.value || [];
 });
 
 const filteredEvents = computed((): FormattedEvent[] => {
@@ -205,11 +179,18 @@ const filteredEvents = computed((): FormattedEvent[] => {
   }
 
   // Sort events by start time
-  return filtered.sort((a: FormattedEvent, b: FormattedEvent) => {
+  filtered = filtered.sort((a: FormattedEvent, b: FormattedEvent) => {
     const aTime = a.dateDetails.start_time_unix;
     const bTime = b.dateDetails.start_time_unix;
     return aTime - bTime;
   });
+
+  // If no events match the selected category, return an empty array
+  if (filtered.length === 0) {
+    return [];
+  }
+
+  return filtered;
 });
 
 // Watch for dates to be populated
@@ -586,5 +567,13 @@ const selectedCategoryName = computed(() => {
 // hide the scrollbar
 .date-selector::-webkit-scrollbar {
     display: none;
+}
+</style>
+
+<style lang="scss">
+.events-list__no-events p {
+  color: #fdd456;
+  margin-top: 0;
+  font-size: 0.8em;
 }
 </style>

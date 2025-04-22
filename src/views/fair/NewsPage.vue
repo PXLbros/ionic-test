@@ -5,18 +5,16 @@
         <div class="wrapper">
           <!-- Featured News Article (Latest News) -->
           <router-link
-              v-if="featuredNewsItem"
-              :to="`/fair/news/${encodeURIComponent(featuredNewsItem.id)}`"
-              class="featured-article"
+            v-if="featuredNewsItem"
+            :to="`/fair/news/${encodeURIComponent(featuredNewsItem.id)}`"
+            class="featured-article"
           >
-              <div class="featured-article__image">
-                  <img v-if="featuredNewsItem.image" :src="featuredNewsItem.image" alt="">
-                  <svg v-else xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
-                      <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
-                  </svg>
-              </div>
-              <h4 class="featured-article__title">{{ featuredNewsItem.title }}</h4>
-              <!-- <p class="featured-article__description" v-html="stripHTML(featuredNews.content.slice(0, 200) + '...')"></p> -->
+            <div class="featured-article__image">
+              <img v-if="featuredNewsItem.image" :src="featuredNewsItem.image" alt="">
+              <PlaceholderIcon v-else />
+            </div>
+            <h4 class="featured-article__title">{{ featuredNewsItem.title }}</h4>
+            <!-- <p class="featured-article__description" v-html="stripHTML(featuredNews.content.slice(0, 200) + '...')"></p> -->
           </router-link>
         </div>
 
@@ -42,10 +40,8 @@
                     <h4 class="article-item__title">{{ truncateText(article.title, 60) }}</h4>
                 </div>
                 <div class="article-item__image">
-                    <img v-if="article.image" :src="article.image" alt="News Image">
-                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 62 62" fill="none">
-                        <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
-                    </svg>
+                  <img v-if="article.image" :src="article.image" alt="News Image">
+                  <PlaceholderIcon v-else />
                 </div>
             </router-link>
 
@@ -67,7 +63,7 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { IonButton } from '@ionic/vue';
-import { computed } from 'vue';
+import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
 import { NewsArticle } from '@/types'
 import FairLayout from '@/layouts/fair.vue';
 import Loader from '@/components/Loader.vue';

@@ -44,7 +44,7 @@
           <!-- Scrollable Dates only for List View -->
           <div v-if="!isSearching" ref="dateScrollRef" class="date-scroll">
             <div
-              v-for="(date, index) in dates"
+              v-for="date in monthsWithUpcomingEvents"
               :key="date.toISOString()"
               :ref="(el: HTMLElement) => { if (isSameMonth(date, selectedDate)) currentMonthRef = el }"
               class="date-item"
@@ -183,7 +183,7 @@ import { ref, computed, onMounted, nextTick } from 'vue';
 import { IonIcon } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import { listOutline } from 'ionicons/icons';
-import { format, isSameMonth, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameDay } from 'date-fns';
+import { format, isSameMonth, parseISO, addMonths, subMonths, isSameDay } from 'date-fns';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 
 interface EventDate {
@@ -191,6 +191,7 @@ interface EventDate {
   endDate: string;
   startTime?: string;
   endTime?: string;
+  date_time_formatted?: string;
 }
 
 interface EventImage {
@@ -213,58 +214,6 @@ interface Event {
 interface EventWithCurrentDate extends Event {
   currentDate: EventDate;
 }
-
-// Test Events for now
-const testEvents = [
-  {
-    id: '2345',
-    title: 'Winter Festival 2024',
-    enabled: true,
-    eventDates: [{
-      date: '2024-12-15T04:00:00+00:00',
-      startTime: '2024-12-15T14:00:00+00:00',
-      endTime: '2024-12-15T22:00:00+00:00'
-    }],
-    eventAdmission: '$10',
-    eventImage: [{
-      url: '/modal-img/News_NYSF.jpg',
-      title: 'Winter Festival',
-      filename: 'winter-fest.jpg'
-    }]
-  },
-  {
-    id: '1234',
-    title: 'Holiday Market',
-    enabled: true,
-    eventDates: [{
-      date: '2024-12-10T04:00:00+00:00',
-      startTime: '2024-12-10T10:00:00+00:00',
-      endTime: '2024-12-10T17:00:00+00:00'
-    }],
-    eventAdmission: 'Free',
-    eventImage: [{
-      url: '/modal-img/News_NYSF.jpg',
-      title: 'Holiday Market',
-      filename: 'holiday-market.jpg'
-    }]
-  },
-  {
-    id: '4443',
-    title: 'New Year Concert',
-    enabled: true,
-    eventDates: [{
-      date: '2024-12-31T04:00:00+00:00',
-      startTime: '2024-12-31T20:00:00+00:00',
-      endTime: '2025-01-01T01:00:00+00:00'
-    }],
-    eventAdmission: '$25',
-    eventImage: [{
-      url: '/modal-img/News_NYSF.jpg',
-      title: 'New Year Concert',
-      filename: 'nye-concert.jpg'
-    }]
-  }
-];
 
 // Store and Data
 const dataStore = useDataStore();
@@ -315,36 +264,27 @@ watch(selectedDate, async () => {
 });
 
 // Generate next 12 months for the date scroll
-const dates = computed(() => {
-  const months: Date[] = [];
-  const currentDate = new Date();
+const monthsWithUpcomingEvents = computed(() => {
+  const monthsSet = new Set<string>();
 
-  // Add past 12 months
-  for (let i = -12; i < 0; i++) {
-    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
-    months.push(date);
-  }
+  events.value.forEach((event: Event) => {
+    event.eventDates?.forEach((dateObj: any) => {
+      if (dateObj.is_upcoming) {
+        const date = new Date(dateObj.date);
+        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+        monthsSet.add(monthStart.toISOString()); // Use ISO to ensure uniqueness
+      }
+    });
+  });
 
-  // Add current month
-  months.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
-
-  // Add future 12 months
-  for (let i = 1; i <= 12; i++) {
-    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
-    months.push(date);
-  }
-
-  return months;
-});
-
-// Update events computed property to combine real and test data
-const combinedEvents = computed(() => {
-  const historicalEvents = dataStore.data.nysfairgroundsWebsite.events;
-  return [...historicalEvents, ...testEvents];
+  // Convert back to Date[] and sort
+  return Array.from(monthsSet)
+    .map(iso => new Date(iso))
+    .sort((a, b) => a.getTime() - b.getTime());
 });
 
 // Update existing events computed reference to use combinedEvents
-const events = combinedEvents;
+const events = computed(() => dataStore.data.nysfairgroundsWebsite.events || []);
 
 // Update calendar computations to handle the full date properly
 const calendarDays = computed(() => {
@@ -788,9 +728,11 @@ const getEventImage = (event: Event): string => {
         background-color: #F5F7FA;
         border-bottom-right-radius: 12px;
         border-bottom-left-radius: 12px;
+        padding-bottom: 8px;
 
         .day {
-          aspect-ratio: 1;
+          // aspect-ratio: 1;
+          padding: 6px 0;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -800,11 +742,11 @@ const getEventImage = (event: Event): string => {
           cursor: pointer;
           background-color: #F5F7FA;
 
-          &.active {
-            background-color: #3B71CA;
-            color: white;
-            margin: 0px !important;
-          }
+          // &.active {
+          //   background-color: #3B71CA;
+          //   color: white;
+          //   margin: 0px !important;
+          // }
 
           &.has-events {
             color: white;
@@ -827,7 +769,7 @@ const getEventImage = (event: Event): string => {
           &.active.has-events {
             background-color: #3B71CA;
             color: white;
-            margin: 0px !important;
+            // margin: 0px !important;
             transition: all 0.2s ease-in-out;
 
             .event-indicator {
@@ -836,7 +778,7 @@ const getEventImage = (event: Event): string => {
           }
 
           .date {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 500;
           }
         }

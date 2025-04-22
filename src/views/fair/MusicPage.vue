@@ -3,81 +3,83 @@
     title="Concert"
     :showMenuButton="true"
   >
-      <div class="main">
-        <div class="main__header">
-          <div class="main__header-content">
-            <h1 class="main__header-title">Chevrolet Music Series</h1>
-            <p class="main__header-subtitle">Aug 21 - Sept 2</p>
-          </div>
-          <div class="main__header-img">
-            <!-- just using the first image for now -->
-            <img v-if="filteredEvents[0] && filteredEvents[0].featured_image" :src="filteredEvents[0].featured_image" alt="Music Image" />
-            <svg v-else xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
-              <path
-                d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z"
-                fill="#1E5EAE"
-              />
-            </svg>
-          </div>
-          <div class="main__header-sponsor">
-            <p class="title">Sponsored By</p>
-            <img src="/src/imgs/Sponsor_Chevrolet_Black.png" alt="Chevy Logo" />
-          </div>
+    <div class="main">
+      <div class="main__header">
+        <div class="main__header-content">
+          <h1 class="main__header-title">Chevrolet Music Series</h1>
+          <p class="main__header-subtitle">Aug 21 - Sept 2</p>
         </div>
 
-        <!-- Filter Section -->
-        <div class="wrapper">
-          <div class="sticky-wrapper">
-            <div class="action-buttons">
-              <router-link :to="{ name: 'event-favorites' }" class="favorites-btn">
-                <ion-icon class="heart-icon" :icon="heart"></ion-icon>
-                My Favorites
-              </router-link>
-              <button class="reset-btn" @click="clearFilters">
-                <ion-icon class="reset-icon" :icon="refreshOutline"></ion-icon>
-                Reset Filters
+        <div class="main__header-img">
+          <!-- just using the first image for now -->
+          <img v-if="filteredEvents[0] && filteredEvents[0].featured_image" :src="filteredEvents[0].featured_image" alt="Music Image" />
+          <PlaceholderIcon v-else />
+        </div>
+
+        <div class="main__header-sponsor">
+          <p class="title">Sponsored By</p>
+          <img src="/src/imgs/Sponsor_Chevrolet_Black.png" alt="Chevy Logo" />
+        </div>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="wrapper">
+        <div class="sticky-wrapper">
+          <div class="action-buttons">
+            <router-link :to="{ name: 'event-favorites' }" class="favorites-btn">
+              <ion-icon class="heart-icon" :icon="heart"></ion-icon>
+              My Favorites
+            </router-link>
+
+            <button class="reset-btn" @click="clearFilters">
+              <ion-icon class="reset-icon" :icon="refreshOutline"></ion-icon>
+              Reset Filters
+            </button>
+          </div>
+
+          <div class="filters">
+            <div class="filter-dropdown">
+              <button class="filter-btn" :class="{ 'filter-btn--active': showDateDropdown === true }" @click="toggleDateDropdown">
+                {{ selectedDate || 'Date' }}
+                <span>▼</span>
               </button>
+
+              <div v-if="showDateDropdown" class="dropdown-content">
+                <div @click="selectDate('')">All Dates</div>
+                <div v-for="date in uniqueDates" :key="date" @click="selectDate(date || '')">
+                  {{ formatDate(date || '') }}
+                </div>
+              </div>
             </div>
-            <div class="filters">
-              <div class="filter-dropdown">
-                <button class="filter-btn" :class="{ 'filter-btn--active': showDateDropdown === true }" @click="toggleDateDropdown">
-                  {{ selectedDate || 'Date' }}
-                  <span>▼</span>
-                </button>
-                <div v-if="showDateDropdown" class="dropdown-content">
-                  <div @click="selectDate('')">All Dates</div>
-                  <div v-for="date in uniqueDates" :key="date" @click="selectDate(date || '')">
-                    {{ formatDate(date || '') }}
-                  </div>
+
+            <div class="filter-dropdown">
+              <button class="filter-btn" :class="{ 'filter-btn--active': showGenreDropdown === true }" @click="toggleGenreDropdown">
+                {{ selectedGenre || 'Genre' }}
+                <span>▼</span>
+              </button>
+
+              <div v-if="showGenreDropdown" class="dropdown-content">
+                <div @click="selectGenre('')">All Genres</div>
+                <div :class="{ 'active': selectedGenre !== '' }" v-for="genre in uniqueGenres" :key="genre" @click="selectGenre(genre)">
+                  {{ genre }}
                 </div>
               </div>
-              <div class="filter-dropdown">
-                <button class="filter-btn" :class="{ 'filter-btn--active': showGenreDropdown === true }" @click="toggleGenreDropdown">
-                  {{ selectedGenre || 'Genre' }}
-                  <span>▼</span>
-                </button>
-                <div v-if="showGenreDropdown" class="dropdown-content">
-                  <div @click="selectGenre('')">All Genres</div>
-                  <div :class="{ 'active': selectedGenre !== '' }" v-for="genre in uniqueGenres" :key="genre" @click="selectGenre(genre)">
-                    {{ genre }}
-                  </div>
-                </div>
-              </div>
-              <div class="filter-dropdown">
-                <button class="filter-btn" :class="{ 'filter-btn--active': showVenueDropdown === true }" @click="toggleVenueDropdown">
-                  {{ selectedVenue || 'Venue' }}
-                  <span>▼</span>
-                </button>
-                <div v-if="showVenueDropdown" class="dropdown-content">
-                  <div @click="selectVenue('')">All Venues</div>
-                  <div v-for="venue in uniqueVenues" :key="venue" @click="selectVenue(venue || '')">
-                    {{ venue }}
-                  </div>
+            </div>
+
+            <div class="filter-dropdown">
+              <button class="filter-btn" :class="{ 'filter-btn--active': showVenueDropdown === true }" @click="toggleVenueDropdown">
+                {{ selectedVenue || 'Venue' }}
+                <span>▼</span>
+              </button>
+              <div v-if="showVenueDropdown" class="dropdown-content">
+                <div @click="selectVenue('')">All Venues</div>
+                <div v-for="venue in uniqueVenues" :key="venue" @click="selectVenue(venue || '')">
+                  {{ venue }}
                 </div>
               </div>
             </div>
           </div>
-
+        </div>
 
         <!-- Events List -->
         <div class="events-list">
@@ -87,15 +89,11 @@
             :to="`/fair/music/${event.id}`"
             class="event-card"
           >
-          <div class="event-image">
-            <img v-if="event.featured_image" :src="event.featured_image" alt="Music Image" />
-            <svg v-else xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 62 62" fill="none">
-              <path
-                d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z"
-                fill="#1E5EAE"
-              />
-            </svg>
-          </div>
+            <div class="event-image">
+              <img v-if="event.featured_image" :src="event.featured_image" alt="Music Image" />
+              <PlaceholderIcon v-else />
+            </div>
+
             <div class="event-info">
               <div class="venue-name">{{ event?.venue?.name || 'Chevy Court' }}</div>
               <h2 class="event-title">{{ event.title }}</h2>
@@ -107,7 +105,6 @@
               :event-id="event.id"
               :date-details="event.currentDate || { start_time_date: '', start_time_time: '', start_time_unix: 0 }"
             />
-
           </router-link>
         </div>
       </div>
@@ -177,7 +174,7 @@ interface DataStore {
 import FairLayout from '@/layouts/fair.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import { useDataStore } from '@/stores/data';
-import { ref, computed } from 'vue';
+import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
 import { storeToRefs } from 'pinia';
 import { refreshOutline, heart, triangle } from 'ionicons/icons';
 import { IonIcon } from '@ionic/vue';

@@ -1,64 +1,66 @@
 <template>
   <FairLayout title="News" :showMenuButton="true">
     <div v-if="isFetchingArticle" class="loading-article">
-        Loading article...
+      Loading article...
     </div>
 
     <div v-else-if="fetchArticleError">
-        {{ fetchArticleError }}
+      {{ fetchArticleError }}
     </div>
 
     <div v-else-if="article" class="main">
-        <div class="main__image">
-            <img v-if="article.image" :src="article.image" alt="News Image">
-            <svg v-else xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
-                <path d="M62 55.1111V6.88889C62 3.1 58.9 0 55.1111 0H6.88889C3.1 0 0 3.1 0 6.88889V55.1111C0 58.9 3.1 62 6.88889 62H55.1111C58.9 62 62 58.9 62 55.1111ZM18.9444 36.1667L27.5556 46.5344L39.6111 31L55.1111 51.6667H6.88889L18.9444 36.1667Z" fill="#1E5EAE"/>
-            </svg>
-        </div>
+      <div class="main__image">
+        <img v-if="article.image" :src="article.image" alt="News Image">
+        <PlaceholderIcon v-else />
+      </div>
 
-        <div class="main__content">
-            <div class="wrapper">
-                <div class="main__category">Press Releases</div>
-                <h1 class="main__title">{{ article.title }}</h1>
+      <div class="main__content">
+          <div class="wrapper">
+            <div class="main__category">
+              Press Releases
             </div>
-            <div class="main__text" v-html="article.content"></div>
-        </div>
 
-        <div class="navigation">
-            <a
-                v-if="previousArticleId"
-                href="#"
-                @click.prevent="navigateToArticle(previousArticleId)"
-                class="navigation__button"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m15 18-6-6 6-6"/>
-                </svg>
-                Previous
-            </a>
+            <h1 class="main__title">
+              {{ article.title }}
+            </h1>
+          </div>
+          <div class="main__text" v-html="article.content"></div>
+      </div>
 
-            <a
-                v-if="nextArticleId"
-                href="#"
-                @click.prevent="navigateToArticle(nextArticleId)"
-                class="navigation__button"
-            >
-                Next
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m9 18 6-6-6-6"/>
-                </svg>
-            </a>
-        </div>
+      <div class="navigation">
+          <a
+            v-if="previousArticleId"
+            href="#"
+            @click.prevent="navigateToArticle(previousArticleId)"
+            class="navigation__button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+            Previous
+          </a>
+
+          <a
+            v-if="nextArticleId"
+            href="#"
+            @click.prevent="navigateToArticle(nextArticleId)"
+            class="navigation__button"
+          >
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m9 18 6-6-6-6" />
+            </svg>
+          </a>
+      </div>
     </div>
   </FairLayout>
 </template>
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import { ref, onMounted } from 'vue';
+import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
 import axios from 'axios';
 import FairLayout from '@/layouts/fair.vue';
-
 
 interface NewsArticle {
   title: string;

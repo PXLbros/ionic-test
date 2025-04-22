@@ -4,36 +4,106 @@ http://ionicframework.com/docs/theming/ */
 @use "sass:map";
 
 /* Color configuration for NYS Fair and NYS Fairgrounds */
-
 // Define color maps for both sites
 $colors: (
   nysfair: (
-    primary: #FDD456,
-    secondary: #1F3667
+    primary: (
+      light: #FDD456,
+      medium: #FDD456,
+      dark: #FDD456
+    ),
+    blue: (
+      light: #EFF2F6,
+      light2: #ecedef,
+      other2: #1E5EAE,
+      other5: #007AFF,
+      medium: #1F3667,
+      other4: #1F3667,
+      other3: #19262D,
+    ),
+    black: (
+      default: #000,
+      medium: #333,
+      other: #343434,
+    ),
+    green: (
+      medium: #098944,
+    ),
+    gray: (
+      light: #eee,
+      light2: #E0E0E0,
+      medium: #666,
+      other: #999999,
+    ),
+    yellow: (
+      light: #F4E8AB,
+      medium: #FDD456,
+      other: #FDD252,
+      other2: #FFF1AF,
+      other3: #FFD100,
+    ),
+    purple: (
+      medium: #7323B4,
+      dark: #540F8C,
+    ),
+    red: (
+      medium: #EE4623,
+    ),
+    white: (
+      default: #fff,
+    ),
   ),
   nysfairgrounds: (
-    primary: red,
-    secondary: #333333
-  )
+    white: (
+      default: #fff,
+    ),
+    black: (
+      default: #000,
+    ),
+    gray: (
+      medium: #EBEBEB,
+      other: #F1F1F1,
+    ),
+    blue: (
+      light: #EFF2F6,
+      medium: #0077C8,
+      dark: #19262D,
+    ),
+  ),
 );
 
 // Mixin to retrieve colors from the map
-@function appColor($site, $type) {
-  @if map.has-key($colors, $site) and map.has-key(map.get($colors, $site), $type) {
-    @return map.get(map.get($colors, $site), $type);
-  } @else {
-    @error "Color `#{$type}` for site `#{$site}` not found in the color map.";
+@function appColor($site, $type, $shade: null) {
+  @if not map.has-key($colors, $site) {
+    @error "Site `#{$site}` not found in the color map.";
   }
+
+  $site-map: map.get($colors, $site);
+
+  @if not map.has-key($site-map, $type) {
+    @error "Color type `#{$type}` not found for site `#{$site}`.";
+  }
+
+  $color-value: map.get($site-map, $type);
+
+  @if $shade != null {
+    @if type-of($color-value) != 'map' or not map.has-key($color-value, $shade) {
+      @error "Shade `#{$shade}` not found for type `#{$type}` in site `#{$site}`.";
+    }
+    @return map.get($color-value, $shade);
+  }
+
+  @return $color-value;
 }
 
 // // Example usage
 // body.nysfair {
-//   background-color: #{color(nysfair, primary)};
+//   background-color: #{color(nysfair, white, medium)};
 //   color: #{color(nysfair, secondary)};
 // }
 
 // body.nysfairgrounds {
-//   background-color: #{color(nysfairgrounds, primary)};
+//   background-color: #{color(nysfairgrounds, black, medium)};
 //   color: #{color(nysfairgrounds, secondary)};
 // }
 

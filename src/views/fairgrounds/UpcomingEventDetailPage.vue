@@ -103,6 +103,7 @@ interface NYSFairgroundsEventDate {
   startTime: string;
   start_time_date: string;
   start_time_unix: number;
+  start_time_time: string;
   end_time_time: string;
   date_time_formatted: string;
   isFavorite: boolean;
@@ -179,11 +180,15 @@ const getEventTime = (event: NYSFairgroundsEvent): string => {
 };
 
 const additionalDates = computed(() => {
-  if (!event.value || !event.value.eventDates) return [];
+  if (!event.value || !event.value.eventDates) {
+    return [];
+  }
 
-  return event.value.eventDates.filter(date =>
+  const additionalDates = event.value.eventDates.filter(date =>
     parseISO(date.date).getTime() !== parseISO(currentEventDate.value?.date || '').getTime()
   );
+
+  return additionalDates;
 });
 
 const hasContactInfo = (event: NYSFairgroundsEvent): boolean => {
@@ -195,16 +200,12 @@ const getEventImage = (event: NYSFairgroundsEvent): string => {
     // Return the full URL directly
     return event.eventImage[0].url;
   }
+
   return '/api/placeholder/400/200';
 };
 
 const formatAdditionalDate = (date: NYSFairgroundsEventDate): string => {
-  const eventDate = format(parseISO(date.date), 'E, MMM d, yyyy');
-  if (!date.startTime || !date.endTime) return eventDate;
-
-  const startTime = format(parseISO(date.startTime), 'h:mm aaa');
-  const endTime = format(parseISO(date.endTime), 'h:mm aaa');
-  return `${eventDate} at ${startTime} - ${endTime}`;
+  return `${date.start_time_date} at ${date.start_time_time} - ${date.end_time_time}`;
 };
 </script>
 

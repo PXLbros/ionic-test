@@ -29,6 +29,7 @@ declare module 'vue' {
     MapDetailsPopup: typeof import('./components/MapDetailsPopup.vue')['default']
     MapIcon: typeof import('./components/icons/MapIcon.vue')['default']
     PinIcon: typeof import('./components/icons/PinIcon.vue')['default']
+    PlaceholderIcon: typeof import('./components/icons/PlaceholderIcon.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ScheduleIcon: typeof import('./components/icons/ScheduleIcon.vue')['default']
