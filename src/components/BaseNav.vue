@@ -13,6 +13,10 @@
             >
           </router-link>
 
+          <div v-if="props.title" class="header-container">
+            <ion-title>{{ props.title }}</ion-title>
+          </div>
+
           <HamburgerIcon class="menu-icon" @click="toggleMenu" />
         </div>
       </ion-toolbar>
@@ -37,11 +41,11 @@
 
       <div class="nav-menu" :class="{ 'is-open': isMenuOpen }" :style="{ background: menuBackground }">
         <div class="nav-header" :style="{ background: toolbarBackground }">
-          <img
+          <!-- <img
             :src="logoSrc"
             :alt="logoAlt"
             class="nav-logo"
-          >
+          > -->
           <button class="close-button" @click="closeMenu">
             <ion-icon :icon="closeCircleOutline"></ion-icon>
           </button>
@@ -117,6 +121,7 @@ const props = defineProps<{
   logoSrc: string
   logoAlt: string
   headerVisible?: boolean
+  title?: string;
 }>();
 
 const appStore = useAppStore();
@@ -206,6 +211,10 @@ const toggleNotifications = async () => {
     }
   }
 };
+
+onMounted(() => {
+  console.log('~~~~~~~~~~~~~~~ eyy');
+});
 </script>
 
 <style scoped lang="scss">
@@ -320,7 +329,7 @@ ion-toolbar {
 
 .nav-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding: 20px;
   // padding-top: 40px;

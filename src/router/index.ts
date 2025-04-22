@@ -15,7 +15,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/fairgrounds',
-    component: () => import('@/views/fairgrounds/FairgroundsPage.vue'),
+    component: () => import('@/views/fairgrounds/FairgroundsHomePage.vue'),
     meta: {
       title: 'Home',
       showInMenu: true,
@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/fairgrounds/featured-event',
-    component: () => import('@/views/fairgrounds/FairgroundsPage.vue'),
+    component: () => import('@/views/fairgrounds/FairgroundsHomePage.vue'),
     meta: {
       title: 'Featured Event',
       showInMenu: false

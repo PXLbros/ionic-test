@@ -10,15 +10,6 @@
   </div>
 </template>
 
-<script setup lang="ts">
-
-import { IonButton, IonInput } from '@ionic/vue';
-import { useDataStore } from '@/stores/data';
-import { useAppStore } from '@/stores/app';
-import { useRouter } from 'vue-router';
-
-</script>
-
 <style scoped>
 
   /* Keep in touch section styles */

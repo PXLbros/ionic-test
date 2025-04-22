@@ -4,19 +4,6 @@ import { useLogger } from '@/composables/useLogger';
 
 const logger = useLogger();
 
-export enum MapLayer {
-  MapClusterIcon = 'map-cluster-icon',
-  MapClusterCount = 'map-cluster-count',
-  MapIcon = 'map-icon',
-  ChevyCourtOverlay = 'chevy-court-overlay',
-}
-
-export enum MapSource {
-  PointsClustered = 'points-clustered',
-  ChevyCourtArea = 'chevy-court-area',
-}
-
-// Update the CategoryIconLoadingConfig interface to support separate settings for clusters and icons
 export interface CategoryIconLoadingConfig {
   failOnIconError: boolean;
 

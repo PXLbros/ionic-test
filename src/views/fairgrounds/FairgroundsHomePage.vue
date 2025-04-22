@@ -1,58 +1,56 @@
 <template>
   <ion-page id="main-content">
-      <!-- Header Nav -->
-      <FairgroundsNav />
-      <FairgroundsBottomNavigation />
+    <!-- Header Nav -->
+    <FairgroundsNav title="Upcoming Events" />
 
-      <ion-content>
-          <div class="main">
-            <div class="main__header-title">
-                <h1 id="fg-title">Upcoming Events</h1>
+    <FairgroundsBottomNavigation />
+
+    <ion-content>
+      <div class="main">
+        <EventCarousel :eventData="allEvents" />
+
+        <!-- Updated grid section to match the design -->
+        <div class="categories-section">
+          <!-- Events section with title outside -->
+          <h2 id="fg-h2" class="section-title">More Events</h2>
+          <router-link to="/fairgrounds/upcoming-events" class="category-link">
+            <div class="category-card events-card">
+              <img src="/Start_Screen_NYS.png" alt="Events" class="category-img" />
             </div>
-                <EventCarousel :eventData="allEvents" />
+          </router-link>
 
-              <!-- Updated grid section to match the design -->
-              <div class="categories-section">
-                  <!-- Events section with title outside -->
-                  <h2 id="fg-h2" class="section-title">More Events</h2>
-                  <router-link to="/fairgrounds/upcoming-events" class="category-link">
-                      <div class="category-card events-card">
-                          <img src="/Start_Screen_NYS.png" alt="Events" class="category-img" />
-                      </div>
-                  </router-link>
+          <div class="categories-row">
+            <div class="category-column">
+              <h2 id="fg-h2" class="section-title">Venues</h2>
+              <router-link to="/fairgrounds/venues" class="category-link">
+                <div class="category-card venues-card">
+                  <img src="/Start_Screen_NYS.png" alt="Venues" class="category-img" />
+                </div>
+              </router-link>
+            </div>
 
-                  <div class="categories-row">
-                      <div class="category-column">
-                          <h2 id="fg-h2" class="section-title">Venues</h2>
-                          <router-link to="/fairgrounds/venues" class="category-link">
-                              <div class="category-card venues-card">
-                                  <img src="/Start_Screen_NYS.png" alt="Venues" class="category-img" />
-                              </div>
-                          </router-link>
-                      </div>
-
-                      <div class="category-column">
-                          <h2 id="fg-h2" class="section-title">Rental Opportunities</h2>
-                          <router-link to="/fairgrounds/rental-opportunity" class="category-link">
-                              <div class="category-card rental-card">
-                                  <img src="/Start_Screen_NYS.png" alt="Rental Opportunities" class="category-img" />
-                              </div>
-                          </router-link>
-                      </div>
-                  </div>
-              </div>
-
-              <FGKeepInTouch />
-
-              <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
+            <div class="category-column">
+              <h2 id="fg-h2" class="section-title">Rental Opportunities</h2>
+              <router-link to="/fairgrounds/rental-opportunity" class="category-link">
+                <div class="category-card rental-card">
+                  <img src="/Start_Screen_NYS.png" alt="Rental Opportunities" class="category-img" />
+                </div>
+              </router-link>
+            </div>
           </div>
-      </ion-content>
+        </div>
+
+        <FGKeepInTouch />
+
+        <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
+      </div>
+    </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
   import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
-  import FairgroundsNav from '@/components/FairgroundsNav.vue';
+  import FairgroundsNav from '@/components/Fairgrounds/Nav.vue';
   import { useDataStore } from '@/stores/data';
   import FairgroundsBottomNavigation from '@/components/tabs/FairgroundsBottomNavigation.vue';
 

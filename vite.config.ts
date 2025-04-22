@@ -11,7 +11,9 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         additionalData: `@use "@/theme/global" as *;
-@use "@/theme/form" as *;`,
+@use "@/theme/form" as *;
+@use "@/theme/sites/fair" as *;
+@use "@/theme/sites/fairgrounds" as *;`,
       }
     }
   },
