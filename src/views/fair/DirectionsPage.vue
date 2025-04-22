@@ -82,64 +82,57 @@ console.log('directions page data', pageData);
               margin-bottom: 0;
           }
 
-          :deep {
-            // Fix the h1 tag
-            h1 {
-                font-size: 32px;
-                font-weight: 600;
-                color: #343434;
-                margin: 0 0 5px 0;
-                line-height: 36px;
-                letter-spacing: 0.5px;
+          :deep(h1) {
+            font-size: 32px;
+            font-weight: 600;
+            color: #343434;
+            margin: 0 0 5px 0;
+            line-height: 36px;
+            letter-spacing: 0.5px;
 
-                &:not(:first-child) {
-                  margin-top: 40px;
-              }
+            &:not(:first-child) {
+              margin-top: 40px;
             }
+          }
 
-            h2 {
-                font-size: 16px;
-                font-weight: 600;
-                color: #333333;
-                margin: 24px 0 5px 0;
-                line-height: 1.2;
-            }
+          :deep(h2) {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+            margin: 24px 0 5px 0;
+            line-height: 1.2;
+          }
 
-            hr {
-              margin-bottom: 32px;
-              border-top: 1px solid rgba(239, 242, 246, 1);
-            }
+          :deep(hr) {
+            margin-bottom: 32px;
+            border-top: 1px solid rgba(239, 242, 246, 1);
+          }
 
-            strong {
-              display: block;
-              margin-top: 10px;
-            }
+          :deep(strong) {
+            display: block;
+            margin-top: 10px;
+          }
+
+          :deep(a) {
+            color: #343434;
+            text-decoration: underline;
+            font-weight: 400;
+          }
+
+          :deep(ul) {
+            padding: 24px;
+            border-radius: 16px;
+            list-style: none;
+            background-color: #F4E8AB;
+            color: #000;
 
             a {
-              color: #343434;
+              color: #000;
               text-decoration: underline;
               font-weight: 400;
             }
-
-            ul {
-               padding: 24px;
-               border-radius: 16px;
-               list-style: none;
-               background-color: #F4E8AB;
-               color: #000;
-               // color: #42639F;
-
-               a {
-                  color: #000;
-                  text-decoration: underline;
-                  font-weight: 400;
-               }
-            }
-
-
-
-
           }
+
       }
 
       &-link {

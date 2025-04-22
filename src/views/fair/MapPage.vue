@@ -1701,7 +1701,7 @@ onUnmounted(() => {
 }
 
 /* Customize popups */
-:deep .mapboxgl-popup-content {
+:deep(.mapboxgl-popup-content) {
   background-color: #f4e8ab;
   padding: 20px;
   border-radius: 8px;
@@ -1777,7 +1777,7 @@ onUnmounted(() => {
   }
 }
 
-:deep .mapboxgl-popup-tip {
+:deep(.mapboxgl-popup-tip) {
   border-bottom-color: #f4e8ab;
 }
 
