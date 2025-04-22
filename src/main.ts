@@ -38,8 +38,10 @@ import { Capacitor } from '@capacitor/core';
 /* @import '@ionic/vue/css/palettes/dark.class.css'; */
 import '@ionic/vue/css/palettes/dark.system.css';
 
-// /* Theme variables */
-// import './theme/variables.scss';
+/* Global styles */
+import '@/theme/global.scss';
+import '@/theme/sites/fair.scss';
+import '@/theme/sites/fairgrounds.scss';
 
 const pinia = createPinia();
 
