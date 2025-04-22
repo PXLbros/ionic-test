@@ -1,0 +1,35 @@
+// body {
+//   display: none !important;
+// }
+
+.site {
+  &--fairgrounds {
+    .header-container {
+      ion-title {
+        color: #fff;
+        text-transform: uppercase;
+        font-family: 'pt-sans-bold', sans-serif;
+        font-size: 28px;
+        line-height: 40px;
+      }
+    }
+  }
+}
+
+#fg-title {
+  font-family: 'pt-sans-bold', sans-serif;
+  font-size: 28px;
+  line-height: 40px;
+}
+
+#fg-bar-title {
+  font-family: 'pt-sans-bold', sans-serif;
+  font-size: 22px;
+  line-height: 28px;
+}
+
+#fg-h2 {
+  font-family: 'pt-sans-bold', sans-serif;
+  font-size: 22px;
+  line-height: 40px;
+}

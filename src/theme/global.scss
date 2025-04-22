@@ -98,15 +98,8 @@ $colors: (
 }
 
 // // Example usage
-// body.nysfair {
-//   background-color: #{color(nysfair, white, medium)};
-//   color: #{color(nysfair, secondary)};
-// }
-
-// body.nysfairgrounds {
-//   background-color: #{color(nysfairgrounds, black, medium)};
-//   color: #{color(nysfairgrounds, secondary)};
-// }
+// background-color: #{color(nysfair, white, medium)};
+// color: #{color(nysfair, secondary)};
 
 ion-content {
   --background: white;
@@ -149,26 +142,6 @@ p {
   font-family: 'inter', sans-serif;
 }
 
-/* fairgrounds styles for the pt-sans */
-#fg-title {
-  font-family: 'pt-sans-bold', sans-serif;
-  font-size: 28px;
-  line-height: 40px;
-}
-
-#fg-bar-title {
-  font-family: 'pt-sans-bold', sans-serif;
-  font-size: 22px;
-  line-height: 28px;
-}
-
-#fg-h2 {
-  font-family: 'pt-sans-bold', sans-serif;
-  font-size: 22px;
-  line-height: 40px;
-}
-
-/* Main Homepage Button Font */
 @font-face {
   font-family: 'jockey';
   src: url('../fonts/JockeyOne-Regular.ttf') format('truetype');

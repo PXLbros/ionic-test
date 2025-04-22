@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 
-
-
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -211,6 +209,24 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
+})
+
+router.afterEach((to) => {
+  const html = document.documentElement
+
+  const fairClass = 'site--fair';
+  const fairgroundsClass = 'site--fairgrounds';
+
+  if (to.path.startsWith('/fairgrounds')) {
+    html.classList.add(fairgroundsClass)
+    html.classList.remove(fairClass)
+  } else if (to.path.startsWith('/fair')) {
+    html.classList.add(fairClass)
+    html.classList.remove(fairgroundsClass)
+  } else {
+    html.classList.remove(fairClass)
+    html.classList.remove(fairgroundsClass)
+  }
 })
 
 export default router

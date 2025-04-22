@@ -57,24 +57,24 @@
 
             <!-- Regular navigation links -->
             <router-link
-            v-for="route in mainNavLinks"
-            :key="route.path"
-            :to="route.path"
-            class="nav-link"
-            @click="closeMenu"
-            >
-            {{ route.meta?.title }}
-          </router-link>
-
-          <div class="section-switch">
-            <router-link
-              :to="oppositeSection.path"
+              v-for="route in mainNavLinks"
+              :key="route.path"
+              :to="route.path"
               class="nav-link"
               @click="closeMenu"
-            >
-              {{ oppositeSection.title }}
+              >
+            {{ route.meta?.title }}
             </router-link>
-          </div>
+
+            <div class="section-switch">
+              <router-link
+                :to="oppositeSection.path"
+                class="nav-link"
+                @click="closeMenu"
+              >
+                {{ oppositeSection.title }}
+              </router-link>
+            </div>
           </div>
 
           <!-- Secondary Links -->
@@ -109,7 +109,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { IonToolbar, IonHeader } from '@ionic/vue';
+import { IonToolbar, IonTitle, IonHeader } from '@ionic/vue';
 import { closeCircleOutline } from 'ionicons/icons';
 import { IonIcon } from '@ionic/vue';
 import HamburgerIcon from './icons/HamburgerIcon.vue';
@@ -211,10 +211,6 @@ const toggleNotifications = async () => {
     }
   }
 };
-
-onMounted(() => {
-  console.log('~~~~~~~~~~~~~~~ eyy');
-});
 </script>
 
 <style scoped lang="scss">

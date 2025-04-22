@@ -147,7 +147,7 @@ import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline, clos
 import mapboxgl, { Map as MapboxMap } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
-import { loadCategoryIcons, setupIconClickHandlers, addMapClusterIconLayer, addMapIconLayer, MapLayer, MapSource, getMapClusterIconImageExpression, getMapIconImageExpression } from '@/utils/MapIconUtils';
+import { loadCategoryIcons, setupIconClickHandlers, addMapClusterIconLayer, addMapIconLayer, getMapClusterIconImageExpression, getMapIconImageExpression, MapLayer, MapSource } from '@/utils/MapIconUtils';
 import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
 import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
