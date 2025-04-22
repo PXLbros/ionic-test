@@ -45,7 +45,7 @@ const pinia = createPinia();
 
 const app = createApp(App)
   .use(IonicVue, {
-    swipeBackEnabled: false,
+    swipeBackEnabled: true,
   })
   .use(router)
   .use(pinia);

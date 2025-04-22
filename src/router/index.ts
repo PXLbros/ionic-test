@@ -211,6 +211,21 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  const swipeDisabledRoutes = ['/fair/map'];
+
+  const isSwipeDisabled = swipeDisabledRoutes.includes(to.path);
+
+  const ionRouter = document.querySelector('ion-router-outlet');
+
+  if (ionRouter) {
+    // @ts-ignore
+    ionRouter.swipeHandler = isSwipeDisabled ? null : true;
+  }
+
+  next();
+});
+
 router.afterEach((to) => {
   const html = document.documentElement
 
@@ -218,15 +233,15 @@ router.afterEach((to) => {
   const fairgroundsClass = 'site--fairgrounds';
 
   if (to.path.startsWith('/fairgrounds')) {
-    html.classList.add(fairgroundsClass)
-    html.classList.remove(fairClass)
+    html.classList.add(fairgroundsClass);
+    html.classList.remove(fairClass);
   } else if (to.path.startsWith('/fair')) {
-    html.classList.add(fairClass)
-    html.classList.remove(fairgroundsClass)
+    html.classList.add(fairClass);
+    html.classList.remove(fairgroundsClass);
   } else {
-    html.classList.remove(fairClass)
-    html.classList.remove(fairgroundsClass)
+    html.classList.remove(fairClass);
+    html.classList.remove(fairgroundsClass);
   }
-})
+});
 
 export default router
