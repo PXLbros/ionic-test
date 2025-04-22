@@ -2,6 +2,7 @@
 http://ionicframework.com/docs/theming/ */
 
 @use "sass:map";
+@use "sass:meta";
 
 /* Color configuration for NYS Fair and NYS Fairgrounds */
 // Define color maps for both sites
@@ -87,9 +88,10 @@ $colors: (
   $color-value: map.get($site-map, $type);
 
   @if $shade != null {
-    @if type-of($color-value) != 'map' or not map.has-key($color-value, $shade) {
+    @if meta.type-of($color-value) != 'map' or not map.has-key($color-value, $shade) {
       @error "Shade `#{$shade}` not found for type `#{$type}` in site `#{$site}`.";
     }
+
     @return map.get($color-value, $shade);
   }
 

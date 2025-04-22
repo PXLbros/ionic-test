@@ -2,7 +2,7 @@
   <FairgroundsLayout title="Venues" :showMenuButton="true">
     <div class="main">
       <div class="main__header">
-        <img src="/public/Host_Event.png" alt="Venues" class="main__header-image" />
+        <img src="/Host_Event.png" alt="Venues" class="main__header-image" />
         <div class="title">Host an Event</div>
         <div class="description">If you're considering hosting an event, you'll want to first review the different
           spaces we can offer your organization.</div>

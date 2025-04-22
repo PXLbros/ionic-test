@@ -205,6 +205,8 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@use "sass:color";
+
 .main {
     background-color: #EBEDEF;
     padding-bottom: 90px;
@@ -333,7 +335,7 @@ onMounted(() => {
   text-transform: uppercase;
 
   &:hover {
-      background-color: darken(#3B71CA, 5%);
+    background-color: color.adjust(#3B71CA, $lightness: -5%);
   }
 
   &[disabled] {
