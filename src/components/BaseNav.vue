@@ -1,6 +1,6 @@
 <!-- components/base/BaseNavMenu.vue -->
 <template>
-  <div :id="sectionId" class="base-nav">
+  <div :id="sectionId" :class="{ 'relative': props.relative === true }" class="base-nav">
     <!-- Main Navbar -->
     <ion-header :class="{ 'nav-visible': props.headerVisible && !isMenuOpen }">
       <ion-toolbar :style="{ '--background': toolbarBackground }">
@@ -122,6 +122,7 @@ const props = defineProps<{
   logoAlt: string
   headerVisible?: boolean
   title?: string;
+  relative?: boolean;
 }>();
 
 const appStore = useAppStore();
@@ -214,13 +215,25 @@ const toggleNotifications = async () => {
 </script>
 
 <style scoped lang="scss">
+.base-nav {
+  ion-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  &.relative {
+    ion-header {
+      position: relative;
+    }
+  }
+}
+
 ion-header {
   box-shadow: none;
 }
 
 ion-header {
-  position: fixed;
-  top: 0;
   width: 100%;
   z-index: 10000;
   transform: translateY(-100%); /* Hidden by default */

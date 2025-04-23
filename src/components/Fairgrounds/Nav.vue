@@ -8,6 +8,7 @@
     logoAlt="Fairgrounds Logo"
     headerVisible
     :title="props.title"
+    :relative="props.relative"
   />
   </template>
 
@@ -17,7 +18,9 @@
 
   const props = withDefaults(defineProps<{
     title?: string;
+    relative?: boolean;
   }>(), {
-    title: ''
+    title: '',
+    relative: false,
   });
   </script>

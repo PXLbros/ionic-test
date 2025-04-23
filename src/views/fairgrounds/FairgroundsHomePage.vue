@@ -1,7 +1,7 @@
 <template>
   <ion-page id="main-content">
     <!-- Header Nav -->
-    <FairgroundsNav />
+    <FairgroundsNav relative />
 
     <FairgroundsBottomNavigation />
 
@@ -200,6 +200,7 @@
         color: #333;
         margin: 0 0 0px 0;
         padding: 0;
+        white-space: nowrap;
     }
 
     .category-card {

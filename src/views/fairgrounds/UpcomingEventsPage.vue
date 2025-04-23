@@ -184,7 +184,10 @@ import { IonIcon } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import { listOutline } from 'ionicons/icons';
 import { format, isSameMonth, parseISO, addMonths, subMonths, isSameDay } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
+
+const timeZone = 'America/New_York';
 
 interface EventDate {
   date: string;
@@ -309,10 +312,8 @@ const calendarDays = computed(() => {
 
 const filteredEvents = computed(() => {
   return events.value.flatMap((event: Event): EventWithCurrentDate[] => {
-    if (!event.enabled) return [];
-    if (!event.eventDates || event.eventDates.length === 0) return [];
+    if (!event.enabled || !event.eventDates || event.eventDates.length === 0) return [];
 
-    // If there's a search query, return event once if it matches
     if (searchQuery.value) {
       if (event.title.toLowerCase().includes(searchQuery.value.toLowerCase())) {
         return [{...event, currentDate: event.eventDates[0]}];
@@ -320,11 +321,11 @@ const filteredEvents = computed(() => {
       return [];
     }
 
-    // Otherwise return event multiple times, once for each date in the selected month
     return event.eventDates.map(date => {
-      const eventDate = parseISO(date.date);
-      if (isSameMonth(eventDate, selectedDate.value) &&
-          eventDate.getFullYear() === selectedDate.value.getFullYear()) {
+      const eventDate = toZonedTime(parseISO(date.date), timeZone);
+      const selectedZoned = toZonedTime(selectedDate.value, timeZone);
+
+      if (isSameMonth(eventDate, selectedZoned) && eventDate.getFullYear() === selectedZoned.getFullYear()) {
         return {...event, currentDate: date};
       }
       return null;
@@ -350,22 +351,6 @@ watch(isSearching, async (newValue, oldValue) => {
   }
 });
 
-const eventsByDate = computed(() => {
-  const eventMap = new Map<string, Event[]>();
-
-  events.value.forEach(event => {
-    if (event.eventDates?.[0]) {
-      const dateKey = format(parseISO(event.eventDates[0].date), 'yyyy-MM-dd');
-      if (!eventMap.has(dateKey)) {
-        eventMap.set(dateKey, []);
-      }
-      eventMap.get(dateKey)?.push(event);
-    }
-  });
-
-  return eventMap;
-});
-
 // Handlers
 const handleDateSelect = (date: Date) => {
   selectedDate.value = date;
@@ -375,11 +360,21 @@ const handleDateSelect = (date: Date) => {
 const hasEvents = (date: Date): boolean => {
   if (!date) return false;
 
+  console.log('hasEvents', date);
+
+  // Convert the input date to New York time
+  const zonedDate = toZonedTime(date, timeZone);
+
   return events.value.some((event: Event) => {
-    if (!event.enabled || !event.eventDates) return false;
+    if (!event.enabled || !event.eventDates) {
+      return false;
+    }
+
     return event.eventDates.some((eventDate: EventDate) => {
       const parsedDate = parseISO(eventDate.date);
-      return isSameDay(parsedDate, date);
+      const zonedEventDate = toZonedTime(parsedDate, timeZone);
+
+      return isSameDay(zonedEventDate, zonedDate);
     });
   });
 };
@@ -387,12 +382,15 @@ const hasEvents = (date: Date): boolean => {
 const getEventsForDate = (date: Date): EventWithCurrentDate[] => {
   if (!date) return [];
 
+  const zonedDate = toZonedTime(date, timeZone);
+
   return events.value.flatMap((event: Event): EventWithCurrentDate[] => {
     if (!event.enabled || !event.eventDates) return [];
 
     const matchingDates = event.eventDates.filter((eventDate: EventDate) => {
       const parsedDate = parseISO(eventDate.date);
-      return isSameDay(parsedDate, date);
+      const zonedEventDate = toZonedTime(parsedDate, timeZone);
+      return isSameDay(zonedEventDate, zonedDate);
     });
 
     return matchingDates.map((matchedDate: EventDate): EventWithCurrentDate => ({
