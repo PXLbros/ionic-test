@@ -1,6 +1,6 @@
 <template>
   <ion-page id="layout">
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar style="--background: #19262D; color: #FFFFFF;">
         <ion-buttons slot="start">
           <ion-back-button :default-href="backButtonHref" @click="goBack"></ion-back-button>

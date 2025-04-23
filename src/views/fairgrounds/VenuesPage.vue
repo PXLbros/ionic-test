@@ -110,7 +110,6 @@ const stripHTML = (html: string): string => {
                     font-weight: 600;
                     line-height: 24px;
                     letter-spacing: 0.5px;
-                    text-transform: capitalize;
                 }
 
                 &__title {
@@ -130,7 +129,6 @@ const stripHTML = (html: string): string => {
                     line-height: 28px;
                     letter-spacing: 0.5px;
                     margin-bottom: 10px;
-                    text-transform: capitalize;
                 }
             }
 

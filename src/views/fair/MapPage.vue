@@ -16,9 +16,9 @@
                 class="suggestion-item"
                 @click="selectSuggestion(suggestion)"
               >
-                <div class="suggestion-type-badge" :class="suggestion.type">
+                <!-- <div class="suggestion-type-badge" :class="suggestion.type">
                   {{ suggestion.type === 'vendor' ? 'Vendor' : 'Service' }}
-                </div>
+                </div> -->
                 <div class="suggestion-content">
                   <div class="suggestion-name">{{ suggestion.name }}</div>
 
@@ -99,7 +99,7 @@
         </button>
       </div>
       <div class="filter-panel__content">
-        <h4>Categories</h4>
+        <!-- <h4>Categories</h4> -->
         <div class="categories-list">
           <div v-if="filteredCategories.length === 0" class="no-categories">
             No categories available for this map
@@ -268,11 +268,11 @@ watch(currentMapIndex, (newMapIndex) => {
 watch(showSearchSuggestions, (newShowSearchSuggestionsValue) => {
   appStore.bottomBar.isVisible = !newShowSearchSuggestionsValue;
 
-  nextTick(() => {
-    if (mapboxMap) {
-      mapboxMap.resize();
-    }
-  });
+  // nextTick(() => {
+  //   if (mapboxMap) {
+  //     mapboxMap.resize();
+  //   }
+  // });
 });
 
 // Map reference - update the type to use the renamed import
@@ -1603,7 +1603,7 @@ onUnmounted(() => {
 
     .search-input {
       width: 100%;
-      padding: 15px 20px;
+      padding: 15px 45px 15px 20px;
       border-radius: 15px;
       border: 1px solid #eee;
       background-color: #F4E8AB;
@@ -1992,7 +1992,7 @@ onUnmounted(() => {
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: #f4e8ab;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-top: 6px;
@@ -2077,6 +2077,7 @@ onUnmounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 4px;
 }
 
 /* Opacity slider control */

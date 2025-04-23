@@ -79,8 +79,7 @@ const props = withDefaults(defineProps<{
   &__no-events {
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 200px;
+    min-height: 150px;
     font-size: 18px;
     color: #666;
   }

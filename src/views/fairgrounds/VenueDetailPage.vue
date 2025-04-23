@@ -20,7 +20,7 @@
         <div class="main__description" v-html="sanitizedDescription"></div>
       </div>
 
-      <!-- <div class="main__specifications">
+      <div class="main__specifications">
           <h2 class="main__subtitle">Specifications</h2>
 
           <div class="spec-group">
@@ -37,7 +37,7 @@
               <h3 class="spec-label">Electoral</h3>
               <p class="spec-value">110/208 non-commercial</p>
           </div>
-      </div> -->
+      </div>
     </div>
     <div class="wrapper">
       <FGKeepInTouch />

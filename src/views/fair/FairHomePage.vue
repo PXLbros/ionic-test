@@ -1,13 +1,13 @@
 <template>
   <ion-page id="main-content" class="main-content--fair-page">
-    <BaseNav
+    <!-- <BaseNav
       type="fair"
       toolbarBackground="#098944"
       menuBackground="linear-gradient(180deg, #098944 0%, #098944 100%)"
       :logoSrc="fairLogo"
       logoAlt="NYSF Logo"
       :headerVisible="isHeaderVisible"
-    />
+    /> -->
 
     <FairBottomNavigation />
 
@@ -326,7 +326,7 @@ ion-col {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 30px;
+    margin-top: 40px;
     position: relative; // Add this
     z-index: 10; // Add this to ensure logo stays on top
     margin-bottom: 10px;

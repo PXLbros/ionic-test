@@ -82,6 +82,7 @@ const dataStore = useDataStore();
     display: flex;
     flex-direction: column;
     background: #FDD456;
+    padding-bottom: 25px;
 
 
 
@@ -120,7 +121,7 @@ const dataStore = useDataStore();
     &__links {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      // overflow: hidden;
       margin: 0px 20px;
       gap: 5px;
     }

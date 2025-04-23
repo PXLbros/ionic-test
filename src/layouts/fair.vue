@@ -4,7 +4,7 @@
       {{ props.loadingText }}
     </div>
 
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button :default-href="backButtonHref" @click="goBack"></ion-back-button>

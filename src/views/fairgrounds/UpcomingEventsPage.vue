@@ -42,7 +42,7 @@
           </div>
 
           <!-- Scrollable Dates only for List View -->
-          <div v-if="!isSearching" ref="dateScrollRef" class="date-scroll">
+          <div v-if="!isSearching && viewMode !== 'calendar'" ref="dateScrollRef" class="date-scroll">
             <div
               v-for="date in monthsWithUpcomingEvents"
               :key="date.toISOString()"
@@ -107,67 +107,21 @@
 
           <!-- Events for selected day-->
           <div v-if="getEventsForDate(selectedDate).length > 0" class="day-events">
-            <div v-for="event in getEventsForDate(selectedDate)"
-                 :key="`${event.id}-${event.currentDate.date}`"
-                 class="day-event">
-                  <router-link class="cta" :to="`/fairgrounds/upcoming-events/${encodeURIComponent(event.id)}?date=${encodeURIComponent(event.currentDate.date)}`">
-                  <div class="event-card__image">
-                    <img :src="getEventImage(event) || '/api/placeholder/400/200'" alt="Event image" />
-                    <svg class="favorite" width="24" height="21" viewBox="0 0 24 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g clip-path="url(#clip0_2961_1313)">
-                      <path d="M11.5506 3.66404L11.9978 4.58109L12.4486 3.66583C13.3563 1.82286 15.2948 0.524902 17.56 0.524902C19.0798 0.524902 20.4861 1.29683 21.525 2.48415C22.5652 3.67294 23.2 5.23859 23.2 6.7449C23.2 8.21373 22.5298 9.80996 21.4566 11.411C20.3886 13.0044 18.9554 14.5526 17.5075 15.9144C16.0617 17.2743 14.6139 18.4368 13.5264 19.2598C12.9831 19.671 12.5307 19.9967 12.2149 20.2192C12.1325 20.2772 12.0594 20.3282 11.9965 20.3719C11.9341 20.3297 11.8619 20.2805 11.7806 20.2246C11.465 20.0076 11.0129 19.6893 10.4698 19.2865C9.38291 18.4801 7.93584 17.3377 6.49087 15.9916C5.04384 14.6435 3.61157 13.1027 2.54427 11.5008C1.47277 9.89262 0.800049 8.26906 0.800049 6.7449C0.800049 5.23911 1.43701 3.67356 2.47972 2.48457C3.52118 1.297 4.93016 0.524902 6.45005 0.524902C8.71571 0.524902 10.6529 1.82303 11.5506 3.66404Z" fill="#19262D" stroke="#FFD100"/>
-                      </g>
-                      <defs>
-                      <clipPath id="clip0_2961_1313">
-                      <rect width="23.4" height="20.95" fill="white" transform="translate(0.300049 0.0249023)"/>
-                      </clipPath>
-                      </defs>
-                    </svg>
-                  </div>
-                  <div class="event-card__content">
-                    <div class="event-card__meta">
-                      <div class="event-card__date">
-                        {{ event.currentDate.date_time_formatted }}
-                      </div>
-                    </div>
-                    <h3 class="event-card__title">{{ event.title }}</h3>
-                  </div>
-                </router-link>
-            </div>
+            <EventCard
+              v-for="event in getEventsForDate(selectedDate)"
+              :key="`${event.id}-${event.currentDate.date}`"
+              :event="event"
+            />
           </div>
         </div>
 
         <!-- List View -->
         <div v-else class="events-list">
-          <div
+          <EventCard
             v-for="event in filteredEvents"
             :key="`${event.id}-${event.currentDate.date}`"
-            class="event-card"
-          >
-              <router-link class="cta" :to="`/fairgrounds/upcoming-events/${encodeURIComponent(event.id)}?date=${encodeURIComponent(event.currentDate.date)}`">
-              <div class="event-card__image">
-                <img :src="getEventImage(event) || '/api/placeholder/400/200'" alt="Event image" />
-                <svg class="favorite" width="24" height="21" viewBox="0 0 24 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g clip-path="url(#clip0_2961_1313)">
-                  <path d="M11.5506 3.66404L11.9978 4.58109L12.4486 3.66583C13.3563 1.82286 15.2948 0.524902 17.56 0.524902C19.0798 0.524902 20.4861 1.29683 21.525 2.48415C22.5652 3.67294 23.2 5.23859 23.2 6.7449C23.2 8.21373 22.5298 9.80996 21.4566 11.411C20.3886 13.0044 18.9554 14.5526 17.5075 15.9144C16.0617 17.2743 14.6139 18.4368 13.5264 19.2598C12.9831 19.671 12.5307 19.9967 12.2149 20.2192C12.1325 20.2772 12.0594 20.3282 11.9965 20.3719C11.9341 20.3297 11.8619 20.2805 11.7806 20.2246C11.465 20.0076 11.0129 19.6893 10.4698 19.2865C9.38291 18.4801 7.93584 17.3377 6.49087 15.9916C5.04384 14.6435 3.61157 13.1027 2.54427 11.5008C1.47277 9.89262 0.800049 8.26906 0.800049 6.7449C0.800049 5.23911 1.43701 3.67356 2.47972 2.48457C3.52118 1.297 4.93016 0.524902 6.45005 0.524902C8.71571 0.524902 10.6529 1.82303 11.5506 3.66404Z" fill="#19262D" stroke="#FFD100"/>
-                  </g>
-                  <defs>
-                  <clipPath id="clip0_2961_1313">
-                  <rect width="23.4" height="20.95" fill="white" transform="translate(0.300049 0.0249023)"/>
-                  </clipPath>
-                  </defs>
-                </svg>
-              </div>
-              <div class="event-card__content">
-                <div class="event-card__meta">
-                  <div class="event-card__date">
-                    {{ event.currentDate.date_time_formatted }}
-                  </div>
-                </div>
-                <h2 class="event-card__title">{{ event.title }}</h2>
-              </div>
-            </router-link>
-          </div>
+            :event="event"
+          />
         </div>
 
         <FGKeepInTouch />
@@ -186,8 +140,7 @@ import { listOutline } from 'ionicons/icons';
 import { format, isSameMonth, parseISO, addMonths, subMonths, isSameDay } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
-
-const timeZone = 'America/New_York';
+import appConfig from '@/config/app';
 
 interface EventDate {
   date: string;
@@ -322,8 +275,8 @@ const filteredEvents = computed(() => {
     }
 
     return event.eventDates.map(date => {
-      const eventDate = toZonedTime(parseISO(date.date), timeZone);
-      const selectedZoned = toZonedTime(selectedDate.value, timeZone);
+      const eventDate = toZonedTime(parseISO(date.date), appConfig.timezone);
+      const selectedZoned = toZonedTime(selectedDate.value, appConfig.timezone);
 
       if (isSameMonth(eventDate, selectedZoned) && eventDate.getFullYear() === selectedZoned.getFullYear()) {
         return {...event, currentDate: date};
@@ -358,12 +311,12 @@ const handleDateSelect = (date: Date) => {
 };
 
 const hasEvents = (date: Date): boolean => {
-  if (!date) return false;
-
-  console.log('hasEvents', date);
+  if (!date) {
+    return false;
+  }
 
   // Convert the input date to New York time
-  const zonedDate = toZonedTime(date, timeZone);
+  const zonedDate = toZonedTime(date, appConfig.timezone);
 
   return events.value.some((event: Event) => {
     if (!event.enabled || !event.eventDates) {
@@ -372,7 +325,7 @@ const hasEvents = (date: Date): boolean => {
 
     return event.eventDates.some((eventDate: EventDate) => {
       const parsedDate = parseISO(eventDate.date);
-      const zonedEventDate = toZonedTime(parsedDate, timeZone);
+      const zonedEventDate = toZonedTime(parsedDate, appConfig.timezone);
 
       return isSameDay(zonedEventDate, zonedDate);
     });
@@ -382,14 +335,14 @@ const hasEvents = (date: Date): boolean => {
 const getEventsForDate = (date: Date): EventWithCurrentDate[] => {
   if (!date) return [];
 
-  const zonedDate = toZonedTime(date, timeZone);
+  const zonedDate = toZonedTime(date, appConfig.timezone);
 
   return events.value.flatMap((event: Event): EventWithCurrentDate[] => {
     if (!event.enabled || !event.eventDates) return [];
 
     const matchingDates = event.eventDates.filter((eventDate: EventDate) => {
       const parsedDate = parseISO(eventDate.date);
-      const zonedEventDate = toZonedTime(parsedDate, timeZone);
+      const zonedEventDate = toZonedTime(parsedDate, appConfig.timezone);
       return isSameDay(zonedEventDate, zonedDate);
     });
 
@@ -417,14 +370,6 @@ const navigateMonth = (direction: number) => {
   if (newDate >= minDate && newDate <= maxDate) {
     selectedDate.value = newDate;
   }
-};
-
-const getEventImage = (event: Event): string => {
-  if (event.eventImage && event.eventImage.length > 0 && event.eventImage[0].url) {
-    // Return the full URL directly
-    return event.eventImage[0].url;
-  }
-  return '/api/placeholder/400/200';
 };
 </script>
 
@@ -543,9 +488,6 @@ const getEventImage = (event: Event): string => {
 
     }
   }
-  .cta {
-    text-decoration: none;
-  }
 
   .events-list {
     padding: 20px;
@@ -553,83 +495,6 @@ const getEventImage = (event: Event): string => {
     border-bottom-right-radius: 12px;
     border-bottom-left-radius: 12px;
     background-color: #FFF;
-  }
-  .event-card {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 30px;
-
-      &__image {
-          background-color: #EFF2F6;
-          border-radius: 5px;
-          height: 25vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 15px;
-          overflow: hidden;
-          position: relative;
-
-          img {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-          }
-
-          .favorite {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-          }
-      }
-
-      &__meta {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-
-      }
-
-      &__date {
-        font-size: 12px;
-        color: #343434;
-        font-weight: 600;
-        font-family: 'inter', sans-serif;
-        line-height: 24px;
-      }
-
-      &__content {
-          display: flex;
-          flex-direction: column;
-      }
-
-      &__time {
-        font-family: 'inter', sans-serif;
-          font-size: 12px;
-          color: #343434;
-          font-weight: 600;
-          line-height: 24px;
-      }
-
-      &__title {
-          font-size: 22px;
-          font-weight: 700;
-          font-family: 'inter', sans-serif;
-          color: #343434;
-          margin: 0px;
-          line-height: 28px;
-      }
-
-      &__location {
-          font-size: 16px;
-          color: #343434;
-          font-weight: 600;
-          line-height: 24px;
-          letter-spacing: 0.5px;
-          margin: 0px;
-      }
   }
 
   .search-results-header {

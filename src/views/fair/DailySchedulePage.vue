@@ -574,6 +574,6 @@ const selectedCategoryName = computed(() => {
 .events-list__no-events p {
   color: #fdd456;
   margin-top: 0;
-  font-size: 0.8em;
+  font-size: 0.85em;
 }
 </style>
