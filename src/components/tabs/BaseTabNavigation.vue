@@ -21,6 +21,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
+import appConfig from '@/config/app';
 
 const props = defineProps<{
   tabs: Array<{
@@ -65,7 +66,7 @@ const externalLinkAttrs = {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 10vh;
+  height: v-bind('appConfig.bottomBar.height');
   background: rgba(255, 255, 255, 0.844);
   --webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);

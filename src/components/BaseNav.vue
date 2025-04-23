@@ -435,7 +435,7 @@ ion-toolbar {
     .enable-btn {
       background: none;
       border: none;
-      color: #7323B4;
+      color: #FDD252;
       font-size: 16px;
       font-weight: 500;
       cursor: pointer;

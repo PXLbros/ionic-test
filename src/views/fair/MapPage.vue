@@ -1,6 +1,6 @@
 <template>
   <FairLayout title="Interactive Map" :showMenuButton="true" :isLoading="isLoadingMap" loadingText="Loading map...">
-    <div class="main">
+    <div :class="{ 'main--full-height': showSearchSuggestions }" class="main">
       <div class="main__header">
         <div class="wrapper">
           <div class="search-container">
@@ -152,6 +152,7 @@ import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSugges
 import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
 import { useDataStore } from '@/stores/data';
+import appConfig from '@/config/app';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_ACCESS_TOKEN as string;
 
@@ -266,6 +267,12 @@ watch(currentMapIndex, (newMapIndex) => {
 // Hide bottom bar when search suggestions are shown
 watch(showSearchSuggestions, (newShowSearchSuggestionsValue) => {
   appStore.bottomBar.isVisible = !newShowSearchSuggestionsValue;
+
+  nextTick(() => {
+    if (mapboxMap) {
+      mapboxMap.resize();
+    }
+  });
 });
 
 // Map reference - update the type to use the renamed import
@@ -1211,6 +1218,13 @@ function initMap() {
     dataStore.hideLoader();
   });
 
+  mapboxMap.on('resize', () => {
+    logger.debug('Map resized', {
+      width: mapContainer.value?.offsetWidth,
+      height: mapContainer.value?.offsetHeight,
+    });
+  });
+
   // Wait for style to load before loading other resources
   mapboxMap.on('style.load', () => {
     logger.info('Map style loaded');
@@ -1530,8 +1544,12 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   background: #FDD456;
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
   position: relative;
+
+  &--full-height {
+    padding-bottom: 0;
+  }
 }
 
 .wrapper {
