@@ -7,6 +7,10 @@
 
     <ion-content>
       <div class="main">
+        <div class="main__header-title">
+          <h1 id="fg-title">Upcoming Events</h1>
+        </div>
+
         <EventCarousel :eventData="allEvents" />
 
         <!-- Updated grid section to match the design -->
