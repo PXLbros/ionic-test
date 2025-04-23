@@ -211,20 +211,20 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  const swipeDisabledRoutes = ['/fair/map'];
+// router.beforeEach((to, from, next) => {
+//   const swipeDisabledRoutes = ['/fair/map'];
 
-  const isSwipeDisabled = swipeDisabledRoutes.includes(to.path);
+//   const isSwipeDisabled = swipeDisabledRoutes.includes(to.path);
 
-  const ionRouter = document.querySelector('ion-router-outlet');
+//   const ionRouter = document.querySelector('ion-router-outlet');
 
-  if (ionRouter) {
-    // @ts-ignore
-    ionRouter.swipeHandler = isSwipeDisabled ? null : true;
-  }
+//   if (ionRouter) {
+//     // @ts-ignore
+//     ionRouter.swipeHandler = isSwipeDisabled ? null : true;
+//   }
 
-  next();
-});
+//   next();
+// });
 
 router.afterEach((to) => {
   const html = document.documentElement

@@ -1,7 +1,7 @@
 <template>
   <ion-page id="main-content">
     <!-- Header Nav -->
-    <FairgroundsNav title="Upcoming Events" />
+    <FairgroundsNav />
 
     <FairgroundsBottomNavigation />
 

@@ -1778,7 +1778,7 @@ onUnmounted(() => {
 }
 
 :deep(.mapboxgl-popup-tip) {
-  border-bottom-color: #f4e8ab;
+  border-bottom-color: #f4e8ab !important;
 }
 
 /* Filter Panel Styles */

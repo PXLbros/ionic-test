@@ -16,7 +16,7 @@
   import fairgroundsLightLogo from '@/imgs/svg/fg-light.svg'
 
   const props = withDefaults(defineProps<{
-    title: string;
+    title?: string;
   }>(), {
     title: ''
   });
