@@ -151,13 +151,10 @@ import { loadCategoryIcons, setupIconClickHandlers, addMapClusterIconLayer, addM
 import { ServiceMap, VendorProperties, ServiceProperties, Category, SearchSuggestion } from '@/types';
 import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
-
-// Access Token for Mapbox
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_ACCESS_TOKEN as string;
-
 import { useDataStore } from '@/stores/data';
 
-// Default map view state to reset to
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_ACCESS_TOKEN as string;
+
 const DEFAULT_MAP_CENTER: [number, number] = [-76.2197, 43.073];
 const DEFAULT_MAP_ZOOM = 14;
 const DEFAULT_MAP_BEARING = 222; // In degrees
