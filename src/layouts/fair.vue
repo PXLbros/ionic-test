@@ -112,7 +112,6 @@
 
 <script setup lang="ts">
 import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonToast, IonButton, IonIcon } from '@ionic/vue';
-import { ref, computed } from 'vue';
 import { useAppStore } from '@/stores/app';
 import { useDataStore } from '@/stores/data';
 import { closeCircleOutline } from 'ionicons/icons';

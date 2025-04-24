@@ -1,4 +1,3 @@
-import { ref } from 'vue';
 import { createLogger } from '../utils/logger';
 
 export const useLogger = ({

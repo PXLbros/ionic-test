@@ -188,7 +188,6 @@ import { IonContent, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import BaseNav from '@/components/BaseNav.vue';
 import SocialIcons from '@/components/SocialIcons.vue';
-import { ref, onMounted } from 'vue';
 import Contact from '@/components/Contact.vue';
 import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
 import fairLogo from '@/imgs/svg/fair-logo-light.svg';

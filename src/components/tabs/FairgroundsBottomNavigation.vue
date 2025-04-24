@@ -5,7 +5,6 @@
 
 <script setup lang="ts">
 import BaseTabNavigation from '../tabs/BaseTabNavigation.vue';
-import { ref, markRaw } from 'vue';
 import HomeIcon from '@/components/icons/HomeIcon.vue';
 import StartIcon from '@/components/icons/StartIcon.vue';
 import MapIcon from '@/components/icons/MapIcon.vue';

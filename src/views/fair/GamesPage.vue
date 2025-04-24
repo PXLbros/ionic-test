@@ -20,7 +20,6 @@
 
 <script setup lang="ts">
 import FairLayout from '@/layouts/fair.vue';
-import { ref } from 'vue';
 import { useDataStore } from '@/stores/data';
 import { Browser } from '@capacitor/browser';
 

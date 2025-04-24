@@ -58,7 +58,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, computed } from 'vue';
 import { IonIcon } from '@ionic/vue';
 import { close, timeOutline, locationOutline, pricetagOutline, cashOutline } from 'ionicons/icons';
 

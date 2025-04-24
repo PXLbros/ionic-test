@@ -15,7 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import { IonIcon } from '@ionic/vue';
 
 const props = defineProps({

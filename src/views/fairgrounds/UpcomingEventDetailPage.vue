@@ -90,7 +90,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDataStore } from '@/stores/data';
 import { format, parseISO } from 'date-fns';

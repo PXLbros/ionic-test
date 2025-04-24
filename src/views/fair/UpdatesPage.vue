@@ -29,7 +29,6 @@
 <script setup lang="ts">
 import FairLayout from '@/layouts/fair.vue';
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
 import Loader from '@/components/Loader.vue';
 import { useDataStore } from '@/stores/data';
 
