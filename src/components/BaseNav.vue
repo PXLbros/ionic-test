@@ -2,9 +2,9 @@
 <template>
   <div :id="sectionId" :class="{ 'relative': props.relative === true }" class="base-nav">
     <!-- Main Navbar -->
-    <ion-header :class="{ 'nav-visible': props.headerVisible && !isMenuOpen }">
+    <ion-header :class="{ 'nav-visible': props.headerVisible && (!props.showOnScroll || isNavVisible) && !isMenuOpen }">
       <ion-toolbar :style="{ '--background': toolbarBackground }">
-        <div  class="nav-container">
+        <div class="nav-container">
           <router-link :to="`/${type}`">
             <img
               :src="logoSrc"
@@ -17,13 +17,17 @@
             <ion-title>{{ props.title }}</ion-title>
           </div>
 
-          <HamburgerIcon class="menu-icon" @click="toggleMenu" />
+          <HamburgerIcon
+            v-if="props.showHamburgerToggle !== false"
+            class="menu-icon"
+            @click="toggleMenu"
+          />
         </div>
       </ion-toolbar>
     </ion-header>
 
     <div
-      v-if="type === 'fair'"
+      v-if="props.showHamburgerToggle !== false && type === 'fair'"
       class="hamburger-toggle"
       :class="{ 'toggle-hidden': props.headerVisible || isMenuOpen }"
       @click="toggleMenu"
@@ -123,12 +127,34 @@ const props = defineProps<{
   headerVisible?: boolean
   title?: string;
   relative?: boolean;
+  showHamburgerToggle?: boolean;
+  showOnScroll?: boolean;
 }>();
 
 const appStore = useAppStore();
 const dataStore = useDataStore();
 const router = useRouter();
 const isMenuOpen = ref(false);
+const isNavVisible = ref(true);
+let lastScrollY = 0;
+
+if (props.showOnScroll !== false) {
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+    isNavVisible.value = currentScrollY < lastScrollY || currentScrollY <= 0;
+    lastScrollY = currentScrollY;
+  };
+
+  onMounted(() => {
+    window.addEventListener('scroll', handleScroll);
+  });
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('scroll', handleScroll);
+  });
+} else {
+  isNavVisible.value = true;
+}
 
 const oppositeSection = computed(() => {
   if (props.type === 'fair') {

@@ -1,13 +1,15 @@
 <template>
   <ion-page id="main-content" class="main-content--fair-page">
-    <!-- <BaseNav
+    <BaseNav
       type="fair"
       toolbarBackground="#098944"
       menuBackground="linear-gradient(180deg, #098944 0%, #098944 100%)"
       :logoSrc="fairLogo"
       logoAlt="NYSF Logo"
       :headerVisible="isHeaderVisible"
-    /> -->
+      :showHamburgerToggle="false"
+      :showOnScroll="false"
+    />
 
     <FairBottomNavigation />
 
@@ -222,23 +224,23 @@ const openTicketsWebsite = () => {
 };
 
 const handleScroll = (event: CustomEvent) => {
-  const currentY = event.detail.currentY;
+  // const currentY = event.detail.currentY;
 
-  const isScrollingDown = currentY > lastScrollY;
-  const isScrollingUp = currentY < lastScrollY;
+  // const isScrollingDown = currentY > lastScrollY;
+  // const isScrollingUp = currentY < lastScrollY;
 
-  // Only trigger if scrolled past 10px
-  if (currentY > 10) {
-    if (isScrollingDown) {
-      isHeaderVisible.value = true; // Show header when scrolling down
-    } else if (isScrollingUp) {
-      isHeaderVisible.value = false; // Hide header when scrolling up
-    }
-  } else {
-    isHeaderVisible.value = false; // At top, keep it hidden
-  }
+  // // Only trigger if scrolled past 10px
+  // if (currentY > 10) {
+  //   if (isScrollingDown) {
+  //     isHeaderVisible.value = true; // Show header when scrolling down
+  //   } else if (isScrollingUp) {
+  //     isHeaderVisible.value = false; // Hide header when scrolling up
+  //   }
+  // } else {
+  //   isHeaderVisible.value = false; // At top, keep it hidden
+  // }
 
-  lastScrollY = currentY;
+  // lastScrollY = currentY;
 };
 
 onMounted(() => {

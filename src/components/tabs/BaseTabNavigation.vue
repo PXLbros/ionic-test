@@ -1,14 +1,15 @@
 <template>
   <div class="tab-navigation">
     <component
-      v-for="tab in props.tabs"
-      :key="tab.path"
-      :is="isExternal(tab.path) ? 'a' : 'router-link'"
-      :to="!isExternal(tab.path) ? tab.path : undefined"
-      :href="isExternal(tab.path) ? tab.path : undefined"
+      v-for="tab in formattedTabs"
+      :key="tab.path || tab.label"
+      :is="tab.onClick ? 'a' : tab.isExternal ? 'a' : 'router-link'"
+      :to="!tab.onClick && !tab.isExternal ? tab.path : undefined"
+      :href="!tab.onClick && tab.isExternal ? tab.path : undefined"
       class="tab-item"
-      :class="{ active: isActive(tab.path) }"
-      v-bind="isExternal(tab.path) ? externalLinkAttrs : {}"
+      :class="{ active: tab.isActive }"
+      v-bind="tab.linkAttrs"
+      @click="tab.onClick ? tab.onClick() : undefined"
     >
       <div class="tab-icon">
         <img v-if="typeof tab.icon === 'string'" :src="tab.icon" :alt="tab.label">
@@ -22,13 +23,17 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import appConfig from '@/config/app';
+import { computed } from 'vue';
+
+interface Tab {
+  path?: string;
+  label: string;
+  icon: any;
+  onClick?: () => void;
+}
 
 const props = defineProps<{
-  tabs: Array<{
-    path: string;
-    label: string;
-    icon: any;
-  }>;
+  tabs: Array<Tab>;
 }>();
 
 const route = useRoute();
@@ -37,8 +42,12 @@ const isExternal = (path: string): boolean => {
   return /^(http|https):\/\//.test(path);
 };
 
-const isActive = (path: string): boolean => {
-  if (isExternal(path)) {
+const isActive = (tab: Tab): boolean => {
+  const path = tab.path || '';
+
+  if (tab.onClick) {
+    return false;
+  } else if (isExternal(path)) {
     return false;
   }
 
@@ -58,6 +67,19 @@ const externalLinkAttrs = {
   target: '_blank',
   rel: 'noopener noreferrer'
 };
+
+const formattedTabs = computed(() =>
+  props.tabs.map((tab) => ({
+    ...tab,
+    isExternal: isExternal(tab.path || ''),
+    isActive: isActive(tab),
+    linkAttrs: tab.onClick
+      ? {}
+      : tab.path && isExternal(tab.path)
+      ? externalLinkAttrs
+      : {}
+  }))
+);
 </script>
 
 <style scoped lang="scss">

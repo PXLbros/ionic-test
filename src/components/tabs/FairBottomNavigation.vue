@@ -11,8 +11,6 @@ import MapIcon from '@/components/icons/MapIcon.vue';
 import ScheduleIcon from '@/components/icons/ScheduleIcon.vue';
 import TicketsIcon from '@/components/icons/TicketsIcon.vue';
 
-const dataStore = useDataStore();
-
 const fairTabs = ref([
   {
     path: '/',
@@ -35,9 +33,11 @@ const fairTabs = ref([
     icon: markRaw(ScheduleIcon)
   },
   {
-    path: dataStore.nysfairTicketsUrl,
-    label: 'Tickets',
-    icon: markRaw(TicketsIcon)
+    label: 'Menu',
+    icon: markRaw(TicketsIcon),
+    onClick: () => {
+      alert('show menu!');
+    },
   },
 ]);
 </script>
