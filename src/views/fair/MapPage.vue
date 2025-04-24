@@ -1,5 +1,5 @@
 <template>
-  <FairLayout title="Interactive Map" :showMenuButton="true" :isLoading="isLoadingMap" loadingText="Loading map...">
+  <FairLayout title="Interactive Map" :showMenuButton="true">
     <div :class="{ 'main--full-height': showSearchSuggestions }" class="main">
       <div class="main__header">
         <div class="wrapper">
@@ -1215,7 +1215,7 @@ function initMap() {
 
     isLoadingMap.value = false;
 
-    dataStore.hideLoader();
+    appStore.hideSubLoader();
   });
 
   mapboxMap.on('resize', () => {
@@ -1271,8 +1271,6 @@ async function loadMapResources() {
     logger.error(error);
 
     isLoadingMap.value = false;
-
-    dataStore.hideLoader();
   }
 }
 
@@ -1439,7 +1437,6 @@ function setupMapLayers() {
   } catch (error) {
     logger.error(error);
     isLoadingMap.value = false;
-    dataStore.hideLoader();
   }
 }
 
@@ -1456,14 +1453,14 @@ function finalizeMapSetup() {
 
     // Hide loading indicators
     isLoadingMap.value = false;
-    dataStore.hideLoader();
 
     // Log that map is ready
     logger.info('Map fully rendered and ready');
   } catch (error) {
     logger.error('Error finalizing map setup:', error);
     isLoadingMap.value = false;
-    dataStore.hideLoader();
+  } finally {
+    appStore.hideSubLoader();
   }
 }
 
@@ -1514,6 +1511,12 @@ function updateMapOpacity(event: Event) {
 }
 
 onMounted(async () => {
+  appStore.$patch({
+    subLoader: {
+      message: 'Loading map'
+    },
+  });
+
   // Setup listener for closing dropdown when clicking outside
   document.addEventListener('click', closeDropdownOnOutsideClick);
 

@@ -16,7 +16,7 @@ interface DataStoreState {
 
 export const useDataStore = defineStore('data', {
   state: (): DataStoreState => ({
-    isInitiallyLoading: false,
+    isInitiallyLoading: true,
     isLoading: false,
     loadError: null,
     data: null,

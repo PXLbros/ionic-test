@@ -4,8 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Device } from '@capacitor/device';
-
-const DEFAULT_TOAST_DURATION = 2500;
+import appConfig from '@/config/app';
 
 export interface AppStoreToastConfig {
   isOpen: boolean;
@@ -25,10 +24,16 @@ export interface BottomBarConfig {
   isVisible: boolean;
 }
 
+export interface SubLoaderConfig {
+  isActive: boolean;
+  message: string;
+}
+
 interface AppStoreState {
   toast: AppStoreToastConfig;
   pushNotifications: PushNotificationsData;
   bottomBar: BottomBarConfig;
+  subLoader: SubLoaderConfig;
 }
 
 export const useAppStore = defineStore('app', {
@@ -36,7 +41,7 @@ export const useAppStore = defineStore('app', {
     toast: {
       isOpen: false,
       message: '',
-      duration: DEFAULT_TOAST_DURATION,
+      duration: appConfig.toast.defaultDuration,
     },
 
     pushNotifications: {
@@ -50,6 +55,11 @@ export const useAppStore = defineStore('app', {
     bottomBar: {
       isVisible: true,
     },
+
+    subLoader: {
+      isActive: false,
+      message: '',
+    },
   }),
 
   actions: {
@@ -57,7 +67,7 @@ export const useAppStore = defineStore('app', {
       this.toast = {
         isOpen: true,
         message,
-        duration: duration || DEFAULT_TOAST_DURATION,
+        duration: duration || appConfig.toast.defaultDuration,
       };
     },
 
@@ -65,7 +75,7 @@ export const useAppStore = defineStore('app', {
       this.toast = {
         isOpen: false,
         message: '',
-        duration: DEFAULT_TOAST_DURATION,
+        duration: appConfig.toast.defaultDuration,
       };
     },
 
@@ -215,6 +225,17 @@ export const useAppStore = defineStore('app', {
         this.pushNotifications.deviceId = null;
         this.pushNotifications.didRegisterDevice = false;
       }
+    },
+
+    hideSubLoader() {
+      setTimeout(() => {
+        this.$patch({
+          subLoader: {
+            isActive: false,
+            message: '',
+          },
+        });
+      }, appConfig.subLoader.hideDelayDuration);
     },
   },
 });

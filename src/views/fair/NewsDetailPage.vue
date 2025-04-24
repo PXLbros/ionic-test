@@ -1,8 +1,6 @@
 <template>
   <FairLayout title="News" :showMenuButton="true">
-    <Loader v-if="isFetchingArticle" class="loading-article" />
-
-    <div v-else-if="fetchArticleError">
+    <div v-if="fetchArticleError">
       {{ fetchArticleError }}
     </div>
 
@@ -59,7 +57,7 @@ import { useRoute, useRouter } from 'vue-router';
 import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
 import axios from 'axios';
 import FairLayout from '@/layouts/fair.vue';
-import Loader from '@/components/Loader.vue';
+import appConfig from '@/config/app';
 
 interface NewsArticle {
   title: string;
@@ -69,6 +67,7 @@ interface NewsArticle {
   image: string;
 }
 
+const appStore = useAppStore();
 const route = useRoute();
 const router = useRouter();
 const article = ref<NewsArticle | null>(null);
@@ -86,6 +85,13 @@ const fetchArticle = async () => {
   try {
     isFetchingArticle.value = true;
     fetchArticleError.value = null;
+
+    appStore.$patch({
+      subLoader: {
+        isActive: true,
+        message: 'Loading article...',
+      },
+    });
 
     const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data/news/${id}`);
 
@@ -108,6 +114,15 @@ const fetchArticle = async () => {
     fetchArticleError.value = 'An error occurred while fetching the article. Please try again later.';
   } finally {
     isFetchingArticle.value = false;
+
+    setTimeout(() => {
+      appStore.$patch({
+        subLoader: {
+          isActive: false,
+          message: '',
+        },
+      });
+    }, appConfig.subLoader.hideDelayDuration);
   }
 };
 

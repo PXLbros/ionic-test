@@ -9,24 +9,8 @@ import StartIcon from '@/components/icons/StartIcon.vue';
 import MapIcon from '@/components/icons/MapIcon.vue';
 import ScheduleIcon from '@/components/icons/ScheduleIcon.vue';
 import TicketsIcon from '@/components/icons/TicketsIcon.vue';
-import { useLogger } from '@/composables/useLogger';
 
-const props = withDefaults(defineProps<{
-  hamburgerMenuBaseNav?: any;
-}>(), {
-  hamburgerMenuBaseNav: null
-});
-
-const logger = useLogger();
-
-const openMenu = () => {
-  const baseNav = props.hamburgerMenuBaseNav;
-  if (baseNav && typeof baseNav.openMenu === 'function') {
-    baseNav.openMenu();
-  } else {
-    logger.warn('hamburgerMenuBaseNav is not ready or missing openMenu');
-  }
-};
+const emit = defineEmits(['tabClick']);
 
 const fairTabs = ref([
   {
@@ -52,7 +36,7 @@ const fairTabs = ref([
   {
     label: 'Menu',
     icon: markRaw(TicketsIcon),
-    onClick: openMenu,
+    onClick: () => emit('tabClick', { id: 'hamburgerMenu' }),
   },
 ]);
 </script>

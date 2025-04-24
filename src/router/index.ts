@@ -95,7 +95,8 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: 'Fair Finder Interactive Map',
       showInMenu: true,
-      menuOrder: 3
+      menuOrder: 3,
+      subLoader: true,
     }
   },
   {
@@ -201,7 +202,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/NewsDetailPage.vue'),
     meta: {
       title: 'News Detail',
-      showInMenu: false
+      showInMenu: false,
+      subLoader: true,
     }
   }
 ]

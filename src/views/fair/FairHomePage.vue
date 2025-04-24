@@ -12,7 +12,7 @@
       :showOnScroll="false"
     />
 
-    <FairBottomNavigation :hamburgerMenuBaseNav="hamburgerMenuBaseNav" />
+    <FairBottomNavigation @tabClick="onBottomNavTabClick" />
 
     <ion-content :fullscreen="true" :scroll-events="true" @ion-scroll="handleScroll($event)">
       <div class="main">
@@ -195,14 +195,16 @@ import FairKeepInTouchForm from '@/components/Fair/KeepInTouchForm.vue';
 import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
 import fairLogo from '@/imgs/svg/fair-logo-light.svg';
 import appConfig from '@/config/app';
+import { useLogger } from '@/composables/useLogger';
 
+const logger = useLogger();
 const dataStore = useDataStore();
 
 const isHeaderVisible = ref(false);
 let lastScrollY = 0;
 
 const carouselContainer = ref<HTMLElement | null>(null);
-const hamburgerMenuBaseNav = ref(null);
+const hamburgerMenuBaseNav = ref<InstanceType<typeof BaseNav> | null>(null);
 
 // Sample sponsors data - replace with your actual data
 const sponsors = computed(() => dataStore.data.nysfairWebsite.sponsors || []);
@@ -243,6 +245,28 @@ const handleScroll = (event: CustomEvent) => {
   // }
 
   // lastScrollY = currentY;
+};
+
+const onBottomNavTabClick = ({ id }: { id: string }) => {
+  switch (id) {
+    case 'hamburgerMenu': {
+      // Open the hamburger menu
+      if (hamburgerMenuBaseNav.value) {
+        hamburgerMenuBaseNav.value.openMenu();
+      } else {
+        logger.warn('hamburgerMenuBaseNav is not ready or missing');
+      }
+
+      break;
+    }
+    default: {
+      logger.warn('Unknown tab clicked', {
+        ID: id,
+      });
+
+      break;
+    }
+  }
 };
 
 onMounted(() => {

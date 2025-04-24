@@ -1,6 +1,9 @@
 <template>
   <ion-app>
-    <Loader v-if="dataStore.isInitiallyLoading" />
+    <Loader
+      v-if="dataStore.isInitiallyLoading || (isSubLoaderRoute && appStore.subLoader.isActive)"
+      :text="subLoaderMessage"
+    />
 
     <div v-if="dataStore.loadError" class="load-error">
       {{ dataStore.loadError }}
@@ -19,6 +22,7 @@ import { fetchData } from '@/services/api';
 import Loader from '@/components/Loader.vue';
 import { useLogger } from '@/composables/useLogger';
 
+const appStore = useAppStore();
 const dataStore = useDataStore();
 const logger = useLogger();
 
@@ -61,6 +65,18 @@ watch(
   },
   { immediate: true },
 );
+
+const subLoaderMessage = computed(() => appStore.subLoader.message);
+
+const isSubLoaderRoute = computed(() => {
+  return router.currentRoute.value.meta?.subLoader === true;
+});
+
+if (isSubLoaderRoute.value === true) {
+  logger.debug('Activated sub loader');
+
+  appStore.subLoader.isActive = true;
+}
 </script>
 
 <style lang="scss" scoped>

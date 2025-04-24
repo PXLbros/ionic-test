@@ -40,13 +40,20 @@
     </div>
 
     <div class="loading-text">
-      Loading
+      {{ loadingText }}
       <span class="dots"><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+const props = defineProps<{
+  text: string;
+}>();
+
+const loadingText = computed(() => {
+  return props.text ? props.text : 'Loading';
+});
 </script>
 
 <style lang="scss" scoped>

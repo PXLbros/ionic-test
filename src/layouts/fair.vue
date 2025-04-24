@@ -97,7 +97,7 @@
       <slot />
     </ion-content>
 
-    <FairBottomNavigation v-if="isFairRoute" v-show="appStore.bottomBar.isVisible" />
+    <FairBottomNavigation v-if="isFairRoute" v-show="appStore.bottomBar.isVisible" @tabClick="onBottomNavTabClick" />
     <FairgroundsBottomNavigation v-if="isFairgroundsRoute" v-show="appStore.bottomBar.isVisible" />
 
     <ion-toast
@@ -121,7 +121,9 @@ import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
 import FairgroundsBottomNavigation from '@/components/tabs/FairgroundsBottomNavigation.vue';
 import HamburgerIcon from '@/components/icons/HamburgerIcon.vue';
 import { useRoute } from 'vue-router';
+import { useLogger } from '@/composables/useLogger';
 
+const logger = useLogger();
 const route = useRoute();
 
 const props = withDefaults(defineProps<{
@@ -203,6 +205,25 @@ const goBack = () => {
     router.back();
   } else {
     router.push('/fair');
+  }
+};
+
+const onBottomNavTabClick = ({ id }: { id: string }) => {
+  switch (id) {
+    case 'hamburgerMenu': {
+      // Open the hamburger menu
+      isMenuOpen.value = true;
+      document.body.style.overflow = 'hidden';
+
+      break;
+    }
+    default: {
+      logger.warn('Unknown tab clicked', {
+        ID: id,
+      });
+
+      break;
+    }
   }
 };
 </script>
