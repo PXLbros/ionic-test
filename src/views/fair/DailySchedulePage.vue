@@ -73,6 +73,7 @@ import { Category, DateObject, Event } from '@/types';
 import { convertToEasternTime } from '@/utils/time';
 import { formatEvent, FormattedEvent } from '@/utils/event';
 import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
@@ -278,7 +279,7 @@ const selectedCategoryName = computed(() => {
 .main {
   font-family: 'Inter', sans-serif;
   background: #FDD456;
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
 
   &__header {
     padding: 25px 20px;

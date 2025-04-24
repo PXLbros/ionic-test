@@ -124,7 +124,7 @@
           />
         </div>
 
-        <FGKeepInTouch />
+        <FairgroundsKeepInTouchForm />
 
         <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
 
@@ -140,6 +140,7 @@ import { format, isSameMonth, parseISO, addMonths, subMonths, isSameDay } from '
 import { toZonedTime } from 'date-fns-tz';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import appConfig from '@/config/app';
+import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
 
 interface NYSFairgroundsEventDate {
   date: string;

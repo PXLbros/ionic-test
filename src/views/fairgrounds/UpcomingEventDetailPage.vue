@@ -79,7 +79,7 @@
         </div>
       </div>
 
-      <FGKeepInTouch />
+      <FairgroundsKeepInTouchForm />
 
     </div>
     <div v-else class="alt">
@@ -95,6 +95,7 @@ import { useDataStore } from '@/stores/data';
 import { format, parseISO } from 'date-fns';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import type { EventDate } from '@/types';
+import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
 
 interface NYSFairgroundsEventDate {
   date: string;

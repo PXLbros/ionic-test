@@ -44,7 +44,7 @@
           </div>
         </div>
 
-        <FGKeepInTouch />
+        <FairgroundsKeepInTouchForm />
 
         <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
       </div>
@@ -53,39 +53,40 @@
 </template>
 
 <script setup lang="ts">
-  import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton } from '@ionic/vue';
-  import FairgroundsNav from '@/components/Fairgrounds/Nav.vue';
-  import { useDataStore } from '@/stores/data';
-  import FairgroundsBottomNavigation from '@/components/tabs/FairgroundsBottomNavigation.vue';
+import { IonContent, IonPage } from '@ionic/vue';
+import { useDataStore } from '@/stores/data';
+import FairgroundsNav from '@/components/Fairgrounds/Nav.vue';
+import FairgroundsBottomNavigation from '@/components/tabs/FairgroundsBottomNavigation.vue';
+import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
 
-  const dataStore = useDataStore();
-  console.log('dataStore', dataStore.data);
+const dataStore = useDataStore();
 
-  const featuredEvents = dataStore.data.nysfairgroundsWebsite.featuredEvents;
+const allEvents = computed(() => {
+  const featured = dataStore.data.nysfairgroundsWebsite.featuredEvents || [];
+  const regularEvents = dataStore.data.nysfairgroundsWebsite.events || [];
 
-  // Combine featured events with other events to create a full list of events
-  const allEvents = computed(() => {
-    const featured = dataStore.data.nysfairgroundsWebsite.featuredEvents || [];
-    const regularEvents = dataStore.data.nysfairgroundsWebsite.events || [];
+  const filterUpcomingEvents = (events: { eventDates?: { is_upcoming: boolean }[] }[]) =>
+    events.filter((event) => event.eventDates?.some((date) => date.is_upcoming));
 
-    // If there are no featured events, just use the first 5 regular events
-    if (!featured.length) {
-      return regularEvents.slice(0, 5);
-    }
+  const filteredRegularEvents = filterUpcomingEvents(regularEvents);
 
-    // Otherwise, use featured events and add regular events to get to 5 total
-    const combined = [...featured];
-    if (combined.length < 5) {
-      const remainingNeeded = 5 - combined.length;
-      // Add regular events that are not already in featured
-      const regularNotFeatured = regularEvents.filter(
-        (regEvent: { id: string }) => !featured.some((featEvent: any) => featEvent.id === regEvent.id)
-      );
-      combined.push(...regularNotFeatured.slice(0, remainingNeeded));
-    }
+  if (!featured.length) {
+    return filteredRegularEvents.slice(0, 5);
+  }
 
-    return combined;
-  });
+  const combined = [...featured];
+  const remainingNeeded = 5 - combined.length;
+
+  if (remainingNeeded > 0) {
+    const regularNotFeatured = filteredRegularEvents.filter(
+      (regEvent) => !featured.some((featEvent: any) => featEvent.id === regEvent.id)
+    );
+
+    combined.push(...regularNotFeatured.slice(0, remainingNeeded));
+  }
+
+  return combined;
+});
 </script>
 
 <style lang="scss" scoped>

@@ -20,16 +20,17 @@
 import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import appConfig from '@/config/app';
 
 interface DirectionsPageData {
-    title: string;
-    content: string;
+  title: string;
+  content: string;
 }
 
 const dataStore = useDataStore();
 const directionsPageData = ref<DirectionsPageData>({
-    title: '',
-    content: '',
+  title: '',
+  content: '',
 });
 
 // Fix the data path to match the actual structure
@@ -42,8 +43,6 @@ if (pageData) {
     content: pageData.content || ''
   };
 }
-console.log('directions page data', pageData);
-
 
 </script>
 
@@ -53,7 +52,7 @@ console.log('directions page data', pageData);
   display: flex;
   flex-direction: column;
   background: #FDD456;
-  padding-bottom: 110px;
+  padding-bottom: calc(v-bind('appConfig.bottomBar.height') + 2rem);
 
   &__image {
       background-color: #EFF2F6;

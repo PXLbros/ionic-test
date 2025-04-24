@@ -33,7 +33,7 @@
     </div>
 
     <div class="wrapper">
-      <FGKeepInTouch />
+      <FairgroundsKeepInTouchForm />
     </div>
   </FairgroundsLayout>
 </template>
@@ -43,6 +43,7 @@ import { useRoute } from 'vue-router';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
 
 interface Venue {
   id: string;

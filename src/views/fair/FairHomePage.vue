@@ -174,7 +174,7 @@ xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAA
         </div>
 
         <!-- Keep in Touch Section -->
-        <Contact />
+        <FairKeepInTouchForm />
 
         <!-- Social Icons -->
         <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
@@ -188,9 +188,10 @@ import { IonContent, IonPage, IonGrid, IonRow, IonCol } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import BaseNav from '@/components/BaseNav.vue';
 import SocialIcons from '@/components/SocialIcons.vue';
-import Contact from '@/components/Contact.vue';
+import FairKeepInTouchForm from '@/components/Fair/KeepInTouchForm.vue';
 import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
 import fairLogo from '@/imgs/svg/fair-logo-light.svg';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 
@@ -281,7 +282,6 @@ ion-col {
   padding-bottom: 100px;
   z-index: 10;
   background: #FDD456;
-
 
   &::before {
     content: '';
@@ -393,8 +393,13 @@ ion-col {
   border-top-right-radius: 40px;
   position: relative;
   z-index: 10;
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
   margin-top: -86px;
+}
+
+.section.keep-in-touch {
+  padding-top: 10px;
+  padding-bottom: 30px;
 }
 
 .section {
