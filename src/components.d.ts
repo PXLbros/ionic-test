@@ -22,6 +22,7 @@ declare module 'vue' {
     FGKeepInTouch: typeof import('./components/FGKeepInTouch.vue')['default']
     HamburgerIcon: typeof import('./components/icons/HamburgerIcon.vue')['default']
     HomeIcon: typeof import('./components/icons/HomeIcon.vue')['default']
+    ImageCarousel: typeof import('./components/ImageCarousel.vue')['default']
     Loader: typeof import('./components/Loader.vue')['default']
     MapDetailsPopup: typeof import('./components/MapDetailsPopup.vue')['default']
     MapIcon: typeof import('./components/icons/MapIcon.vue')['default']
