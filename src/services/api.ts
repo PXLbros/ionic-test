@@ -8,7 +8,7 @@ export const fetchData = async () => {
   const dataStore = useDataStore();
 
   try {
-    dataStore.showLoader();
+    dataStore.isLoading = true;
     dataStore.setLoadError({ error: null });
 
     const useFakeData = false;
@@ -55,7 +55,8 @@ export const fetchData = async () => {
       Sentry.captureException(error);
     }
   } finally {
-    dataStore.hideLoader();
+    dataStore.isLoading = false;
+    dataStore.isInitiallyLoading = false;
   }
 };
 

@@ -7,6 +7,7 @@ interface DataErrors {
 }
 
 interface DataStoreState {
+  isInitiallyLoading: boolean;
   isLoading: boolean;
   loadError: Error | null;
   data: any | null;
@@ -15,6 +16,7 @@ interface DataStoreState {
 
 export const useDataStore = defineStore('data', {
   state: (): DataStoreState => ({
+    isInitiallyLoading: false,
     isLoading: false,
     loadError: null,
     data: null,
@@ -40,14 +42,6 @@ export const useDataStore = defineStore('data', {
   },
 
   actions: {
-    showLoader() {
-      this.isLoading = true;
-    },
-
-    hideLoader() {
-      this.isLoading = false;
-    },
-
     setLoadError({ error }: { error: any }) {
       this.loadError = error;
     },

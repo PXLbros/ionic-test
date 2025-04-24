@@ -26,7 +26,7 @@ import { useRoute } from 'vue-router';
 import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
 import FairLayout from '@/layouts/fair.vue';
-
+import appConfig from '@/config/app';
 
 interface Event {
     id: number;
@@ -164,8 +164,7 @@ ion-back-button {
 .main {
     padding: 20px;
     background: #FDD456;
-    padding-bottom: 90px;
-
+    padding-bottom: v-bind('appConfig.bottomBar.height');
 
     &__image {
         background-color: #EFF2F6;

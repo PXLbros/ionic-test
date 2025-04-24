@@ -1,6 +1,7 @@
 <template>
   <ion-page id="main-content" class="main-content--fair-page">
     <BaseNav
+      ref="hamburgerMenuBaseNav"
       type="fair"
       toolbarBackground="#098944"
       menuBackground="linear-gradient(180deg, #098944 0%, #098944 100%)"
@@ -11,7 +12,7 @@
       :showOnScroll="false"
     />
 
-    <FairBottomNavigation />
+    <FairBottomNavigation :hamburgerMenuBaseNav="hamburgerMenuBaseNav" />
 
     <ion-content :fullscreen="true" :scroll-events="true" @ion-scroll="handleScroll($event)">
       <div class="main">
@@ -201,6 +202,7 @@ const isHeaderVisible = ref(false);
 let lastScrollY = 0;
 
 const carouselContainer = ref<HTMLElement | null>(null);
+const hamburgerMenuBaseNav = ref(null);
 
 // Sample sponsors data - replace with your actual data
 const sponsors = computed(() => dataStore.data.nysfairWebsite.sponsors || []);

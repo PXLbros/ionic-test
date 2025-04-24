@@ -1,13 +1,13 @@
 <template>
   <ion-app>
-    <Loader v-if="dataStore.isLoading" />
+    <Loader v-if="dataStore.isInitiallyLoading" />
 
     <div v-if="dataStore.loadError" class="load-error">
       {{ dataStore.loadError }}
     </div>
 
     <ion-router-outlet
-      v-if="!dataStore.isLoading && !dataStore.loadError && dataStore.data"
+      v-if="!dataStore.isInitiallyLoading && !dataStore.loadError && dataStore.data"
       ref="routerOutlet"
     />
   </ion-app>

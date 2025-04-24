@@ -178,6 +178,7 @@ import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
 import { storeToRefs } from 'pinia';
 import { refreshOutline, heart, triangle } from 'ionicons/icons';
 import { IonIcon } from '@ionic/vue';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
@@ -420,7 +421,7 @@ const venueInfo = computed(() => {
 
 <style lang="scss" scoped>
 .main {
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
 
   &__header {
     display: flex;

@@ -1,8 +1,6 @@
 <template>
   <FairLayout title="News" :showMenuButton="true">
-    <div v-if="isFetchingArticle" class="loading-article">
-      Loading article...
-    </div>
+    <Loader v-if="isFetchingArticle" class="loading-article" />
 
     <div v-else-if="fetchArticleError">
       {{ fetchArticleError }}
@@ -61,6 +59,7 @@ import { useRoute, useRouter } from 'vue-router';
 import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
 import axios from 'axios';
 import FairLayout from '@/layouts/fair.vue';
+import Loader from '@/components/Loader.vue';
 
 interface NewsArticle {
   title: string;

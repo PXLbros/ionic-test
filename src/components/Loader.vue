@@ -33,13 +33,15 @@
         </g>
         <defs>
         <clipPath id="clip0_1904_788">
-        <rect width="148" height="146" fill="white"/>
+          <rect width="148" height="146" fill="white"/>
         </clipPath>
         </defs>
       </svg>
     </div>
+
     <div class="loading-text">
-      Loading<span class="dots"><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>
+      Loading
+      <span class="dots"><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>
     </div>
   </div>
 </template>
@@ -48,77 +50,85 @@
 </script>
 
 <style lang="scss" scoped>
+.loader {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #FDD456;
+  color: #000;
+  z-index: 99999;
+}
 
-    .loader {
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #FDD456;
-      color: #000;
-      z-index: 99999;
-    }
+.logo {
+  // animation: bounce 2s ease infinite;
+  margin-bottom: 0px;
+}
 
-    .logo {
-      // animation: bounce 2s ease infinite;
-      margin-bottom: 0px;
-    }
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
 
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-      }
-      40% {
-        transform: translateY(-20px);
-      }
-      60% {
-        transform: translateY(-10px);
-      }
-    }
+  40% {
+    transform: translateY(-20px);
+  }
 
-    .loading-text {
-      font-size: 24px;
-      font-weight: regular;
-      position: relative;
-      margin-top: 15px;
-      font-family: 'lalezar', sans-serif;
-    }
+  60% {
+    transform: translateY(-10px);
+  }
+}
 
-    .dots {
-      display: inline-block;
-      width: 70px;
-      text-align: left;
-    }
+.loading-text {
+  font-size: 24px;
+  font-weight: regular;
+  position: relative;
+  margin-top: 15px;
+  font-family: 'lalezar', sans-serif;
+}
 
-    .dot {
-      display: inline-block;
-      opacity: 0;
-      animation: dotAnimation 1.5s infinite;
-      margin-left: 3px;
-    }
+.dots {
+  display: inline-block;
+  width: 70px;
+  text-align: left;
+}
 
-    .dot:nth-child(2) {
-      animation-delay: 0.5s;
-    }
+.dot {
+  display: inline-block;
+  opacity: 0;
+  animation: dotAnimation 1.5s infinite;
+  margin-left: 3px;
+}
 
-    .dot:nth-child(3) {
-      animation-delay: 1s;
-    }
+.dot:nth-child(2) {
+  animation-delay: 0.5s;
+}
 
-    @keyframes dotAnimation {
-      0% {
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
-  </style>
+.dot:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes dotAnimation {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+</style>

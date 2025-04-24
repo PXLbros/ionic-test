@@ -19,14 +19,11 @@
         </div>
 
         <!-- Article List -->
-        <div class="loader" v-if="isLoading && newsItems === null">
-          <Loader />
-        </div>
+        <Loader v-if="isInitiallyLoading || (isLoading && newsItems === null)" />
 
         <div v-else-if="loadError">
           Could not load news.
         </div>
-
 
         <div v-else class="articles-list">
             <router-link
@@ -68,11 +65,13 @@ import { NewsArticle } from '@/types'
 import FairLayout from '@/layouts/fair.vue';
 import Loader from '@/components/Loader.vue';
 import { useDataStore } from '@/stores/data';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 
 // const itemsPerPage = 5;
 const currentPage = ref(1);
+const isInitiallyLoading = ref(true);
 const isLoading = ref(true);
 const loadError = ref<string | null>(null);
 const newsItems = ref<NewsArticle[] | null>(null);
@@ -169,6 +168,7 @@ const fetchNews = async ({ page }: { page: number } = { page: 1 }) => {
     loadError.value = (error instanceof Error) ? error.message : 'An error occurred while fetching news.';
   } finally {
     isLoading.value = false;
+    isInitiallyLoading.value = false;
   }
 }
 
@@ -192,7 +192,7 @@ a {
 }
 .main {
     background: #FDD456;
-    padding-bottom: 90px;
+    padding-bottom: v-bind('appConfig.bottomBar.height');
 
     .wrapper {
       padding: 20px;

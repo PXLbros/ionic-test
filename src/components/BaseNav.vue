@@ -238,6 +238,12 @@ const toggleNotifications = async () => {
     }
   }
 };
+
+defineExpose({
+  openMenu,
+  closeMenu,
+  toggleMenu,
+});
 </script>
 
 <style scoped lang="scss">
