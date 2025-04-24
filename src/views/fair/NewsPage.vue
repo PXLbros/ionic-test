@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { IonButton } from '@ionic/vue';
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import { NewsArticle } from '@/types'
 import FairLayout from '@/layouts/fair.vue';
 import Loader from '@/components/Loader.vue';

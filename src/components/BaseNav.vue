@@ -116,7 +116,7 @@ import { useRouter } from 'vue-router';
 import { IonToolbar, IonTitle, IonHeader } from '@ionic/vue';
 import { closeCircleOutline } from 'ionicons/icons';
 import { IonIcon } from '@ionic/vue';
-import HamburgerIcon from './icons/HamburgerIcon.vue';
+import HamburgerIcon from './Icons/HamburgerIcon.vue';
 
 const props = defineProps<{
   type: 'fair' | 'fairgrounds'

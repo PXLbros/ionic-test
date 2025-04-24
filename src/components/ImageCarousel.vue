@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import PlaceholderIcon from './icons/PlaceholderIcon.vue';
+import PlaceholderIcon from './Icons/PlaceholderIcon.vue';
 
 interface ImageItem {
   url: string;

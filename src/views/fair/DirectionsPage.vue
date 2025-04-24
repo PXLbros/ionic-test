@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import appConfig from '@/config/app';
 
 interface DirectionsPageData {

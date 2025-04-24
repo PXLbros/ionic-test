@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { useDataStore } from '@/stores/data';
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import FairLayout from '@/layouts/fair.vue';
 import appConfig from '@/config/app';
 

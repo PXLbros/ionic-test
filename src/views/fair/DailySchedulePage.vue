@@ -72,7 +72,7 @@ import { storeToRefs } from 'pinia';
 import { Category, DateObject, Event } from '@/types';
 import { convertToEasternTime } from '@/utils/time';
 import { formatEvent, FormattedEvent } from '@/utils/event';
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import appConfig from '@/config/app';
 
 const dataStore = useDataStore();

@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import axios from 'axios';
 import FairLayout from '@/layouts/fair.vue';
 import appConfig from '@/config/app';

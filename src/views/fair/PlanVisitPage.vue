@@ -71,7 +71,7 @@
 import FairLayout from '@/layouts/fair.vue';
 import Contact from '@/components/Fair/KeepInTouchForm.vue';
 import { useDataStore } from '@/stores/data';
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 
 const dataStore = useDataStore();
 </script>

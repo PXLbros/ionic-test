@@ -3,12 +3,12 @@
 </template>
 
 <script setup lang="ts">
-import BaseTabNavigation from '../tabs/BaseTabNavigation.vue';
-import HomeIcon from '@/components/icons/HomeIcon.vue';
-import StartIcon from '@/components/icons/StartIcon.vue';
-import MapIcon from '@/components/icons/MapIcon.vue';
-import ScheduleIcon from '@/components/icons/ScheduleIcon.vue';
-import TicketsIcon from '@/components/icons/TicketsIcon.vue';
+import BaseTabNavigation from '../Tabs/BaseTabNavigation.vue';
+import HomeIcon from '@/components/Icons/HomeIcon.vue';
+import StartIcon from '@/components/Icons/StartIcon.vue';
+import MapIcon from '@/components/Icons/MapIcon.vue';
+import ScheduleIcon from '@/components/Icons/ScheduleIcon.vue';
+import TicketsIcon from '@/components/Icons/TicketsIcon.vue';
 
 const emit = defineEmits(['tabClick']);
 

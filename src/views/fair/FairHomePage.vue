@@ -192,7 +192,7 @@ import { useDataStore } from '@/stores/data';
 import BaseNav from '@/components/BaseNav.vue';
 import SocialIcons from '@/components/SocialIcons.vue';
 import FairKeepInTouchForm from '@/components/Fair/KeepInTouchForm.vue';
-import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
+import FairBottomNavigation from '@/components/Tabs/FairBottomNavigation.vue';
 import fairLogo from '@/imgs/svg/fair-logo-light.svg';
 import appConfig from '@/config/app';
 import { useLogger } from '@/composables/useLogger';

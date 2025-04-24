@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 

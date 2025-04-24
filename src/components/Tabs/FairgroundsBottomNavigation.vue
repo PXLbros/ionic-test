@@ -4,12 +4,12 @@
 </template>
 
 <script setup lang="ts">
-import BaseTabNavigation from '../tabs/BaseTabNavigation.vue';
-import HomeIcon from '@/components/icons/HomeIcon.vue';
-import StartIcon from '@/components/icons/StartIcon.vue';
-import MapIcon from '@/components/icons/MapIcon.vue';
-import CalendarIcon from '@/components/icons/CalendarIcon.vue';
-import PinIcon from '@/components/icons/PinIcon.vue';
+import BaseTabNavigation from '../Tabs/BaseTabNavigation.vue';
+import HomeIcon from '@/components/Icons/HomeIcon.vue';
+import StartIcon from '@/components/Icons/StartIcon.vue';
+import MapIcon from '@/components/Icons/MapIcon.vue';
+import CalendarIcon from '@/components/Icons/CalendarIcon.vue';
+import PinIcon from '@/components/Icons/PinIcon.vue';
 
 const fairgroundsTabs = ref([
   {

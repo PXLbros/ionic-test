@@ -33,8 +33,8 @@
             >
           </div>
 
-          <div class="btn">
-            <button class="sign-up-btn" :disabled="isSubmitting">
+          <div class="btn-container">
+            <button class="btn" :disabled="isSubmitting">
               {{ submitButtonText }}
             </button>
           </div>
@@ -137,36 +137,10 @@ const handleSubmit = async () => {
   background: #F4E8AB;
 }
 
-.btn {
-  width: 100%;
+.btn-container {
   display: flex;
   justify-content: center;
   align-items: center;
-
-  .sign-up-btn {
-    background-color: #098944;
-    border: 2px solid #098944;
-    color: #FFF1AF;
-    text-transform: uppercase;
-    padding: 18px 50px;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: fit-content;
-    font-size: 20px;
-    line-height: 24px;
-
-    &:hover {
-      background: #098944;
-      color: #FFF1AF;
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: default;
-    }
-  }
+  width: 100%;
 }
 </style>

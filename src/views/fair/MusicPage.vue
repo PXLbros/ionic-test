@@ -174,7 +174,7 @@ interface DataStore {
 import FairLayout from '@/layouts/fair.vue';
 import FavoriteButton from '@/components/FavoriteButton.vue';
 import { useDataStore } from '@/stores/data';
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import { storeToRefs } from 'pinia';
 import { refreshOutline, heart, triangle } from 'ionicons/icons';
 import { IonIcon } from '@ionic/vue';

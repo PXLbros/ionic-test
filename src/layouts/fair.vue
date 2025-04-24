@@ -117,9 +117,9 @@ import { useDataStore } from '@/stores/data';
 import { closeCircleOutline } from 'ionicons/icons';
 import SocialIcons from '@/components/SocialIcons.vue';
 import { useRouter } from 'vue-router';
-import FairBottomNavigation from '@/components/tabs/FairBottomNavigation.vue';
-import FairgroundsBottomNavigation from '@/components/tabs/FairgroundsBottomNavigation.vue';
-import HamburgerIcon from '@/components/icons/HamburgerIcon.vue';
+import FairBottomNavigation from '@/components/Tabs/FairBottomNavigation.vue';
+import FairgroundsBottomNavigation from '@/components/Tabs/FairgroundsBottomNavigation.vue';
+import HamburgerIcon from '@/components/Icons/HamburgerIcon.vue';
 import { useRoute } from 'vue-router';
 import { useLogger } from '@/composables/useLogger';
 
@@ -458,8 +458,8 @@ ion-back-button {
   width: 100%;
   height: 100%;
   z-index: 9999;
-  background-color: #{appColor(nysfair, yellow, medium)};
-  color: #{appColor(nysfair, blue, medium)};
+  background-color: appColor(nysfair, yellow, medium);
+  color: appColor(nysfair, blue, medium);
   font-weight: bold;
   font-size: 1.2rem;
 }

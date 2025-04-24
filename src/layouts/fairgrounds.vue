@@ -112,8 +112,8 @@ import { useDataStore } from '@/stores/data';
 import { closeCircleOutline } from 'ionicons/icons';
 import SocialIcons from '@/components/SocialIcons.vue';
 import { useRouter } from 'vue-router';
-import FairgroundsBottomNavigation from '@/components/tabs/FairgroundsBottomNavigation.vue';
-import HamburgerIcon from '@/components/icons/HamburgerIcon.vue';
+import FairgroundsBottomNavigation from '@/components/Tabs/FairgroundsBottomNavigation.vue';
+import HamburgerIcon from '@/components/Icons/HamburgerIcon.vue';
 
 const props = withDefaults(defineProps<{
   title: string;

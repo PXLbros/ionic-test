@@ -56,7 +56,7 @@
 import { IonContent, IonPage } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import FairgroundsNav from '@/components/Fairgrounds/Nav.vue';
-import FairgroundsBottomNavigation from '@/components/tabs/FairgroundsBottomNavigation.vue';
+import FairgroundsBottomNavigation from '@/components/Tabs/FairgroundsBottomNavigation.vue';
 import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
 
 const dataStore = useDataStore();

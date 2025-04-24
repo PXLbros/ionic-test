@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import { useDataStore } from '@/stores/data';
 import SocialIcons from '@/components/SocialIcons.vue';

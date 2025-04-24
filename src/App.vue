@@ -1,12 +1,24 @@
 <template>
   <ion-app>
     <Loader
-      v-if="dataStore.isInitiallyLoading || (isSubLoaderRoute && appStore.subLoader.isActive)"
+      v-if="dataStore.isInitiallyLoading || dataStore.isLoading || (isSubLoaderRoute && appStore.subLoader.isActive)"
       :text="subLoaderMessage"
     />
 
-    <div v-if="dataStore.loadError" class="load-error">
-      {{ dataStore.loadError }}
+    <div v-if="dataStore.loadError" class="load-error-container">
+      <IconsLogo />
+
+      <h1 class="load-error-title">
+        Error
+      </h1>
+
+      <p class="load-error-message">
+        {{ dataStore.loadError }}
+      </p>
+
+      <button class="btn btn--small btn--load-more" @click="fetchData">
+        {{ retryButtonText }}
+      </button>
     </div>
 
     <ion-router-outlet
@@ -21,6 +33,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/vue';
 import { fetchData } from '@/services/api';
 import Loader from '@/components/Loader.vue';
 import { useLogger } from '@/composables/useLogger';
+import IconsLogo from '@/components/Icons/Logo.vue';
 
 const appStore = useAppStore();
 const dataStore = useDataStore();
@@ -30,13 +43,15 @@ const routerOutlet = ref<InstanceType<typeof IonRouterOutlet> | null>(null);
 const router = useRouter();
 
 const swipeDisabledRoutes = ['/fair/map'];
+let originalSwipeHandler: any = null;
+
+const retryButtonText = computed(() => {
+  return dataStore.isLoading ? 'Retrying...' : 'Retry';
+});
 
 onMounted(async () => {
   await fetchData();
 });
-
-// Store the original swipeHandler to restore it later
-let originalSwipeHandler: any = null;
 
 watch(
   () => router.currentRoute.value.fullPath,
@@ -80,8 +95,9 @@ if (isSubLoaderRoute.value === true) {
 </script>
 
 <style lang="scss" scoped>
-.load-error {
+.load-error-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: fixed;
@@ -89,8 +105,17 @@ if (isSubLoaderRoute.value === true) {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #fff;
-  color: #000;
+  background-color: appColor(nysfair, yellow, medium);
+  color: appColor(nysfair, black, default);
   z-index: 99999;
+
+  .load-error-title {
+    font-size: 2.75rem;
+    margin-bottom: 0;
+  }
+
+  .btn--load-more {
+    margin-top: 0.5rem;
+  }
 }
 </style>

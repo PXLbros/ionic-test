@@ -23,7 +23,7 @@
 import { Category } from '@/types';
 import FairLayout from '../../layouts/fair.vue';
 import { formatEvent } from '@/utils/event';
-import PlaceholderIcon from '@/components/icons/PlaceholderIcon.vue';
+import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 
 const dataStore = useDataStore();
 
