@@ -240,17 +240,20 @@ onBeforeUnmount(() => {
   align-items: center;
   padding: 0 10px;
   z-index: 2;
+  pointer-events: none;
 }
 
 .nav-btn {
   width: 30px;
   height: 30px;
+  border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: center;
   align-items: center;
   border: none;
   cursor: pointer;
+  pointer-events: auto;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.5);
@@ -265,6 +268,7 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: center;
   gap: 8px;
+  z-index: 2;
 }
 
 .pagination-dot {
@@ -274,9 +278,20 @@ onBeforeUnmount(() => {
   background-color: rgba(255, 255, 255, 0.6);
   border: none;
   cursor: pointer;
+  padding: 0;
 
   &.active {
     background-color: #0077C8;
+    width: 25px;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    &.active {
+      background-color: #0077C8;
+    }
   }
 }
 </style>
