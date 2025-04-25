@@ -167,6 +167,11 @@ const MAP_MAX_ZOOM = 17;
 const MAP_CLUSTER_RADIUS = 50;
 const MAP_CLUSTER_MIN_POINTS = 10;
 
+const MAP_MAX_BOUNDS: [[number, number], [number, number]] = [
+  [-76.23600195804164, 43.05946664729794], // Top-left (SW)
+  [-76.20036371823731, 43.0845174767999],  // Bottom-right (NE)
+];
+
 const isLoadingMap = ref(true);
 
 const mapContainer = ref<HTMLElement | null>(null);
@@ -1192,7 +1197,7 @@ function initMap() {
     preserveDrawingBuffer: true,
     minZoom: MAP_MIN_ZOOM,
     maxZoom: MAP_MAX_ZOOM,
-    // failIfMajorPerformanceCaveat: true, // Don't load if performance would be poor
+    maxBounds: MAP_MAX_BOUNDS,
   });
 
   mapboxMap.touchZoomRotate.disableRotation();
@@ -1238,6 +1243,15 @@ function initMap() {
   // Update zoom level on zoom events
   mapboxMap.on('zoom', () => {
     currentZoomLevel.value = mapboxMap.getZoom();
+  });
+
+  mapboxMap.on('click', (e) => {
+    if (isDebugMode.value) {
+      logger.debug('Map clicked at coordinates:', {
+        lng: e.lngLat.lng,
+        lat: e.lngLat.lat,
+      });
+    }
   });
 }
 

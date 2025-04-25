@@ -76,8 +76,18 @@
           <div class="calendar-header">
             <h2>{{ format(selectedDate, 'MMMM yyyy') }}</h2>
             <div class="calendar-nav">
-              <button @click="navigateMonth(-1)">‹</button>
-              <button @click="navigateMonth(1)">›</button>
+              <button
+                @click="navigateMonth(-1)"
+                :class="{ 'hidden': !canNavigateToPrevMonth }"
+              >
+                ‹
+              </button>
+              <button
+                @click="navigateMonth(1)"
+                :class="{ 'hidden': !canNavigateToNextMonth }"
+              >
+                ›
+              </button>
             </div>
           </div>
 
@@ -381,17 +391,43 @@ const toggleView = () => {
   viewMode.value = viewMode.value === 'list' ? 'calendar' : 'list';
 };
 
+const firstMonthWithEvents = computed(() => {
+  if (!monthsWithUpcomingEvents.value.length) return null;
+  return monthsWithUpcomingEvents.value[0];
+});
+
+const lastMonthWithEvents = computed(() => {
+  if (!monthsWithUpcomingEvents.value.length) return null;
+  return monthsWithUpcomingEvents.value[monthsWithUpcomingEvents.value.length - 1];
+});
+
+const canNavigateToPrevMonth = computed(() => {
+  if (!firstMonthWithEvents.value) return false;
+
+  const currentMonthStart = new Date(selectedDate.value.getFullYear(), selectedDate.value.getMonth(), 1);
+  const firstEventMonthStart = new Date(firstMonthWithEvents.value.getFullYear(), firstMonthWithEvents.value.getMonth(), 1);
+
+  return currentMonthStart > firstEventMonthStart;
+});
+
+const canNavigateToNextMonth = computed(() => {
+  if (!lastMonthWithEvents.value) return false;
+
+  const currentMonthStart = new Date(selectedDate.value.getFullYear(), selectedDate.value.getMonth(), 1);
+  const lastEventMonthStart = new Date(lastMonthWithEvents.value.getFullYear(), lastMonthWithEvents.value.getMonth(), 1);
+
+  return currentMonthStart < lastEventMonthStart;
+});
+
 const navigateMonth = (direction: number) => {
   const newDate = direction > 0
     ? addMonths(selectedDate.value, 1)
     : subMonths(selectedDate.value, 1);
 
-  // Check if the new date is within bounds
-  const currentDate = new Date();
-  const minDate = subMonths(currentDate, 12);
-  const maxDate = addMonths(currentDate, 12);
-
-  if (newDate >= minDate && newDate <= maxDate) {
+  // Check if the new date is within the range of months with events
+  if (direction < 0 && canNavigateToPrevMonth.value) {
+    selectedDate.value = newDate;
+  } else if (direction > 0 && canNavigateToNextMonth.value) {
     selectedDate.value = newDate;
   }
 };
@@ -589,6 +625,12 @@ const navigateMonth = (direction: number) => {
           color: #3B71CA;
           cursor: pointer;
           padding: 8px;
+          transition: opacity 0.3s ease;
+
+          &.hidden {
+            opacity: 0.3;
+            pointer-events: none;
+          }
         }
       }
     }
