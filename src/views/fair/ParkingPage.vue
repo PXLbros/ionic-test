@@ -118,8 +118,15 @@ watch(() => parkingPageData.value.content, (newContent: string) => {
       currentNode = currentNode.nextSibling;
     }
 
+    let sectionTitle = header.textContent?.trim() || '';
+
+    // Remove last : from sectionTitle if it exists
+    if (sectionTitle.endsWith(':')) {
+      sectionTitle = sectionTitle.slice(0, -1);
+    }
+
     sections.push({
-      title: header.textContent?.trim() || '',
+      title: sectionTitle,
       content: content.trim(),
       isExpanded: false,
     });

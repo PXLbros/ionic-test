@@ -41,10 +41,10 @@
                 {{ selectedFilterCount }}
               </span>
             </button>
-            <button class="filter-button" @click="resetFilters">
+            <!-- <button class="filter-button" @click="resetFilters">
               <ion-icon size="small" :icon="refreshOutline"></ion-icon>
               Reset
-            </button>
+            </button> -->
           </div>
         </div>
 
@@ -93,10 +93,18 @@
     <!-- Filters Modal -->
     <div class="filter-panel" :class="{ 'filter-panel--open': showFiltersPanel }">
       <div class="filter-panel__header">
-        <h3>Filter Options</h3>
-        <button class="close-button" @click="toggleFiltersPanel">
-          <ion-icon :icon="closeOutline"></ion-icon>
-        </button>
+        <div class="filter-panel__header-column filter-panel__header-column--left">
+          <button class="close-button" @click="toggleFiltersPanel">
+            <ion-icon :icon="closeOutline"></ion-icon>
+          </button>
+          <span>Filters</span>
+        </div>
+
+        <div class="filter-panel__header-column filter-panel__header-column--right">
+          <span>
+            Reset
+          </span>
+        </div>
       </div>
       <div class="filter-panel__content">
         <!-- <h4>Categories</h4> -->
@@ -121,8 +129,8 @@
           </div>
         </div>
         <div class="filter-actions">
-          <button class="action-button apply" @click="applyFilters">Apply Filters</button>
-          <button class="action-button clear" @click="clearCategoryFilters">Clear All</button>
+          <button class="action-button apply" @click="applyFilters">Apply</button>
+          <button class="action-button clear" @click="clearCategoryFilters">Clear</button>
         </div>
       </div>
     </div>
@@ -1837,7 +1845,8 @@ onUnmounted(() => {
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  max-height: 78vh;
+  // max-height: 78vh;
+  height: calc(100% - v-bind('appConfig.bottomBar.height'));
   display: flex;
   flex-direction: column;
   padding-top: 45px;
@@ -1876,6 +1885,16 @@ onUnmounted(() => {
       &:hover {
         background-color: #f5f5f5;
       }
+    }
+  }
+
+  &__header-column {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    span {
+      font-size: 0.8rem;
     }
   }
 
@@ -1961,8 +1980,8 @@ onUnmounted(() => {
   bottom: 0px;
   width: 100%;
   left: 0px;
-  padding: 10px;
-  background: #F4E8AB49;
+  padding: 10px 10px 20px 10px;
+  background: #fdd456;
   backdrop-filter: blur(6px);
 
   .action-button {
