@@ -107,24 +107,30 @@
         </div>
       </div>
       <div class="filter-panel__content">
-        <!-- <h4>Categories</h4> -->
-        <div class="categories-list">
-          <div v-if="filteredCategories.length === 0" class="no-categories">
-            No categories available for this map
-          </div>
-          <div
-            v-for="category in filteredCategories"
-            :key="category.id"
-            class="category-item"
-            :class="{ 'category-item--selected': selectedCategories[category.id] }"
-            @click="toggleCategory(category.id)"
-          >
-            <div class="category-checkbox">
-              <div class="checkbox-inner" v-if="selectedCategories[category.id]"></div>
+        <!-- Group categories by map -->
+        <div v-for="map in allMaps" :key="map.id" class="map-category-group">
+          <h4>{{ map.name }}</h4>
+          <div class="categories-list">
+            <div
+              v-if="filteredCategories.filter(category => category.map_slugs.includes(map.slug)).length === 0"
+              class="no-categories"
+            >
+              No categories available for this map
             </div>
-            <div class="category-name">{{ category.name }}</div>
-            <div class="category-count" v-if="category.num_services || category.num_vendors">
-              ({{ (category.num_services || 0) + (category.num_vendors || 0) }})
+            <div
+              v-for="category in filteredCategories.filter(category => category.map_slugs.includes(map.slug))"
+              :key="category.id"
+              class="category-item"
+              :class="{ 'category-item--selected': selectedCategories[category.id] }"
+              @click="toggleCategory(category.id)"
+            >
+              <div class="category-name">{{ category.name }}</div>
+              <!-- <div class="category-count" v-if="category.num_services || category.num_vendors">
+                ({{ (category.num_services || 0) + (category.num_vendors || 0) }})
+              </div> -->
+              <div class="category-checkbox">
+                <div class="checkbox-inner" v-if="selectedCategories[category.id]"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -1899,15 +1905,16 @@ onUnmounted(() => {
   }
 
   &__content {
-    padding: 16px 20px;
+    padding: 16px 20px 70px;
     overflow-y: auto;
     // height: 360px;
 
     h4 {
       margin: 0 0 16px 0;
-      font-size: 16px;
+      font-size: 22px;
       font-weight: 600;
       color: #555;
+      font-family: 'inter';
     }
   }
 }
@@ -1917,7 +1924,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 54px;
+  margin-bottom: 20px;
 
   .no-categories {
     color: #666;
@@ -1929,7 +1936,7 @@ onUnmounted(() => {
 .category-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 6px 16px 6px 0;
   background-color: #F4E8AB;
   border-radius: 8px;
   cursor: pointer;
@@ -1941,12 +1948,14 @@ onUnmounted(() => {
 
   }
 
+  $checkbox-color: #002f6a;
+
   .category-checkbox {
     width: 20px;
     height: 20px;
     border-radius: 4px;
-    border: 2px solid #1F3667;
-    margin-right: 12px;
+    border: 2px solid $checkbox-color;
+    margin-right: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1954,7 +1963,7 @@ onUnmounted(() => {
     .checkbox-inner {
       width: 12px;
       height: 12px;
-      background-color: #1F3667;
+      background-color: $checkbox-color;
       border-radius: 2px;
     }
   }
