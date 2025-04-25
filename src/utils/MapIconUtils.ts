@@ -503,10 +503,21 @@ export function setupIconClickHandlers(
   map.on('click', MapLayer.MapIcon, handleMapIconClick);
   map.on('move', handleMapMove);
 
+  // Close active popup when switching maps
+  const handleMapStyleChange = () => {
+    if (activePopup) {
+      activePopup.remove();
+      activePopup = null;
+    }
+  };
+
+  map.on('styledata', handleMapStyleChange);
+
   // Return a cleanup function that removes all the event handlers
   return () => {
     map.off('click', MapLayer.MapIcon, handleMapIconClick);
     map.off('move', handleMapMove);
+    map.off('styledata', handleMapStyleChange);
 
     if (activePopup) {
       activePopup.remove();

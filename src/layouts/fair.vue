@@ -15,11 +15,11 @@
         </div>
 
         <!-- Menu button on the right side if showMenuButton is true -->
-        <ion-buttons class="menu-button" slot="end" v-if="showMenuButton">
+        <!-- <ion-buttons class="menu-button" slot="end" v-if="showMenuButton">
           <ion-button @click="openMenu">
             <HamburgerIcon class="menu-icon" />
           </ion-button>
-        </ion-buttons>
+        </ion-buttons> -->
       </ion-toolbar>
     </ion-header>
 
