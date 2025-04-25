@@ -83,23 +83,24 @@
 
           <div class="calendar-grid">
             <div class="calendar-weekdays">
-              <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat']"
-                   :key="day"
-                   class="weekday">
+              <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat']" :key="day" class="weekday">
                 {{ day }}
               </div>
             </div>
 
             <div v-if="calendarDays" class="calendar-days">
-              <div v-for="day in calendarDays"
-                  :key="day ? day.toISOString() : ''"
-                   class="day"
-                   :class="{
-                    'has-events': day && hasEvents(day),
-                    'active': day && format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
-                   }"
-                  @click="day && handleDateSelect(day)">
+              <div
+                v-for="day in calendarDays"
+                :key="day ? day.toISOString() : ''"
+                class="day"
+                :class="{
+                  'has-events': day && hasEvents(day),
+                  'active': day && format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+                }"
+                @click="day && handleDateSelect(day)"
+              >
                 <span class="date">{{ day ? format(day, 'd') : '' }}</span>
+
                 <div v-if="day && hasEvents(day)" class="event-indicator"></div>
               </div>
             </div>
@@ -332,7 +333,8 @@ const hasEvents = (date: Date): boolean => {
       const parsedDate = parseISO(eventDate.date);
       const zonedEventDate = toZonedTime(parsedDate, appConfig.timezone);
 
-      return isSameDay(zonedEventDate, zonedDate);
+      return isSameDay(zonedEventDate, zonedDate) &&
+             (isSameDay(zonedEventDate, new Date()) || eventDate.is_upcoming);
     });
   });
 };
