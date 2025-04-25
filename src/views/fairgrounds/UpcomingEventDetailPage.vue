@@ -96,6 +96,7 @@ import { format, parseISO } from 'date-fns';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import type { EventDate } from '@/types';
 import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
+import appConfig from '@/config/app';
 
 interface NYSFairgroundsEventDate {
   date: string;
@@ -211,7 +212,7 @@ const formatAdditionalDate = (date: NYSFairgroundsEventDate): string => {
 
 <style lang="scss" scoped>
 .main {
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
   background-color: #F0F0F0;
 
   &__header {

@@ -133,8 +133,7 @@ fetchArticle();
 .main {
   padding: 20px;
   background: #FDD456;
-  padding-bottom: 110px;
-
+  padding-bottom: calc(v-bind('appConfig.bottomBar.height') + 3rem);
 
   &__image {
       background-color: #EFF2F6;

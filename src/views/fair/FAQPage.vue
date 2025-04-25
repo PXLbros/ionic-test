@@ -47,6 +47,7 @@
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
+import appConfig from '@/config/app';
 
 interface FAQSection {
   title: string;
@@ -155,7 +156,7 @@ const toggleSection = (index: number) => {
   flex-direction: column;
   gap: 24px;
   background: #FDD456;
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
 
 
   &__image {

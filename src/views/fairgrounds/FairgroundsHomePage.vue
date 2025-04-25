@@ -58,6 +58,7 @@ import { useDataStore } from '@/stores/data';
 import FairgroundsNav from '@/components/Fairgrounds/Nav.vue';
 import FairgroundsBottomNavigation from '@/components/Tabs/FairgroundsBottomNavigation.vue';
 import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 
@@ -92,7 +93,7 @@ const allEvents = computed(() => {
 <style lang="scss" scoped>
 .main {
     padding: 0px;
-    padding-bottom: 90px;
+    padding-bottom: v-bind('appConfig.bottomBar.height');
     background-color: #19262D;
 
     &__header {

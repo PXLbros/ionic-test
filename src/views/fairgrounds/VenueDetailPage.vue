@@ -44,6 +44,7 @@ import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
+import appConfig from '@/config/app';
 
 interface Venue {
   id: string;
@@ -205,7 +206,7 @@ const sanitizedDescription = computed(() => {
 }
 
 .wrapper {
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
 }
 
 :deep(ion-content) {

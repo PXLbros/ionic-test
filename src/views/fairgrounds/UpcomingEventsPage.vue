@@ -381,7 +381,7 @@ const navigateMonth = (direction: number) => {
 <style lang="scss" scoped>
 
 .main {
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
   background-color: #19262D;
 
   .wrapper {

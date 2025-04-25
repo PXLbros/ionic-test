@@ -22,6 +22,7 @@
 import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 import { Browser } from '@capacitor/browser';
+import appConfig from '@/config/app';
 
 // Game Interface Type
 interface Game {
@@ -57,7 +58,7 @@ const openGame = async (url: string) => {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding-bottom: 100px;
+  padding-bottom: calc(v-bind('appConfig.bottomBar.height') + 2rem);
 }
 
 .game-grid {

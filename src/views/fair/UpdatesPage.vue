@@ -31,6 +31,7 @@ import FairLayout from '@/layouts/fair.vue';
 import axios from 'axios';
 import Loader from '@/components/Loader.vue';
 import { useDataStore } from '@/stores/data';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 
@@ -155,8 +156,7 @@ fetchUpdates();
 }
 
 .wrapper {
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
 }
-
 </style>
 

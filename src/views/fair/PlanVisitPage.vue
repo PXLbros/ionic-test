@@ -72,6 +72,7 @@ import FairLayout from '@/layouts/fair.vue';
 import Contact from '@/components/Fair/KeepInTouchForm.vue';
 import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 </script>
@@ -154,7 +155,7 @@ const dataStore = useDataStore();
     }
   }
   .wrapper {
-    padding-bottom: 90px;
+    padding-bottom: v-bind('appConfig.bottomBar.height');
   }
 
 .contact-form {

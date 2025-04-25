@@ -125,6 +125,7 @@ import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import { useDataStore } from '@/stores/data';
 import SocialIcons from '@/components/SocialIcons.vue';
 import { useAppStore } from '@/stores/app';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 const appStore = useAppStore();
@@ -209,7 +210,7 @@ onMounted(() => {
 
 .main {
     background-color: #EBEDEF;
-    padding-bottom: 90px;
+    padding-bottom: v-bind('appConfig.bottomBar.height');
 
     .padding-wrapper {
       padding: 20px;

@@ -50,6 +50,7 @@ import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import { useDataStore } from '@/stores/data';
 import FairLayout from '@/layouts/fair.vue';
 import axios from 'axios';
+import appConfig from '@/config/app';
 
 interface ParkingSection {
   title: string;
@@ -233,7 +234,7 @@ onMounted(() => {
   flex-direction: column;
   gap: 24px;
   background: #FDD456;
-  padding-bottom: 90px;
+  padding-bottom: v-bind('appConfig.bottomBar.height');
 
   &__image {
     margin: 20px;
