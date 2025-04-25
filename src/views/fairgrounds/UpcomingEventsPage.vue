@@ -88,20 +88,20 @@
               </div>
             </div>
 
-            <div v-if="calendarDays" class="calendar-days">
+            <div v-if="formattedCalendarDays" class="calendar-days">
               <div
-                v-for="day in calendarDays"
-                :key="day ? day.toISOString() : ''"
+                v-for="(day, dayIndex) in formattedCalendarDays"
+                :key="`day-${dayIndex}`"
                 class="day"
                 :class="{
-                  'has-events': day && hasEvents(day),
-                  'active': day && format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+                  'has-events': day.hasEvents,
+                  'active': day.isActive
                 }"
-                @click="day && handleDateSelect(day)"
+                @click="day.date && handleDateSelect(day.date)"
               >
-                <span class="date">{{ day ? format(day, 'd') : '' }}</span>
+                <span class="date">{{ day.date ? format(day.date, 'd') : '' }}</span>
 
-                <div v-if="day && hasEvents(day)" class="event-indicator"></div>
+                <div v-if="day.hasEvents" class="event-indicator"></div>
               </div>
             </div>
           </div>
@@ -263,6 +263,23 @@ const calendarDays = computed(() => {
   }
 
   return days;
+});
+
+const formattedCalendarDays = computed(() => {
+  return calendarDays.value.map((day) => {
+    if (!day) {
+      return { date: null, hasEvents: false, isActive: false };
+    }
+
+    const hasEventsForDay = hasEvents(day);
+    const isActiveDay = format(day, 'yyyy-MM-dd') === format(selectedDate.value, 'yyyy-MM-dd');
+
+    return {
+      date: day,
+      hasEvents: hasEventsForDay,
+      isActive: isActiveDay,
+    };
+  });
 });
 
 const filteredEvents = computed(() => {
