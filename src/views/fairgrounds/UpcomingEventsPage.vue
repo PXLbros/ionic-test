@@ -609,6 +609,7 @@ const navigateMonth = (direction: number) => {
           border-radius: 10px;
           cursor: pointer;
           background-color: #F5F7FA;
+          margin: 7px;
 
           // &.active {
           //   background-color: #3B71CA;
@@ -619,7 +620,7 @@ const navigateMonth = (direction: number) => {
           &.has-events {
             color: white;
             background-color: #19262D;
-            margin: 7px;
+            // margin: 7px;
 
             .event-indicator {
               width: 6px;

@@ -59,7 +59,6 @@ import FairgroundsNav from '@/components/Fairgrounds/Nav.vue';
 import FairgroundsBottomNavigation from '@/components/Tabs/FairgroundsBottomNavigation.vue';
 import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
 import appConfig from '@/config/app';
-
 const dataStore = useDataStore();
 
 const allEvents = computed(() => {

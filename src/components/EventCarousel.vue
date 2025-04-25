@@ -12,6 +12,7 @@
         :key="event.id"
         class="carousel-slide"
         :class="{ 'active': currentIndex === index }"
+        @click="navigateToEvent(event.id)"
       >
         <div class="image-container">
           <img
@@ -27,7 +28,7 @@
       </div>
 
       <!-- Navigation arrows -->
-      <div class="carousel-nav">
+      <div v-if="events.length > 1" class="carousel-nav">
         <button class="nav-btn prev" @click="prevSlide">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -53,7 +54,7 @@
     </div>
 
     <!-- Event information banner -->
-    <div class="image-banner">
+    <div class="image-banner" @click="navigateToEvent(currentEvent?.id)">
       <p class="date">{{ formatDate(currentEvent?.eventDates?.[0]?.startDate) || 'Upcoming Event' }}</p>
       <h3 class="title">{{ currentEvent?.title || 'Event' }}</h3>
     </div>
@@ -62,6 +63,9 @@
 
 <script setup lang="ts">
 import PlaceholderIcon from './Icons/PlaceholderIcon.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 // Define event type interface
 interface EventImage {
@@ -193,6 +197,10 @@ function formatDate(dateStr?: string): string {
   const year = date.getFullYear();
 
   return `${month} ${day}${suffix}, ${year}`;
+}
+
+function navigateToEvent(eventId: string): void {
+  router.push(`/fairgrounds/upcoming-events/${encodeURIComponent(eventId)}`);
 }
 
 onMounted(() => {
