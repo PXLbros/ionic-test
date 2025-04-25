@@ -490,10 +490,10 @@ function handleFocus() {
 // When the input loses focus, hide the suggestions after a short delay
 function handleBlur() {
   // Use setTimeout to allow clicks on suggestions to register before closing
-  setTimeout(() => {
-    showSearchSuggestions.value = false;
-    btnGroup.value?.classList.remove('search-focused');
-  }, 150);
+  // setTimeout(() => {
+  //   showSearchSuggestions.value = false;
+  //   btnGroup.value?.classList.remove('search-focused');
+  // }, 150);
 }
 
 function generateInitialSuggestions() {
@@ -1735,7 +1735,7 @@ onUnmounted(() => {
 /* Customize popups */
 :deep(.mapboxgl-popup-content) {
   background-color: #f4e8ab;
-  padding: 20px;
+  padding: 18px 16px;
   border-radius: 8px;
   max-height: 30vh;
   overflow-y: auto;
@@ -1796,6 +1796,12 @@ onUnmounted(() => {
     h3 {
       color: #000;
     }
+
+    p {
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 
   .mapboxgl-popup-close-button {
@@ -1810,7 +1816,12 @@ onUnmounted(() => {
 }
 
 :deep(.mapboxgl-popup-tip) {
-  border-bottom-color: #f4e8ab !important;
+  display: none;
+  // border-bottom-color: #f4e8ab !important;
+}
+
+:deep(.mapboxgl-popup-close-button) {
+  display: none;
 }
 
 /* Filter Panel Styles */
@@ -2005,18 +2016,20 @@ onUnmounted(() => {
 
 /* Search suggestions styles */
 .search-suggestions {
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: 129px;
   left: 0;
-  right: 0;
+  // right: 0;
   background: #f4e8ab;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-top: 6px;
-  max-height: 300px;
+  // border-radius: 12px;
+  // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  // margin-top: 12px;
+  // max-height: 300px;
   overflow-y: auto;
   z-index: 1000;
-  width: 90vw;
+  // width: 90vw;
+  width: 100%;
+  height: 100vh;
 }
 
 .suggestion-item {
@@ -2056,10 +2069,10 @@ onUnmounted(() => {
 
 .suggestion-map-badge {
   font-size: 10px;
-  background-color: #f0f0f0;
+  // background-color: #f0f0f0;
   color: #555;
-  padding: 2px 5px;
-  border-radius: 4px;
+  // padding: 2px 5px;
+  // border-radius: 4px;
   margin-right: 5px;
   margin-bottom: 2px;
   display: inline-block;
