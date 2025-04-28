@@ -20,7 +20,7 @@
         <div class="main__description" v-html="sanitizedDescription"></div>
       </div>
 
-      <div class="main__specifications">
+      <div class="main__specifications" v-if="specificationGroups && specificationGroups.length > 0">
         <h2 class="main__subtitle">Specifications</h2>
 
         <div v-for="specificationGroup in specificationGroups" class="spec-group">
@@ -29,7 +29,10 @@
         </div>
       </div>
 
-      <ImageCarousel :imageData="venue.venueImageGallery" />
+      <ImageCarousel
+        v-if="venue.venueImageGallery && venue.venueImageGallery.length > 0"
+        :imageData="venue.venueImageGallery"
+      />
     </div>
 
     <div class="wrapper">
@@ -45,39 +48,16 @@ import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
 import appConfig from '@/config/app';
-
-interface Venue {
-  id: string;
-  title: string;
-  slug: string;
-  url: string;
-  dateCreated: string;
-  dateUpdated: string;
-  venueDetailBody: string | null;
-  venueDetailHeadline: string | null;
-  venueDetailPreheader: string | null;
-  venueNavTitle: string | null;
-  venueSubheader: string | null;
-  venuePreheader: string | null;
-  venueImageGallery: {
-    url: string;
-    title: string;
-    filename: string;
-  }[];
-  venueSpecifications: {
-    specTitle: string;
-    specValue: string;
-  }[];
-}
+import { FairgroundsVenue } from '@/types';
 
 const route = useRoute();
 const dataStore = useDataStore();
 const venueId = decodeURIComponent(route.params.id as string);
 
 // Get the specific venue
-const venue = computed<Venue | undefined>(() => {
+const venue = computed<FairgroundsVenue | undefined>(() => {
   return dataStore.data.nysfairgroundsWebsite.venues.find(
-    (venue: Venue) => venue.id === venueId
+    (venue: FairgroundsVenue) => venue.id === venueId
   );
 });
 

@@ -24,36 +24,38 @@
             <PlaceholderIcon />
           </div>
         </div>
-        <div v-if="image.title || image.description" class="image-caption">
-          <h3 v-if="image.title" class="image-title">{{ image.title }}</h3>
-          <p v-if="image.description" class="image-description">{{ image.description }}</p>
-        </div>
+      </div>
+
+      <!-- Pagination dots -->
+      <div class="carousel-pagination">
+        <button
+          v-for="(_, index) in images"
+          :key="index"
+          class="pagination-dot"
+          :class="{ 'active': currentIndex === index }"
+          @click="setSlide(index)"
+        ></button>
+      </div>
+
+      <!-- Navigation arrows -->
+      <div class="carousel-nav">
+        <button class="nav-btn prev" @click="prevSlide">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="nav-btn next" @click="nextSlide">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18L15 12L9 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
     </div>
 
-    <!-- Navigation arrows -->
-    <div class="carousel-nav">
-      <button class="nav-btn prev" @click="prevSlide">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <button class="nav-btn next" @click="nextSlide">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 18L15 12L9 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-
-    <!-- Pagination dots -->
-    <div class="carousel-pagination">
-      <button
-        v-for="(_, index) in images"
-        :key="index"
-        class="pagination-dot"
-        :class="{ 'active': currentIndex === index }"
-        @click="setSlide(index)"
-      ></button>
+    <!-- Image information banner -->
+    <div v-if="currentImage?.title || currentImage?.description" class="image-banner">
+      <h3 v-if="currentImage?.title" class="title">{{ currentImage.title }}</h3>
+      <p v-if="currentImage?.description" class="description">{{ currentImage.description }}</p>
     </div>
   </div>
 </template>
@@ -154,6 +156,10 @@ function resetAutoplay(): void {
   }
 }
 
+const currentImage = computed<ImageItem | null>(() =>
+  images.value.length > 0 ? images.value[currentIndex.value] : null
+);
+
 onMounted(() => {
   startAutoplay();
 });
@@ -175,6 +181,31 @@ onBeforeUnmount(() => {
   position: relative;
   height: 36vh;
   overflow: hidden;
+
+  .carousel-pagination {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    z-index: 2;
+  }
+
+  .carousel-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    z-index: 2;
+    pointer-events: none;
+  }
 }
 
 .carousel-slide {
@@ -212,35 +243,35 @@ onBeforeUnmount(() => {
   background-color: #EFF2F6;
 }
 
-.image-caption {
-  position: absolute;
-  bottom: 10%;
-  left: 5%;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-}
-
-.image-title {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.image-description {
-  font-size: 14px;
-}
-
-.carousel-nav {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.image-banner {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  gap: 3px;
+  background-color: #ecedef;
+  padding: 20px 0;
+  width: 100%;
+  margin-top: 10px; /* Add spacing between carousel and banner */
+}
+
+.title {
+  color: #343434;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'inter', sans-serif;
+  text-align: center;
   padding: 0 10px;
-  z-index: 2;
-  pointer-events: none;
+}
+
+.description {
+  color: #0077C8;
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0;
+  text-align: center;
+  padding: 0 10px;
 }
 
 .nav-btn {
@@ -258,17 +289,6 @@ onBeforeUnmount(() => {
   &:hover {
     background-color: rgba(0, 0, 0, 0.5);
   }
-}
-
-.carousel-pagination {
-  position: absolute;
-  bottom: 10px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  z-index: 2;
 }
 
 .pagination-dot {

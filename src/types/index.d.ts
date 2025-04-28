@@ -56,7 +56,7 @@ export interface NewsArticle {
 // Map Types
 
 // Interfaces for our data
-interface VendorProperties {
+export interface VendorProperties {
   name: string;
   description: string;
   id: number;
@@ -64,7 +64,7 @@ interface VendorProperties {
   categories?: number[];
 }
 
-interface ServiceProperties {
+export interface ServiceProperties {
   title: string;
   description: string;
   id: number;
@@ -73,7 +73,7 @@ interface ServiceProperties {
   categories: number[];
 }
 
-interface ServiceMap {
+export interface ServiceMap {
   id: number;
   name: string;
   slug: string;
@@ -82,7 +82,7 @@ interface ServiceMap {
   num_vendors?: number;
 }
 
-interface Category {
+export interface Category {
   id: number;
   name: string;
   slug: string;
@@ -93,7 +93,7 @@ interface Category {
   map_slugs: string[];
 }
 
-interface SearchSuggestion {
+export interface SearchSuggestion {
   id: number;
   name: string;
   description?: string;
@@ -106,7 +106,13 @@ interface SearchSuggestion {
   mapSlug?: string;
 }
 
-interface FairgroundsVenue {
+export interface FairgroundsAsset {
+  url: string;
+  title: string;
+  filename: string;
+}
+
+export interface FairgroundsVenue {
   id: string;
   title: string;
   slug: string;
@@ -118,6 +124,16 @@ interface FairgroundsVenue {
   venueDetailPreheader: string | null;
   venueNavTitle: string | null;
   venueSubheader: string | null;
-  venueMainImage: string | null;
   venuePreheader: string | null;
+  venueMainImage: FairgroundsAsset[];
+  venueImageGallery: FairgroundsAsset[];
+  venuePricingSheet: FairgroundsAsset[];
+  venueSpecSheet: FairgroundsAsset[];
+  venueSpecifications: {
+    specTitle: string;
+    specValue: string;
+  }[];
+  venueFloorPlanPdf: FairgroundsAsset[];
+  venueFloorPlanImage: FairgroundsAsset[];
+  venueFloorPlanFeatures: string;
 }
