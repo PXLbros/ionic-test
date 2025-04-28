@@ -17,7 +17,16 @@
       </h1>
 
       <div class="main__description">
-        <div class="main__description" v-html="sanitizedDescription"></div>
+        <div class="main__description-text" v-html="formattedDescription"></div>
+
+        <div class="main__description-buttons">
+          <div class="main__description-button">
+            <a :href="inquireNowUrl" target="_blank">Inquire Now</a>
+          </div>
+          <div v-if="specSheetPdf" class="main__description-button">
+            <a :href="specSheetPdf.url" target="_blank">Download PDF</a>
+          </div>
+        </div>
       </div>
 
       <div class="main__specifications" v-if="specificationGroups && specificationGroups.length > 0">
@@ -33,6 +42,16 @@
         v-if="venue.venueImageGallery && venue.venueImageGallery.length > 0"
         :imageData="venue.venueImageGallery"
       />
+
+      <div v-if="venue.venueFloorPlanFeatures || floorPlanImage" class="main__floor-plan">
+        <h2 class="main__subtitle">Floor Plan</h2>
+
+        <div v-if="formattedFloorPlanFeatures" v-html="formattedFloorPlanFeatures" class="main__floor-plan-features"></div>
+
+        <a v-if="floorPlanPdf" :href="floorPlanPdf.url" target="_blank">
+          View Floor Plan
+        </a>
+      </div>
     </div>
 
     <div class="wrapper">
@@ -65,9 +84,32 @@ const specificationGroups = computed(() => {
   return venue.value?.venueSpecifications || [];
 });
 
-// Sanitize the description to allow HTML
-const sanitizedDescription = computed(() => {
+const inquireNowUrl = computed(() => {
+  let url = import.meta.env.VITE_NYSFAIRGROUNDS_BASE_URL;
+
+  url += `/contact?venue=${venueId}`;
+
+  return url;
+});
+
+const specSheetPdf = computed(() => {
+  return venue.value?.venueSpecSheet?.[0] || null;
+});
+
+const formattedDescription = computed(() => {
   return venue.value?.venueDetailBody || 'No description available';
+});
+
+const floorPlanImage = computed(() => {
+  return venue.value?.venueFloorPlanImage?.[0] || null;
+});
+
+const floorPlanPdf = computed(() => {
+  return venue.value?.venueFloorPlanPdf?.[0] || null;
+});
+
+const formattedFloorPlanFeatures = computed(() => {
+  return venue.value?.venueFloorPlanFeatures || null;
 });
 </script>
 
@@ -195,5 +237,14 @@ const sanitizedDescription = computed(() => {
 
 .image-carousel {
   margin-top: 1rem;
+}
+</style>
+
+<style lang="scss">
+.main__floor-plan {
+  ul {
+    list-style-position: inside;
+    padding: 0;
+  }
 }
 </style>

@@ -1405,7 +1405,7 @@ function setupMapLayers() {
     //   ]
     // });
 
-    const nysfairWebsiteBaseUrl = import.meta.env.VITE_NYSFAIR_WEBSITE_BASE_URL;
+    const nysfairWebsiteBaseUrl = import.meta.env.VITE_NYSFAIR_BASE_URL;
 
     mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'raster',

@@ -158,7 +158,7 @@ const isSubmitted = ref(false);
 const handleSubmit = async () => {
     isSubmitting.value = true;
     try {
-        const response = await fetch(`${import.meta.env.VITE_NYSFAIRGROUNDS_API_URL}/contact/submit`, {
+        const response = await fetch(`${import.meta.env.VITE_NYSFAIRGROUNDS_BASE_URL}/api/contact/submit`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

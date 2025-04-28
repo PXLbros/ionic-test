@@ -89,7 +89,7 @@ const fetchArticle = async () => {
     appStore.$patch({
       subLoader: {
         isActive: true,
-        message: 'Loading article...',
+        message: 'Loading article',
       },
     });
 
