@@ -318,10 +318,10 @@ ion-col {
     left: 0;
     width: 100%;
     height: 110%;
-    background-image: url('/home/NYSF_Home_Flags_Two.png');
+    background-image: url('/fair/images/home-page/NYSF_Home_Flags_Two.png');
     background-repeat: no-repeat;
     background-size: contain;
-    z-index: -2;
+    z-index: -1;
     /* Negative z-index to place it behind the background */
     pointer-events: none;
   }
@@ -334,17 +334,17 @@ ion-col {
     left: 0;
     width: 100%;
     height: 117%;
-    background-image: url('/home/NYSF_Home_Art.png');
+    background-image: url('/fair/images/home-page/NYSF_Home_Art_400_2x.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
-    z-index: -1;
+    z-index: -2;
     /* Higher than the gradient but still behind content */
     pointer-events: none;
 
     // For smaller screens use differe bg image
     @media (max-width: 410px) {
-      background-image: url('/home/NYSF_Home_Art_380.png');
+      background-image: url('/fair/images/home-page/NYSF_Home_Art_380.jpg');
     }
   }
 
