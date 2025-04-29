@@ -11,11 +11,11 @@
         </div>
 
         <!-- Menu button on the right side if showMenuButton is true -->
-        <ion-buttons class="menu-button" slot="end" v-if="showMenuButton">
+        <!-- <ion-buttons class="menu-button" slot="end" v-if="showMenuButton">
           <ion-button @click="openMenu">
             <HamburgerIcon class="menu-icon" />
           </ion-button>
-        </ion-buttons>
+        </ion-buttons> -->
       </ion-toolbar>
     </ion-header>
 
@@ -93,7 +93,7 @@
       <slot />
     </ion-content>
 
-    <FairgroundsBottomNavigation />
+    <FairgroundsBottomNavigation @tabClick="onBottomNavTabClick" />
 
     <ion-toast
       :isOpen="appStore.toast.isOpen"
@@ -114,6 +114,7 @@ import SocialIcons from '@/components/SocialIcons.vue';
 import { useRouter } from 'vue-router';
 import FairgroundsBottomNavigation from '@/components/Tabs/FairgroundsBottomNavigation.vue';
 import HamburgerIcon from '@/components/Icons/HamburgerIcon.vue';
+import { useLogger } from '@/composables/useLogger';
 
 const props = withDefaults(defineProps<{
   title: string;
@@ -127,6 +128,8 @@ const props = withDefaults(defineProps<{
 const appStore = useAppStore();
 const dataStore = useDataStore();
 const router = useRouter();
+const logger = useLogger();
+
 const isMenuOpen = ref(false);
 
 const mainNavLinks = computed(() => {
@@ -181,6 +184,24 @@ const goBack = () => {
     router.back();
   } else {
     router.push('/fairgrounds');
+  }
+};
+
+const onBottomNavTabClick = ({ id }: { id: string }) => {
+  switch (id) {
+    case 'hamburgerMenu': {
+      isMenuOpen.value = true;
+      document.body.style.overflow = 'hidden';
+
+      break;
+    }
+    default: {
+      logger.warn('Unknown tab clicked', {
+        ID: id,
+      });
+
+      break;
+    }
   }
 };
 </script>

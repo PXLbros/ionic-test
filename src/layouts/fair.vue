@@ -97,8 +97,8 @@
       <slot />
     </ion-content>
 
-    <FairBottomNavigation v-if="isFairRoute" v-show="appStore.bottomBar.isVisible" @tabClick="onBottomNavTabClick" />
-    <FairgroundsBottomNavigation v-if="isFairgroundsRoute" v-show="appStore.bottomBar.isVisible" />
+    <FairBottomNavigation v-show="appStore.bottomBar.isVisible" @tabClick="onBottomNavTabClick" />
+    <!-- <FairgroundsBottomNavigation v-if="isFairgroundsRoute" v-show="appStore.bottomBar.isVisible" /> -->
 
     <ion-toast
       :isOpen="appStore.toast.isOpen"
@@ -144,10 +144,10 @@ const dataStore = useDataStore();
 const router = useRouter();
 const isMenuOpen = ref(false);
 
-// Determine which navigation to show based on route
-const isFairRoute = computed(() => {
-  return route.path === '/fair' || route.path.startsWith('/fair/');
-});
+// // Determine which navigation to show based on route
+// const isFairRoute = computed(() => {
+//   return route.path === '/fair' || route.path.startsWith('/fair/');
+// });
 
 const isFairgroundsRoute = computed(() => {
   return route.path === '/fairgrounds' || route.path.startsWith('/fairgrounds/');

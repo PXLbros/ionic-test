@@ -109,7 +109,10 @@ if (pageData) {
 
           :deep(strong) {
             display: block;
-            margin-top: 10px;
+
+            &:not(:first-child) {
+              margin-top: 10px;
+            }
           }
 
           :deep(a) {

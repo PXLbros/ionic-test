@@ -1,9 +1,17 @@
 <template>
   <ion-page id="main-content">
-    <!-- Header Nav -->
-    <FairgroundsNav relative />
+    <BaseNav
+      ref="hamburgerMenuBaseNav"
+      type="fairgrounds"
+      toolbarBackground="#19262D"
+      menuBackground="#19262D"
+      :logoSrc="fairgroundsLightLogo"
+      logoAlt="Fairgrounds Logo"
+      headerVisible
+      relative
+    />
 
-    <FairgroundsBottomNavigation />
+    <FairgroundsBottomNavigation @tabClick="onBottomNavTabClick" />
 
     <ion-content>
       <div class="main">
@@ -59,7 +67,14 @@ import FairgroundsNav from '@/components/Fairgrounds/Nav.vue';
 import FairgroundsBottomNavigation from '@/components/Tabs/FairgroundsBottomNavigation.vue';
 import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
 import appConfig from '@/config/app';
+import fairgroundsLightLogo from '@/imgs/svg/fg-light.svg'
+import BaseNav from '@/components/BaseNav.vue';
+import { useLogger } from '@/composables/useLogger';
+
 const dataStore = useDataStore();
+const logger = useLogger();
+
+const hamburgerMenuBaseNav = ref<InstanceType<typeof BaseNav> | null>(null);
 
 const allEvents = computed(() => {
   const featured = dataStore.data.nysfairgroundsWebsite.featuredEvents || [];
@@ -87,6 +102,28 @@ const allEvents = computed(() => {
 
   return combined;
 });
+
+const onBottomNavTabClick = ({ id }: { id: string }) => {
+  switch (id) {
+    case 'hamburgerMenu': {
+      // Open the hamburger menu
+      if (hamburgerMenuBaseNav.value) {
+        hamburgerMenuBaseNav.value.openMenu();
+      } else {
+        logger.warn('hamburgerMenuBaseNav is not ready or missing');
+      }
+
+      break;
+    }
+    default: {
+      logger.warn('Unknown tab clicked', {
+        ID: id,
+      });
+
+      break;
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>

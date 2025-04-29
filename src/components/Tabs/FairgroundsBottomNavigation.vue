@@ -7,9 +7,11 @@
 import BaseTabNavigation from '../Tabs/BaseTabNavigation.vue';
 import HomeIcon from '@/components/Icons/HomeIcon.vue';
 import StartIcon from '@/components/Icons/StartIcon.vue';
-import MapIcon from '@/components/Icons/MapIcon.vue';
 import CalendarIcon from '@/components/Icons/CalendarIcon.vue';
 import PinIcon from '@/components/Icons/PinIcon.vue';
+import TicketsIcon from '@/components/Icons/TicketsIcon.vue';
+
+const emit = defineEmits(['tabClick']);
 
 const fairgroundsTabs = ref([
   {
@@ -23,11 +25,6 @@ const fairgroundsTabs = ref([
     icon: markRaw(HomeIcon)
   },
   {
-    path: '/fair/map',
-    label: 'Map',
-    icon: markRaw(MapIcon)
-  },
-  {
     path: '/fairgrounds/upcoming-events',
     label: 'Events',
     icon: markRaw(CalendarIcon)
@@ -36,6 +33,11 @@ const fairgroundsTabs = ref([
     path: '/fairgrounds/venues',
     label: 'Venues',
     icon: markRaw(PinIcon)
+  },
+  {
+    label: 'Menu',
+    icon: markRaw(TicketsIcon),
+    onClick: () => emit('tabClick', { id: 'hamburgerMenu' }),
   },
 ]);
 </script>

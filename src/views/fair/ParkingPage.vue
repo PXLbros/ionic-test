@@ -1,7 +1,7 @@
 <template>
   <FairLayout title="Parking">
     <div class="notification" v-if="showNotification && latestParkingUpdate">
-      <router-link class="link" :to="{ name: 'updates', params: { updateId: latestParkingUpdate.id } }">
+      <router-link class="link" :to="{ name: 'updates' }">
         {{ truncateContent(latestParkingUpdate.message, 75) }}
       </router-link>
     </div>
@@ -220,7 +220,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .notification {
-  background-color: rgb(185 249 204 / 88%);
+  background-color: #f4e8ac;
   padding: 16px 20px;
   font-size: 16px;
   color: #333333;

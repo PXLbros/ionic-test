@@ -1781,7 +1781,7 @@ onUnmounted(() => {
       margin-top: 8px;
       margin-bottom: 0px;
       font-weight: 500;
-      background-color: #F4E8AB;
+      background-color: #fdd456;
       padding: 4px 8px;
       border-radius: 8px;
       text-align: center;
