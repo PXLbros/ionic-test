@@ -565,7 +565,7 @@ const navigateMonth = (direction: number) => {
     &__no-events {
       text-align: center;
       margin: 10px 0 20px;
-      color:
+      color: #343434;
     }
   }
 
