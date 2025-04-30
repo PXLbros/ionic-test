@@ -3,11 +3,25 @@
     <div :class="{ 'main--full-height': showSearchSuggestions }" class="main">
       <div class="main__header">
         <div class="wrapper wrapper--search">
-          <div class="search-container">
-            <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @input="handleLiveSearch" @keyup.enter="handleSearch" @focus="handleFocus" @blur="handleBlur">
-            <ion-icon :icon="showSearchSuggestions ? closeOutline : searchOutline" class="search-icon" @click="clearSearch"></ion-icon>
+          <div class="search-container" ref="wrapperSearchElement">
+            <input
+              type="text"
+              placeholder="Search"
+              class="search-input"
+              v-model="searchQuery"
+              @input="handleLiveSearch"
+              @keyup.enter="handleSearch"
+              @focus="handleFocus"
+              @blur="handleBlur"
+            />
+            <ion-icon
+              :icon="showSearchSuggestions ? closeOutline : searchOutline"
+              class="search-icon"
+              @click="clearSearch"
+            ></ion-icon>
             <div
               class="search-suggestions"
+              ref="searchSuggestionsElement"
               v-show="showSearchSuggestions && filteredSuggestions.length > 0"
             >
               <div
@@ -229,6 +243,9 @@ const vendorCategories = dataStore.data.nysfairWebsite.vendor_categories;
 const maps = dataStore.data.nysfairWebsite.maps;
 
 const allMaps = computed(() => maps);
+
+const searchSuggestionsElement = ref<HTMLElement | null>(null);
+const wrapperSearchElement = ref<HTMLElement | null>(null);
 
 // Find the master map by its slug
 const defaultMap = allMaps.value.find((map: any) => map.slug === DEFAULT_MAP_NAME);
@@ -496,13 +513,9 @@ function handleLiveSearch() {
 }
 
 function openSearchSuggestions() {
-  const searchSuggestionsEl = document.querySelector('.search-suggestions');
-  const wrapperSearchEl = document.querySelector('.wrapper--search');
-
-  if (searchSuggestionsEl && wrapperSearchEl) {
-    const wrapperBottom = wrapperSearchEl.getBoundingClientRect().bottom;
-
-    searchSuggestionsEl.style.top = `${wrapperBottom}px`;
+  if (searchSuggestionsElement.value && wrapperSearchElement.value) {
+    const wrapperBottom = wrapperSearchElement.value.getBoundingClientRect().bottom;
+    searchSuggestionsElement.value.style.top = `${wrapperBottom}px`;
   }
 
   showSearchSuggestions.value = true;
