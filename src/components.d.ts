@@ -28,6 +28,7 @@ declare module 'vue' {
     Logo: typeof import('./components/Icons/Logo.vue')['default']
     MapDetailsPopup: typeof import('./components/MapDetailsPopup.vue')['default']
     MapIcon: typeof import('./components/Icons/MapIcon.vue')['default']
+    MenuIcon: typeof import('./components/Icons/MenuIcon.vue')['default']
     PinIcon: typeof import('./components/Icons/PinIcon.vue')['default']
     PlaceholderIcon: typeof import('./components/Icons/PlaceholderIcon.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

@@ -54,9 +54,14 @@
     </div>
 
     <!-- Event information banner -->
-    <div class="image-banner" @click="navigateToEvent(currentEvent?.id)">
-      <p class="date">{{ formatDate(currentEvent?.eventDates?.[0]?.startDate) || 'Upcoming Event' }}</p>
-      <h3 class="title">{{ currentEvent?.title || 'Event' }}</h3>
+    <div v-if="currentEvent" class="image-banner" @click="navigateToEvent(currentEvent.id)">
+      <p class="date" v-if="currentEvent.eventDates?.[0]?.start_time_date">
+        {{ currentEvent.eventDates?.[0]?.start_time_date }}
+      </p>
+
+      <h3 class="title">
+        {{ currentEvent.title }}
+      </h3>
     </div>
   </div>
 </template>
@@ -77,6 +82,7 @@ interface EventImage {
 interface EventDate {
   startDate: string;
   endDate?: string;
+  start_time_date?: string;
 }
 
 interface EventItem {

@@ -8,7 +8,7 @@ import HomeIcon from '@/components/Icons/HomeIcon.vue';
 import StartIcon from '@/components/Icons/StartIcon.vue';
 import MapIcon from '@/components/Icons/MapIcon.vue';
 import ScheduleIcon from '@/components/Icons/ScheduleIcon.vue';
-import TicketsIcon from '@/components/Icons/TicketsIcon.vue';
+import MenuIcon from '@/components/Icons/MenuIcon.vue';
 
 const emit = defineEmits(['tabClick']);
 
@@ -35,7 +35,7 @@ const fairTabs = ref([
   },
   {
     label: 'Menu',
-    icon: markRaw(TicketsIcon),
+    icon: markRaw(MenuIcon),
     onClick: () => emit('tabClick', { id: 'hamburgerMenu' }),
   },
 ]);

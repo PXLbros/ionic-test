@@ -2,13 +2,13 @@
   <FairLayout title="Interactive Map" :showMenuButton="true">
     <div :class="{ 'main--full-height': showSearchSuggestions }" class="main">
       <div class="main__header">
-        <div class="wrapper">
+        <div class="wrapper wrapper--search">
           <div class="search-container">
             <input type="text" placeholder="Search" class="search-input" v-model="searchQuery" @input="handleLiveSearch" @keyup.enter="handleSearch" @focus="handleFocus" @blur="handleBlur">
             <ion-icon :icon="showSearchSuggestions ? closeOutline : searchOutline" class="search-icon" @click="clearSearch"></ion-icon>
             <div
               class="search-suggestions"
-              v-if="showSearchSuggestions && filteredSuggestions.length > 0"
+              v-show="showSearchSuggestions && filteredSuggestions.length > 0"
             >
               <div
                 v-for="(suggestion, index) in filteredSuggestions"
@@ -477,7 +477,9 @@ function handleLiveSearch() {
   }
 
   // Show suggestions panel
-  showSearchSuggestions.value = true;
+  if (showSearchSuggestions.value !== true) {
+    openSearchSuggestions();
+  }
 
   // If input is empty, show initial suggestions instead
   if (!searchQuery.value.trim()) {
@@ -493,8 +495,22 @@ function handleLiveSearch() {
   }, 300) as unknown as number;
 }
 
-function handleFocus() {
+function openSearchSuggestions() {
+  const searchSuggestionsEl = document.querySelector('.search-suggestions');
+  const wrapperSearchEl = document.querySelector('.wrapper--search');
+
+  if (searchSuggestionsEl && wrapperSearchEl) {
+    const wrapperBottom = wrapperSearchEl.getBoundingClientRect().bottom;
+
+    searchSuggestionsEl.style.top = `${wrapperBottom}px`;
+  }
+
   showSearchSuggestions.value = true;
+}
+
+function handleFocus() {
+  openSearchSuggestions();
+
   btnGroup.value?.classList.add('search-focused');
 
   // Generate initial suggestions without requiring any text input
@@ -1541,6 +1557,8 @@ function updateMapOpacity(event: Event) {
 }
 
 onMounted(async () => {
+  appStore.bottomBar.isVisible = true;
+
   appStore.$patch({
     subLoader: {
       message: 'Loading map'
@@ -2047,7 +2065,7 @@ onUnmounted(() => {
 /* Search suggestions styles */
 .search-suggestions {
   position: fixed;
-  top: 129px;
+  top: 0;
   left: 0;
   // right: 0;
   background: #f4e8ab;

@@ -11,7 +11,8 @@
           class="game-card"
           @click="openGame(game.externalUrl)"
         >
-          <h2>{{ game.name }}</h2>
+          <img v-if="game.image" :src="game.image.url" alt="" />
+          <h2 v-else>{{ game.name }}</h2>
         </div>
       </div>
     </div>
@@ -31,12 +32,17 @@ interface Game {
   externalUrl: string;
   createdAt: string;
   updatedAt: string;
-  image: null | string;
+  image: {
+    id: number;
+    url: string;
+    width: number;
+    height: number;
+  } | null;
 }
 
 const dataStore = useDataStore();
 const games = ref<Game[]>(dataStore?.data?.nysfairWebsite.games);
-
+console.log('games', games.value);
 const openGame = async (url: string) => {
   try {
     await Browser.open({
@@ -51,6 +57,8 @@ const openGame = async (url: string) => {
 </script>
 
 <style lang="scss" scoped>
+$game-card-border-radius: 40px;
+
 .activities-container {
   background: #FDD456;
   height: 100%;
@@ -72,8 +80,9 @@ const openGame = async (url: string) => {
 }
 
 .game-card {
+  position: relative;
   background-color: #FFFFFF;
-  border-radius: 40px;
+  border-radius: $game-card-border-radius;
   border: 9px solid #F4E8AB;
   display: flex;
   justify-content: center;
@@ -96,6 +105,18 @@ const openGame = async (url: string) => {
     text-align: center;
     margin: 0;
     line-height: 1.2;
+  }
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: $game-card-border-radius;
   }
 }
 
