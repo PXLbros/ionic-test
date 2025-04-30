@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import FairLayout from '@/layouts/fair.vue';
-import Contact from '@/components/Fair/KeepInTouchForm.vue';
+import Contact from '@/components/FairKeepInTouchForm.vue';
 import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import appConfig from '@/config/app';

@@ -207,7 +207,7 @@ const mapOpacity = ref(1); // Default to fully visible (100%)
 // Refs for search suggestions
 const showSearchSuggestions = ref(false);
 const filteredSuggestions = ref<SearchSuggestion[]>([]);
-const maxSuggestionsToShow = 5; // Reduced for mobile screens
+const maxSuggestionsToShow = 5;
 
 const logger = useLogger();
 
@@ -1293,8 +1293,10 @@ async function loadMapResources() {
     // Load category icons
     await loadCategoryIcons({ map: mapboxMap, maps });
 
-    // Load map overlay image
-    await loadMapOverlayImage();
+    // // Load map overlay image
+    // await loadMapOverlayImage();
+
+    setupMapLayers();
   } catch (error) {
     logger.error(error);
 
@@ -1302,26 +1304,26 @@ async function loadMapResources() {
   }
 }
 
-// Load the map overlay image with proper promise handling
-function loadMapOverlayImage(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const imageOverlayElement = new Image();
+// // Load the map overlay image with proper promise handling
+// function loadMapOverlayImage(): Promise<void> {
+//   return new Promise((resolve, reject) => {
+//     const imageOverlayElement = new Image();
 
-    imageOverlayElement.onload = () => {
-      logger.info('Map overlay image loaded');
-      setupMapLayers();
-      resolve();
-    };
+//     imageOverlayElement.onload = () => {
+//       logger.info('Map overlay image loaded');
+//       // setupMapLayers();
+//       resolve();
+//     };
 
-    imageOverlayElement.onerror = (error) => {
-      logger.error('Failed to load map overlay image', error);
-      reject(error);
-    };
+//     imageOverlayElement.onerror = (error) => {
+//       logger.error('Failed to load map overlay image', error);
+//       reject(error);
+//     };
 
-    // Set the source after setting up event handlers
-    imageOverlayElement.src = '/icons/Map_Design-big-min.png';
-  });
-}
+//     // Set the source after setting up event handlers
+//     imageOverlayElement.src = '/icons/Map_Design-big-min.png';
+//   });
+// }
 
 function checkWebPSupport(): Promise<boolean> {
   return new Promise((resolve) => {

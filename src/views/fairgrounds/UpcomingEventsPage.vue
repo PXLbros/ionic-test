@@ -129,10 +129,15 @@
         <!-- List View -->
         <div v-else class="events-list">
           <EventCard
+            v-if="filteredEvents.length > 0"
             v-for="event in filteredEvents"
             :key="`${event.id}-${event.currentDate.date}`"
             :event="event"
           />
+
+          <p v-else class="events-list__no-events">
+            No events.
+          </p>
         </div>
 
         <FairgroundsKeepInTouchForm />
@@ -151,7 +156,7 @@ import { format, isSameMonth, parseISO, addMonths, subMonths, isSameDay } from '
 import { toZonedTime } from 'date-fns-tz';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import appConfig from '@/config/app';
-import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
+import FairgroundsKeepInTouchForm from '@/components/FairgroundsKeepInTouchForm.vue';
 
 interface NYSFairgroundsEventDate {
   date: string;
@@ -464,6 +469,7 @@ const navigateMonth = (direction: number) => {
         width: 100%;
         justify-content: space-between;
         align-items: center;
+        height: 44px;
 
         .filter {
           font-size: 14px;
@@ -555,6 +561,12 @@ const navigateMonth = (direction: number) => {
     border-bottom-right-radius: 12px;
     border-bottom-left-radius: 12px;
     background-color: #FFF;
+
+    &__no-events {
+      text-align: center;
+      margin: 10px 0 20px;
+      color:
+    }
   }
 
   .search-results-header {

@@ -65,7 +65,7 @@ import { useRoute } from 'vue-router';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
-import FairgroundsKeepInTouchForm from '@/components/Fairgrounds/KeepInTouchForm.vue';
+import FairgroundsKeepInTouchForm from '@/components/FairgroundsKeepInTouchForm.vue';
 import appConfig from '@/config/app';
 import { FairgroundsVenue } from '@/types';
 

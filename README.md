@@ -30,9 +30,21 @@ Center: -76.22191,43.07350
 Center: -8484984.642,5323165.667
 
 ### Georeference and generate .tif file in QGIS
-  - Transformation Type: Linear
-  - Resampling method: Nearest neighbour
-  - Target SRS: EPSG:3857 – Web Mercator:
+
+#### Create Raster in QGIS
+
+Go to `Raster` -> `Georeferencer...` and add points.
+Make sure to add points in EPSG:3857 format.
+Use convert-location tool to convert coordinates.
+
+```sh
+docker build -t convert-location -f Dockerfile.convert-location .
+docker run --rm convert-location -76.215325 43.055330
+```
+
+- Transformation Type: Linear
+- Resampling method: Nearest neighbour
+- Target SRS: EPSG:3857 – Web Mercator:
 
 Run and it will export a `map_modified.tif` file.
 Copy `map_modified.tif` into directory [scripts/generate-map-tiles/input](scripts/generate-map-tiles/input/).
@@ -40,7 +52,7 @@ Copy `map_modified.tif` into directory [scripts/generate-map-tiles/input](script
 ### Convert .tif to Raster Tiles (XYZ format)
 
 From `scripts/generate-map-tiles` directory, run:
-
+            
 ```sh
 docker build -f Dockerfile.gdal2tiles -t gdal2tiles-gdal38 .
 ```

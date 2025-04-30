@@ -1,0 +1,13 @@
+FROM python:3.13-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the script and requirements
+COPY convert-location.py /app/convert-location.py
+
+# Install dependencies
+RUN pip install pyproj
+
+# Set the entrypoint to the script
+ENTRYPOINT ["python", "convert-location.py"]
