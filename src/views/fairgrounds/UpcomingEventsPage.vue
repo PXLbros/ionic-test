@@ -71,7 +71,7 @@
           </button>
         </div>
 
-        <div class="my-favorites">
+        <div v-show="showMyFavoritesContainer" class="my-favorites">
           <router-link
             :to="{ name: 'fairgrounds-event-favorites' }"
             class="my-favorites__link"
@@ -189,11 +189,11 @@ interface EventWithCurrentDate extends FairgroundsEvent {
 const dataStore = useDataStore();
 
 // State
-const selectedDate = ref(new Date());
 const searchQuery = ref('');
 const viewMode = ref<'list' | 'calendar'>('list');
 const dateScrollRef = ref<HTMLElement | null>(null);
 const currentMonthRef = ref<HTMLElement | null>(null);
+const showMyFavoritesContainer = ref(true);
 
 const scrollToSelectedMonth = async () => {
   await nextTick();
@@ -214,24 +214,6 @@ const scrollToSelectedMonth = async () => {
     });
   }
 };
-
-onMounted(async () => {
-  // Use a slight delay to ensure everything is rendered and measured
-  setTimeout(scrollToSelectedMonth, 100);
-});
-
-// Switching from Calendar to List will center the selected date value
-watch(viewMode, async (newMode) => {
-  if (newMode === 'list') {
-    await scrollToSelectedMonth();
-  }
-});
-
-watch(selectedDate, async () => {
-  if (viewMode.value === 'list') {
-    await scrollToSelectedMonth();
-  }
-});
 
 // Generate next 12 months for the date scroll
 const monthsWithUpcomingEvents = computed(() => {
@@ -255,6 +237,33 @@ const monthsWithUpcomingEvents = computed(() => {
 
 // Update existing events computed reference to use combinedEvents
 const events = computed(() => dataStore.data.nysfairgroundsWebsite.events || []);
+
+const today = toZonedTime(new Date(), appConfig.timezone);
+
+const findNextAvailableDate = (): Date => {
+  const sortedDates = events.value
+    .flatMap((event: FairgroundsEvent) => event.dates || [])
+    .filter((date: FairgroundsEventDate) => date.is_upcoming)
+    .map((date: FairgroundsEventDate) => toZonedTime(parseISO(date.date), appConfig.timezone))
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  return sortedDates.find(date => date >= today) || today;
+};
+
+const selectedDate = ref<Date>(findNextAvailableDate());
+
+// Switching from Calendar to List will center the selected date value
+watch(viewMode, async (newMode) => {
+  if (newMode === 'list') {
+    await scrollToSelectedMonth();
+  }
+});
+
+watch(selectedDate, async () => {
+  if (viewMode.value === 'list') {
+    await scrollToSelectedMonth();
+  }
+});
 
 // Update calendar computations to handle the full date properly
 const calendarDays = computed(() => {
@@ -363,7 +372,7 @@ const hasEvents = (date: Date): boolean => {
       const zonedEventDate = toZonedTime(parsedDate, appConfig.timezone);
 
       return isSameDay(zonedEventDate, zonedDate) &&
-             (isSameDay(zonedEventDate, new Date()) || eventDate.is_upcoming);
+        (isSameDay(zonedEventDate, new Date()) || eventDate.is_upcoming);
     });
   });
 };
@@ -394,6 +403,12 @@ const eventsForSelectedDate = computed(() => {
 
 const toggleView = () => {
   viewMode.value = viewMode.value === 'list' ? 'calendar' : 'list';
+
+  if (viewMode.value === 'calendar') {
+    showMyFavoritesContainer.value = false;
+  } else {
+    showMyFavoritesContainer.value = true;
+  }
 };
 
 const firstMonthWithEvents = computed(() => {
@@ -436,6 +451,11 @@ const navigateMonth = (direction: number) => {
     selectedDate.value = newDate;
   }
 };
+
+onMounted(async () => {
+  // Use a slight delay to ensure everything is rendered and measured
+  setTimeout(scrollToSelectedMonth, 100);
+});
 </script>
 
 <style lang="scss" scoped>
