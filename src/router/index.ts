@@ -72,6 +72,14 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/fairgrounds/event-favorites',
+    name: 'fairgrounds-event-favorites',
+    component: () => import('@/views/fairgrounds/EventFavoritesPage.vue'),
+    meta: {
+      title: 'Event Favorites',
+    }
+  },
+  {
     path: '/fair',
     component: () => import('@/views/fair/FairHomePage.vue'),
     meta: {
@@ -114,8 +122,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/fair/EventFavoritesPage.vue'),
     meta: {
       title: 'Event Favorites',
-      // showInMenu: true,
-      // menuOrder: 4
     }
   },
   {
@@ -204,8 +210,8 @@ const routes: Array<RouteRecordRaw> = [
       title: 'News Detail',
       showInMenu: false,
       subLoader: true,
-    }
-  }
+    },
+  },
 ]
 
 const router = createRouter({

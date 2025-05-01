@@ -91,7 +91,14 @@
               </button>
             </div>
 
-            <a href="#" class="nav-link secondary">Contact Us <span class="arrow">›</span></a>
+            <router-link
+              v-if="props.type === 'fairgrounds'"
+              to="/fairgrounds/rental-opportunity"
+              class="nav-link secondary"
+            >
+              Contact Us <span class="arrow">›</span>
+            </router-link>
+
             <a href="#" class="nav-link secondary">
               Terms of Service
               <span class="arrow">›</span>

@@ -360,6 +360,7 @@ onBeforeUnmount(() => {
   background-color: #ecedef;
   padding: 30px 0px;
   width: 100%;
+  height: 105px;
 }
 
 .date {

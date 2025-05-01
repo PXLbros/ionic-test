@@ -57,7 +57,6 @@
           </div>
         </div>
 
-
         <!-- Search results heading when searching -->
         <div v-if="isSearching" class="search-results-header">
           <h2 class="search-results-title">
@@ -69,6 +68,16 @@
           >
             Clear Search
           </button>
+        </div>
+
+        <div class="my-favorites">
+          <router-link
+            :to="{ name: 'fairgrounds-event-favorites' }"
+            class="my-favorites__link"
+          >
+            <HeartIcon color="#000" />
+            My Favorites
+          </router-link>
         </div>
 
         <!-- Calendar View -->
@@ -163,6 +172,7 @@ import { toZonedTime } from 'date-fns-tz';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import appConfig from '@/config/app';
 import FairgroundsKeepInTouchForm from '@/components/FairgroundsKeepInTouchForm.vue';
+import HeartIcon from '@/components/Icons/HeartIcon.vue';
 
 interface NYSFairgroundsEventDate {
   date: string;
@@ -490,7 +500,7 @@ const navigateMonth = (direction: number) => {
       }
 
       &-search {
-        padding: 0 30px;
+        padding: 0 30px 20px;
         margin-top: 10px;
 
         .search-container {
@@ -523,7 +533,7 @@ const navigateMonth = (direction: number) => {
   .date-scroll {
     display: flex;
     overflow-x: auto;
-    padding: 20px 30px;
+    padding: 0 30px 20px;
     gap: 10px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -561,6 +571,26 @@ const navigateMonth = (direction: number) => {
       letter-spacing: 0.5px;
       font-weight: 700;
 
+    }
+  }
+
+  .my-favorites {
+    background-color: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    font-weight: bold;
+
+    &__link {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: #000;
+
+      svg {
+        margin-right: 8px;
+      }
     }
   }
 

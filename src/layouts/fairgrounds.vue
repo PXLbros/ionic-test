@@ -78,7 +78,9 @@
               </button>
             </div>
 
-            <a href="#" class="nav-link secondary">Contact Us <span class="arrow">›</span></a>
+            <router-link to="/fairgrounds/rental-opportunity" class="nav-link secondary">
+              Contact Us <span class="arrow">›</span>
+            </router-link>
             <a href="#" class="nav-link secondary">
               Terms of Service
               <span class="arrow">›</span>
