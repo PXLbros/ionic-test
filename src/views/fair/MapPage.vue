@@ -89,35 +89,41 @@
 
         <div v-if="isDebugMode" class="opacity-control">
           <div class="opacity-label">Overlay Opacity</div>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            :value="mapOpacity * 100"
-            @input="updateMapOpacity($event)"
-            class="opacity-slider"
-          />
-          <div class="opacity-value">{{ Math.round(mapOpacity * 100) }}%</div>
+          <div class="opacity-row">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              :value="mapOpacity * 100"
+              @input="updateMapOpacity($event)"
+              class="opacity-slider"
+            />
+            <div class="opacity-value">{{ Math.round(mapOpacity * 100) }}%</div>
+          </div>
           <div class="opacity-label">Cluster Radius</div>
-          <input
-            type="range"
-            min="10"
-            max="100"
-            :value="mapClusterRadius"
-            @input="(e: any) => { mapClusterRadius = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
-            class="opacity-slider"
-          />
-          <div class="opacity-value">{{ mapClusterRadius }}</div>
+          <div class="opacity-row">
+            <input
+              type="range"
+              min="10"
+              max="100"
+              :value="mapClusterRadius"
+              @input="(e: any) => { mapClusterRadius = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
+              class="opacity-slider"
+            />
+            <div class="opacity-value">{{ mapClusterRadius }}</div>
+          </div>
           <div class="opacity-label">Min Points in Cluster</div>
-          <input
-            type="range"
-            min="1"
-            max="20"
-            :value="mapClusterMinPoints"
-            @input="(e: any) => { mapClusterMinPoints = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
-            class="opacity-slider"
-          />
-          <div class="opacity-value">{{ mapClusterMinPoints }}</div>
+          <div class="opacity-row">
+            <input
+              type="range"
+              min="1"
+              max="20"
+              :value="mapClusterMinPoints"
+              @input="(e: any) => { mapClusterMinPoints = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
+              class="opacity-slider"
+            />
+            <div class="opacity-value">{{ mapClusterMinPoints }}</div>
+          </div>
           <div class="zoom-level"><strong>Zoom Level</strong> {{ currentZoomLevel.toFixed(2) }}</div>
         </div>
       </ion-content>
@@ -2267,7 +2273,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 8px;
   z-index: 5;
-  min-width: 160px;
+  // min-width: 160px;
   backdrop-filter: blur(4px);
 
   .debug-title {
@@ -2289,7 +2295,7 @@ onUnmounted(() => {
   .opacity-slider {
     -webkit-appearance: none;
     appearance: none;
-    width: 100%;
+    width: 90px;
     height: 6px;
     background: #e0e0e0;
     border-radius: 3px;
@@ -2319,6 +2325,7 @@ onUnmounted(() => {
     font-size: 12px;
     color: #555;
     text-align: right;
+    width: 35px;
   }
 
   .zoom-level {
@@ -2328,6 +2335,13 @@ onUnmounted(() => {
     font-weight: 500;
     color: #333;
   }
+}
+
+.opacity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  // gap: 10px;
 }
 
 @media (prefers-color-scheme: dark) {
