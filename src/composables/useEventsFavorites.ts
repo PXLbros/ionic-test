@@ -6,10 +6,13 @@ import { useAppStore } from '@/stores/app';
 import { useDataStore } from '@/stores/data';
 import { storeToRefs } from 'pinia';
 import type { Event, EventDate, Site } from '@/types';
+import { useLogger } from './useLogger';
 
 export function useEventFavorites({ site }: { site: Site }) {
   const appStore = useAppStore();
   const dataStore = useDataStore();
+  const logger = useLogger();
+
   const { data } = storeToRefs(dataStore);
 
   const findEventDate = (eventId: number | string, startTimeUnix: number): EventDate | undefined => {
@@ -104,7 +107,12 @@ export function useEventFavorites({ site }: { site: Site }) {
     const matchingDate = findEventDate(eventId, selectedStartTimeUnix);
 
     if (!matchingDate) {
-      console.warn('No matching date found for the selected start time.');
+      logger.warn('No matching date found for the selected start time.', {
+        Site: site,
+        'Event ID': eventId,
+        'Start Time': selectedStartTimeUnix,
+      });
+
       return;
     }
 

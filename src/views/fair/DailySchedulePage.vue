@@ -53,7 +53,7 @@
         </div>
 
         <div v-else class="schedule-content">
-          <EventsList
+          <FairEventsList
             :events="filteredEvents"
             :categories="categories"
             noEventsText="No events scheduled for this day"
@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
 import FairLayout from '@/layouts/fair.vue';
-import EventsList from '@/components/EventsList.vue';
+import EventsList from '@/components/FairEventsList.vue';
 import { useDataStore } from '@/stores/data';
 import { storeToRefs } from 'pinia';
 import { Category, DateObject, Event } from '@/types';

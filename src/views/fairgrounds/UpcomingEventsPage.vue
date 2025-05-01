@@ -128,7 +128,7 @@
 
           <!-- Events for selected day -->
           <div v-if="eventsForSelectedDate.length > 0" class="day-events">
-            <EventCard
+            <FairgroundsEventCard
               v-for="event in eventsForSelectedDate"
               :key="`${event.id}-${event.currentDate.date}`"
               :event="event"
@@ -142,7 +142,7 @@
 
         <!-- List View -->
         <div v-else class="events-list">
-          <EventCard
+          <FairgroundsEventCard
             v-if="filteredEvents.length > 0"
             v-for="event in filteredEvents"
             :key="`${event.id}-${event.currentDate.date}`"

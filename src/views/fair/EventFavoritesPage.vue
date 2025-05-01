@@ -8,7 +8,7 @@
       </div>
 
       <div class="main__content">
-        <EventsList
+        <FairEventsList
           :events="favoriteEventItems"
           :categories="categories"
           noEventsText="No favorited events"
@@ -108,5 +108,11 @@ const favoriteEventItems = computed(() => {
     padding-top: 10px;
     background-color: #098944;
   }
+}
+</style>
+
+<style lang="scss">
+.main__content .events-list__no-events {
+  color: #FDD456;
 }
 </style>

@@ -65,6 +65,7 @@ import { IonContent, IonPage } from '@ionic/vue';
 import { useDataStore } from '@/stores/data';
 import FairgroundsBottomNavigation from '@/components/Tabs/FairgroundsBottomNavigation.vue';
 import FairgroundsKeepInTouchForm from '@/components/FairgroundsKeepInTouchForm.vue';
+import FairgroundsEventCarousel from '@/components/FairgroundsEventCarousel.vue';
 import appConfig from '@/config/app';
 import fairgroundsLightLogo from '@/imgs/svg/fg-light.svg'
 import BaseNav from '@/components/BaseNav.vue';

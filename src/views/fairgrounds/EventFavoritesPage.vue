@@ -1,5 +1,5 @@
 <template>
-  <FairLayout title="Event Favorites" backButtonHref="/fairgrounds/upcoming-events">
+  <FairgroundsLayout title="Event Favorites" backButtonHref="/fairgrounds/upcoming-events">
     <div class="main main--event-favorites-page">
       <div class="main__header">
         <div class="main__header-img">
@@ -8,7 +8,7 @@
       </div>
 
       <div class="main__content">
-        <EventsList
+        <FairgroundsEventsList
           :events="favoriteEventItems"
           :categories="categories"
           noEventsText="No favorited events"
@@ -16,12 +16,12 @@
         />
       </div>
     </div>
-  </FairLayout>
+  </FairgroundsLayout>
 </template>
 
 <script setup lang="ts">
 import { Category } from '@/types';
-import FairLayout from '../../layouts/fair.vue';
+import FairgroundsLayout from '../../layouts/fairgrounds.vue';
 import { formatEvent } from '@/utils/event';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 
@@ -40,6 +40,7 @@ const favoriteEventItems = computed(() => {
     for (const eventDate of event.dates) {
       if (eventDate.isFavorite) {
         const formattedEvent = formatEvent({ event, eventDate, categories: categories.value });
+        console.log('formattedEvent', formattedEvent);
 
         favoriteEventItems.push(formattedEvent);
       }
@@ -53,7 +54,7 @@ const favoriteEventItems = computed(() => {
 <style lang="scss" scoped>
 .main {
   font-family: 'Inter', sans-serif;
-  background: #098944;
+  background: #999;
   min-height: calc(100vh - 7.5vh);
 
   &--event-favorites-page {
@@ -68,7 +69,6 @@ const favoriteEventItems = computed(() => {
     justify-content: center;
     gap: 10px;
     position: relative;
-    background: #FDD456;
 
     &-img {
       width: 100%;
@@ -108,7 +108,6 @@ const favoriteEventItems = computed(() => {
   &__content {
     padding: 20px;
     padding-top: 10px;
-    background-color: #098944;
   }
 }
 </style>

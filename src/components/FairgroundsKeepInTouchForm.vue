@@ -1,7 +1,7 @@
 <template>
   <div class="keep-in-touch">
     <h2 class="touch-title">KEEP IN TOUCH</h2>
-    <p>Sign up for the latest updates.</p>
+    <p class="keep-in-touch__sub-text">Sign up for the latest updates.</p>
     <div class="contact-form">
         <label for="email">Email*</label>
         <input type="email" id="email" placeholder="Enter your email..." />
@@ -17,6 +17,10 @@
   padding: 1px 20px 40px 20px;
   color: white;
   text-align: center;
+
+  &__sub-text {
+    margin-bottom: 25px;
+  }
 }
 
 .touch-title {
