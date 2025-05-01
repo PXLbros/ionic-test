@@ -408,7 +408,7 @@ export function setupIconClickHandlers(
   };
 
   // Vendor icon click handler
-  const handleVendorIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
+  const handleVendorIconClick = (e: mapboxgl.MapMouseEvent) => {
     if (!e.features || e.features.length === 0) return;
 
     const feature = e.features[0];
@@ -431,7 +431,7 @@ export function setupIconClickHandlers(
   };
 
   // Service icon click handler
-  const handleServiceIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
+  const handleServiceIconClick = (e: mapboxgl.MapMouseEvent) => {
     if (!e.features || e.features.length === 0) return;
 
     const feature = e.features[0];
@@ -472,14 +472,14 @@ export function setupIconClickHandlers(
     createPopup(coordinates, popupContent);
   };
 
-  const handleMapIconClick = (e: mapboxgl.MapLayerEventType['click'] & mapboxgl.EventData) => {
+  const handleMapIconClick = (e: mapboxgl.MapMouseEvent) => {
     if (!e.features || e.features.length === 0) {
       return;
     }
 
     const feature = e.features[0];
 
-    switch (feature.properties.type) {
+    switch (feature.properties?.type) {
       case 'vendor': {
         handleVendorIconClick(e);
 
@@ -492,7 +492,7 @@ export function setupIconClickHandlers(
       }
       default: {
         logger.warn('Unknown feature type', {
-          'Type': feature.properties.type,
+          'Type': feature.properties?.type,
         });
 
         break;

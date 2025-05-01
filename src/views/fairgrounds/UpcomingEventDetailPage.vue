@@ -92,68 +92,34 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { useDataStore } from '@/stores/data';
-import { format, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 import FairgroundsLayout from '@/layouts/fairgrounds.vue';
-import type { EventDate } from '@/types';
+import type { EventDate, FairgroundsEvent, FairgroundsEventDate } from '@/types';
 import FairgroundsKeepInTouchForm from '@/components/FairgroundsKeepInTouchForm.vue';
 import appConfig from '@/config/app';
-
-interface NYSFairgroundsEventDate {
-  date: string;
-  endTime: string;
-  startTime: string;
-  start_time_date: string;
-  start_time_unix: number;
-  start_time_time: string;
-  end_time_time: string;
-  date_time_formatted: string;
-  isFavorite: boolean;
-  isAddingToFavorites: boolean;
-  isRemovingFromFavorites: boolean;
-}
-
-interface NYSFairgroundsEventImage {
-  filename: string;
-  title: string;
-  url: string;
-}
-
-interface NYSFairgroundsEvent {
-  id: string;
-  title: string;
-  eventBody: string;
-  eventDates: NYSFairgroundsEventDate[];
-  eventImage: NYSFairgroundsEventImage[];
-  eventAdmission: string;
-  eventWebSite: string;
-  enabled: boolean;
-  eventContactEmail: string;
-  eventContactPhone: string;
-}
 
 const route = useRoute();
 const dataStore = useDataStore();
 const eventId = decodeURIComponent(route.params.id as string);
 const selectedDate = route.query.date ? decodeURIComponent(route.query.date as string) : null;
 
-const event = computed<NYSFairgroundsEvent | undefined>(() => {
+const event = computed<FairgroundsEvent | undefined>(() => {
   return dataStore.data.nysfairgroundsWebsite.events.find(
-    (event: NYSFairgroundsEvent) => event.id === eventId
+    (event: FairgroundsEvent) => event.id === eventId
   );
 });
 
 const currentEventDate = computed(() => {
-  if (!event.value || !event.value.eventDates) return null;
+  if (!event.value || !event.value.dates) return null;
 
   if (selectedDate) {
-    // Find the matching date in eventDates
-    const matchingDate = event.value.eventDates.find(
-      date => parseISO(date.date).getTime() === parseISO(selectedDate).getTime()
+    const matchingDate = event.value.dates.find(
+      (date: FairgroundsEventDate) => parseISO(date.date).getTime() === parseISO(selectedDate).getTime()
     );
-    return matchingDate || event.value.eventDates[0];
+    return matchingDate || event.value.dates[0];
   }
 
-  return event.value.eventDates[0];
+  return event.value.dates[0];
 });
 
 const dateDetails = computed((): EventDate | null => {
@@ -172,7 +138,7 @@ const dateDetails = computed((): EventDate | null => {
   };
 });
 
-const getEventTime = (event: NYSFairgroundsEvent): string => {
+const getEventTime = (event: FairgroundsEvent): string => {
   if (!currentEventDate.value) {
     return '';
   }
@@ -181,22 +147,22 @@ const getEventTime = (event: NYSFairgroundsEvent): string => {
 };
 
 const additionalDates = computed(() => {
-  if (!event.value || !event.value.eventDates) {
+  if (!event.value || !event.value.dates) {
     return [];
   }
 
-  const additionalDates = event.value.eventDates.filter(date =>
+  const additionalDates = event.value.dates.filter(date =>
     parseISO(date.date).getTime() !== parseISO(currentEventDate.value?.date || '').getTime()
   );
 
   return additionalDates;
 });
 
-const hasContactInfo = (event: NYSFairgroundsEvent): boolean => {
+const hasContactInfo = (event: FairgroundsEvent): boolean => {
   return !!(event.eventWebSite || event.eventContactPhone || event.eventContactEmail);
 };
 
-const getEventImage = (event: NYSFairgroundsEvent): string => {
+const getEventImage = (event: FairgroundsEvent): string => {
   if (event.eventImage && event.eventImage.length > 0 && event.eventImage[0].url) {
     // Return the full URL directly
     return event.eventImage[0].url;
@@ -205,7 +171,7 @@ const getEventImage = (event: NYSFairgroundsEvent): string => {
   return '/api/placeholder/400/200';
 };
 
-const formatAdditionalDate = (date: NYSFairgroundsEventDate): string => {
+const formatAdditionalDate = (date: FairgroundsEventDate): string => {
   return `${date.start_time_date} at ${date.start_time_time} - ${date.end_time_time}`;
 };
 </script>

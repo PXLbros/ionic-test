@@ -40,19 +40,21 @@
     </div>
 
     <div class="loading-text">
-      {{ loadingText }}
+      {{ formattedLoadingText }}
       <span class="dots"><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  text: string;
-}>();
+const props = withDefaults(defineProps<{
+  text?: string;
+}>(), {
+  text: ''
+});
 
-const loadingText = computed(() => {
-  return props.text ? props.text : 'Loading';
+const formattedLoadingText = computed(() => {
+  return props.text || 'Loading';
 });
 </script>
 

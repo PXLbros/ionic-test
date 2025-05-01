@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import FavoriteButton from './FavoriteButton.vue';
-import type { Category, Event } from '@/types';
+import type { Category } from '@/types';
 import type { FormattedEvent } from '@/utils/event';
 
 const props = withDefaults(defineProps<{

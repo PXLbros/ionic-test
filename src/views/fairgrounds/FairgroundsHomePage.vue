@@ -19,7 +19,7 @@
           <h1 id="fg-title">Upcoming Events</h1>
         </div>
 
-        <EventCarousel :eventData="allEvents" />
+        <FairgroundsEventCarousel :eventData="allEvents" />
 
         <!-- Updated grid section to match the design -->
         <div class="categories-section">
@@ -69,6 +69,7 @@ import appConfig from '@/config/app';
 import fairgroundsLightLogo from '@/imgs/svg/fg-light.svg'
 import BaseNav from '@/components/BaseNav.vue';
 import { useLogger } from '@/composables/useLogger';
+import { FairgroundsEvent } from '@/types';
 
 const dataStore = useDataStore();
 const logger = useLogger();
@@ -79,8 +80,8 @@ const allEvents = computed(() => {
   const featured = dataStore.data.nysfairgroundsWebsite.featuredEvents || [];
   const regularEvents = dataStore.data.nysfairgroundsWebsite.events || [];
 
-  const filterUpcomingEvents = (events: { eventDates?: { is_upcoming: boolean }[] }[]) =>
-    events.filter((event) => event.eventDates?.some((date) => date.is_upcoming));
+  const filterUpcomingEvents = (events: FairgroundsEvent[]) =>
+    events.filter((event) => event.dates?.some((date) => date.is_upcoming));
 
   const filteredRegularEvents = filterUpcomingEvents(regularEvents);
 

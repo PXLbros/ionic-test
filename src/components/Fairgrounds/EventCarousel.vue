@@ -55,8 +55,8 @@
 
     <!-- Event information banner -->
     <div v-if="currentEvent" class="image-banner" @click="navigateToEvent(currentEvent.id)">
-      <p class="date" v-if="currentEvent.eventDates?.[0]?.start_time_date">
-        {{ currentEvent.eventDates?.[0]?.start_time_date }}
+      <p class="date" v-if="currentEvent.dates?.[0]?.start_time_date">
+        {{ currentEvent.dates?.[0]?.start_time_date }}
       </p>
 
       <h3 class="title">
@@ -67,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+import { FairgroundsEvent } from '@/types';
 import PlaceholderIcon from './Icons/PlaceholderIcon.vue';
 import { useRouter } from 'vue-router';
 
@@ -85,30 +86,20 @@ interface EventDate {
   start_time_date?: string;
 }
 
-interface EventItem {
-  id: string;
-  title: string;
-  eventImage?: EventImage[];
-  eventDates?: EventDate[];
-  eventAdmission?: string;
-  eventWebSite?: string;
-  [key: string]: any; // For other potential properties
-}
-
 const props = defineProps({
   eventData: {
-    type: Array as () => EventItem[],
+    type: Array as () => FairgroundsEvent[],
     default: () => []
   }
 });
 
-const events = computed<EventItem[]>(() => {
+const events = computed<FairgroundsEvent[]>(() => {
   // Take the first 5 events from the provided data
   return props.eventData.slice(0, 5);
 });
 
 const currentIndex = ref<number>(0);
-const currentEvent = computed<EventItem | null>(() =>
+const currentEvent = computed<FairgroundsEvent | null>(() =>
   events.value.length > 0 ? events.value[currentIndex.value] : null
 );
 

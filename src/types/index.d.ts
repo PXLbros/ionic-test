@@ -137,3 +137,38 @@ export interface FairgroundsVenue {
   venueFloorPlanImage: FairgroundsAsset[];
   venueFloorPlanFeatures: string;
 }
+
+export interface FairgroundsEventDate {
+  date: string;
+  endTime: string;
+  startTime: string;
+  start_time_date: string;
+  start_time_unix: number;
+  start_time_time: string;
+  end_time_time: string;
+  date_time_formatted: string;
+  isFavorite: boolean;
+  isAddingToFavorites: boolean;
+  isRemovingFromFavorites: boolean;
+  is_upcoming: boolean;
+}
+
+export interface FairgroundsEventImage {
+  filename: string;
+  title: string;
+  url: string;
+}
+
+export interface FairgroundsEvent {
+  id: string;
+  title: string;
+  eventBody: string;
+  dates: FairgroundsEventDate[];
+  eventImage: FairgroundsEventImage[];
+  eventAdmission: string;
+  uri: string;
+  eventWebSite: string;
+  enabled: boolean;
+  eventContactEmail: string;
+  eventContactPhone: string;
+}

@@ -195,17 +195,6 @@ const getFavoriteEventsPreferenceKey = (site: Site) => {
   }
 }
 
-const getEventDatesKey = (site: Site) => {
-  switch (site) {
-    case 'nysfair':
-      return 'dates';
-    case 'nysfairgrounds':
-      return 'eventDates';
-    default:
-      return '';
-  }
-}
-
 const formatData = async ({ site, data }: { site: Site; data: any }) => {
   const favoriteEventsPreferenceKey = getFavoriteEventsPreferenceKey(site);
 
@@ -218,10 +207,8 @@ const formatData = async ({ site, data }: { site: Site; data: any }) => {
   const favoriteNYSFairEvents: { id: number; start_time_unix: number }[] = JSON.parse(favoriteNYSFairEventIds);
 
   if (data.events) {
-    const eventDatesKey = getEventDatesKey(site);
-
     data.events = data.events.map((event: any) => {
-      event[eventDatesKey] = event[eventDatesKey]?.map((date: any) => {
+      event.dates = event.dates?.map((date: any) => {
         const isFavorite = favoriteNYSFairEvents.some((favoritedEvent) => {
           return favoritedEvent.id === event.id && favoritedEvent.start_time_unix === date.start_time_unix;
         });

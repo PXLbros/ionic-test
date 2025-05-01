@@ -28,12 +28,7 @@ export function useEventFavorites({ site }: { site: Site }) {
       return event.id === eventId;
     });
 
-    switch (site) {
-      case 'nysfair':
-        return event?.dates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
-      case 'nysfairgrounds':
-        return event?.eventDates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
-    }
+    return event?.dates.find((date: EventDate) => date.start_time_unix === startTimeUnix);
   };
 
   const toggleFavorite = async (site: Site, eventId: number | string, dateDetails: EventDate): Promise<void> => {

@@ -3,7 +3,8 @@
     title="Upcoming Events"
     :showMenuButton="true"
   >
-      <div class="main" id="events">
+    <div class="main" id="events">
+      <template v-if="monthsWithUpcomingEvents?.length > 0">
         <div class="wrapper">
           <div class="main__header">
             <div class="main__header-toggles">
@@ -152,15 +153,20 @@
             No upcoming events in {{ format(selectedDate, 'MMMM') }}.
           </p>
         </div>
+      </template>
 
-        <FairgroundsKeepInTouchForm />
-
-        <SocialIcons
-          type="fairgrounds"
-          :social-data="dataStore.data.nysfairWebsite.social"
-        />
+      <div v-else class="no-events">
+        No upcoming events.
       </div>
-    </FairgroundsLayout>
+
+      <FairgroundsKeepInTouchForm />
+
+      <SocialIcons
+        type="fairgrounds"
+        :social-data="dataStore.data.nysfairWebsite.social"
+      />
+    </div>
+  </FairgroundsLayout>
 </template>
 
 <script setup lang="ts">
@@ -173,35 +179,10 @@ import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import appConfig from '@/config/app';
 import FairgroundsKeepInTouchForm from '@/components/FairgroundsKeepInTouchForm.vue';
 import HeartIcon from '@/components/Icons/HeartIcon.vue';
+import { FairgroundsEvent as FairgroundsEvent, FairgroundsEventDate } from '@/types';
 
-interface NYSFairgroundsEventDate {
-  date: string;
-  endDate: string;
-  startTime?: string;
-  endTime?: string;
-  date_time_formatted?: string;
-  is_upcoming: boolean;
-}
-
-interface NYSFairgroundsEventImage {
-  filename: string;
-  title: string;
-  url: string;
-}
-
-interface Event {
-  id: string;
-  title: string;
-  eventDates: NYSFairgroundsEventDate[];
-  eventImage: NYSFairgroundsEventImage[];
-  eventBody: string;
-  eventAdmission: string;
-  uri: string;
-  enabled: boolean;
-}
-
-interface EventWithCurrentDate extends Event {
-  currentDate: NYSFairgroundsEventDate;
+interface EventWithCurrentDate extends FairgroundsEvent {
+  currentDate: FairgroundsEventDate;
 }
 
 // Store and Data
@@ -256,8 +237,8 @@ watch(selectedDate, async () => {
 const monthsWithUpcomingEvents = computed(() => {
   const monthsSet = new Set<string>();
 
-  events.value.forEach((event: Event) => {
-    event.eventDates?.forEach((dateObj: any) => {
+  events.value.forEach((event: FairgroundsEvent) => {
+    event.dates?.forEach((dateObj: any) => {
       if (dateObj.is_upcoming) {
         const date = new Date(dateObj.date);
         const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -314,18 +295,18 @@ const formattedCalendarDays = computed(() => {
 });
 
 const filteredEvents = computed(() => {
-  return events.value.flatMap((event: Event): EventWithCurrentDate[] => {
-    if (!event.enabled || !event.eventDates || event.eventDates.length === 0) return [];
+  return events.value.flatMap((event: FairgroundsEvent): EventWithCurrentDate[] => {
+    if (!event.enabled || !event.dates || event.dates.length === 0) return [];
 
     if (searchQuery.value) {
       if (event.title.toLowerCase().includes(searchQuery.value.toLowerCase())) {
-        const upcomingDates = event.eventDates.filter((date: NYSFairgroundsEventDate) => date.is_upcoming);
+        const upcomingDates = event.dates.filter((date: FairgroundsEventDate) => date.is_upcoming);
         return upcomingDates.length > 0 ? [{ ...event, currentDate: upcomingDates[0] }] : [];
       }
       return [];
     }
 
-    return event.eventDates
+    return event.dates
       .filter(date => date.is_upcoming)
       .map(date => {
         const eventDate = toZonedTime(parseISO(date.date), appConfig.timezone);
@@ -372,12 +353,12 @@ const hasEvents = (date: Date): boolean => {
   // Convert the input date to New York time
   const zonedDate = toZonedTime(date, appConfig.timezone);
 
-  return events.value.some((event: Event) => {
-    if (!event.enabled || !event.eventDates) {
+  return events.value.some((event: FairgroundsEvent) => {
+    if (!event.enabled || !event.dates) {
       return false;
     }
 
-    return event.eventDates.some((eventDate: NYSFairgroundsEventDate) => {
+    return event.dates.some((eventDate: FairgroundsEventDate) => {
       const parsedDate = parseISO(eventDate.date);
       const zonedEventDate = toZonedTime(parsedDate, appConfig.timezone);
 
@@ -392,19 +373,19 @@ const eventsForSelectedDate = computed(() => {
 
   const zonedDate = toZonedTime(selectedDate.value, appConfig.timezone);
 
-  return events.value.flatMap((event: Event): EventWithCurrentDate[] => {
-    if (!event.enabled || !event.eventDates) {
+  return events.value.flatMap((event: FairgroundsEvent): EventWithCurrentDate[] => {
+    if (!event.enabled || !event.dates) {
       return [];
     }
 
-    const matchingDates = event.eventDates.filter((eventDate: NYSFairgroundsEventDate) => {
+    const matchingDates = event.dates.filter((eventDate: FairgroundsEventDate) => {
       const parsedDate = parseISO(eventDate.date);
       const zonedEventDate = toZonedTime(parsedDate, appConfig.timezone);
 
       return isSameDay(zonedEventDate, zonedDate);
     });
 
-    return matchingDates.map((matchedDate: NYSFairgroundsEventDate): EventWithCurrentDate => ({
+    return matchingDates.map((matchedDate: FairgroundsEventDate): EventWithCurrentDate => ({
       ...event,
       currentDate: matchedDate
     }));
@@ -804,4 +785,13 @@ const navigateMonth = (direction: number) => {
     }
   }
 
+.no-events {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #343434;
+  background-color: #fff;
+  height: 80px
+}
 </style>

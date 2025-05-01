@@ -12,7 +12,7 @@ declare module 'vue' {
     BaseTabNavigation: typeof import('./components/Tabs/BaseTabNavigation.vue')['default']
     CalendarIcon: typeof import('./components/Icons/CalendarIcon.vue')['default']
     EventCard: typeof import('./components/Fairgrounds/EventCard.vue')['default']
-    EventCarousel: typeof import('./components/EventCarousel.vue')['default']
+    EventCarousel: typeof import('./components/Fairgrounds/EventCarousel.vue')['default']
     EventModal: typeof import('./components/EventModal.vue')['default']
     EventsList: typeof import('./components/EventsList.vue')['default']
     FairBottomNavigation: typeof import('./components/Tabs/FairBottomNavigation.vue')['default']
