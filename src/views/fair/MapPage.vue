@@ -88,7 +88,6 @@
         <div class="map" ref="mapContainer"></div>
 
         <div v-if="isDebugMode" class="opacity-control">
-          <div class="debug-title">Map Debug</div>
           <div class="opacity-label">Overlay Opacity</div>
           <input
             type="range"
@@ -100,6 +99,29 @@
           />
           <div class="opacity-value">{{ Math.round(mapOpacity * 100) }}%</div>
           <div class="zoom-level"><strong>Zoom Level:</strong> {{ currentZoomLevel.toFixed(2) }}</div>
+
+          <div class="debug-title">Cluster Settings</div>
+          <div class="opacity-label">Cluster Radius</div>
+          <input
+            type="range"
+            min="10"
+            max="100"
+            :value="mapClusterRadius"
+            @input="(e: any) => { mapClusterRadius = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
+            class="opacity-slider"
+          />
+          <div class="opacity-value">{{ mapClusterRadius }}</div>
+
+          <div class="opacity-label">Min Points in Cluster</div>
+          <input
+            type="range"
+            min="1"
+            max="20"
+            :value="mapClusterMinPoints"
+            @input="(e: any) => { mapClusterMinPoints = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
+            class="opacity-slider"
+          />
+          <div class="opacity-value">{{ mapClusterMinPoints }}</div>
         </div>
       </ion-content>
     </div>
@@ -171,7 +193,7 @@ import {
   IonIcon,
   IonContent,
 } from '@ionic/vue';
-import { searchOutline, chevronDownOutline, optionsOutline, refreshOutline, closeOutline } from 'ionicons/icons';
+import { searchOutline, chevronDownOutline, optionsOutline, closeOutline } from 'ionicons/icons';
 import mapboxgl, { Map as MapboxMap } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
@@ -181,6 +203,7 @@ import { useLogger } from '@/composables/useLogger';
 import { cloneDeep } from '@/utils/clone';
 import { useDataStore } from '@/stores/data';
 import appConfig from '@/config/app';
+import { debounce } from '@/utils/time';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_ACCESS_TOKEN as string;
 
@@ -192,8 +215,11 @@ const DEFAULT_MAP_NAME = 'food-beverage';
 const MAP_MIN_ZOOM = 13;
 const MAP_MAX_ZOOM = 19;
 
-const MAP_CLUSTER_RADIUS = 50;
-const MAP_CLUSTER_MIN_POINTS = 7;
+const DEFAULT_MAP_CLUSTER_RADIUS = 50;
+const DEFAULT_MAP_CLUSTER_MIN_POINTS = 7;
+
+const mapClusterRadius = ref(DEFAULT_MAP_CLUSTER_RADIUS);
+const mapClusterMinPoints = ref(DEFAULT_MAP_CLUSTER_MIN_POINTS);
 
 const MAP_MAX_BOUNDS: [[number, number], [number, number]] = [
   [-76.23600195804164, 43.05946664729794], // Top-left (SW)
@@ -1249,9 +1275,9 @@ function initMap() {
 
   // Enable debug features if debug mode is active
   if (isDebugMode.value) {
-    mapboxMap.showCollisionBoxes = true;
-    mapboxMap.showTileBoundaries = true;
-    mapboxMap.showTerrainWireframe = true;
+    // mapboxMap.showCollisionBoxes = true;
+    // mapboxMap.showTileBoundaries = true;
+    // mapboxMap.showTerrainWireframe = true;
 
     logger.debug('Debug mode enabled');
   }
@@ -1471,9 +1497,9 @@ function setupMapLayers() {
       type: 'geojson',
       data: filteredGeoJson,
       cluster: true,
-      clusterRadius: MAP_CLUSTER_RADIUS,
+      clusterRadius: mapClusterRadius.value,
       clusterMaxZoom: MAP_MAX_ZOOM - 1,
-      clusterMinPoints: MAP_CLUSTER_MIN_POINTS,
+      clusterMinPoints: mapClusterMinPoints.value,
     });
 
     // 4. Add icon layers
@@ -1570,6 +1596,59 @@ function updateMapOpacity(event: Event) {
     );
   }
 }
+
+function updateClusterSettings() {
+  if (!mapboxMap) return;
+
+  const sourceId = MapSource.PointsClustered;
+
+  // Remove layers that depend on the source (in correct order)
+  const layersToRemove = [
+    MapLayer.MapClusterIcon,
+    MapLayer.MapClusterCount, // If you have a count label layer
+    MapLayer.MapIcon
+  ];
+
+  layersToRemove.forEach((layerId) => {
+    if (mapboxMap.getLayer(layerId)) {
+      mapboxMap.removeLayer(layerId);
+    }
+  });
+
+  // Now it's safe to remove the source
+  if (mapboxMap.getSource(sourceId)) {
+    mapboxMap.removeSource(sourceId);
+  }
+
+  // Rebuild data
+  const newData = buildCombinedGeoJSONCollection();
+
+  // Add source again with new clustering options
+  mapboxMap.addSource(sourceId, {
+    type: 'geojson',
+    data: newData,
+    cluster: true,
+    clusterRadius: mapClusterRadius.value,
+    clusterMinPoints: mapClusterMinPoints.value,
+    clusterMaxZoom: MAP_MAX_ZOOM - 1,
+  });
+
+  // Re-add your layers
+  addMapIconLayer(mapboxMap, allMaps.value, currentMapIndex.value);
+  addMapClusterIconLayer(mapboxMap, allMaps.value, currentMapIndex.value);
+
+  // Rebind cluster click handler
+  mapboxMap.on('click', MapLayer.MapClusterIcon, handleClusterClick);
+
+  logger.debug('Map cluster settings updated', {
+    clusterRadius: mapClusterRadius.value,
+    clusterMinPoints: mapClusterMinPoints.value,
+  });
+}
+
+const debouncedUpdateClusterSettings = debounce(() => {
+  updateClusterSettings();
+}, 400);
 
 onMounted(async () => {
   appStore.bottomBar.isVisible = true;
@@ -2181,7 +2260,7 @@ onUnmounted(() => {
 .opacity-control {
   position: absolute;
   bottom: 15px;
-  left: 15px;
+  left: 0;
   background-color: rgba(255, 255, 255, 0.85);
   padding: 10px 15px;
   border-radius: 12px;
@@ -2190,7 +2269,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 8px;
   z-index: 5;
-  min-width: 180px;
+  min-width: 160px;
   backdrop-filter: blur(4px);
 
   .debug-title {

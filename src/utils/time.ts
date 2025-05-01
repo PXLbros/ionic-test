@@ -5,3 +5,12 @@ export const convertToEasternTime = (unixTimestamp: number): Date => {
 
   return new Date(date.toLocaleString('en-US', { timeZone: appConfig.timezone }));
 };
+
+export const debounce = (fn: () => void, delay: number) => {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return () => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(fn, delay);
+  };
+};
