@@ -24,6 +24,8 @@ import '@ionic/vue/css/text-transformation.css';
 import '@ionic/vue/css/flex-utils.css';
 import '@ionic/vue/css/display.css';
 
+import { arrowBackOutline } from 'ionicons/icons';
+
 import { FirebaseAnalytics } from '@capacitor-firebase/analytics';
 import { Capacitor } from '@capacitor/core';
 
@@ -48,6 +50,7 @@ const pinia = createPinia();
 const app = createApp(App)
   .use(IonicVue, {
     swipeBackEnabled: true,
+    backButtonIcon: arrowBackOutline,
   })
   .use(router)
   .use(pinia);

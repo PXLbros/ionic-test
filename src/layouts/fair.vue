@@ -7,7 +7,12 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button :default-href="backButtonHref" @click="goBack"></ion-back-button>
+          <ion-back-button
+            :default-href="backButtonHref"
+            text=""
+            style="--icon-margin-start: 2px;"
+            @click="goBack"
+          ></ion-back-button>
         </ion-buttons>
 
         <div class="header-container">

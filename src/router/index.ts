@@ -80,15 +80,15 @@ const routes: Array<RouteRecordRaw> = [
       menuOrder: 1
     }
   },
-  {
-    path: '/fair/tickets',
-    component: () => import('@/views/fair/TicketsPage.vue'),
-    meta: {
-      title: 'Buy Tickets',
-      showInMenu: true,
-      menuOrder: 2
-    }
-  },
+  // {
+  //   path: '/fair/tickets',
+  //   component: () => import('@/views/fair/TicketsPage.vue'),
+  //   meta: {
+  //     title: 'Buy Tickets',
+  //     showInMenu: true,
+  //     menuOrder: 2
+  //   }
+  // },
   {
     path: '/fair/map',
     component: () => import('@/views/fair/MapPage.vue'),

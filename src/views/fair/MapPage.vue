@@ -190,10 +190,10 @@ const DEFAULT_MAP_BEARING = 222; // In degrees
 const DEFAULT_MAP_NAME = 'food-beverage';
 
 const MAP_MIN_ZOOM = 13;
-const MAP_MAX_ZOOM = 17;
+const MAP_MAX_ZOOM = 19;
 
 const MAP_CLUSTER_RADIUS = 50;
-const MAP_CLUSTER_MIN_POINTS = 10;
+const MAP_CLUSTER_MIN_POINTS = 7;
 
 const MAP_MAX_BOUNDS: [[number, number], [number, number]] = [
   [-76.23600195804164, 43.05946664729794], // Top-left (SW)
@@ -515,7 +515,9 @@ function handleLiveSearch() {
 function openSearchSuggestions() {
   if (searchSuggestionsElement.value && wrapperSearchElement.value) {
     const wrapperBottom = wrapperSearchElement.value.getBoundingClientRect().bottom;
-    searchSuggestionsElement.value.style.top = `${wrapperBottom}px`;
+    const searchSuggestionsTopPosition = wrapperBottom + 13;
+
+    searchSuggestionsElement.value.style.top = `${searchSuggestionsTopPosition}px`;
   }
 
   showSearchSuggestions.value = true;
@@ -1672,6 +1674,10 @@ onUnmounted(() => {
       border: 1px solid #eee;
       background-color: #F4E8AB;
       font-size: 16px;
+
+      &:focus {
+        outline: none;
+      }
     }
 
     .search-icon {

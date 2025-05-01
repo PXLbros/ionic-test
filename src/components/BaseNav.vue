@@ -431,7 +431,7 @@ ion-toolbar {
   }
 
   &.router-link-active {
-    color: #000000;
+    color: #FDD252;
     font-weight: 500;
   }
 
@@ -459,7 +459,7 @@ ion-toolbar {
     justify-content: space-between;
     align-items: center;
     padding: 15px 0;
-    color: black;
+    color: #FDD252;
     font-weight: 500;
     font-size: 20px;
 

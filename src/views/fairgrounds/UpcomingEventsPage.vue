@@ -116,14 +116,18 @@
             </div>
           </div>
 
-          <!-- Events for selected day-->
-          <div v-if="getEventsForDate(selectedDate).length > 0" class="day-events">
+          <!-- Events for selected day -->
+          <div v-if="eventsForSelectedDate.length > 0" class="day-events">
             <EventCard
-              v-for="event in getEventsForDate(selectedDate)"
+              v-for="event in eventsForSelectedDate"
               :key="`${event.id}-${event.currentDate.date}`"
               :event="event"
             />
           </div>
+
+          <p v-else class="calendar-grid__no-events">
+            No events on {{ format(selectedDate, 'MMMM d') }}.
+          </p>
         </div>
 
         <!-- List View -->
@@ -136,14 +140,16 @@
           />
 
           <p v-else class="events-list__no-events">
-            No events.
+            No upcoming events in {{ format(selectedDate, 'MMMM') }}.
           </p>
         </div>
 
         <FairgroundsKeepInTouchForm />
 
-        <SocialIcons type="fairgrounds" :social-data="dataStore.data.nysfairWebsite.social" />
-
+        <SocialIcons
+          type="fairgrounds"
+          :social-data="dataStore.data.nysfairWebsite.social"
+        />
       </div>
     </FairgroundsLayout>
 </template>
@@ -371,17 +377,20 @@ const hasEvents = (date: Date): boolean => {
   });
 };
 
-const getEventsForDate = (date: Date): EventWithCurrentDate[] => {
-  if (!date) return [];
+const eventsForSelectedDate = computed(() => {
+  if (!selectedDate.value) return [];
 
-  const zonedDate = toZonedTime(date, appConfig.timezone);
+  const zonedDate = toZonedTime(selectedDate.value, appConfig.timezone);
 
   return events.value.flatMap((event: Event): EventWithCurrentDate[] => {
-    if (!event.enabled || !event.eventDates) return [];
+    if (!event.enabled || !event.eventDates) {
+      return [];
+    }
 
     const matchingDates = event.eventDates.filter((eventDate: NYSFairgroundsEventDate) => {
       const parsedDate = parseISO(eventDate.date);
       const zonedEventDate = toZonedTime(parsedDate, appConfig.timezone);
+
       return isSameDay(zonedEventDate, zonedDate);
     });
 
@@ -390,7 +399,7 @@ const getEventsForDate = (date: Date): EventWithCurrentDate[] => {
       currentDate: matchedDate
     }));
   });
-};
+});
 
 const toggleView = () => {
   viewMode.value = viewMode.value === 'list' ? 'calendar' : 'list';
@@ -724,6 +733,12 @@ const navigateMonth = (direction: number) => {
             font-weight: 500;
           }
         }
+      }
+
+      &__no-events {
+        text-align: center;
+        margin: 25px 0 0;
+        color: #343434;
       }
     }
 
