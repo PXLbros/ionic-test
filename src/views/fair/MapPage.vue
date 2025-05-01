@@ -98,9 +98,6 @@
             class="opacity-slider"
           />
           <div class="opacity-value">{{ Math.round(mapOpacity * 100) }}%</div>
-          <div class="zoom-level"><strong>Zoom Level:</strong> {{ currentZoomLevel.toFixed(2) }}</div>
-
-          <div class="debug-title">Cluster Settings</div>
           <div class="opacity-label">Cluster Radius</div>
           <input
             type="range"
@@ -111,7 +108,6 @@
             class="opacity-slider"
           />
           <div class="opacity-value">{{ mapClusterRadius }}</div>
-
           <div class="opacity-label">Min Points in Cluster</div>
           <input
             type="range"
@@ -122,6 +118,7 @@
             class="opacity-slider"
           />
           <div class="opacity-value">{{ mapClusterMinPoints }}</div>
+          <div class="zoom-level"><strong>Zoom Level</strong> {{ currentZoomLevel.toFixed(2) }}</div>
         </div>
       </ion-content>
     </div>
@@ -256,7 +253,7 @@ const appStore = useAppStore();
 const dataStore = useDataStore();
 
 // isdebug mode if ?debug=1
-const isDebugMode = ref(new URLSearchParams(window.location.search).get('debug') === '1');
+const isDebugMode = ref(true); // ref(new URLSearchParams(window.location.search).get('debug') === '1');
 
 const isWebPSupported = ref(false);
 
@@ -2259,11 +2256,12 @@ onUnmounted(() => {
 /* Opacity slider control */
 .opacity-control {
   position: absolute;
-  bottom: 15px;
+  bottom: 0;
   left: 0;
   background-color: rgba(255, 255, 255, 0.85);
-  padding: 10px 15px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-top-right-radius: 12px;
+  // border-bottom-right-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
@@ -2324,12 +2322,11 @@ onUnmounted(() => {
   }
 
   .zoom-level {
-    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
     font-weight: 500;
     color: #333;
-    margin-top: 4px;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    padding-top: 6px;
   }
 }
 
