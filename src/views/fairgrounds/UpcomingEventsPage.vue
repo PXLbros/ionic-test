@@ -3,12 +3,84 @@
     title="Upcoming Events"
     :showMenuButton="true"
   >
-    <div class="main" id="events">
+    <div class="main">
+      <div v-if="showFiltersOverlay" class="filters-overlay">
+        <div class="wrapper">
+          <div class="main__header">
+            <div class="main__header-toggles">
+              <div class="filter" @click="closeFiltersOverlay()">
+                Close
+              </div>
+            </div>
+          </div>
+
+          <div class="filters-overlay__filters">
+            <div class="filters-overlay__filter-set">
+              <h2>Venue</h2>
+
+              <div class="filters-overlay__filter-set-options">
+                <div
+                  v-for="venue in formattedVenues"
+                  :key="venue.id"
+                  class="filters-overlay__filter-set-option"
+                >
+                  <label :for="`venue-${venue.id}`">
+                    {{ venue.title }}
+                  </label>
+
+                  <input
+                    type="radio"
+                    :id="`venue-${venue.id}`"
+                    :name="`venue`"
+                    :value="venue.id"
+                    v-model="selectedFilterVenueId"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="filters-overlay__filter-set">
+              <h2>Event Type</h2>
+
+              <div class="filters-overlay__filter-set-options">
+                <div
+                  v-for="eventType in formattedEventTypes"
+                  :key="eventType.id"
+                  class="filters-overlay__filter-set-option"
+                >
+                  <label :for="`eventType-${eventType.id}`">
+                    {{ eventType.title }}
+                  </label>
+
+                  <!-- input checkbox -->
+                  <input
+                    type="checkbox"
+                    :id="`eventType-${eventType.id}`"
+                    :name="`eventType`"
+                    :value="eventType.id"
+                    v-model="selectedFilterEventTypeIds"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="filters-overlay__actions">
+            <button
+              class="filters-overlay__apply-button"
+              @click="applyFilters"
+            >
+              Apply Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
       <template v-if="monthsWithUpcomingEvents?.length > 0">
         <div class="wrapper">
           <div class="main__header">
             <div class="main__header-toggles">
-              <div class="filter">
+              <div class="filter" @click="openFiltersOverlay()">
                 <span>
                   <svg width="24" height="15" viewBox="0 0 24 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M23.1441 10.7915H18.1461C17.9558 10.0783 17.5363 9.44756 16.9523 8.99658C16.3683 8.5456 15.6523 8.29945 14.9146 8.29611C14.1774 8.30005 13.462 8.54648 12.8786 8.99741C12.2951 9.44834 11.8761 10.0788 11.6859 10.7915H0.861355C0.748601 10.7912 0.636879 10.813 0.532569 10.8559C0.428259 10.8987 0.333402 10.9617 0.253418 11.0413C0.173433 11.1208 0.109889 11.2153 0.0664069 11.3194C0.0229249 11.4235 0.000359663 11.5352 0 11.6481C0.000726013 11.8747 0.0912149 12.0919 0.251643 12.2519C0.412071 12.412 0.629352 12.5018 0.855868 12.5018H11.6887C11.8778 13.2149 12.2961 13.8458 12.8791 14.2973C13.4621 14.7488 14.1774 14.9957 14.9146 15C15.6522 14.9959 16.3678 14.7491 16.9513 14.2976C17.5348 13.8461 17.9537 13.2151 18.1433 12.5018H23.1441C23.2569 12.5022 23.3685 12.4802 23.4727 12.4371C23.5769 12.394 23.6715 12.3307 23.7511 12.2508C23.8307 12.1709 23.8937 12.076 23.9364 11.9716C23.9791 11.8672 24.0007 11.7554 24 11.6426C24.0003 11.5301 23.9781 11.4188 23.9348 11.3151C23.8915 11.2113 23.8278 11.1173 23.7476 11.0386C23.5871 10.8795 23.3701 10.7907 23.1441 10.7915Z" fill="#333333"/>
@@ -195,6 +267,10 @@ const dateScrollRef = ref<HTMLElement | null>(null);
 const currentMonthRef = ref<HTMLElement | null>(null);
 const showMyFavoritesContainer = ref(true);
 
+const showFiltersOverlay = ref(false);
+const selectedFilterVenueId = ref<string | null>(null);
+const selectedFilterEventTypeIds = ref<string[]>([]);
+
 const scrollToSelectedMonth = async () => {
   await nextTick();
 
@@ -228,6 +304,8 @@ const monthsWithUpcomingEvents = computed(() => {
       }
     });
   });
+
+  console.log('monthsSet', monthsSet);
 
   // Convert back to Date[] and sort
   return Array.from(monthsSet)
@@ -452,6 +530,34 @@ const navigateMonth = (direction: number) => {
   }
 };
 
+const openFiltersOverlay = () => {
+  showFiltersOverlay.value = true;
+};
+
+const closeFiltersOverlay = () => {
+  showFiltersOverlay.value = false;
+};
+
+const applyFilters = () => {
+  alert('Apply filters!');
+};
+
+const formattedVenues = computed(() => {
+  if (!dataStore.data.nysfairgroundsWebsite.venues) {
+    return [];
+  }
+
+  return dataStore.data.nysfairgroundsWebsite.venues;
+});
+
+const formattedEventTypes = computed(() => {
+  if (!dataStore.data.nysfairgroundsWebsite.eventTypes) {
+    return [];
+  }
+
+  return dataStore.data.nysfairgroundsWebsite.eventTypes;
+});
+
 onMounted(async () => {
   // Use a slight delay to ensure everything is rendered and measured
   setTimeout(scrollToSelectedMonth, 100);
@@ -459,6 +565,7 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
+$horizontal-padding: 30px;
 
 .main {
   padding-bottom: v-bind('appConfig.bottomBar.height');
@@ -474,7 +581,7 @@ onMounted(async () => {
       flex-direction: column;
 
       &-title {
-        padding: 30px;
+        padding: 30px $horizontal-padding;
         color: #343434;
         font-size: 24px;
         font-weight: 600;
@@ -484,12 +591,12 @@ onMounted(async () => {
       }
 
       &-toggles {
-        padding: 0 30px;
+        padding: 0 $horizontal-padding;
         display: flex;
         width: 100%;
         justify-content: space-between;
         align-items: center;
-        height: 44px;
+        height: v-bind('appConfig.toolbar.height');
 
         .filter {
           font-size: 14px;
@@ -501,7 +608,7 @@ onMounted(async () => {
       }
 
       &-search {
-        padding: 0 30px 20px;
+        padding: 0 $horizontal-padding 20px;
         margin-top: 10px;
 
         .search-container {
@@ -534,7 +641,7 @@ onMounted(async () => {
   .date-scroll {
     display: flex;
     overflow-x: auto;
-    padding: 0 30px 20px;
+    padding: 0 $horizontal-padding 20px;
     gap: 10px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -610,7 +717,7 @@ onMounted(async () => {
   }
 
   .search-results-header {
-    padding: 20px 30px;
+    padding: 20px $horizontal-padding;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -813,5 +920,39 @@ onMounted(async () => {
   color: #343434;
   background-color: #fff;
   height: 80px
+}
+
+.filters-overlay {
+  position: fixed;
+  top: v-bind('appConfig.toolbar.height');
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: auto;
+  background-color: #fff;
+  z-index: 99999;
+
+  .wrapper {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(v-bind('appConfig.bottomBar.height') + 2rem);
+  }
+
+  &__filters {
+    padding: 0 $horizontal-padding;
+  }
+
+  &__filter-set {
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: space-between;
+  }
+
+  &__filter-set-option {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
 }
 </style>
