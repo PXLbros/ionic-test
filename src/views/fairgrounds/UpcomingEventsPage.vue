@@ -271,6 +271,10 @@ const showFiltersOverlay = ref(false);
 const selectedFilterVenueId = ref<string | null>(null);
 const selectedFilterEventTypeIds = ref<string[]>([]);
 
+// State for applied filters
+const appliedFilterVenueId = ref<string | null>(null);
+const appliedFilterEventTypeIds = ref<string[]>([]);
+
 const scrollToSelectedMonth = async () => {
   await nextTick();
 
@@ -381,10 +385,18 @@ const formattedCalendarDays = computed(() => {
   });
 });
 
+const applyFilters = () => {
+  appliedFilterVenueId.value = selectedFilterVenueId.value;
+  appliedFilterEventTypeIds.value = [...selectedFilterEventTypeIds.value];
+
+  closeFiltersOverlay();
+};
+
 const filteredEvents = computed(() => {
   return events.value.flatMap((event: FairgroundsEvent): EventWithCurrentDate[] => {
     if (!event.enabled || !event.dates || event.dates.length === 0) return [];
 
+    // Filter by search query
     if (searchQuery.value) {
       if (event.title.toLowerCase().includes(searchQuery.value.toLowerCase())) {
         const upcomingDates = event.dates.filter((date: FairgroundsEventDate) => date.is_upcoming);
@@ -393,6 +405,19 @@ const filteredEvents = computed(() => {
       return [];
     }
 
+    // Filter by applied venue
+    if (appliedFilterVenueId.value) {
+      const venueIds = event.eventVenues?.map(venue => venue.id) || [];
+      if (!venueIds.includes(appliedFilterVenueId.value)) return [];
+    }
+
+    // Filter by applied event types
+    if (appliedFilterEventTypeIds.value.length > 0) {
+      const eventTypeIds = event.eventTypes?.map(type => type.id) || [];
+      if (!appliedFilterEventTypeIds.value.some(id => eventTypeIds.includes(id))) return [];
+    }
+
+    // Filter by upcoming dates in the selected month
     return event.dates
       .filter(date => date.is_upcoming)
       .map(date => {
@@ -536,10 +561,6 @@ const openFiltersOverlay = () => {
 
 const closeFiltersOverlay = () => {
   showFiltersOverlay.value = false;
-};
-
-const applyFilters = () => {
-  alert('Apply filters!');
 };
 
 const formattedVenues = computed(() => {

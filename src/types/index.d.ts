@@ -171,4 +171,6 @@ export interface FairgroundsEvent {
   enabled: boolean;
   eventContactEmail: string;
   eventContactPhone: string;
+  eventVenues: FairgroundsVenue[];
+  eventTypes: any[];
 }
