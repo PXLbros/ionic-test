@@ -7,9 +7,12 @@
       <div v-if="showFiltersOverlay" class="filters-overlay">
         <div class="wrapper">
           <div class="main__header">
-            <div class="main__header-toggles">
+            <div class="main__header-toggles" style="justify-content: space-between;">
               <div class="filter" @click="closeFiltersOverlay()">
                 Close
+              </div>
+              <div class="filter" @click="resetFilters" style="margin-left:auto;">
+                Reset
               </div>
             </div>
           </div>
@@ -563,6 +566,14 @@ const closeFiltersOverlay = () => {
   showFiltersOverlay.value = false;
 };
 
+const resetFilters = () => {
+  selectedFilterVenueId.value = null;
+  selectedFilterEventTypeIds.value = [];
+  appliedFilterVenueId.value = null;
+  appliedFilterEventTypeIds.value = [];
+  // closeFiltersOverlay();
+};
+
 const formattedVenues = computed(() => {
   if (!dataStore.data.nysfairgroundsWebsite.venues) {
     return [];
@@ -993,6 +1004,8 @@ $horizontal-padding: 30px;
     width: 100%;
     padding: 30px 0;
     font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 1.6px;
   }
 }
 </style>
