@@ -637,6 +637,11 @@ $horizontal-padding: 30px;
           display: flex;
           gap: 5px;
         }
+
+        .filter,
+        .calendar {
+          cursor: pointer;
+        }
       }
 
       &-search {
