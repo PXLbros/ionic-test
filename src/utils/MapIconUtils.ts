@@ -229,7 +229,6 @@ export async function loadCategoryIcons({
 
   // Load category icons
   categoryIconMap.forEach((iconUrl, iconId) => {
-    console.log('iconUrl', iconUrl, ' - iconId', iconId);
     if (iconUrl) {
       loadPromises.push(loadImage(iconUrl, iconId));
     }

@@ -2334,6 +2334,7 @@ onUnmounted(() => {
     font-size: 13px;
     font-weight: 500;
     color: #333;
+    margin-top: 0.5rem;
   }
 }
 
