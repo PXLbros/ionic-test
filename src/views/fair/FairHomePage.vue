@@ -361,17 +361,22 @@ ion-col {
     @media (max-height: 950px) {
       max-height: 14vh;
     }
+
+    // 667px height
+    @media (max-height: 667px) {
+      margin-top: 35px;
+    }
   }
 
   &-button {
-    padding: 10px;
+    padding: 5px 10px 10px 10px;
     border-radius: 30px;
     box-shadow: 0px 3px 0px 0px #2C4B8C;
     border: 4px solid #33559C;
     background: linear-gradient(180deg, #32539A 0%, #1F3667 100%);
     gap: 5px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     flex-direction: column;
     width: 34vw;
@@ -383,8 +388,15 @@ ion-col {
       height: 16vh;
     }
 
+    // For screens <= 667px height
+    @media (max-height: 667px) {
+      width: 34vw;
+      height: 15vh;
+    }
+
     &__icon {
       max-width: 60px;
+      max-height: 60px;
 
       // Smaller screens
       @media (max-height: 845px) {
@@ -403,13 +415,15 @@ ion-col {
       text-align: center;
       margin: 0px;
       padding: 0px 5px;
-      flex-grow: 1;
+      // flex-grow: 1;
       color: #FFF;
+      width: 100px;
 
       // Smaller screens
       @media (max-height: 845px) {
         font-size: 16px;
         padding: 0px;
+        width: 90px;
       }
     }
   }
