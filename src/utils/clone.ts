@@ -11,10 +11,18 @@ export function cloneDeep<T>(value: T): T {
 
   // Handle plain objects
   const clonedObj: any = {};
+
+  const forbiddenKeys = ['__proto__', 'constructor', 'prototype'];
+
   for (const key in value) {
-    if (Object.prototype.hasOwnProperty.call(value, key)) {
+    if (
+      Object.prototype.hasOwnProperty.call(value, key) &&
+      !forbiddenKeys.includes(key)
+    ) {
+      // eslint-disable-next-line security/detect-object-injection
       clonedObj[key] = cloneDeep((value as any)[key]);
     }
   }
+
   return clonedObj;
 }

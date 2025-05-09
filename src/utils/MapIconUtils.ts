@@ -1,6 +1,7 @@
 // mapIconUtils.ts
 import mapboxgl, { DataDrivenPropertyValueSpecification } from 'mapbox-gl';
 import { useLogger } from '@/composables/useLogger';
+import { isSafeKey } from './text';
 
 const logger = useLogger();
 
@@ -71,29 +72,23 @@ export async function loadCategoryIcons({
   config?: CategoryIconLoadingConfig
 }): Promise<void> {
   // Create a mapping of category IDs to their icon URLs
-  const categoryIconMap: Record<string, string> = {};
+  const categoryIconMap = new Map<string, string>();
   const loadErrors: string[] = [];
 
   maps.forEach((map: any) => {
-    // if (map.map_cluster_icon) {
-    //   const key = `map-cluster-icon-${map.slug}`;
-
-    //   categoryIconMap[key] = map.map_cluster_icon;
-    // }
-
-    // if (map.map_icon) {
-    //   const key = `map-icon-${map.slug}`;
-
-    //   categoryIconMap[key] = map.map_icon;
-    // }
-
     const slug = map.slug;
+
+    if (!isSafeKey(slug)) {
+      logger.warn('Skipping map with unsafe slug', { Slug: slug });
+
+      return;
+    }
 
     const clusterKey = `map-cluster-icon-${slug}`;
     const iconKey = `map-icon-${slug}`;
 
-    categoryIconMap[clusterKey] = map.map_cluster_icon || '/icons/default-map-cluster-icon.png';
-    categoryIconMap[iconKey] = map.map_icon || '/icons/default-map-icon.png';
+    categoryIconMap.set(clusterKey, map.map_cluster_icon || '/icons/default-map-cluster-icon.png');
+    categoryIconMap.set(iconKey, map.map_icon || '/icons/default-map-icon.png');
   });
 
   // Helper function to load an image with modern Mapbox API
@@ -233,7 +228,8 @@ export async function loadCategoryIcons({
   const loadPromises: Promise<void>[] = [];
 
   // Load category icons
-  Object.entries(categoryIconMap).forEach(([iconId, iconUrl]) => {
+  categoryIconMap.forEach((iconUrl, iconId) => {
+    console.log('iconUrl', iconUrl, ' - iconId', iconId);
     if (iconUrl) {
       loadPromises.push(loadImage(iconUrl, iconId));
     }
@@ -246,7 +242,9 @@ export async function loadCategoryIcons({
   loadPromises.push(loadImage('/icons/default-map-cluster-icon.png', 'default-map-cluster-icon'));
   loadPromises.push(loadImage('/icons/default-map-icon.png', 'default-map-icon'));
 
-  const numCategoryIcons = Object.keys(categoryIconMap).length;
+  const numCategoryIcons = categoryIconMap.size;
+
+  console.log('numCategoryIcons', numCategoryIcons);
 
   // Wait for all icons to load
   try {

@@ -3,6 +3,7 @@ import vue from 'eslint-plugin-vue';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import vueParser from 'vue-eslint-parser';
+import pluginSecurity from 'eslint-plugin-security';
 
 export default [
   {
@@ -44,8 +45,10 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
+      security: pluginSecurity,
     },
     rules: {
+      ...pluginSecurity.configs.recommended.rules,
       'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       '@typescript-eslint/no-explicit-any': 'off',
