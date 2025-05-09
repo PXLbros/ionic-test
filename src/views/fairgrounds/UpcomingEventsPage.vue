@@ -70,7 +70,7 @@
               class="filters-overlay__apply-button"
               @click="applyFilters"
             >
-              Apply Filters
+              Apply
             </button>
           </div>
         </div>
@@ -957,7 +957,7 @@ $horizontal-padding: 30px;
     height: 100%;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: calc(v-bind('appConfig.bottomBar.height') + 2rem);
+    padding-bottom: calc(v-bind('appConfig.bottomBar.height') + 10rem);
   }
 
   &__filters {
@@ -974,6 +974,25 @@ $horizontal-padding: 30px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+  }
+
+  &__actions {
+    position: absolute;
+    bottom: v-bind('appConfig.bottomBar.height');
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 30px 40px;
+    z-index: 1;
+  }
+
+  &__apply-button {
+    background: #3b71ca;
+    border-radius: 4px;
+    color: #fff;
+    width: 100%;
+    padding: 30px 0;
+    font-size: 16px;
   }
 }
 </style>

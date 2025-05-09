@@ -309,7 +309,7 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], cur
       'text-offset': [-0.05, -2.9],
       'text-anchor': 'center',
       'text-justify': 'center',
-      'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'], // Make text bold
+      'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
     },
     paint: {
       'text-color': '#ffffff'
