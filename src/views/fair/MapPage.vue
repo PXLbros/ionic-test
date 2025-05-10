@@ -2,7 +2,7 @@
   <FairLayout title="Interactive Map" :showMenuButton="true">
     <div :class="{ 'main--full-height': showSearchSuggestions }" class="main">
       <div class="main__header">
-        <div class="wrapper wrapper--search">
+        <div ref="searchWrapperElement" class="wrapper wrapper--search">
           <div class="search-container" ref="wrapperSearchElement">
             <input
               type="text"
@@ -47,18 +47,17 @@
               </div>
             </div>
           </div>
-          <div ref="btnGroup" class="group">
+          <div class="group">
             <button class="filter-button" @click="toggleFiltersPanel">
-              <ion-icon size="small" :icon="optionsOutline"></ion-icon>
-              Filter
+              <ion-icon :icon="optionsOutline" class="filter-icon"></ion-icon>
+
               <span class="badge" v-if="selectedFilterCount > 0">
                 {{ selectedFilterCount }}
               </span>
             </button>
-            <!-- <button class="filter-button" @click="resetFilters">
-              <ion-icon size="small" :icon="refreshOutline"></ion-icon>
-              Reset
-            </button> -->
+          </div>
+          <div class="sponsored-column">
+            <img :src="sponsorshipMicronSvg" />
           </div>
         </div>
 
@@ -207,6 +206,7 @@ import { cloneDeep } from '@/utils/clone';
 import { useDataStore } from '@/stores/data';
 import appConfig from '@/config/app';
 import { debounce } from '@/utils/time';
+import sponsorshipMicronSvg from '@/imgs/svg/sponsorship-micron.svg';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_ACCESS_TOKEN as string;
 
@@ -237,7 +237,8 @@ const showMapDropdown = ref(false);
 const currentMapSlug = ref<string | null>(null);
 const searchQuery = ref('');
 const searchDebounceTimeout = ref<number | null>(null);
-const btnGroup = ref<HTMLElement | null>(null);
+
+const searchWrapperElement = ref<HTMLElement | null>(null);
 
 // Add new refs for filters modal
 const selectedCategories = ref<Record<number, boolean>>({});
@@ -555,7 +556,7 @@ function openSearchSuggestions() {
 function handleFocus() {
   openSearchSuggestions();
 
-  btnGroup.value?.classList.add('search-focused');
+  searchWrapperElement?.value?.classList.add('wrapper--search-focused');
 
   // Generate initial suggestions without requiring any text input
   generateInitialSuggestions();
@@ -563,11 +564,6 @@ function handleFocus() {
 
 // When the input loses focus, hide the suggestions after a short delay
 function handleBlur() {
-  // Use setTimeout to allow clicks on suggestions to register before closing
-  // setTimeout(() => {
-  //   showSearchSuggestions.value = false;
-  //   btnGroup.value?.classList.remove('search-focused');
-  // }, 150);
 }
 
 function generateInitialSuggestions() {
@@ -740,7 +736,7 @@ function clearSearch() {
   searchQuery.value = '';
   showSearchSuggestions.value = false;
   filteredSuggestions.value = [];
-  btnGroup.value?.classList.remove('search-focused');
+  searchWrapperElement.value?.classList.remove('wrapper--search-focused');
 
   // Simply call the resetFilters function to handle the rest
   // This ensures consistent behavior between search clear and reset button
@@ -1707,15 +1703,17 @@ onUnmounted(() => {
   justify-content: space-between;
   padding: 20px 20px 0 20px;
 
+  // &--search-focused {
+  //   .group {
+  //     display: none;
+  //   }
+  // }
+
   .group {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
-
-    &.search-focused {
-      display: none;
-    }
 
     .filter-button {
       background-color: transparent;
@@ -1727,6 +1725,10 @@ onUnmounted(() => {
       align-items: center;
       gap: 5px;
       position: relative;
+
+      .filter-icon {
+        font-size: 1.75rem;
+      }
 
       svg {
         font-size: 34px;
@@ -1770,6 +1772,26 @@ onUnmounted(() => {
       color: #666;
       cursor: pointer;
     }
+  }
+
+  .sponsored-column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    img {
+      display: block;
+      width: 160px;
+      height: auto;
+    }
+  }
+}
+
+.wrapper.wrapper--search-focused {
+  .group,
+  .sponsored-column{
+    display: none;
   }
 }
 
@@ -2184,7 +2206,7 @@ onUnmounted(() => {
 .suggestion-item {
   display: flex;
   padding: 14px 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #ded285;
   cursor: pointer;
   transition: background-color 0.2s ease;
   align-items: center;
@@ -2341,7 +2363,7 @@ onUnmounted(() => {
 .opacity-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+   justify-content: space-between;
   // gap: 10px;
 }
 
