@@ -123,6 +123,18 @@
             />
             <div class="opacity-value">{{ mapClusterMinPoints }}</div>
           </div>
+          <div class="opacity-label">Cluster Zoom-In Amount</div>
+          <div class="opacity-row">
+            <input
+              type="range"
+              min="0.1"
+              max="4"
+              step="0.1"
+              v-model.number="clusterZoomInAmount"
+              class="opacity-slider"
+            />
+            <div class="opacity-value">{{ clusterZoomInAmount.toFixed(2) }}</div>
+          </div>
           <div class="zoom-level"><strong>Zoom Level</strong> {{ currentZoomLevel.toFixed(2) }}</div>
         </div>
       </ion-content>
@@ -190,7 +202,6 @@
 
 <script setup lang="ts">
 import FairLayout from '@/layouts/fair.vue';
-// import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import {
   IonIcon,
   IonContent,
@@ -252,6 +263,9 @@ const mapOpacity = ref(1); // Default to fully visible (100%)
 const showSearchSuggestions = ref(false);
 const filteredSuggestions = ref<SearchSuggestion[]>([]);
 const maxSuggestionsToShow = 5;
+
+// New ref for zoom-in amount past cluster expansion
+const clusterZoomInAmount = ref(0.5); // Default value for zoom-in past expansion
 
 const logger = useLogger();
 
@@ -1431,11 +1445,16 @@ function handleClusterClick(e: mapboxgl.MapMouseEvent) {
       return;
     }
 
+    logger.info('Cluster clicked', {
+      'Cluster ID': clusterId,
+      'Zoom Level': zoom,
+    });
+
     const [lng, lat] = (cluster.geometry as Point).coordinates;
 
     mapboxMap.easeTo({
       center: [lng, lat],
-      zoom: Math.min(zoom + 0.5, MAP_MAX_ZOOM), // Zoom in slightly past the expansion level
+      zoom: Math.min(zoom + clusterZoomInAmount.value, MAP_MAX_ZOOM), // Use slider value
       duration: 500,
     });
   });
@@ -2342,6 +2361,8 @@ onUnmounted(() => {
       border: none;
     }
   }
+
+
 
   .opacity-value {
     font-size: 12px;

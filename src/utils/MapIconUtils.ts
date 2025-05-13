@@ -243,8 +243,6 @@ export async function loadCategoryIcons({
 
   const numCategoryIcons = categoryIconMap.size;
 
-  console.log('numCategoryIcons', numCategoryIcons);
-
   // Wait for all icons to load
   try {
     await Promise.all(loadPromises);
