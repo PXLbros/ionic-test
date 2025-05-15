@@ -15,7 +15,7 @@
               @blur="handleBlur"
             />
             <ion-icon
-              :icon="showSearchSuggestions ? closeOutline : searchOutline"
+              :icon="showSearchSuggestions ? closeOutlineIcon : searchOutlineIcon"
               class="search-icon"
               @click="clearSearch"
             ></ion-icon>
@@ -49,7 +49,7 @@
           </div>
           <div class="group">
             <button class="filter-button" @click="toggleFiltersPanel">
-              <ion-icon :icon="optionsOutline" class="filter-icon"></ion-icon>
+              <ion-icon :icon="optionsOutlineIcon" class="filter-icon"></ion-icon>
 
               <span class="badge" v-if="selectedFilterCount > 0">
                 {{ selectedFilterCount }}
@@ -65,7 +65,7 @@
           <div class="map-dropdown">
             <button class="filter-tab" @click="toggleMapDropdown">
               {{ currentMapName }}
-              <ion-icon :icon="chevronDownOutline"></ion-icon>
+              <ion-icon :icon="chevronDownOutlineIcon"></ion-icon>
             </button>
             <div class="dropdown-content" v-if="showMapDropdown">
               <div
@@ -86,56 +86,61 @@
       <ion-content class="map-container">
         <div class="map" ref="mapContainer"></div>
 
-        <div v-if="isDebugMode" class="opacity-control">
-          <div class="opacity-label">Overlay Opacity</div>
-          <div class="opacity-row">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              :value="mapOpacity * 100"
-              @input="updateMapOpacity($event)"
-              class="opacity-slider"
-            />
-            <div class="opacity-value">{{ Math.round(mapOpacity * 100) }}%</div>
-          </div>
-          <div class="opacity-label">Cluster Radius</div>
-          <div class="opacity-row">
-            <input
-              type="range"
-              min="10"
-              max="100"
-              :value="mapClusterRadius"
-              @input="(e: any) => { mapClusterRadius = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
-              class="opacity-slider"
-            />
-            <div class="opacity-value">{{ mapClusterRadius }}</div>
-          </div>
-          <div class="opacity-label">Min Points in Cluster</div>
-          <div class="opacity-row">
-            <input
-              type="range"
-              min="1"
-              max="20"
-              :value="mapClusterMinPoints"
-              @input="(e: any) => { mapClusterMinPoints = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
-              class="opacity-slider"
-            />
-            <div class="opacity-value">{{ mapClusterMinPoints }}</div>
-          </div>
-          <div class="opacity-label">Cluster Zoom-In Amount</div>
-          <div class="opacity-row">
-            <input
-              type="range"
-              min="0.1"
-              max="4"
-              step="0.1"
-              v-model.number="clusterClickZoomInAmount"
-              class="opacity-slider"
-            />
-            <div class="opacity-value">{{ clusterClickZoomInAmount.toFixed(2) }}</div>
-          </div>
-          <div class="zoom-level"><strong>Zoom Level</strong> {{ currentZoomLevel.toFixed(2) }}</div>
+        <div v-if="isDebugMode" class="opacity-control" :class="{ minimized: opacityControlMinimized }">
+          <button :class="{ 'expanded': !opacityControlMinimized }" class="opacity-minimize-btn" @click="opacityControlMinimized = !opacityControlMinimized">
+            <ion-icon :icon="opacityControlMinimized ? expandOutlineIcon : closeIcon"></ion-icon>
+          </button>
+          <template v-if="!opacityControlMinimized">
+            <div class="opacity-label">Overlay Opacity</div>
+            <div class="opacity-row">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                :value="mapOpacity * 100"
+                @input="updateMapOpacity($event)"
+                class="opacity-slider"
+              />
+              <div class="opacity-value">{{ Math.round(mapOpacity * 100) }}%</div>
+            </div>
+            <div class="opacity-label">Cluster Radius</div>
+            <div class="opacity-row">
+              <input
+                type="range"
+                min="10"
+                max="100"
+                :value="mapClusterRadius"
+                @input="(e: any) => { mapClusterRadius = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
+                class="opacity-slider"
+              />
+              <div class="opacity-value">{{ mapClusterRadius }}</div>
+            </div>
+            <div class="opacity-label">Min Points in Cluster</div>
+            <div class="opacity-row">
+              <input
+                type="range"
+                min="1"
+                max="20"
+                :value="mapClusterMinPoints"
+                @input="(e: any) => { mapClusterMinPoints = parseInt(e.target.value); debouncedUpdateClusterSettings(); }"
+                class="opacity-slider"
+              />
+              <div class="opacity-value">{{ mapClusterMinPoints }}</div>
+            </div>
+            <div class="opacity-label">Cluster Zoom-In Amount</div>
+            <div class="opacity-row">
+              <input
+                type="range"
+                min="0.1"
+                max="4"
+                step="0.1"
+                v-model.number="clusterClickZoomInAmount"
+                class="opacity-slider"
+              />
+              <div class="opacity-value">{{ clusterClickZoomInAmount.toFixed(2) }}</div>
+            </div>
+            <div class="zoom-level"><strong>Zoom Level</strong> {{ currentZoomLevel.toFixed(2) }}</div>
+          </template>
         </div>
       </ion-content>
     </div>
@@ -145,7 +150,7 @@
       <div class="filter-panel__header">
         <div class="filter-panel__header-column filter-panel__header-column--left">
           <button class="close-button" @click="toggleFiltersPanel">
-            <ion-icon :icon="closeOutline"></ion-icon>
+            <ion-icon :icon="closeOutlineIcon"></ion-icon>
           </button>
           <span>Filters</span>
         </div>
@@ -206,7 +211,14 @@ import {
   IonIcon,
   IonContent,
 } from '@ionic/vue';
-import { searchOutline, chevronDownOutline, optionsOutline, closeOutline } from 'ionicons/icons';
+import {
+  close as closeIcon,
+  searchOutline as searchOutlineIcon,
+  chevronDownOutline as chevronDownOutlineIcon,
+  optionsOutline as optionsOutlineIcon,
+  closeOutline as closeOutlineIcon,
+  expandOutline as expandOutlineIcon
+} from 'ionicons/icons';
 import mapboxgl, { Map as MapboxMap } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Feature, Point, FeatureCollection } from 'geojson';
@@ -278,7 +290,9 @@ const dataStore = useDataStore();
 // isdebug mode if ?debug=1
 const isDebugMode = ref(true); // ref(new URLSearchParams(window.location.search).get('debug') === '1');
 
+// Overlay opacity control minimize state
 const isWebPSupported = ref(false);
+const opacityControlMinimized = ref(true); // Start minimized
 
 const clusterConfigByZoomRange = [
   {

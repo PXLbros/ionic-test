@@ -611,6 +611,41 @@
   // min-width: 160px;
   backdrop-filter: blur(4px);
 
+  .opacity-minimize-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-bottom: 4px;
+    font-size: 24px;
+    color: #333;
+    padding: 4px 4px 0;
+    border-radius: 6px;
+    transition: background 0.15s;
+
+    &:hover {
+      background: #eee;
+    }
+
+    &.expanded {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      padding: 0;
+      font-size: 16px;
+    }
+  }
+
+  &.minimized {
+    padding: 10px 12px 10px 12px;
+    .opacity-minimize-btn {
+      margin-bottom: 0;
+    }
+    > *:not(.opacity-minimize-btn) {
+      display: none !important;
+    }
+  }
+
   .debug-title {
     font-size: 14px;
     font-weight: 700;
