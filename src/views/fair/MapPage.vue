@@ -130,10 +130,10 @@
               min="0.1"
               max="4"
               step="0.1"
-              v-model.number="clusterZoomInAmount"
+              v-model.number="clusterClickZoomInAmount"
               class="opacity-slider"
             />
-            <div class="opacity-value">{{ clusterZoomInAmount.toFixed(2) }}</div>
+            <div class="opacity-value">{{ clusterClickZoomInAmount.toFixed(2) }}</div>
           </div>
           <div class="zoom-level"><strong>Zoom Level</strong> {{ currentZoomLevel.toFixed(2) }}</div>
         </div>
@@ -232,6 +232,7 @@ const MAP_MAX_ZOOM = 19;
 
 const DEFAULT_MAP_CLUSTER_RADIUS = 23;
 const DEFAULT_MAP_CLUSTER_MIN_POINTS = 3;
+const DEFAULT_MAP_CLUSTER_CLICK_ZOOM_IN_AMOUNT = 2;
 
 const mapClusterRadius = ref(DEFAULT_MAP_CLUSTER_RADIUS);
 const mapClusterMinPoints = ref(DEFAULT_MAP_CLUSTER_MIN_POINTS);
@@ -266,7 +267,7 @@ const filteredSuggestions = ref<SearchSuggestion[]>([]);
 const maxSuggestionsToShow = 5;
 
 // New ref for zoom-in amount past cluster expansion
-const clusterZoomInAmount = ref(0.5); // Default value for zoom-in past expansion
+const clusterClickZoomInAmount = ref(DEFAULT_MAP_CLUSTER_CLICK_ZOOM_IN_AMOUNT); // Default value for zoom-in past expansion
 
 const logger = useLogger();
 
@@ -278,6 +279,39 @@ const dataStore = useDataStore();
 const isDebugMode = ref(true); // ref(new URLSearchParams(window.location.search).get('debug') === '1');
 
 const isWebPSupported = ref(false);
+
+const clusterConfigByZoomRange = [
+  {
+    minZoom: MAP_MIN_ZOOM,
+    maxZoom: 16,
+    clusterRadius: DEFAULT_MAP_CLUSTER_RADIUS,
+    clusterMinPoints: DEFAULT_MAP_CLUSTER_MIN_POINTS,
+    clusterClickZoomInAmount: DEFAULT_MAP_CLUSTER_CLICK_ZOOM_IN_AMOUNT,
+  },
+  {
+    minZoom: 16,
+    maxZoom: MAP_MAX_ZOOM + 1,
+    clusterRadius: 66,
+    clusterMinPoints: 6,
+    clusterClickZoomInAmount: 1.5,
+  }
+];
+
+function getClusterConfig(zoom: number) {
+  for (const config of clusterConfigByZoomRange) {
+    if (zoom >= config.minZoom && zoom < config.maxZoom) {
+      return config;
+    }
+  }
+
+  console.warn(`No cluster config found for zoom ${zoom}, using default.`);
+
+  return {
+    clusterRadius: DEFAULT_MAP_CLUSTER_RADIUS,
+    clusterMinPoints: DEFAULT_MAP_CLUSTER_MIN_POINTS,
+    clusterClickZoomInAmount: DEFAULT_MAP_CLUSTER_CLICK_ZOOM_IN_AMOUNT,
+  };
+}
 
 const vendors = dataStore.data.nysfairWebsite.vendors;
 const services = dataStore.data.nysfairWebsite.services;
@@ -1330,6 +1364,42 @@ function initMap() {
     currentZoomLevel.value = mapboxMap.getZoom();
   });
 
+  mapboxMap.on('zoomend', () => {
+    const zoom = mapboxMap.getZoom();
+    const { clusterRadius, clusterMinPoints, clusterClickZoomInAmount: newZoomInAmount } = getClusterConfig(zoom);
+
+    logger.info('Zoom level changed', {
+      'Zoom Level': mapboxMap.getZoom(),
+      'Cluster Radius': clusterRadius,
+      'Cluster Min Points': clusterMinPoints,
+      'Cluster Click Zoom-In Amount': newZoomInAmount,
+    });
+
+    // Track previous values
+    const prevClusterRadius = mapClusterRadius.value;
+    const prevClusterMinPoints = mapClusterMinPoints.value;
+    const prevZoomInAmount = clusterClickZoomInAmount.value;
+
+    // Only update and call updateClusterSettings if values changed
+    let clusterSettingsChanged = prevClusterRadius !== clusterRadius ||
+      prevClusterMinPoints !== clusterMinPoints ||
+      prevZoomInAmount !== newZoomInAmount;
+
+    if (clusterSettingsChanged) {
+      mapClusterRadius.value = clusterRadius;
+      mapClusterMinPoints.value = clusterMinPoints;
+      clusterClickZoomInAmount.value = newZoomInAmount;
+
+      updateClusterSettings();
+
+      logger.info('Updated cluster settings', {
+        'Cluster Radius': mapClusterRadius.value,
+        'Cluster Min Points': mapClusterMinPoints.value,
+        'Cluster Click Zoom-In Amount': clusterClickZoomInAmount.value,
+      });
+    }
+  });
+
   mapboxMap.on('click', (e) => {
     if (isDebugMode.value) {
       logger.debug('Map clicked at coordinates:', {
@@ -1350,18 +1420,7 @@ async function loadMapResources() {
   try {
     // const numMaps = maps?.length || 0;
     const numServiceMaps = maps?.filter((m: any) => m.type === 'service')?.length || 0;
-    const numVendorMaps = maps?.filter((m: any) => m.type === 'vendor')?.length || 0;
-    const numServiceCategories = serviceCategories?.length || 0;
-    const numVendorCategories = vendorCategories?.length || 0;
-
-    logger.info('Loading category icons...', {
-      'Service Maps': numServiceMaps,
-      'Vendor Maps': numVendorMaps,
-      'Service Categories': numServiceCategories,
-      'Vendor Categories': numVendorCategories,
-    });
-
-    // Load category icons
+    const numVendorMaps = maps?.filter((m: any) => m.type === 'vendor')
     await loadCategoryIcons({ map: mapboxMap, maps });
 
     // // Load map overlay image
@@ -1455,7 +1514,7 @@ function handleClusterClick(e: mapboxgl.MapMouseEvent) {
 
     mapboxMap.easeTo({
       center: [lng, lat],
-      zoom: Math.min(zoom + clusterZoomInAmount.value, MAP_MAX_ZOOM), // Use slider value
+      zoom: Math.min(zoom + clusterClickZoomInAmount.value, MAP_MAX_ZOOM), // Use slider value
       duration: 500,
     });
   });
@@ -1484,6 +1543,16 @@ function setupMapLayers() {
     // });
 
     const nysfairWebsiteBaseUrl = import.meta.env.VITE_NYSFAIR_BASE_URL;
+
+    const currentZoomLevel = mapboxMap.getZoom();
+
+    console.log('Current zoom level:', currentZoomLevel);
+
+    const { clusterRadius, clusterMinPoints, clusterClickZoomInAmount: newZoomInAmount } = getClusterConfig(currentZoomLevel);
+
+    mapClusterRadius.value = clusterRadius;
+    mapClusterMinPoints.value = clusterMinPoints;
+    clusterClickZoomInAmount.value = newZoomInAmount;
 
     mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'raster',
@@ -1516,9 +1585,9 @@ function setupMapLayers() {
       type: 'geojson',
       data: filteredGeoJson,
       cluster: true,
-      clusterRadius: mapClusterRadius.value,
+      clusterRadius,
       clusterMaxZoom: MAP_MAX_ZOOM - 1,
-      clusterMinPoints: mapClusterMinPoints.value,
+      clusterMinPoints
     });
 
     // 4. Add icon layers
