@@ -52,13 +52,6 @@
 
 <script setup lang="ts">
 import { IonContent, IonPage } from '@ionic/vue';
-import { useDataStore } from '@/stores/data';
-import { useAppStore } from '@/stores/app';
-
-const appStore = useAppStore();
-const dataStore = useDataStore();
-
-console.log('data from the store', dataStore.data);
 </script>
 
 <style scoped lang="scss">
