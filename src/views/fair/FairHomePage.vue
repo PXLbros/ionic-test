@@ -353,10 +353,10 @@ ion-col {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 40px;
+    margin-top: 45px;
     position: relative; // Add this
     z-index: 10; // Add this to ensure logo stays on top
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 
     @media (max-height: 950px) {
       max-height: 14vh;
@@ -385,7 +385,7 @@ ion-col {
     // Smaller screens
     @media (max-height: 845px) {
       width: 35vw;
-      height: 16vh;
+      height: 15.75vh;
     }
 
     // For screens <= 667px height
