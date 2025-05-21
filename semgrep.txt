@@ -1,0 +1,128 @@
+                                 
+                                 
+┌───────────────────────────────┐
+│ 13 Non-blocking Code Findings │
+└───────────────────────────────┘
+                             
+  [36m[22m[24m  index.html[0m
+    ❯❱ [1mhtml.security.audit.missing-integrity.missing-integrity[0m
+          This tag is missing an 'integrity' subresource integrity attribute. The 'integrity' attribute allows
+          for the browser to verify that externally hosted files (for example from a CDN) are delivered       
+          without unexpected manipulation. Without this attribute, if an attacker can modify the externally   
+          hosted resource, this could lead to XSS and other types of attacks. To prevent this, include the    
+          base64-encoded cryptographic hash of the resource (file) you’re telling the browser to fetch in the 
+          'integrity' attribute for all externally hosted files.                                              
+          Details: https://sg.run/krXA                                                                        
+                                                                                                              
+           29┆ <link href="https://api.fontshare.com/v2/css?f[]=stardom@400&f[]=pally@1&f[]=general-
+               sans@1&display=swap" rel="stylesheet">                                               
+                                                
+  [36m[22m[24m  src/components/EventModal.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+           51┆ <p v-html="event.description"></p>
+                                                     
+  [36m[22m[24m  src/components/MapDetailsPopup.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+            9┆ <div class="popup-content" v-html="content"></div>
+                                                    
+  [36m[22m[24m  src/views/fair/DirectionsPage.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+            9┆ <div
+           10┆   v-if="directionsPageData.content"
+           11┆   v-html="directionsPageData.content"
+                                             
+  [36m[22m[24m  src/views/fair/FAQPage.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+           28┆ <div
+           29┆   v-show="section.isExpanded"
+           30┆   class="expandable-section__content"
+           31┆   v-html="section.content"
+                                                     
+  [36m[22m[24m  src/views/fair/MusicDetailPage.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+           18┆ <div class="main__description" v-html="event.description"></div>
+                                                    
+  [36m[22m[24m  src/views/fair/NewsDetailPage.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+           23┆ <div class="main__text" v-html="article.content"></div>
+                                              
+  [36m[22m[24m  src/views/fair/NewsPage.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+           17┆ <!-- <p class="featured-article__description"                          
+               v-html="stripHTML(featuredNews.content.slice(0, 200) + '...')"></p> -->
+                                                 
+  [36m[22m[24m  src/views/fair/ParkingPage.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+           41┆ <div class="expandable-section__content" :class="{ 'expandable-section__content--expanded':
+               section.isExpanded }" v-html="section.content"></div>                                      
+                                                                    
+  [36m[22m[24m  src/views/fairgrounds/UpcomingEventDetailPage.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+           25┆ <div class="event-description" v-html="event.eventBody"></div>
+                                                            
+  [36m[22m[24m  src/views/fairgrounds/VenueDetailPage.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+           20┆ <div class="main__description-text" v-html="formattedDescription"></div>
+            ⋮┆----------------------------------------
+           49┆ <div v-if="formattedFloorPlanFeatures" v-html="formattedFloorPlanFeatures"
+               class="main__floor-plan-features"></div>                                  
+                                                       
+  [36m[22m[24m  src/views/fairgrounds/VenuesPage.vue[0m
+    ❯❱ [1mjavascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html[0m
+          Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily
+          lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-  
+          provided content.                                                                               
+          Details: https://sg.run/0QEw                                                                    
+                                                                                                          
+           18┆ <div v-if="venue.venueDetailBody" v-html="stripHTML(venue.venueDetailBody?.slice(0, 75) +
+               '...')"                                                                                  

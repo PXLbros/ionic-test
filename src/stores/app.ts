@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Device } from '@capacitor/device';
 import appConfig from '@/config/app';
+import { useStrapiApi } from '@/composables/useStrapiApi';
 
 export interface AppStoreToastConfig {
   isOpen: boolean;
@@ -94,12 +95,22 @@ export const useAppStore = defineStore('app', {
     },
 
     async createUserDeviceToken({ deviceId, model, platform, operatingSystem }: { deviceId: string; model?: string; platform?: string; operatingSystem?: string }) {
-      const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-device-tokens/create`, {
-        deviceId,
-        model,
-        platform,
-        operatingSystem,
-      });
+      const strapiApi = useStrapiApi();
+
+      const response = await strapiApi.post(
+        '/user-device-tokens/create',
+        {
+          deviceId,
+          model,
+          platform,
+          operatingSystem,
+        },
+        {
+          headers: {
+            'X-Token': import.meta.env.VITE_STRAPI_API_TOKEN,
+          },
+        }
+      );
 
       if (response.data?.success !== true) {
         throw new Error();
@@ -201,6 +212,8 @@ export const useAppStore = defineStore('app', {
     },
 
     async disablePushNotifications() {
+      const strapiApi = useStrapiApi();
+
       const deviceId = this.pushNotifications.deviceId;
 
       if (!deviceId) {
@@ -209,7 +222,7 @@ export const useAppStore = defineStore('app', {
       }
 
       try {
-        const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-device-tokens/delete`, {
+        const response = await strapiApi.post('/user-device-tokens/delete', {
           deviceId,
         });
 

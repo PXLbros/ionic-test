@@ -51,6 +51,7 @@ import { useDataStore } from '@/stores/data';
 import FairLayout from '@/layouts/fair.vue';
 import axios from 'axios';
 import appConfig from '@/config/app';
+import { useStrapiApi } from '@/composables/useStrapiApi';
 
 interface ParkingSection {
   title: string;
@@ -70,6 +71,8 @@ interface ParkingUpdate {
 }
 
 const dataStore = useDataStore();
+const strapiApi = useStrapiApi();
+
 const showNotification = ref(true);
 const parkingPageData = ref<ParkingSection>({
   title: '',
@@ -168,7 +171,7 @@ const fetchParkingUpdates = async () => {
     isLoadingUpdates.value = true;
 
     // Get all updates
-    const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data/real-time-updates`);
+    const response = await strapiApi.get('/data/real-time-updates');
 
     if (!response || !Array.isArray(response.data?.realTimeUpdates)) {
       throw new Error('Invalid response data');

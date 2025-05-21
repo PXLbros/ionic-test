@@ -66,8 +66,10 @@ import FairLayout from '@/layouts/fair.vue';
 import Loader from '@/components/Loader.vue';
 import { useDataStore } from '@/stores/data';
 import appConfig from '@/config/app';
+import { useStrapiApi } from '@/composables/useStrapiApi';
 
 const dataStore = useDataStore();
+const strapiApi = useStrapiApi();
 
 // const itemsPerPage = 5;
 const currentPage = ref(1);
@@ -151,7 +153,7 @@ const fetchNews = async ({ page }: { page: number } = { page: 1 }) => {
     isLoading.value = true;
     loadError.value = null;
 
-    const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data/news?page=${page}`);
+    const response = await strapiApi.get(`/data/news?page=${page}`);
 
     if (!response || !Array.isArray(response.data?.data)) {
       throw new Error('Invalid response data');

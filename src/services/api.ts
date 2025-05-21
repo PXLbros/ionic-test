@@ -3,9 +3,11 @@ import { useDataStore } from '@/stores/data';
 import * as Sentry from '@sentry/capacitor';
 import { Preferences } from '@capacitor/preferences';
 import { Site } from '@/types';
+import { useStrapiApi } from '@/composables/useStrapiApi';
 
 export const fetchData = async () => {
   const dataStore = useDataStore();
+  const strapiApi = useStrapiApi();
 
   try {
     dataStore.isLoading = true;
@@ -18,7 +20,18 @@ export const fetchData = async () => {
     if (useFakeData) {
       data = getFakeData();
     } else {
-      const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data${import.meta.env.VITE_NODE_ENV === 'local' ? '?cache=0' : ''}`);
+      const params: Record<string, any> = {};
+
+      if (import.meta.env.VITE_NODE_ENV === 'local') {
+        params.cache = 0;
+      }
+
+      const response = await strapiApi.get(
+        '/data',
+        {
+          params,
+        },
+      );
 
       data = response.data?.data;
 
@@ -250,6 +263,8 @@ export const addUserEventFavorite = async ({
   eventId: number | string;
   startTime: number;
 }): Promise<boolean> => {
+  const strapiApi = useStrapiApi();
+
   try {
     const favoriteEventsPreferenceKey = getFavoriteEventsPreferenceKey(site);
 
@@ -258,7 +273,7 @@ export const addUserEventFavorite = async ({
     const favoriteEventPreferencesApiItems = JSON.parse(favoriteNYSFairEventIds || '[]');
 
     // Save to Strapi API
-    const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/create`, {
+    const response = await strapiApi.post('/user-event-favorites/create', {
       deviceId,
       site,
       eventId,
@@ -310,6 +325,8 @@ export const removeUserEventFavorite = async ({
   eventId: number | string;
   startTime: number;
 }): Promise<boolean> => {
+  const strapiApi = useStrapiApi();
+
   try {
     const favoriteEventsPreferenceKey = getFavoriteEventsPreferenceKey(site);
 
@@ -338,7 +355,7 @@ export const removeUserEventFavorite = async ({
 
   try {
     // Save to Strapi API
-    const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/user-event-favorites/delete`, {
+    const response = await strapiApi.post('/user-event-favorites/delete', {
       deviceId,
       site,
       eventId,

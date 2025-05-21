@@ -8,7 +8,7 @@
       <div class="main__content">
         <div
           v-if="directionsPageData.content"
-          v-html="directionsPageData.content"
+          v-html="sanitizedContent"
           class="main__content-text"
         ></div>
       </div>
@@ -21,6 +21,7 @@ import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import appConfig from '@/config/app';
+import DOMPurify from 'dompurify';
 
 interface DirectionsPageData {
   title: string;
@@ -44,6 +45,12 @@ if (pageData) {
   };
 }
 
+const sanitizedContent = computed(() => {
+  return DOMPurify.sanitize(directionsPageData.value.content, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'ul', 'li', 'h1', 'h2', 'h3'],
+    ALLOWED_ATTR: ['href', 'target'],
+  });
+});
 </script>
 
 <style lang="scss" scoped>

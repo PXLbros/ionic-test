@@ -46,6 +46,9 @@
 
 <script setup lang="ts">
 import axios from 'axios';
+import { useStrapiApi } from '@/composables/useStrapiApi';
+
+const strapiApi = useStrapiApi();
 
 const email = ref('');
 
@@ -62,7 +65,7 @@ const handleSubmit = async () => {
     isSubmitting.value = true;
     submitError.value = false;
 
-    await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/data/nysfair/newsletter-sign-up`, {
+    await strapiApi.post('/data/nysfair/newsletter-sign-up', {
       email: email.value,
     });
 
@@ -142,5 +145,11 @@ const handleSubmit = async () => {
   justify-content: center;
   align-items: center;
   width: 100%;
+}
+
+.error-message {
+  color: #ee4623;
+  text-align: center;
+  margin-bottom: 1rem;
 }
 </style>

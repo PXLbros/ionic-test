@@ -58,6 +58,7 @@ import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import axios from 'axios';
 import FairLayout from '@/layouts/fair.vue';
 import appConfig from '@/config/app';
+import { useStrapiApi } from '@/composables/useStrapiApi';
 
 interface NewsArticle {
   title: string;
@@ -70,6 +71,8 @@ interface NewsArticle {
 const appStore = useAppStore();
 const route = useRoute();
 const router = useRouter();
+const strapiApi = useStrapiApi();
+
 const article = ref<NewsArticle | null>(null);
 const previousArticleId = ref<number | null>(null);
 const nextArticleId = ref<number | null>(null);
@@ -93,7 +96,7 @@ const fetchArticle = async () => {
       },
     });
 
-    const response = await axios.get(`${import.meta.env.VITE_STRAPI_API_URL}/data/news/${id}`);
+    const response = await strapiApi.get(`/data/news/${id}`);
 
     if (!response.data?.data) {
       throw new Error('Article not found');

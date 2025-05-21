@@ -139,6 +139,12 @@
               />
               <div class="opacity-value">{{ clusterClickZoomInAmount.toFixed(2) }}</div>
             </div>
+            <div class="opacity-row opacity-checkbox-row">
+              <label class="opacity-checkbox-label">
+                <input type="checkbox" v-model="updateClusterOnZoom" />
+                Update cluster settings on zoom
+              </label>
+            </div>
             <div class="zoom-level"><strong>Zoom Level</strong> {{ currentZoomLevel.toFixed(2) }}</div>
           </template>
         </div>
@@ -293,6 +299,9 @@ const isDebugMode = ref(true); // ref(new URLSearchParams(window.location.search
 // Overlay opacity control minimize state
 const isWebPSupported = ref(false);
 const opacityControlMinimized = ref(true); // Start minimized
+
+// Add: control for updating cluster settings on zoomend
+const updateClusterOnZoom = ref(true); // Default checked/enabled
 
 const clusterConfigByZoomRange = [
   {
@@ -870,7 +879,7 @@ function buildItemGeoJSON<T extends 'vendor' | 'service'>(
   items: any[],
   type: T
 ): Array<Feature<Point, T extends 'vendor' ? VendorProperties : ServiceProperties>> {
-  // Apply common filtering by map slug and search query
+  // Apply common filtering to avoid code duplication
   let filteredItems = items.filter((item) => {
     // Check if the item has valid coordinates
     if (type === 'vendor') {
@@ -1399,7 +1408,8 @@ function initMap() {
       prevClusterMinPoints !== clusterMinPoints ||
       prevZoomInAmount !== newZoomInAmount;
 
-    if (clusterSettingsChanged) {
+    // Only update if checkbox is checked
+    if (clusterSettingsChanged && updateClusterOnZoom.value) {
       mapClusterRadius.value = clusterRadius;
       mapClusterMinPoints.value = clusterMinPoints;
       clusterClickZoomInAmount.value = newZoomInAmount;
