@@ -212,6 +212,11 @@ const routes: Array<RouteRecordRaw> = [
       subLoader: true,
     },
   },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFoundPage.vue'),
+  },
 ]
 
 const router = createRouter({

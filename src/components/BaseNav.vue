@@ -86,8 +86,14 @@
             <div class="separator"></div>
             <div class="notifications">
               <span>Notifications</span>
-              <button class="enable-btn" @click="toggleNotifications">
-                {{ notificationsButtonText }}
+              <button
+                class="enable-btn"
+                :disabled="appStore.pushNotifications.isToggling"
+                @click="toggleNotifications"
+              >
+                {{ appStore.pushNotifications.isToggling
+                  ? (appStore.pushNotifications.permissionStatus === 'granted' ? 'Disabling...' : 'Enabling...')
+                  : notificationsButtonText }}
               </button>
             </div>
 
@@ -124,6 +130,7 @@ import { IonToolbar, IonTitle, IonHeader } from '@ionic/vue';
 import { closeCircleOutline } from 'ionicons/icons';
 import { IonIcon } from '@ionic/vue';
 import HamburgerIcon from './Icons/HamburgerIcon.vue';
+import { useLogger } from '@/composables/useLogger';
 
 const props = defineProps<{
   type: 'fair' | 'fairgrounds'
@@ -141,6 +148,8 @@ const props = defineProps<{
 const appStore = useAppStore();
 const dataStore = useDataStore();
 const router = useRouter();
+const logger = useLogger();
+
 const isMenuOpen = ref(false);
 const isNavVisible = ref(true);
 let lastScrollY = 0;
@@ -227,21 +236,23 @@ const notificationsButtonText = computed(() => {
 });
 
 const toggleNotifications = async () => {
+  console.log('Toggle notifications', appStore.pushNotifications.permissionStatus);
+
   if (appStore.pushNotifications.permissionStatus === 'granted') {
     try {
       await appStore.disablePushNotifications();
 
-      console.log('Notifications disabled successfully');
+      logger.info('Notifications disabled successfully');
     } catch (error) {
-      console.error('Error disabling notifications:', error);
+      logger.error(error);
     }
   } else {
     try {
-      await appStore.enablePushNotifications();
+      await appStore.enablePushNotifications({ createUserDeviceToken: true });
 
-      console.log('Notifications enabled successfully');
+      logger.info('Notifications enabled successfully');
     } catch (error) {
-      console.error('Error enabling notifications:', error);
+      logger.error(error);
     }
   }
 };

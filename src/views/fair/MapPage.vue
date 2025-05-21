@@ -1409,18 +1409,20 @@ function initMap() {
       prevZoomInAmount !== newZoomInAmount;
 
     // Only update if checkbox is checked
-    if (clusterSettingsChanged && updateClusterOnZoom.value) {
+    if (clusterSettingsChanged) {
       mapClusterRadius.value = clusterRadius;
       mapClusterMinPoints.value = clusterMinPoints;
       clusterClickZoomInAmount.value = newZoomInAmount;
-
-      updateClusterSettings();
 
       logger.info('Updated cluster settings', {
         'Cluster Radius': mapClusterRadius.value,
         'Cluster Min Points': mapClusterMinPoints.value,
         'Cluster Click Zoom-In Amount': clusterClickZoomInAmount.value,
       });
+
+      if (updateClusterOnZoom.value) {
+        updateClusterSettings();
+      }
     }
   });
 
@@ -1570,7 +1572,7 @@ function setupMapLayers() {
 
     const currentZoomLevel = mapboxMap.getZoom();
 
-    console.log('Current zoom level:', currentZoomLevel);
+    // console.log('Current zoom level:', currentZoomLevel);
 
     const { clusterRadius, clusterMinPoints, clusterClickZoomInAmount: newZoomInAmount } = getClusterConfig(currentZoomLevel);
 
@@ -1581,8 +1583,8 @@ function setupMapLayers() {
     mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'raster',
       tiles: [
-        // '/map/tiles/{z}/{x}/{y}.png',
-        `${nysfairWebsiteBaseUrl}/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png`,
+        '/map-export/{z}/{x}/{y}.png',
+        // `${nysfairWebsiteBaseUrl}/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png`,
       ],
       tileSize: 512,
       // scheme: 'tms',
@@ -1793,6 +1795,14 @@ onUnmounted(() => {
   // Destroy map
   destroyMap();
 });
+
+// watch(updateClusterOnZoom, (newValue) => {
+//   if (newValue) {
+//     logger.info('Update cluster settings on zoom toggled to true, updating cluster settings');
+
+//     updateClusterSettings();
+//   }
+// });
 </script>
 
 <style src="@/theme/sites/fair/pages/map.scss" scoped lang="scss"></style>

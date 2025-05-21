@@ -19,6 +19,7 @@ export interface PushNotificationsData {
   deviceId: string | null;
   getDeviceIdError: string | null;
   listenersInitialized: boolean;
+  isToggling: boolean;
 }
 
 export interface BottomBarConfig {
@@ -51,6 +52,7 @@ export const useAppStore = defineStore('app', {
       deviceId: null,
       getDeviceIdError: null,
       listenersInitialized: false,
+      isToggling: false, // Initialize the state
     },
 
     bottomBar: {
@@ -105,11 +107,6 @@ export const useAppStore = defineStore('app', {
           platform,
           operatingSystem,
         },
-        {
-          headers: {
-            'X-Token': import.meta.env.VITE_STRAPI_API_TOKEN,
-          },
-        }
       );
 
       if (response.data?.success !== true) {
@@ -162,6 +159,7 @@ export const useAppStore = defineStore('app', {
         });
 
         this.pushNotifications.listenersInitialized = true;
+
         console.log('Push notification listeners initialized');
       } else {
         const deviceId = this.getPersistentWebDeviceId();
@@ -178,8 +176,12 @@ export const useAppStore = defineStore('app', {
       }
     },
 
-    async enablePushNotifications() {
+    async enablePushNotifications({ createUserDeviceToken = true }: { createUserDeviceToken?: boolean } = {}) {
+      console.log('Enabling push notifications...');
+
       return new Promise((resolve, reject) => {
+        this.pushNotifications.isToggling = true;
+
         const isNativePlatform = Capacitor.isNativePlatform();
 
         if (isNativePlatform) {
@@ -206,20 +208,55 @@ export const useAppStore = defineStore('app', {
             .catch((error) => {
               console.error('Failed to enable push notifications:', error);
               reject(error); // Reject on error
+            })
+            .finally(() => {
+              this.pushNotifications.isToggling = false; // Reset toggling state
             });
+        } else {
+          if (createUserDeviceToken) {
+            const deviceId = this.getPersistentWebDeviceId();
+
+            this.createUserDeviceToken({
+              deviceId,
+              model: 'Web',
+              platform: navigator.userAgent,
+              operatingSystem: 'web'
+            })
+              .then(() => {
+                this.pushNotifications.permissionStatus = 'granted';
+                this.pushNotifications.didRegisterDevice = true;
+                this.pushNotifications.deviceId = deviceId;
+              })
+              .catch((error) => {
+                console.error('Failed to enable push notifications:', error);
+              })
+              .finally(() => {
+                this.pushNotifications.isToggling = false; // Reset toggling state
+              });
+            } else {
+              this.pushNotifications.permissionStatus = 'granted';
+              this.pushNotifications.didRegisterDevice = true;
+              this.pushNotifications.deviceId = this.getPersistentWebDeviceId();
+              this.pushNotifications.isToggling = false; // Reset toggling state
+            }
         }
       });
     },
 
     async disablePushNotifications() {
-      const strapiApi = useStrapiApi();
+      this.pushNotifications.isToggling = true; // Set toggling state
 
       const deviceId = this.pushNotifications.deviceId;
 
       if (!deviceId) {
         console.warn('No device ID found, skipping push notifications disable');
+
+        this.pushNotifications.isToggling = false; // Reset toggling state
+
         return;
       }
+
+      const strapiApi = useStrapiApi();
 
       try {
         const response = await strapiApi.post('/user-device-tokens/delete', {
@@ -237,6 +274,7 @@ export const useAppStore = defineStore('app', {
         this.pushNotifications.permissionStatus = 'denied';
         this.pushNotifications.deviceId = null;
         this.pushNotifications.didRegisterDevice = false;
+        this.pushNotifications.isToggling = false; // Reset toggling state
       }
     },
 

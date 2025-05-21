@@ -141,5 +141,5 @@ router.isReady().then(async () => {
   appStore.initializePushNotifications();
 
   // Trigger push notification registration
-  appStore.enablePushNotifications();
+  appStore.enablePushNotifications({ createUserDeviceToken: false });
 });
