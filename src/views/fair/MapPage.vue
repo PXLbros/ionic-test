@@ -196,8 +196,8 @@
           </div>
         </div>
         <div class="filter-actions">
-          <button class="action-button apply" @click="applyFilters">Apply</button>
-          <button class="action-button clear" @click="clearCategoryFilters">Clear</button>
+          <button class="action-button action-button--apply" @click="applyFilters">Apply</button>
+          <button class="action-button action-button--clear" @click="clearCategoryFilters">Clear</button>
         </div>
       </div>
     </div>
