@@ -71,7 +71,6 @@ const sanitizedContent = computed(() => {
   }
 
   &__content {
-
       &-text {
           font-size: 14px;
           line-height: 24px;
@@ -81,14 +80,13 @@ const sanitizedContent = computed(() => {
           font-family: 'inter', sans-serif;
           font-weight: 400;
 
-
           &:last-child {
               margin-bottom: 0;
           }
 
           :deep(h1) {
             font-size: 32px;
-            font-weight: 600;
+            font-weight: 400;
             color: #343434;
             margin: 0 0 5px 0;
             line-height: 36px;
@@ -101,7 +99,7 @@ const sanitizedContent = computed(() => {
 
           :deep(h2) {
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 400;
             color: #333333;
             margin: 24px 0 5px 0;
             line-height: 1.2;

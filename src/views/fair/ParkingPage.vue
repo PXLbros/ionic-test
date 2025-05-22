@@ -263,7 +263,7 @@ onMounted(() => {
     padding: 0px 20px 20px 20px;
 
     &-title {
-      font-weight: 600;
+      font-weight: 400;
       color: #343434;
       margin: 0 0 5px 0;
       line-height: 36px;

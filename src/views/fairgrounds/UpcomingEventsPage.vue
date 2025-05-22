@@ -43,7 +43,7 @@
             </div>
 
             <div class="filters-overlay__filter-set">
-              <h2>Event Type</h2>
+              <h2>Event Types</h2>
 
               <div class="filters-overlay__filter-set-options">
                 <div
@@ -807,7 +807,6 @@ $horizontal-padding: 30px;
         margin: 0;
         color: #343434;
         font-family: 'inter', sans-serif;
-
       }
 
       .calendar-nav {
@@ -984,12 +983,89 @@ $horizontal-padding: 30px;
     // display: flex;
     // flex-direction: column;
     // justify-content: space-between;
+
+    h2 {
+      font-family: 'inter', sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+    }
   }
 
   &__filter-set-option {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
+
+    label {
+      color: #343434;
+      width: 280px;
+      font-family: 'inter', sans-serif;
+      font-weight: 500;
+      font-size: 16px;
+      // line-height: 16px;
+    }
+  }
+
+  &__filter-set-option {
+    &:not(:last-child) {
+      margin-bottom: 1rem;
+    }
+
+    input[type="radio"] {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 1px solid #1b262d;
+      border-radius: 50%;
+      position: relative;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    input[type="radio"]::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #0077C8;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    input[type="radio"]:checked::before {
+      opacity: 1;
+    }
+
+    input[type="checkbox"] {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 1px solid #1b262d;
+      border-radius: 4px;
+      position: relative;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"]::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 10px;
+      height: 10px;
+      background-color: #0077C8;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    input[type="checkbox"]:checked::before {
+      opacity: 1;
+    }
   }
 
   &__actions {
@@ -997,20 +1073,20 @@ $horizontal-padding: 30px;
     bottom: v-bind('appConfig.bottomBar.height');
     left: 0;
     width: 100%;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.75);
     padding: 30px 40px;
     z-index: 1;
   }
 
   &__apply-button {
-    background: #3b71ca;
+    background: #0077C8;
     border-radius: 4px;
     color: #fff;
     width: 100%;
-    padding: 30px 0;
+    padding: 24px 0;
     font-size: 16px;
-    font-weight: bold;
-    letter-spacing: 1.6px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
   }
 }
 </style>
