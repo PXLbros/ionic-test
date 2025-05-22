@@ -587,6 +587,9 @@ function handleSearch(event: KeyboardEvent) {
 
   // Otherwise, update the map to show filtered results on current map
   updateMapForSelectedType();
+
+  // Zoom and pan to show all available points
+  zoomMapToAvailablePoints();
 }
 
 // Handle live search as user types
@@ -1434,6 +1437,44 @@ function initMap() {
         lat: e.lngLat.lat,
       });
     }
+  });
+}
+
+function zoomMapToAvailablePoints() {
+  if (!mapboxMap) {
+    return;
+  }
+
+  // Get the filtered GeoJSON features currently shown on the map
+  const filteredGeoJson = buildCombinedGeoJSONCollection();
+
+  if (!filteredGeoJson.features.length) {
+    return;
+  }
+
+  // Calculate bounds
+  const bounds = new mapboxgl.LngLatBounds();
+
+  filteredGeoJson.features.forEach(feature => {
+    if (
+      feature.geometry &&
+      feature.geometry.type === 'Point' &&
+      Array.isArray(feature.geometry.coordinates)
+    ) {
+      bounds.extend(feature.geometry.coordinates as [number, number]);
+    }
+  });
+
+  // Only fit if there are at least two points (otherwise mapbox will zoom too far)
+  if (bounds.isEmpty()) {
+    logger.warn('No valid points to fit bounds');
+  }
+
+  mapboxMap.fitBounds(bounds, {
+    padding: 60,
+    maxZoom: MAP_MAX_ZOOM,
+    duration: 800,
+    bearing: DEFAULT_MAP_BEARING,
   });
 }
 
