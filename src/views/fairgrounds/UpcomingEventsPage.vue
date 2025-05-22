@@ -1051,7 +1051,7 @@ $horizontal-padding: 30px;
       width: 20px;
       height: 20px;
       border: 1px solid #1b262d;
-      border-radius: 4px;
+      // border-radius: 4px;
       position: relative;
       margin-left: 10px;
       cursor: pointer;

@@ -567,7 +567,11 @@ function processPendingMapUpdates() {
 }
 
 // Handle search input
-function handleSearch() {
+function handleSearch(event: KeyboardEvent) {
+  if (event.key === 'Enter') {
+    (event.target as HTMLInputElement).blur();
+  }
+
   // Hide suggestions immediately on Enter
   showSearchSuggestions.value = false;
 
