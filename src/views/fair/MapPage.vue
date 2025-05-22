@@ -168,27 +168,24 @@
         </div>
       </div>
       <div class="filter-panel__content">
-        <!-- Group categories by map -->
-        <div v-for="map in allMaps" :key="map.id" class="map-category-group">
-          <h4>{{ map.name }}</h4>
+        <!-- Group categories by the currently selected map -->
+        <div v-if="currentMapSlug" class="map-category-group">
+          <h4>{{ currentMapName }}</h4>
           <div class="categories-list">
             <div
-              v-if="filteredCategories.filter(category => category.map_slugs.includes(map.slug)).length === 0"
+              v-if="filteredCategories.length === 0"
               class="no-categories"
             >
               No categories available for this map
             </div>
             <div
-              v-for="category in filteredCategories.filter(category => category.map_slugs.includes(map.slug))"
+              v-for="category in filteredCategories"
               :key="category.id"
               class="category-item"
               :class="{ 'category-item--selected': selectedCategories[category.id] }"
               @click="toggleCategory(category.id)"
             >
               <div class="category-name">{{ category.name }}</div>
-              <!-- <div class="category-count" v-if="category.num_services || category.num_vendors">
-                ({{ (category.num_services || 0) + (category.num_vendors || 0) }})
-              </div> -->
               <div class="category-checkbox">
                 <div class="checkbox-inner" v-if="selectedCategories[category.id]"></div>
               </div>
