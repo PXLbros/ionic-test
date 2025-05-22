@@ -1388,8 +1388,8 @@ function initMap() {
   // mapboxMap.addControl(new mapboxgl.NavigationControl());
 
   // Set up map error handling
-  mapboxMap.on('error', (e) => {
-    logger.error(e);
+  mapboxMap.on('error', (error) => {
+    logger.error(error);
 
     isLoadingMap.value = false;
 
@@ -1657,8 +1657,8 @@ function setupMapLayers() {
     mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'raster',
       tiles: [
-        // '/map-export/{z}/{x}/{y}.png',
-        `${nysfairWebsiteBaseUrl}/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png`,
+        '/map-tiles/{z}/{x}/{y}.png',
+        // `${nysfairWebsiteBaseUrl}/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png`,
       ],
       tileSize: 512,
       // scheme: 'tms',
@@ -1711,6 +1711,7 @@ function setupMapLayers() {
     });
   } catch (error) {
     logger.error(error);
+
     isLoadingMap.value = false;
   }
 }

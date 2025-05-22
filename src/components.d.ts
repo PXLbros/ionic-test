@@ -24,6 +24,7 @@ declare module 'vue' {
     FairgroundsEventsList: typeof import('./components/FairgroundsEventsList.vue')['default']
     FairgroundsKeepInTouchForm: typeof import('./components/FairgroundsKeepInTouchForm.vue')['default']
     FairKeepInTouchForm: typeof import('./components/FairKeepInTouchForm.vue')['default']
+    FairLogo: typeof import('./components/FairLogo.vue')['default']
     FavoriteButton: typeof import('./components/FavoriteButton.vue')['default']
     HamburgerIcon: typeof import('./components/Icons/HamburgerIcon.vue')['default']
     HeartIcon: typeof import('./components/Icons/HeartIcon.vue')['default']
