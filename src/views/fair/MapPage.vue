@@ -458,6 +458,9 @@ function selectMap(mapData: ServiceMap) {
 
   // Request map update
   updateMapForSelectedType();
+
+  // After updating the map, zoom to available points
+  zoomMapToAvailablePoints();
 }
 
 // Toggle filters panel
