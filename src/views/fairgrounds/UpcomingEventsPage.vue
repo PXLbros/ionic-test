@@ -980,14 +980,15 @@ $horizontal-padding: 30px;
   }
 
   &__filter-set {
-    // display: flex;
-    // flex-direction: column;
-    // justify-content: space-between;
+    &:not(:first-child) {
+      margin-top: 55px;
+    }
 
     h2 {
       font-family: 'inter', sans-serif;
       font-weight: 700;
       font-size: 24px;
+      margin-bottom: 30px;
     }
   }
 
@@ -1023,6 +1024,10 @@ $horizontal-padding: 30px;
       cursor: pointer;
     }
 
+    input[type="radio"]:checked {
+      border-color: #0077C8;
+    }
+
     input[type="radio"]::before {
       content: '';
       position: absolute;
@@ -1049,6 +1054,10 @@ $horizontal-padding: 30px;
       position: relative;
       margin-left: 10px;
       cursor: pointer;
+    }
+
+    input[type="checkbox"]:checked {
+      border-color: #0077C8;
     }
 
     input[type="checkbox"]::before {
