@@ -387,12 +387,16 @@ export function setupIconClickHandlers(
   };
 
   // Helper function to center the map on coordinates
-  const centerMapOnPoint = (coordinates: [number, number]) => {
+  const centerMapOnPoint = ({ coordinates, onDone }: { coordinates: [number, number]; onDone?: () => void }) => {
     map.flyTo({
       center: coordinates,
       zoom: 17,
       essential: true,
     });
+
+    if (typeof onDone === 'function') {
+      map.once('moveend', onDone);
+    }
   };
 
   // Move event handler
@@ -412,18 +416,23 @@ export function setupIconClickHandlers(
     const { name, description } = feature.properties as any;
 
     // Center the map on the clicked point
-    centerMapOnPoint(coordinates);
+    centerMapOnPoint({
+      coordinates,
+      onDone: () => {
+        // Create popup content
+        const popupContent = `
+          <div class="vendor-popup">
+            <h3>${name}</h3>
+            ${description ? `<p>${description}</p>` : ''}
+          </div>
+        `;
 
-    // Create popup content
-    const popupContent = `
-      <div class="vendor-popup">
-        <h3>${name}</h3>
-        ${description ? `<p>${description}</p>` : ''}
-      </div>
-    `;
-
-    // Show the popup
-    createPopup(coordinates, popupContent);
+        // Show the popup
+        setTimeout(() => {
+          createPopup(coordinates, popupContent);
+        }, 0);
+      },
+    });
   };
 
   // Service icon click handler
@@ -452,20 +461,25 @@ export function setupIconClickHandlers(
     }
 
     // Center the map on the clicked point
-    centerMapOnPoint(coordinates);
+    centerMapOnPoint({
+      coordinates,
+      onDone: () => {
+        // Create popup content
+        const popupContent = `
+          <div class="service-popup">
+            <h3>${props.title || 'Unknown Service'}</h3>
+            ${props.description ? `<p>${props.description}</p>` : ''}
+            ${props.is_accessible ? `<p><strong>Accessible</strong></p>` : ''}
+            ${categoryNames}
+          </div>
+        `;
 
-    // Create popup content
-    const popupContent = `
-      <div class="service-popup">
-        <h3>${props.title || 'Unknown Service'}</h3>
-        ${props.description ? `<p>${props.description}</p>` : ''}
-        ${props.is_accessible ? `<p><strong>Accessible</strong></p>` : ''}
-        ${categoryNames}
-      </div>
-    `;
-
-    // Show the popup
-    createPopup(coordinates, popupContent);
+        // Show the popup
+        setTimeout(() => {
+          createPopup(coordinates, popupContent);
+        }, 0);
+      },
+    });
   };
 
   const handleMapIconClick = (e: mapboxgl.MapMouseEvent) => {

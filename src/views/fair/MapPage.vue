@@ -22,9 +22,10 @@
             <div
               class="search-suggestions"
               ref="searchSuggestionsElement"
-              v-show="showSearchSuggestions && filteredSuggestions.length > 0"
+              v-show="showSearchSuggestions"
             >
               <div
+                v-if="filteredSuggestions.length > 0"
                 v-for="(suggestion, index) in filteredSuggestions"
                 :key="index"
                 class="suggestion-item"
@@ -44,6 +45,10 @@
                     {{ truncateText(suggestion.description, 60) }}
                   </div>
                 </div>
+              </div>
+
+              <div v-else class="no-suggestions">
+                No suggestions found
               </div>
             </div>
           </div>
@@ -578,6 +583,21 @@ function handleSearch(event: KeyboardEvent) {
   // Hide suggestions immediately on Enter
   showSearchSuggestions.value = false;
 
+  // If all filteredSuggestions belong to the same map, select that map first
+  if (filteredSuggestions.value.length > 0) {
+    const firstMapSlug = filteredSuggestions.value[0].mapSlug;
+    const allSameMap = filteredSuggestions.value.every(s => s.mapSlug === firstMapSlug);
+
+    if (allSameMap && firstMapSlug && currentMapSlug.value !== firstMapSlug) {
+      logger.info('All filtered suggestions belong to the same map, switching map', {
+        'Map Slug': firstMapSlug,
+        'Map Name': filteredSuggestions.value[0].mapName,
+      });
+
+      currentMapSlug.value = firstMapSlug;
+    }
+  }
+
   // If there's a selected suggestion in the search query, try to focus on it
   const matchingSuggestion = filteredSuggestions.value.find(s =>
     s.name.toLowerCase() === searchQuery.value.toLowerCase()
@@ -597,6 +617,8 @@ function handleSearch(event: KeyboardEvent) {
 
 // Handle live search as user types
 function handleLiveSearch() {
+  console.log('handling live search...');
+
   // Clear any existing timeout
   if (searchDebounceTimeout.value) {
     clearTimeout(searchDebounceTimeout.value);
@@ -820,6 +842,8 @@ function clearSearch() {
   // Simply call the resetFilters function to handle the rest
   // This ensures consistent behavior between search clear and reset button
   resetFilters();
+
+  zoomMapToAvailablePoints();
 }
 
 // Check if an item matches the category filters
@@ -1395,11 +1419,16 @@ function initMap() {
   });
 
   mapboxMap.on('zoomend', () => {
-    const zoom = mapboxMap.getZoom();
-    const { clusterRadius, clusterMinPoints, clusterClickZoomInAmount: newZoomInAmount } = getClusterConfig(zoom);
+    const newZoomLevel = mapboxMap.getZoom();
+
+    if (currentZoomLevel.value === newZoomLevel) {
+      return;
+    }
+
+    const { clusterRadius, clusterMinPoints, clusterClickZoomInAmount: newZoomInAmount } = getClusterConfig(newZoomLevel);
 
     logger.info('Zoom level changed', {
-      'Zoom Level': mapboxMap.getZoom(),
+      'Zoom Level': newZoomLevel,
       'Cluster Radius': clusterRadius,
       'Cluster Min Points': clusterMinPoints,
       'Cluster Click Zoom-In Amount': newZoomInAmount,
@@ -1474,7 +1503,7 @@ function zoomMapToAvailablePoints() {
   }
 
   mapboxMap.fitBounds(bounds, {
-    padding: 60,
+    padding: 20,
     maxZoom: MAP_MAX_ZOOM,
     duration: 800,
     bearing: DEFAULT_MAP_BEARING,
