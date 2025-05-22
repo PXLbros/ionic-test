@@ -569,8 +569,9 @@ const closeFiltersOverlay = () => {
 const resetFilters = () => {
   selectedFilterVenueId.value = null;
   selectedFilterEventTypeIds.value = [];
-  appliedFilterVenueId.value = null;
-  appliedFilterEventTypeIds.value = [];
+
+  // appliedFilterVenueId.value = null;
+  // appliedFilterEventTypeIds.value = [];
   // closeFiltersOverlay();
 };
 
