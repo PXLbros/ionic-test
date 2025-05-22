@@ -20,7 +20,7 @@
               {{ article.title }}
             </h1>
           </div>
-          <div class="main__text" v-html="article.content"></div>
+          <div class="main__text" v-html="sanitizedArticleContent"></div>
       </div>
 
       <div class="navigation">
@@ -59,6 +59,7 @@ import axios from 'axios';
 import FairLayout from '@/layouts/fair.vue';
 import appConfig from '@/config/app';
 import { useStrapiApi } from '@/composables/useStrapiApi';
+import { sanitizeHtml } from '@/utils/text';
 
 interface NewsArticle {
   title: string;
@@ -128,6 +129,10 @@ const fetchArticle = async () => {
     }, appConfig.subLoader.hideDelayDuration);
   }
 };
+
+const sanitizedArticleContent = computed(() => {
+  return sanitizeHtml({ html: article.value?.content || '' });
+});
 
 fetchArticle();
 </script>

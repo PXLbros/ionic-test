@@ -177,8 +177,6 @@ export const useAppStore = defineStore('app', {
     },
 
     async enablePushNotifications({ createUserDeviceToken = true }: { createUserDeviceToken?: boolean } = {}) {
-      console.log('Enabling push notifications...');
-
       return new Promise((resolve, reject) => {
         this.pushNotifications.isToggling = true;
 

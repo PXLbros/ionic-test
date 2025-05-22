@@ -22,6 +22,7 @@ import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import appConfig from '@/config/app';
 import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@/utils/text';
 
 interface DirectionsPageData {
   title: string;
@@ -46,10 +47,7 @@ if (pageData) {
 }
 
 const sanitizedContent = computed(() => {
-  return DOMPurify.sanitize(directionsPageData.value.content, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'ul', 'li', 'h1', 'h2', 'h3'],
-    ALLOWED_ATTR: ['href', 'target'],
-  });
+  return sanitizeHtml({ html: directionsPageData.value.content });
 });
 </script>
 

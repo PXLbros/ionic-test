@@ -22,7 +22,7 @@
         />
       </div>
 
-      <div class="event-description" v-html="event.eventBody"></div>
+      <div class="event-description" v-html="sanitizedEventBody"></div>
 
       <div v-if="hasContactInfo(event)" class="event-contact">
         <h2 class="contact-title">Contact Information</h2>
@@ -97,6 +97,7 @@ import FairgroundsLayout from '@/layouts/fairgrounds.vue';
 import type { EventDate, FairgroundsEvent, FairgroundsEventDate } from '@/types';
 import FairgroundsKeepInTouchForm from '@/components/FairgroundsKeepInTouchForm.vue';
 import appConfig from '@/config/app';
+import { sanitizeHtml } from '@/utils/text';
 
 const route = useRoute();
 const dataStore = useDataStore();
@@ -174,6 +175,10 @@ const getEventImage = (event: FairgroundsEvent): string => {
 const formatAdditionalDate = (date: FairgroundsEventDate): string => {
   return `${date.start_time_date} at ${date.start_time_time} - ${date.end_time_time}`;
 };
+
+const sanitizedEventBody = computed(() => {
+  return sanitizeHtml({ html: event.value?.eventBody || '' });
+});
 </script>
 
 <style lang="scss" scoped>

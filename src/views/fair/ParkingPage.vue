@@ -38,7 +38,7 @@
               <path fill-rule="evenodd" clip-rule="evenodd" d="M8.41698 1.4988C8.41698 0.671037 7.74594 0 6.91817 0C6.09041 0 5.41937 0.671036 5.41937 1.4988V5.5809L5.34121 5.58087C5.34013 5.58087 5.33909 5.5813 5.33832 5.58207C5.33755 5.58284 5.33651 5.58327 5.33543 5.58327H1.4988C0.671037 5.58327 0 6.2543 0 7.08207C0 7.90984 0.671037 8.58087 1.4988 8.58087H5.41937V12.5012C5.41937 13.329 6.09041 14 6.91817 14C7.74594 14 8.41698 13.329 8.41698 12.5012L8.41829 8.58087H12.5012C13.329 8.58087 14 7.90984 14 7.08207C14 6.2543 13.329 5.58327 12.5012 5.58327L8.41929 5.5819L8.41937 5.34121C8.41937 5.34013 8.41894 5.33909 8.41817 5.33832C8.41741 5.33755 8.41698 5.33651 8.41698 5.33543V1.4988Z" fill="#FDD252" />
             </svg>
           </div>
-          <div class="expandable-section__content" :class="{ 'expandable-section__content--expanded': section.isExpanded }" v-html="section.content"></div>
+          <div class="expandable-section__content" :class="{ 'expandable-section__content--expanded': section.isExpanded }" v-html="sanitizeHtml({ html: section.content })"></div>
         </div>
       </div>
     </div>
@@ -52,6 +52,7 @@ import FairLayout from '@/layouts/fair.vue';
 import axios from 'axios';
 import appConfig from '@/config/app';
 import { useStrapiApi } from '@/composables/useStrapiApi';
+import { sanitizeHtml } from '@/utils/text';
 
 interface ParkingSection {
   title: string;

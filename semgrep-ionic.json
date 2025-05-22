@@ -1,0 +1,1349 @@
+{
+  "version": "1.99.0",
+  "results": [
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/components/MapDetailsPopup.vue",
+      "start": {
+        "line": 9,
+        "col": 5,
+        "offset": 258
+      },
+      "end": {
+        "line": 9,
+        "col": 39,
+        "offset": 292
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "bcd3cc489452c41806108593a9f00113c462c1feea95e527e2c6d5b97c4c5039c8fe8d76198b81907562d5686eb3ea64fc0f71b6a9887a701e1b8c4843499b35_0",
+        "lines": "    <div class=\"popup-content\" v-html=\"sanitizedContent\"></div>",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    },
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/views/fair/DirectionsPage.vue",
+      "start": {
+        "line": 9,
+        "col": 9,
+        "offset": 184
+      },
+      "end": {
+        "line": 11,
+        "col": 18,
+        "offset": 250
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "ac121888f095fb3003fd0fc857d9377aed0f3d2da503c48ef4b5c13fb4a6aa74d4313f351e99d8c2de3b523f3619f37c95b355e5e1cdc017801aac5ad1e3a12e_0",
+        "lines": "        <div\n          v-if=\"directionsPageData.content\"\n          v-html=\"sanitizedContent\"",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    },
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/views/fair/FAQPage.vue",
+      "start": {
+        "line": 28,
+        "col": 11,
+        "offset": 1556
+      },
+      "end": {
+        "line": 31,
+        "col": 20,
+        "offset": 1668
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "943c9e685c0cd6aaf80cdb7f47227324ae84d42ac3d05b8f886c5b808b7b351335c10de6566d0cb9f0af939a3402a57b769a00db10cfa73aeeae7817f29aecd9_0",
+        "lines": "          <div\n            v-show=\"section.isExpanded\"\n            class=\"expandable-section__content\"\n            v-html=\"sanitizeHtml({ html: section.content })\"",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    },
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/views/fair/MusicDetailPage.vue",
+      "start": {
+        "line": 18,
+        "col": 9,
+        "offset": 721
+      },
+      "end": {
+        "line": 18,
+        "col": 47,
+        "offset": 759
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "9c8b89538768eab6efaaa74b1b35a88d468f7016734520dc6170ce382a11d238f0447052364d570a584f68c5a326cd5be98c95e5d768f268ee79b759b38f0891_0",
+        "lines": "        <div class=\"main__description\" v-html=\"sanitizedEventDescription\"></div>",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    },
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/views/fair/NewsDetailPage.vue",
+      "start": {
+        "line": 23,
+        "col": 11,
+        "offset": 608
+      },
+      "end": {
+        "line": 23,
+        "col": 42,
+        "offset": 639
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "a94780d0026c3a007d7ef5b25d2b828625facc34d9bf4e739a1055320893065d585ce136746a4520eeeeaf7d561341ba167df5dfb728b3aa35cdebfc38c20fc6_0",
+        "lines": "          <div class=\"main__text\" v-html=\"sanitizedArticleContent\"></div>",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    },
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/views/fair/ParkingPage.vue",
+      "start": {
+        "line": 41,
+        "col": 11,
+        "offset": 2061
+      },
+      "end": {
+        "line": 41,
+        "col": 132,
+        "offset": 2182
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "c7f07aa227f2fbf392b27ce82b51cacbe38590bc5f4f52299a2a8c10dfd1d2f3c5cb26976f69585269156c8b095729cad6eabf141225c4e8746daab371fc1257_0",
+        "lines": "          <div class=\"expandable-section__content\" :class=\"{ 'expandable-section__content--expanded': section.isExpanded }\" v-html=\"sanitizeHtml({ html: section.content })\"></div>",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    },
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/views/fairgrounds/UpcomingEventDetailPage.vue",
+      "start": {
+        "line": 25,
+        "col": 7,
+        "offset": 667
+      },
+      "end": {
+        "line": 25,
+        "col": 45,
+        "offset": 705
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "0d14146737bd91896c108f7afb3625a7157994b09c0fec4dfc03fbe4431ec3268695a4ce52ee1046a59cccc1ab70dec79616c537fef8e5f1b323cc83d88e573f_0",
+        "lines": "      <div class=\"event-description\" v-html=\"sanitizedEventBody\"></div>",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    },
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/views/fairgrounds/VenueDetailPage.vue",
+      "start": {
+        "line": 20,
+        "col": 9,
+        "offset": 422
+      },
+      "end": {
+        "line": 20,
+        "col": 52,
+        "offset": 465
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "cd0bc00eb4bada52d386678c8df4dec18f2781b3beb7da65d049e98cc9707b0d0ffb70c36315f24d81f9a738047645222367b1f35e024c9a4e7773375dc5d054_0",
+        "lines": "        <div class=\"main__description-text\" v-html=\"formattedDescription\"></div>",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    },
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/views/fairgrounds/VenueDetailPage.vue",
+      "start": {
+        "line": 49,
+        "col": 9,
+        "offset": 1585
+      },
+      "end": {
+        "line": 49,
+        "col": 55,
+        "offset": 1631
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "cd0bc00eb4bada52d386678c8df4dec18f2781b3beb7da65d049e98cc9707b0d0ffb70c36315f24d81f9a738047645222367b1f35e024c9a4e7773375dc5d054_1",
+        "lines": "        <div v-if=\"formattedFloorPlanFeatures\" v-html=\"formattedFloorPlanFeatures\" class=\"main__floor-plan-features\"></div>",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    },
+    {
+      "check_id": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+      "path": "src/views/fairgrounds/VenuesPage.vue",
+      "start": {
+        "line": 18,
+        "col": 13,
+        "offset": 964
+      },
+      "end": {
+        "line": 18,
+        "col": 54,
+        "offset": 1005
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use HTML interpolation on trusted content and never on user-provided content.",
+        "metadata": {
+          "references": [
+            "https://vuejs.org/v2/guide/syntax.html#Raw-HTML"
+          ],
+          "category": "security",
+          "cwe": [
+            "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+          ],
+          "technology": [
+            "vue"
+          ],
+          "owasp": [
+            "A07:2017 - Cross-Site Scripting (XSS)",
+            "A03:2021 - Injection"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site-Scripting (XSS)"
+          ],
+          "source": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "shortlink": "https://sg.run/0QEw",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9354,
+              "rule_id": "2ZUb2o",
+              "rule_name": "javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "rv_id": 945927,
+              "url": "https://semgrep.dev/playground/r/X0TL804/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+              "version_id": "X0TL804"
+            },
+            "src": "unchanged"
+          },
+          "dev.semgrep.actions": [
+            "monitor"
+          ],
+          "semgrep.policy": {
+            "id": 53046,
+            "name": "Rule Board - Audit column",
+            "slug": "rule-board-audit"
+          },
+          "semgrep.url": "https://semgrep.dev/r/javascript.vue.security.audit.xss.templates.avoid-v-html.avoid-v-html",
+          "semgrep.ruleset": "default",
+          "semgrep.ruleset_id": 3471
+        },
+        "severity": "WARNING",
+        "fingerprint": "522507b0572685b40932fd872e21ab606a6628ba5fdd54cfbf4f96a70c15c21b26cb55349f0c4c2c111dd78c31319f4e95c8054d2fccef0d1efeb46be159c4c5_0",
+        "lines": "            <div v-if=\"venue.venueDetailBody\" v-html=\"stripHTML(venue.venueDetailBody?.slice(0, 75) + '...')\"",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "PRO"
+      }
+    }
+  ],
+  "errors": [],
+  "paths": {
+    "scanned": [
+      ".browserslistrc",
+      ".editorconfig",
+      ".env.example",
+      ".gitignore",
+      ".nvmrc",
+      ".semgrepignore",
+      ".vscode/extensions.json",
+      "README.md",
+      "capacitor.config.ts",
+      "eslint.config.js",
+      "index.html",
+      "ionic.config.json",
+      "package-lock.json",
+      "package.json",
+      "public/Host_Event.png",
+      "public/Start_Screen_NYSF.jpg",
+      "public/Start_Screen_NYSFairgrounds.png",
+      "public/fair/images/home-page/Bkg_V4.jpg",
+      "public/fair/images/home-page/Bkg_V5.jpg",
+      "public/fair/images/home-page/NYSF_Concert_Art.png",
+      "public/fair/images/home-page/NYSF_Home_Art_380.jpg",
+      "public/fair/images/home-page/NYSF_Home_Art_400_2x.jpg",
+      "public/fair/images/home-page/NYSF_Home_Art_450_2x.jpg",
+      "public/fair/images/home-page/NYSF_Home_Flags.png",
+      "public/fair/images/home-page/NYSF_Home_Flags_Two.png",
+      "public/favicon.png",
+      "public/home/NYSF_Concert_Art.png",
+      "public/home/NYSF_Home_Art.png",
+      "public/home/NYSF_Home_Art_380.png",
+      "public/home/NYSF_Home_Flags.png",
+      "public/home/NYSF_Home_Flags_Two.png",
+      "public/icons/1x1.webp",
+      "public/icons/Map_Design-big-min.png",
+      "public/icons/Map_Design-big-min.png.points",
+      "public/icons/Map_Render-min.png",
+      "public/icons/chicken-icon.png",
+      "public/icons/default-category.png",
+      "public/icons/default-map-cluster-icon.png",
+      "public/icons/default-map-icon.png",
+      "public/icons/fairgroundsl.png",
+      "public/icons/gates (1).svg",
+      "public/icons/gates.png",
+      "public/icons/map-overlay-3x-pngcrush.png",
+      "public/icons/map-overlay-3x.webp",
+      "public/icons/map_overlay_rgba.vrt",
+      "public/icons/qgis-project.qgz",
+      "public/icons/shirt.png",
+      "public/icons/temp.vrt",
+      "public/map-export/13/2361/3007.png",
+      "public/map-export/13/2361/3008.png",
+      "public/map-export/13/2362/3007.png",
+      "public/map-export/13/2362/3008.png",
+      "public/map-export/14/4722/6015.png",
+      "public/map-export/14/4722/6016.png",
+      "public/map-export/14/4723/6015.png",
+      "public/map-export/14/4723/6016.png",
+      "public/map-export/14/4724/6015.png",
+      "public/map-export/14/4724/6016.png",
+      "public/map-export/15/9444/12030.png",
+      "public/map-export/15/9444/12031.png",
+      "public/map-export/15/9444/12032.png",
+      "public/map-export/15/9445/12030.png",
+      "public/map-export/15/9445/12031.png",
+      "public/map-export/15/9445/12032.png",
+      "public/map-export/15/9446/12030.png",
+      "public/map-export/15/9446/12031.png",
+      "public/map-export/15/9446/12032.png",
+      "public/map-export/15/9447/12030.png",
+      "public/map-export/15/9447/12031.png",
+      "public/map-export/15/9447/12032.png",
+      "public/map-export/15/9448/12030.png",
+      "public/map-export/15/9448/12031.png",
+      "public/map-export/15/9448/12032.png",
+      "public/map-export/16/18889/24060.png",
+      "public/map-export/16/18889/24061.png",
+      "public/map-export/16/18889/24062.png",
+      "public/map-export/16/18889/24063.png",
+      "public/map-export/16/18889/24064.png",
+      "public/map-export/16/18889/24065.png",
+      "public/map-export/16/18890/24060.png",
+      "public/map-export/16/18890/24061.png",
+      "public/map-export/16/18890/24062.png",
+      "public/map-export/16/18890/24063.png",
+      "public/map-export/16/18890/24064.png",
+      "public/map-export/16/18890/24065.png",
+      "public/map-export/16/18891/24060.png",
+      "public/map-export/16/18891/24061.png",
+      "public/map-export/16/18891/24062.png",
+      "public/map-export/16/18891/24063.png",
+      "public/map-export/16/18891/24064.png",
+      "public/map-export/16/18891/24065.png",
+      "public/map-export/16/18892/24060.png",
+      "public/map-export/16/18892/24061.png",
+      "public/map-export/16/18892/24062.png",
+      "public/map-export/16/18892/24063.png",
+      "public/map-export/16/18892/24064.png",
+      "public/map-export/16/18892/24065.png",
+      "public/map-export/16/18893/24060.png",
+      "public/map-export/16/18893/24061.png",
+      "public/map-export/16/18893/24062.png",
+      "public/map-export/16/18893/24063.png",
+      "public/map-export/16/18893/24064.png",
+      "public/map-export/16/18893/24065.png",
+      "public/map-export/16/18894/24060.png",
+      "public/map-export/16/18894/24061.png",
+      "public/map-export/16/18894/24062.png",
+      "public/map-export/16/18894/24063.png",
+      "public/map-export/16/18894/24064.png",
+      "public/map-export/16/18894/24065.png",
+      "public/map-export/16/18895/24060.png",
+      "public/map-export/16/18895/24061.png",
+      "public/map-export/16/18895/24062.png",
+      "public/map-export/16/18895/24063.png",
+      "public/map-export/16/18895/24064.png",
+      "public/map-export/16/18895/24065.png",
+      "public/map-export/16/18896/24060.png",
+      "public/map-export/16/18896/24061.png",
+      "public/map-export/16/18896/24062.png",
+      "public/map-export/16/18896/24063.png",
+      "public/map-export/16/18896/24064.png",
+      "public/map-export/16/18896/24065.png",
+      "public/map-export/17/37779/48120.png",
+      "public/map-export/17/37779/48120.png.aux.xml",
+      "public/map-export/17/37779/48121.png",
+      "public/map-export/17/37779/48121.png.aux.xml",
+      "public/map-export/17/37779/48122.png",
+      "public/map-export/17/37779/48122.png.aux.xml",
+      "public/map-export/17/37779/48123.png",
+      "public/map-export/17/37779/48123.png.aux.xml",
+      "public/map-export/17/37779/48124.png",
+      "public/map-export/17/37779/48124.png.aux.xml",
+      "public/map-export/17/37779/48125.png",
+      "public/map-export/17/37779/48125.png.aux.xml",
+      "public/map-export/17/37779/48126.png",
+      "public/map-export/17/37779/48126.png.aux.xml",
+      "public/map-export/17/37779/48127.png",
+      "public/map-export/17/37779/48127.png.aux.xml",
+      "public/map-export/17/37779/48128.png",
+      "public/map-export/17/37779/48128.png.aux.xml",
+      "public/map-export/17/37779/48129.png",
+      "public/map-export/17/37779/48129.png.aux.xml",
+      "public/map-export/17/37779/48130.png",
+      "public/map-export/17/37779/48130.png.aux.xml",
+      "public/map-export/17/37779/48131.png",
+      "public/map-export/17/37779/48131.png.aux.xml",
+      "public/map-export/17/37780/48120.png",
+      "public/map-export/17/37780/48120.png.aux.xml",
+      "public/map-export/17/37780/48121.png",
+      "public/map-export/17/37780/48121.png.aux.xml",
+      "public/map-export/17/37780/48122.png",
+      "public/map-export/17/37780/48122.png.aux.xml",
+      "public/map-export/17/37780/48123.png",
+      "public/map-export/17/37780/48123.png.aux.xml",
+      "public/map-export/17/37780/48124.png",
+      "public/map-export/17/37780/48124.png.aux.xml",
+      "public/map-export/17/37780/48125.png",
+      "public/map-export/17/37780/48125.png.aux.xml",
+      "public/map-export/17/37780/48126.png",
+      "public/map-export/17/37780/48126.png.aux.xml",
+      "public/map-export/17/37780/48127.png",
+      "public/map-export/17/37780/48127.png.aux.xml",
+      "public/map-export/17/37780/48128.png",
+      "public/map-export/17/37780/48128.png.aux.xml",
+      "public/map-export/17/37780/48129.png",
+      "public/map-export/17/37780/48129.png.aux.xml",
+      "public/map-export/17/37780/48130.png",
+      "public/map-export/17/37780/48130.png.aux.xml",
+      "public/map-export/17/37780/48131.png",
+      "public/map-export/17/37780/48131.png.aux.xml",
+      "public/map-export/17/37781/48120.png",
+      "public/map-export/17/37781/48120.png.aux.xml",
+      "public/map-export/17/37781/48121.png",
+      "public/map-export/17/37781/48121.png.aux.xml",
+      "public/map-export/17/37781/48122.png",
+      "public/map-export/17/37781/48122.png.aux.xml",
+      "public/map-export/17/37781/48123.png",
+      "public/map-export/17/37781/48123.png.aux.xml",
+      "public/map-export/17/37781/48124.png",
+      "public/map-export/17/37781/48124.png.aux.xml",
+      "public/map-export/17/37781/48125.png",
+      "public/map-export/17/37781/48125.png.aux.xml",
+      "public/map-export/17/37781/48126.png",
+      "public/map-export/17/37781/48126.png.aux.xml",
+      "public/map-export/17/37781/48127.png",
+      "public/map-export/17/37781/48127.png.aux.xml",
+      "public/map-export/17/37781/48128.png",
+      "public/map-export/17/37781/48128.png.aux.xml",
+      "public/map-export/17/37781/48129.png",
+      "public/map-export/17/37781/48129.png.aux.xml",
+      "public/map-export/17/37781/48130.png",
+      "public/map-export/17/37781/48130.png.aux.xml",
+      "public/map-export/17/37781/48131.png",
+      "public/map-export/17/37781/48131.png.aux.xml",
+      "public/map-export/17/37782/48120.png",
+      "public/map-export/17/37782/48120.png.aux.xml",
+      "public/map-export/17/37782/48121.png",
+      "public/map-export/17/37782/48121.png.aux.xml",
+      "public/map-export/17/37782/48122.png",
+      "public/map-export/17/37782/48122.png.aux.xml",
+      "public/map-export/17/37782/48123.png",
+      "public/map-export/17/37782/48123.png.aux.xml",
+      "public/map-export/17/37782/48124.png",
+      "public/map-export/17/37782/48124.png.aux.xml",
+      "public/map-export/17/37782/48125.png",
+      "public/map-export/17/37782/48125.png.aux.xml",
+      "public/map-export/17/37782/48126.png",
+      "public/map-export/17/37782/48126.png.aux.xml",
+      "public/map-export/17/37782/48127.png",
+      "public/map-export/17/37782/48127.png.aux.xml",
+      "public/map-export/17/37782/48128.png",
+      "public/map-export/17/37782/48128.png.aux.xml",
+      "public/map-export/17/37782/48129.png",
+      "public/map-export/17/37782/48129.png.aux.xml",
+      "public/map-export/17/37782/48130.png",
+      "public/map-export/17/37782/48130.png.aux.xml",
+      "public/map-export/17/37782/48131.png",
+      "public/map-export/17/37782/48131.png.aux.xml",
+      "public/map-export/17/37783/48120.png",
+      "public/map-export/17/37783/48120.png.aux.xml",
+      "public/map-export/17/37783/48121.png",
+      "public/map-export/17/37783/48121.png.aux.xml",
+      "public/map-export/17/37783/48122.png",
+      "public/map-export/17/37783/48122.png.aux.xml",
+      "public/map-export/17/37783/48123.png",
+      "public/map-export/17/37783/48123.png.aux.xml",
+      "public/map-export/17/37783/48124.png",
+      "public/map-export/17/37783/48124.png.aux.xml",
+      "public/map-export/17/37783/48125.png",
+      "public/map-export/17/37783/48125.png.aux.xml",
+      "public/map-export/17/37783/48126.png",
+      "public/map-export/17/37783/48126.png.aux.xml",
+      "public/map-export/17/37783/48127.png",
+      "public/map-export/17/37783/48127.png.aux.xml",
+      "public/map-export/17/37783/48128.png",
+      "public/map-export/17/37783/48128.png.aux.xml",
+      "public/map-export/17/37783/48129.png",
+      "public/map-export/17/37783/48129.png.aux.xml",
+      "public/map-export/17/37783/48130.png",
+      "public/map-export/17/37783/48130.png.aux.xml",
+      "public/map-export/17/37783/48131.png",
+      "public/map-export/17/37783/48131.png.aux.xml",
+      "public/map-export/17/37784/48120.png",
+      "public/map-export/17/37784/48120.png.aux.xml",
+      "public/map-export/17/37784/48121.png",
+      "public/map-export/17/37784/48121.png.aux.xml",
+      "public/map-export/17/37784/48122.png",
+      "public/map-export/17/37784/48122.png.aux.xml",
+      "public/map-export/17/37784/48123.png",
+      "public/map-export/17/37784/48123.png.aux.xml",
+      "public/map-export/17/37784/48124.png",
+      "public/map-export/17/37784/48124.png.aux.xml",
+      "public/map-export/17/37784/48125.png",
+      "public/map-export/17/37784/48125.png.aux.xml",
+      "public/map-export/17/37784/48126.png",
+      "public/map-export/17/37784/48126.png.aux.xml",
+      "public/map-export/17/37784/48127.png",
+      "public/map-export/17/37784/48127.png.aux.xml",
+      "public/map-export/17/37784/48128.png",
+      "public/map-export/17/37784/48128.png.aux.xml",
+      "public/map-export/17/37784/48129.png",
+      "public/map-export/17/37784/48129.png.aux.xml",
+      "public/map-export/17/37784/48130.png",
+      "public/map-export/17/37784/48130.png.aux.xml",
+      "public/map-export/17/37784/48131.png",
+      "public/map-export/17/37784/48131.png.aux.xml",
+      "public/map-export/17/37785/48120.png",
+      "public/map-export/17/37785/48120.png.aux.xml",
+      "public/map-export/17/37785/48121.png",
+      "public/map-export/17/37785/48121.png.aux.xml",
+      "public/map-export/17/37785/48122.png",
+      "public/map-export/17/37785/48122.png.aux.xml",
+      "public/map-export/17/37785/48123.png",
+      "public/map-export/17/37785/48123.png.aux.xml",
+      "public/map-export/17/37785/48124.png",
+      "public/map-export/17/37785/48124.png.aux.xml",
+      "public/map-export/17/37785/48125.png",
+      "public/map-export/17/37785/48125.png.aux.xml",
+      "public/map-export/17/37785/48126.png",
+      "public/map-export/17/37785/48126.png.aux.xml",
+      "public/map-export/17/37785/48127.png",
+      "public/map-export/17/37785/48127.png.aux.xml",
+      "public/map-export/17/37785/48128.png",
+      "public/map-export/17/37785/48128.png.aux.xml",
+      "public/map-export/17/37785/48129.png",
+      "public/map-export/17/37785/48129.png.aux.xml",
+      "public/map-export/17/37785/48130.png",
+      "public/map-export/17/37785/48130.png.aux.xml",
+      "public/map-export/17/37785/48131.png",
+      "public/map-export/17/37785/48131.png.aux.xml",
+      "public/map-export/17/37786/48120.png",
+      "public/map-export/17/37786/48120.png.aux.xml",
+      "public/map-export/17/37786/48121.png",
+      "public/map-export/17/37786/48121.png.aux.xml",
+      "public/map-export/17/37786/48122.png",
+      "public/map-export/17/37786/48122.png.aux.xml",
+      "public/map-export/17/37786/48123.png",
+      "public/map-export/17/37786/48123.png.aux.xml",
+      "public/map-export/17/37786/48124.png",
+      "public/map-export/17/37786/48124.png.aux.xml",
+      "public/map-export/17/37786/48125.png",
+      "public/map-export/17/37786/48125.png.aux.xml",
+      "public/map-export/17/37786/48126.png",
+      "public/map-export/17/37786/48126.png.aux.xml",
+      "public/map-export/17/37786/48127.png",
+      "public/map-export/17/37786/48127.png.aux.xml",
+      "public/map-export/17/37786/48128.png",
+      "public/map-export/17/37786/48128.png.aux.xml",
+      "public/map-export/17/37786/48129.png",
+      "public/map-export/17/37786/48129.png.aux.xml",
+      "public/map-export/17/37786/48130.png",
+      "public/map-export/17/37786/48130.png.aux.xml",
+      "public/map-export/17/37786/48131.png",
+      "public/map-export/17/37786/48131.png.aux.xml",
+      "public/map-export/17/37787/48120.png",
+      "public/map-export/17/37787/48120.png.aux.xml",
+      "public/map-export/17/37787/48121.png",
+      "public/map-export/17/37787/48121.png.aux.xml",
+      "public/map-export/17/37787/48122.png",
+      "public/map-export/17/37787/48122.png.aux.xml",
+      "public/map-export/17/37787/48123.png",
+      "public/map-export/17/37787/48123.png.aux.xml",
+      "public/map-export/17/37787/48124.png",
+      "public/map-export/17/37787/48124.png.aux.xml",
+      "public/map-export/17/37787/48125.png",
+      "public/map-export/17/37787/48125.png.aux.xml",
+      "public/map-export/17/37787/48126.png",
+      "public/map-export/17/37787/48126.png.aux.xml",
+      "public/map-export/17/37787/48127.png",
+      "public/map-export/17/37787/48127.png.aux.xml",
+      "public/map-export/17/37787/48128.png",
+      "public/map-export/17/37787/48128.png.aux.xml",
+      "public/map-export/17/37787/48129.png",
+      "public/map-export/17/37787/48129.png.aux.xml",
+      "public/map-export/17/37787/48130.png",
+      "public/map-export/17/37787/48130.png.aux.xml",
+      "public/map-export/17/37787/48131.png",
+      "public/map-export/17/37787/48131.png.aux.xml",
+      "public/map-export/17/37788/48120.png",
+      "public/map-export/17/37788/48120.png.aux.xml",
+      "public/map-export/17/37788/48121.png",
+      "public/map-export/17/37788/48121.png.aux.xml",
+      "public/map-export/17/37788/48122.png",
+      "public/map-export/17/37788/48122.png.aux.xml",
+      "public/map-export/17/37788/48123.png",
+      "public/map-export/17/37788/48123.png.aux.xml",
+      "public/map-export/17/37788/48124.png",
+      "public/map-export/17/37788/48124.png.aux.xml",
+      "public/map-export/17/37788/48125.png",
+      "public/map-export/17/37788/48125.png.aux.xml",
+      "public/map-export/17/37788/48126.png",
+      "public/map-export/17/37788/48126.png.aux.xml",
+      "public/map-export/17/37788/48127.png",
+      "public/map-export/17/37788/48127.png.aux.xml",
+      "public/map-export/17/37788/48128.png",
+      "public/map-export/17/37788/48128.png.aux.xml",
+      "public/map-export/17/37788/48129.png",
+      "public/map-export/17/37788/48129.png.aux.xml",
+      "public/map-export/17/37788/48130.png",
+      "public/map-export/17/37788/48130.png.aux.xml",
+      "public/map-export/17/37788/48131.png",
+      "public/map-export/17/37788/48131.png.aux.xml",
+      "public/map-export/17/37789/48120.png",
+      "public/map-export/17/37789/48120.png.aux.xml",
+      "public/map-export/17/37789/48121.png",
+      "public/map-export/17/37789/48121.png.aux.xml",
+      "public/map-export/17/37789/48122.png",
+      "public/map-export/17/37789/48122.png.aux.xml",
+      "public/map-export/17/37789/48123.png",
+      "public/map-export/17/37789/48123.png.aux.xml",
+      "public/map-export/17/37789/48124.png",
+      "public/map-export/17/37789/48124.png.aux.xml",
+      "public/map-export/17/37789/48125.png",
+      "public/map-export/17/37789/48125.png.aux.xml",
+      "public/map-export/17/37789/48126.png",
+      "public/map-export/17/37789/48126.png.aux.xml",
+      "public/map-export/17/37789/48127.png",
+      "public/map-export/17/37789/48127.png.aux.xml",
+      "public/map-export/17/37789/48128.png",
+      "public/map-export/17/37789/48128.png.aux.xml",
+      "public/map-export/17/37789/48129.png",
+      "public/map-export/17/37789/48129.png.aux.xml",
+      "public/map-export/17/37789/48130.png",
+      "public/map-export/17/37789/48130.png.aux.xml",
+      "public/map-export/17/37789/48131.png",
+      "public/map-export/17/37789/48131.png.aux.xml",
+      "public/map-export/17/37790/48120.png",
+      "public/map-export/17/37790/48120.png.aux.xml",
+      "public/map-export/17/37790/48121.png",
+      "public/map-export/17/37790/48121.png.aux.xml",
+      "public/map-export/17/37790/48122.png",
+      "public/map-export/17/37790/48122.png.aux.xml",
+      "public/map-export/17/37790/48123.png",
+      "public/map-export/17/37790/48123.png.aux.xml",
+      "public/map-export/17/37790/48124.png",
+      "public/map-export/17/37790/48124.png.aux.xml",
+      "public/map-export/17/37790/48125.png",
+      "public/map-export/17/37790/48125.png.aux.xml",
+      "public/map-export/17/37790/48126.png",
+      "public/map-export/17/37790/48126.png.aux.xml",
+      "public/map-export/17/37790/48127.png",
+      "public/map-export/17/37790/48127.png.aux.xml",
+      "public/map-export/17/37790/48128.png",
+      "public/map-export/17/37790/48128.png.aux.xml",
+      "public/map-export/17/37790/48129.png",
+      "public/map-export/17/37790/48129.png.aux.xml",
+      "public/map-export/17/37790/48130.png",
+      "public/map-export/17/37790/48130.png.aux.xml",
+      "public/map-export/17/37790/48131.png",
+      "public/map-export/17/37790/48131.png.aux.xml",
+      "public/map-export/17/37791/48120.png",
+      "public/map-export/17/37791/48120.png.aux.xml",
+      "public/map-export/17/37791/48121.png",
+      "public/map-export/17/37791/48121.png.aux.xml",
+      "public/map-export/17/37791/48122.png",
+      "public/map-export/17/37791/48122.png.aux.xml",
+      "public/map-export/17/37791/48123.png",
+      "public/map-export/17/37791/48123.png.aux.xml",
+      "public/map-export/17/37791/48124.png",
+      "public/map-export/17/37791/48124.png.aux.xml",
+      "public/map-export/17/37791/48125.png",
+      "public/map-export/17/37791/48125.png.aux.xml",
+      "public/map-export/17/37791/48126.png",
+      "public/map-export/17/37791/48126.png.aux.xml",
+      "public/map-export/17/37791/48127.png",
+      "public/map-export/17/37791/48127.png.aux.xml",
+      "public/map-export/17/37791/48128.png",
+      "public/map-export/17/37791/48128.png.aux.xml",
+      "public/map-export/17/37791/48129.png",
+      "public/map-export/17/37791/48129.png.aux.xml",
+      "public/map-export/17/37791/48130.png",
+      "public/map-export/17/37791/48130.png.aux.xml",
+      "public/map-export/17/37791/48131.png",
+      "public/map-export/17/37791/48131.png.aux.xml",
+      "public/map-export/17/37792/48120.png",
+      "public/map-export/17/37792/48120.png.aux.xml",
+      "public/map-export/17/37792/48121.png",
+      "public/map-export/17/37792/48121.png.aux.xml",
+      "public/map-export/17/37792/48122.png",
+      "public/map-export/17/37792/48122.png.aux.xml",
+      "public/map-export/17/37792/48123.png",
+      "public/map-export/17/37792/48123.png.aux.xml",
+      "public/map-export/17/37792/48124.png",
+      "public/map-export/17/37792/48124.png.aux.xml",
+      "public/map-export/17/37792/48125.png",
+      "public/map-export/17/37792/48125.png.aux.xml",
+      "public/map-export/17/37792/48126.png",
+      "public/map-export/17/37792/48126.png.aux.xml",
+      "public/map-export/17/37792/48127.png",
+      "public/map-export/17/37792/48127.png.aux.xml",
+      "public/map-export/17/37792/48128.png",
+      "public/map-export/17/37792/48128.png.aux.xml",
+      "public/map-export/17/37792/48129.png",
+      "public/map-export/17/37792/48129.png.aux.xml",
+      "public/map-export/17/37792/48130.png",
+      "public/map-export/17/37792/48130.png.aux.xml",
+      "public/map-export/17/37792/48131.png",
+      "public/map-export/17/37792/48131.png.aux.xml",
+      "public/map4/map.png.aux.xml",
+      "public/map4/map.qgz",
+      "public/modal-img/News_NYSF.jpg",
+      "public/modal-img/placeholder.svg",
+      "scripts/convert-location/Dockerfile.convert-location",
+      "scripts/convert-location/convert-location.py",
+      "scripts/generate-map-tiles/Dockerfile.gdal2tiles",
+      "src/App.vue",
+      "src/Tabs.vue",
+      "src/auto-imports.d.ts",
+      "src/components/BaseNav.vue",
+      "src/components/FairEventsList.vue",
+      "src/components/FairKeepInTouchForm.vue",
+      "src/components/FairgroundsEventCard.vue",
+      "src/components/FairgroundsEventCarousel.vue",
+      "src/components/FairgroundsEventsList.vue",
+      "src/components/FairgroundsKeepInTouchForm.vue",
+      "src/components/FavoriteButton.vue",
+      "src/components/Icons/CalendarIcon.vue",
+      "src/components/Icons/HamburgerIcon.vue",
+      "src/components/Icons/HeartIcon.vue",
+      "src/components/Icons/HomeIcon.vue",
+      "src/components/Icons/Logo.vue",
+      "src/components/Icons/MapIcon.vue",
+      "src/components/Icons/MenuIcon.vue",
+      "src/components/Icons/PinIcon.vue",
+      "src/components/Icons/PlaceholderIcon.vue",
+      "src/components/Icons/ScheduleIcon.vue",
+      "src/components/Icons/StartIcon.vue",
+      "src/components/Icons/TicketsIcon.vue",
+      "src/components/ImageCarousel.vue",
+      "src/components/Loader.vue",
+      "src/components/MapDetailsPopup.vue",
+      "src/components/SocialIcons.vue",
+      "src/components/Tabs/BaseTabNavigation.vue",
+      "src/components/Tabs/FairBottomNavigation.vue",
+      "src/components/Tabs/FairgroundsBottomNavigation.vue",
+      "src/components.d.ts",
+      "src/composables/useEventsFavorites.ts",
+      "src/composables/useLogger.ts",
+      "src/composables/useStrapiApi.ts",
+      "src/config/app.ts",
+      "src/fonts/Inter-Regular.ttf",
+      "src/fonts/JockeyOne-Regular.ttf",
+      "src/fonts/Lalezar-Regular.ttf",
+      "src/fonts/PTSansNarrow-Bold.ttf",
+      "src/fonts/PTSansNarrow-Regular.ttf",
+      "src/imgs/Bkg_V4.jpg",
+      "src/imgs/Flags_Pink.png",
+      "src/imgs/Sponsor_Chevrolet_Black.png",
+      "src/imgs/icons/LogoBLK_Nickelodeon.png",
+      "src/imgs/icons/map-icon.svg",
+      "src/imgs/icons/ticket-icon.svg",
+      "src/imgs/svg/calendar.svg",
+      "src/imgs/svg/fair-logo-light.svg",
+      "src/imgs/svg/fair-main-logo.svg",
+      "src/imgs/svg/fairgrounds-dark.svg",
+      "src/imgs/svg/fg-light.svg",
+      "src/imgs/svg/home.svg",
+      "src/imgs/svg/map.svg",
+      "src/imgs/svg/sponsorship-micron.svg",
+      "src/imgs/svg/start.svg",
+      "src/imgs/svg/ticket.svg",
+      "src/layouts/fair.vue",
+      "src/layouts/fairgrounds.vue",
+      "src/main.ts",
+      "src/router/index.ts",
+      "src/services/api.ts",
+      "src/stores/app.ts",
+      "src/stores/data.ts",
+      "src/theme/colors.scss",
+      "src/theme/global.scss",
+      "src/theme/sites/fair/pages/map.scss",
+      "src/theme/sites/fair.scss",
+      "src/theme/sites/fairgrounds.scss",
+      "src/types/index.d.ts",
+      "src/utils/MapIconUtils.ts",
+      "src/utils/clone.ts",
+      "src/utils/event.ts",
+      "src/utils/logger.ts",
+      "src/utils/text.ts",
+      "src/utils/time.ts",
+      "src/views/HomePage.vue",
+      "src/views/NotFoundPage.vue",
+      "src/views/fair/DailySchedulePage.vue",
+      "src/views/fair/DirectionsPage.vue",
+      "src/views/fair/EventFavoritesPage.vue",
+      "src/views/fair/FAQPage.vue",
+      "src/views/fair/FairHomePage.vue",
+      "src/views/fair/GamesPage.vue",
+      "src/views/fair/MapPage.vue",
+      "src/views/fair/MusicDetailPage.vue",
+      "src/views/fair/MusicPage.vue",
+      "src/views/fair/NewsDetailPage.vue",
+      "src/views/fair/NewsPage.vue",
+      "src/views/fair/ParkingPage.vue",
+      "src/views/fair/PlanVisitPage.vue",
+      "src/views/fair/TicketsPage.vue",
+      "src/views/fair/UpdatesPage.vue",
+      "src/views/fairgrounds/EventFavoritesPage.vue",
+      "src/views/fairgrounds/FairgroundsHomePage.vue",
+      "src/views/fairgrounds/RentalOpportunityPage.vue",
+      "src/views/fairgrounds/UpcomingEventDetailPage.vue",
+      "src/views/fairgrounds/UpcomingEventsPage.vue",
+      "src/views/fairgrounds/VenueDetailPage.vue",
+      "src/views/fairgrounds/VenuesPage.vue",
+      "src/vite-env.d.ts",
+      "tsconfig.json",
+      "tsconfig.node.json",
+      "vite.config.ts"
+    ]
+  },
+  "interfile_languages_used": [],
+  "skipped_rules": []
+}

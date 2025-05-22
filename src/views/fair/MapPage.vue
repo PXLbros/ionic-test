@@ -1583,8 +1583,8 @@ function setupMapLayers() {
     mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'raster',
       tiles: [
-        '/map-export/{z}/{x}/{y}.png',
-        // `${nysfairWebsiteBaseUrl}/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png`,
+        // '/map-export/{z}/{x}/{y}.png',
+        `${nysfairWebsiteBaseUrl}/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png`,
       ],
       tileSize: 512,
       // scheme: 'tms',

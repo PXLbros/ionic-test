@@ -24,6 +24,7 @@ import { Category } from '@/types';
 import FairLayout from '../../layouts/fair.vue';
 import { formatEvent } from '@/utils/event';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 
@@ -104,7 +105,7 @@ const favoriteEventItems = computed(() => {
   }
 
   &__content {
-    padding: 20px;
+    padding: 20px 20px calc(v-bind('appConfig.bottomBar.height') + 1rem) 20px;
     padding-top: 10px;
     background-color: #098944;
   }

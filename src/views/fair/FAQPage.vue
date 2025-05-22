@@ -28,7 +28,7 @@
           <div
             v-show="section.isExpanded"
             class="expandable-section__content"
-            v-html="section.content"
+            v-html="sanitizeHtml({ html: section.content })"
           >
           </div>
         </div>
@@ -42,6 +42,7 @@ import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 import appConfig from '@/config/app';
+import { sanitizeHtml } from '@/utils/text';
 
 interface FAQSection {
   title: string;

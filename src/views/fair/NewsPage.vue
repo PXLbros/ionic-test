@@ -14,7 +14,6 @@
               <PlaceholderIcon v-else />
             </div>
             <h4 class="featured-article__title">{{ featuredNewsItem.title }}</h4>
-            <!-- <p class="featured-article__description" v-html="stripHTML(featuredNews.content.slice(0, 200) + '...')"></p> -->
           </router-link>
         </div>
 

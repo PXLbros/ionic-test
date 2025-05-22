@@ -6,7 +6,7 @@
         <ion-icon name="close-outline"></ion-icon>
       </button>
     </div>
-    <div class="popup-content" v-html="content"></div>
+    <div class="popup-content" v-html="sanitizedContent"></div>
     <div class="popup-category" v-if="category">
       {{ category }}
     </div>
@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { sanitizeHtml } from '@/utils/text';
 import { IonIcon } from '@ionic/vue';
 
 const props = defineProps({
@@ -41,6 +42,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['close']);
+
+const sanitizedContent = computed(() => {
+  return props.content ? sanitizeHtml({ html: props.content }) : '';
+});
 
 function closePopup() {
   emit('close');

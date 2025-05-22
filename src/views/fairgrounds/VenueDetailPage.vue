@@ -68,6 +68,7 @@ import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import FairgroundsKeepInTouchForm from '@/components/FairgroundsKeepInTouchForm.vue';
 import appConfig from '@/config/app';
 import { FairgroundsVenue } from '@/types';
+import { sanitizeHtml } from '@/utils/text';
 
 const route = useRoute();
 const dataStore = useDataStore();
@@ -97,7 +98,7 @@ const specSheetPdf = computed(() => {
 });
 
 const formattedDescription = computed(() => {
-  return venue.value?.venueDetailBody || 'No description available';
+  return venue.value?.venueDetailBody ? sanitizeHtml({ html: venue.value.venueDetailBody }) : 'No description available';
 });
 
 const floorPlanImage = computed(() => {
@@ -109,7 +110,7 @@ const floorPlanPdf = computed(() => {
 });
 
 const formattedFloorPlanFeatures = computed(() => {
-  return venue.value?.venueFloorPlanFeatures || null;
+  return venue.value?.venueFloorPlanFeatures ? sanitizeHtml({ html: venue.value.venueFloorPlanFeatures }) : null;
 });
 </script>
 

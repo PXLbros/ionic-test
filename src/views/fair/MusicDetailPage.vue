@@ -15,7 +15,7 @@
           <div class="main__price" v-if="event.price">Price: ${{event.price || 'price not available'}}</div>
         </div>
 
-        <div class="main__description" v-html="event.description"></div>
+        <div class="main__description" v-html="sanitizedEventDescription"></div>
       </div>
     </div>
   </FairLayout>
@@ -27,6 +27,7 @@ import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import FairLayout from '@/layouts/fair.vue';
 import appConfig from '@/config/app';
+import { sanitizeHtml } from '@/utils/text';
 
 interface Event {
     id: number;
@@ -151,6 +152,10 @@ const event = computed<Event | undefined>(() => {
         }
 
         return undefined;
+});
+
+const sanitizedEventDescription = computed(() => {
+  return sanitizeHtml({ html: event.value?.description || '' });
 });
 </script>
 
