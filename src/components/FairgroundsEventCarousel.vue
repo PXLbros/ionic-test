@@ -56,7 +56,7 @@
     <!-- Event information banner -->
     <div v-if="currentEvent" class="image-banner" @click="navigateToEvent(currentEvent.id)">
       <p class="date" v-if="currentEvent.dates?.[0]?.start_time_date">
-        {{ currentEvent.dates?.[0]?.start_time_date }}
+        {{ currentEventDatesText }}
       </p>
 
       <h3 class="title">
@@ -186,6 +186,8 @@ function formatDate(dateStr?: string): string {
   const month = months[date.getMonth()];
 
   let day = date.getDate();
+
+  const showSuffix = false;
   let suffix = 'th';
   if (day === 1 || day === 21 || day === 31) suffix = 'st';
   if (day === 2 || day === 22) suffix = 'nd';
@@ -193,12 +195,29 @@ function formatDate(dateStr?: string): string {
 
   const year = date.getFullYear();
 
-  return `${month} ${day}${suffix}, ${year}`;
+  return `${month} ${day}${showSuffix ? suffix : ''}, ${year}`;
 }
 
 function navigateToEvent(eventId: string): void {
   router.push(`/fairgrounds/upcoming-events/${encodeURIComponent(eventId)}`);
 }
+
+const currentEventDatesText = computed(() => {
+  // {{ currentEvent.dates?.[0]?.start_time_date }}
+
+  if (!currentEvent.value || !currentEvent.value.dates?.length) {
+    return '';
+  }
+
+  if (currentEvent.value.dates.length === 1) {
+    return formatDate(currentEvent.value.dates[0].start_time_date);
+  } else if (currentEvent.value.dates.length > 1) {
+    const startDate = formatDate(currentEvent.value.dates[0].start_time_date);
+    const endDate = formatDate(currentEvent.value.dates[currentEvent.value.dates.length - 1].start_time_date);
+
+    return `${startDate} - ${endDate}`;
+  }
+});
 
 onMounted(() => {
   startAutoplay();

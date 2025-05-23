@@ -24,6 +24,7 @@ import { Category } from '@/types';
 import FairgroundsLayout from '../../layouts/fairgrounds.vue';
 import { formatEvent } from '@/utils/event';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
+import appConfig from '@/config/app';
 
 const dataStore = useDataStore();
 
@@ -34,13 +35,10 @@ const categories = computed<Category[]>(() => {
 const favoriteEventItems = computed(() => {
   const favoriteEventItems: any[] = [];
 
-  console.log('dataStore.data.nysfairgroundsWebsite.events', dataStore.data.nysfairgroundsWebsite.events);
-
   for (const event of dataStore.data.nysfairgroundsWebsite.events) {
     for (const eventDate of event.dates) {
       if (eventDate.isFavorite) {
         const formattedEvent = formatEvent({ event, eventDate, categories: categories.value });
-        console.log('formattedEvent', formattedEvent);
 
         favoriteEventItems.push(formattedEvent);
       }
@@ -54,11 +52,11 @@ const favoriteEventItems = computed(() => {
 <style lang="scss" scoped>
 .main {
   font-family: 'Inter', sans-serif;
-  background: #999;
   min-height: calc(100vh - 7.5vh);
+  color: #000;
 
   &--event-favorites-page {
-    padding: 0px;
+    padding: 0 0 v-bind('appConfig.bottomBar.height') 0;
   }
 
   &__header {

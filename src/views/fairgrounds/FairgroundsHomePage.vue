@@ -15,16 +15,20 @@
 
     <ion-content>
       <div class="main">
-        <div class="main__header-title">
-          <h1 id="fg-title">Upcoming Events</h1>
-        </div>
+        <template v-if="hasEvents">
+          <div class="main__header-title">
+            <h1 id="fg-title">Upcoming Events</h1>
+          </div>
 
-        <FairgroundsEventCarousel :eventData="allEvents" />
+          <FairgroundsEventCarousel :eventData="allEvents" />
+        </template>
 
         <!-- Updated grid section to match the design -->
         <div class="categories-section">
           <!-- Events section with title outside -->
-          <h2 id="fg-h2" class="section-title">More Events</h2>
+          <h2 id="fg-h2" class="section-title">
+            {{ hasEvents ? 'More Events' : 'Events' }}
+          </h2>
           <router-link to="/fairgrounds/upcoming-events" class="category-link">
             <div class="category-card events-card">
               <img src="/Start_Screen_NYSFairgrounds.png" alt="Events" class="category-img" />
@@ -125,6 +129,10 @@ const onBottomNavTabClick = ({ id }: { id: string }) => {
     }
   }
 };
+
+const hasEvents = computed(() => {
+  return allEvents.value?.length > 0;
+});
 </script>
 
 <style lang="scss" scoped>

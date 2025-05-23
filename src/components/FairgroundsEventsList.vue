@@ -2,7 +2,7 @@
 <template>
   <div class="events-list">
     <template v-if="props.events && props.events.length > 0">
-      <div v-for="event in props.events" :key="`${event.id}-${event.dateDetails.start_time_unix}`" class="events-list__event-item">
+      <!-- <div v-for="event in props.events" :key="`${event.id}-${event.dateDetails.start_time_unix}`" class="events-list__event-item">
         <div class="content">
           <h3>{{ event.title }}</h3>
           <p>{{ props.showEventDate ? event.eventDate.start_time_formatted : event.start_time }}</p>
@@ -14,7 +14,13 @@
             :date-details="event.dateDetails"
           />
         </div>
-      </div>
+      </div> -->
+
+      <FairgroundsEventCard
+        v-for="event in formattedEvents"
+        :key="`${event.id}-${event.currentDate.date}`"
+        :event="event"
+      />
     </template>
 
     <div v-else class="events-list__no-events">
@@ -24,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import FavoriteButton from './FavoriteButton.vue';
+// import FavoriteButton from './FavoriteButton.vue';
 import type { Category } from '@/types';
 import type { FormattedEvent } from '@/utils/event';
 
@@ -38,6 +44,14 @@ const props = withDefaults(defineProps<{
   categories: () => [],
   noEventsText: 'No events',
   showEventDate: false,
+});
+
+const formattedEvents = computed(() => {
+  return props.events.map((event) => {
+    event.currentDate = event.eventDate;
+
+    return event;
+  });
 });
 </script>
 
@@ -56,12 +70,10 @@ const props = withDefaults(defineProps<{
     h3 {
       margin: 0 0 5px 0;
       line-height: 28px;
-      color: #FFF
     }
 
     p {
       font-size: 14px;
-      color: #FFF;
       margin: 0;
       font-weight: 500;
 
