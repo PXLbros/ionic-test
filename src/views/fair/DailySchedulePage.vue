@@ -14,25 +14,36 @@
 
       <div v-if="dates" class="date-selector">
         <div class="date-selector__container">
-          <button v-for="(date, index) in dates" :key="index" class="date-card"
-            :class="{ 'date-card--active': selectedDateIndex === index }" @click="selectDate(index)">
-            <div class="date-card__day">Day {{ date.day }}, {{ date.dayName }}</div>
-            <div class="date-card__date">{{ date.dateOnly }}</div>
+          <button
+            v-for="(date, index) in dates"
+            :key="index"
+            class="date-card"
+            :class="{ 'date-card--active': selectedDateIndex === index }"
+            @click="selectDate(index)"
+          >
+            <div class="date-card__day">
+              Day {{ date.day }}, {{ date.dayName }}
+            </div>
+
+            <div class="date-card__date">
+              {{ date.dateOnly }}
+            </div>
           </button>
         </div>
       </div>
 
       <div class="filter-section">
         <div class="filter-dropdown">
-          <button class="filter-btn" :class="{ 'filter-btn--active': showCategoryDropdown }"
-            @click="toggleCategoryDropdown">
+          <button class="filter-btn" :class="{ 'filter-btn--active': showCategoryDropdown }" @click="toggleCategoryDropdown">
             {{ selectedCategoryName }}
             <span>▼</span>
           </button>
           <div v-if="showCategoryDropdown" class="dropdown-content">
-            <div @click="selectCategory('all')">All Categories</div>
-            <div v-for="category in availableCategoriesForSelectedDay" :key="category.id"
-              @click="selectCategory(category.id)">
+            <div @click="selectCategory('all')">
+              All Categories
+            </div>
+
+            <div v-for="category in availableCategoriesForSelectedDay" :key="category.id" @click="selectCategory(category.id)">
               {{ category.name }}
             </div>
           </div>

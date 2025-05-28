@@ -38,6 +38,7 @@ export interface Category {
 }
 
 export interface DateObject {
+  dateOnly: string;
   dayName: string;
   day: number;
   timestamp: number;
