@@ -1,8 +1,5 @@
 import { Category, Event, FairgroundsEventDate } from '@/types';
 import { convertToEasternTime } from './time';
-// import { toZonedTime } from 'date-fns-tz';
-// import appConfig from '@/config/app';
-// import { isSameDay } from 'date-fns';
 
 export interface FormattedEvent extends Event {
   start_time: string;
@@ -18,26 +15,6 @@ export const formatEvent = ({ event, eventDate, categories }: { event: any; even
   const eventCategories = categories.filter((category: Category) => {
     return event.categories.find((categoryId: number) => categoryId === category.id);
   });
-
-
-  // const matchingDates = event.dates.filter((eventDate: FairgroundsEventDate) => {
-  //   const parsedDate = parseISO(eventDate.date);
-  //   const zonedEventDate = toZonedTime(parsedDate, appConfig.timezone);
-
-  //   return isSameDay(zonedEventDate, zonedDate);
-  // });
-
-  // return matchingDates.map((matchedDate: FairgroundsEventDate): EventWithCurrentDate => ({
-  //   ...event,
-  //   currentDate: matchedDate
-  // }));
-
-  // const matchingDates = event.dates.filter((eventDate: FairgroundsEventDate) => {
-  //   const parsedDate = new Date(eventDate.start_time_unix * 1000);
-  //   const zonedEventDate = toZonedTime(parsedDate, appConfig.timezone);
-
-  //   return isSameDay(zonedEventDate, zonedDate);
-  // });
 
   const formattedEvent = {
     ...event,

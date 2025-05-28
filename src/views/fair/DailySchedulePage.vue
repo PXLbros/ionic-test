@@ -74,7 +74,6 @@
 
 <script setup lang="ts">
 import FairLayout from '@/layouts/fair.vue';
-import EventsList from '@/components/FairEventsList.vue';
 import { useDataStore } from '@/stores/data';
 import { storeToRefs } from 'pinia';
 import { Category, DateObject, Event } from '@/types';
@@ -138,28 +137,15 @@ const dates = computed<DateObject[]>(() => {
 
   const sortedDates = [...allDates].sort((a, b) => a.timestamp - b.timestamp);
 
+  // Use start_time_date directly instead of converting timestamps
   const uniqueDates = [
     ...new Set(
-      sortedDates.map(date => {
-        console.log('date.timestamp', date, date.timestamp);
-
-        const convertedDate = convertToEasternTime(date.timestamp).toDateString();
-
-        console.log('convertedDate', convertedDate);
-
-        return convertedDate;
-      }),
+      sortedDates.map(date => date.originalDate)
     ),
   ];
 
   return uniqueDates.map((dateStr, index) => {
-    const matchingDate = sortedDates.find(date => {
-      const convertedDate = convertToEasternTime(date.timestamp).toDateString() === dateStr
-
-      console.log('convertingDate2', convertToEasternTime(date.timestamp).toDateString(), ' === ', dateStr);
-
-      return convertedDate;
-    });
+    const matchingDate = sortedDates.find(date => date.originalDate === dateStr);
 
     const dateObj = new Date(dateStr);
 
@@ -168,6 +154,7 @@ const dates = computed<DateObject[]>(() => {
       dateOnly: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), // e.g. Apr 14
       day: index + 1, // Day number starting from 1
       timestamp: matchingDate ? matchingDate.timestamp : 0,
+      originalDate: dateStr,
     };
   });
 });
@@ -182,17 +169,26 @@ const availableCategoriesForSelectedDay = computed<Category[]>(() => {
 });
 
 const filteredEvents = computed((): FormattedEvent[] => {
-  if (!eventsData.value || !eventsData.value.length || !dates.value.length) return [];
+  if (!eventsData.value || !eventsData.value.length || !dates.value.length) {
+    return [];
+  }
 
   const selectedDate = dates.value[selectedDateIndex.value];
-  if (!selectedDate) return [];
 
-  const selectedDateUnix = selectedDate.timestamp;
+  if (!selectedDate) {
+    return [];
+  }
+
+  // Get the original date string from the selected date
+  const selectedDateStr = selectedDate.originalDate;
 
   let filtered: FormattedEvent[] = eventsData.value.flatMap((event: Event) => {
-    const matchingDates = event.dates.filter(date =>
-      convertToEasternTime(date.start_time_unix).toDateString() === convertToEasternTime(selectedDateUnix).toDateString()
-    );
+    const matchingDates = event.dates.filter(date => {
+      // Compare the original date strings directly
+      const isMatching = date.start_time_date === selectedDateStr;
+
+      return isMatching;
+    });
 
     return matchingDates.map(matchingDate => {
       const formattedEvent = formatEvent({
@@ -234,6 +230,10 @@ watch(dates, (updatedDates) => {
     // - if the current date is on or before April 14, show the April 14 schedule to start.
     // - if the current date is between April 14 and April 26, show the current date's schedule to start. Example, if today is April 16 and I open then app and go to Daily Schedule the page loads with April 16 selected by default.
     // - if the current date is on or after April 26, show the April 26 schedule to start.
+
+    const firstEventDate = updatedDates[0];
+
+    console.log('firstEventDate', firstEventDate);
 
     // // Set initial date index
     // selectedDateIndex.value =
@@ -316,301 +316,11 @@ const selectedCategoryName = computed(() => {
 });
 </script>
 
+<style src="@/theme/sites/fair/pages/daily-schedule.scss" lang="scss" scoped></style>
+
 <style lang="scss" scoped>
 .main {
-  font-family: 'Inter', sans-serif;
-  background: #FDD456;
   padding-bottom: v-bind('appConfig.bottomBar.height');
-
-  &__header {
-    padding: 25px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 10px;
-
-    &-img {
-      width: 100%;
-      height: 25vh;
-      background-color: #EFF2F6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 10px;
-      background: #EFF2F6;
-      border: 5px solid #F4E8AB;
-    }
-
-    &-content {
-      display: flex;
-      flex-direction: column;
-
-      .title {
-        font-weight: 700;
-        line-height: 28px;
-        letter-spacing: 0.5px;
-        color: #343434;
-      }
-
-      .subtitle {
-        font-size: 14px;
-        font-weight: 500;
-        line-height: 24px;
-        letter-spacing: 0.5px;
-        font-family: 'Inter', sans-serif;
-        color: #343434;
-        margin: 0px;
-        width: 90%;
-      }
-    }
-  }
-
-  &__content {
-    padding: 0 25px;
-  }
-}
-
-.date-selector {
-  padding: 0 20px;
-  margin-bottom: 20px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-
-  &__container {
-    display: flex;
-    gap: 6px;
-    padding: 0px 0px 0px 0px;
-    min-width: min-content;
-  }
-}
-
-.date-card {
-  background-color: #1F3667;
-  width: 32vw;
-  height: 9vh;
-  padding: 16px 25px 12px;
-  border-radius: 15px;
-  text-align: center;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex: 1;
-  min-width: 120px;
-  color: #F1F1F1;
-  white-space: nowrap;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  &--active {
-    background-color: #EE4623;
-    color: #F1F1F1;
-  }
-
-  &__day {
-    font-size: 12px;
-    margin-bottom: 1px;
-    font-weight: 500;
-  }
-
-  &__date {
-    font-weight: 400;
-    font-size: 28px;
-    font-family: 'lalezar', sans-serif;
-  }
-}
-
-
-.filter-section {
-  padding: 0px 20px 10px 20px;
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  margin-bottom: 50px;
-}
-
-// Filter dropdown styling to match MusicPage.vue
-.filter-dropdown {
-  width: 100%;
-  position: relative;
-  display: flex;
-  flex-basis: 100%;
-
-  .filter-btn {
-    background-color: #1F3667;
-    border: none;
-    padding: 15px 20px;
-    border-radius: 12px;
-    font-size: 16px;
-    cursor: pointer;
-    font-weight: 700;
-    width: 100%;
-    color: #F1F1F1;
-    text-align: left;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: transform 0.3s ease;
-
-    &.filter-btn--active {
-      span {
-        transform: rotate(180deg);
-        transition: transform 0.3s ease;
-      }
-    }
-
-    span {
-      transform: rotate(0deg);
-      transition: transform 0.3s ease;
-      color: #F4E8AB;
-    }
-  }
-
-  .dropdown-content {
-    position: absolute;
-    top: 110%;
-    left: 0;
-    width: 100%;
-    background-color: #F4E8AB;
-    border-radius: 12px;
-    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.4);
-    z-index: 10;
-    max-height: 30vh;
-    overflow-y: auto;
-    padding: 10px;
-
-    div {
-      padding: 10px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #f3e59c;
-      }
-    }
-  }
-}
-
-.wrapper {
-  background-color: #098944;
-  padding-top: 20px;
-  border-top-left-radius: 40px;
-  border-top-right-radius: 40px;
-  margin-top: -40px; // This creates the overlap
-  position: relative; // Ensures it stays above the content below
-  z-index: 1; // Ensures the wrapper stays on top
-}
-
-.favorites-link {
-  display: flex;
-  justify-content: center;
-  padding: 0 25px;
-  margin-bottom: 5px;
-  position: sticky;
-  top: 10px;
-
-  a {
-    color: #F4E8AB;
-    font-size: 16px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: color 0.3s ease;
-    padding: 5px 10px;
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
-    background-color: #09894588;
-    // box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-
-    &:hover {
-      color: #F4E8AB;
-    }
-  }
-}
-
-.schedule-content {
-  padding: 5px 25px 0px 25px;
-
-  .category-section {
-    margin-bottom: 20px;
-  }
-
-  .section-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 10px;
-    border-radius: 5px;
-    border-bottom: 1px solid #EFF2F6;
-    cursor: pointer;
-    background-color: #F5F7FA;
-
-
-    h2 {
-      font-size: 18px;
-      margin: 0;
-    }
-  }
-
-  .section-icon {
-    transition: transform 0.3s ease;
-
-    &--open {
-      transform: rotate(180deg);
-    }
-  }
-}
-
-.loader-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  min-height: 200px;
-
-  p {
-    margin-top: 10px;
-  }
-}
-
-.spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border-left-color: #1E5EAE;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-// hide the scrollbar
-.date-selector::-webkit-scrollbar {
-  display: none;
 }
 </style>
 
