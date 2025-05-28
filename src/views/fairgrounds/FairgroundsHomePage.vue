@@ -85,13 +85,47 @@ const allEvents = computed(() => {
   const featured = dataStore.data.nysfairgroundsWebsite.featuredEvents || [];
   const regularEvents = dataStore.data.nysfairgroundsWebsite.events || [];
 
-  const filterUpcomingEvents = (events: FairgroundsEvent[]) =>
-    events.filter((event) => event.dates?.some((date) => date.is_upcoming));
+  const getEarliestUpcomingDate = (event: FairgroundsEvent): Date | null => {
+    const upcomingDates = event.dates?.filter(date => date.is_upcoming) || [];
 
-  const filteredRegularEvents = filterUpcomingEvents(regularEvents);
+    if (upcomingDates.length === 0) {
+      return null;
+    }
+
+    const sortedDates = upcomingDates
+      .map(date => new Date(date.date))
+      .sort((a, b) => a.getTime() - b.getTime());
+
+    return sortedDates[0];
+  };
+
+  const sortEventsByDate = (events: FairgroundsEvent[]) => {
+    return events.sort((a, b) => {
+      const dateA = getEarliestUpcomingDate(a);
+      const dateB = getEarliestUpcomingDate(b);
+
+      if (!dateA && !dateB) {
+        return 0;
+      }
+
+      if (!dateA) {
+        return 1;
+      }
+
+      if (!dateB) {
+        return -1;
+      }
+
+      return dateA.getTime() - dateB.getTime();
+    });
+  };
+
+  const filteredRegularEvents = regularEvents.filter((event: FairgroundsEvent) => {
+    return event.dates?.some((date) => date.is_upcoming);
+  });
 
   if (!featured.length) {
-    return filteredRegularEvents.slice(0, 5);
+    return sortEventsByDate(filteredRegularEvents).slice(0, 5);
   }
 
   const combined = [...featured];
@@ -102,10 +136,10 @@ const allEvents = computed(() => {
       (regEvent) => !featured.some((featEvent: any) => featEvent.id === regEvent.id)
     );
 
-    combined.push(...regularNotFeatured.slice(0, remainingNeeded));
+    combined.push(...sortEventsByDate(regularNotFeatured).slice(0, remainingNeeded));
   }
 
-  return combined;
+  return sortEventsByDate(combined);
 });
 
 const onBottomNavTabClick = ({ id }: { id: string }) => {

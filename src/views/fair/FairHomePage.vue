@@ -19,6 +19,7 @@
         <div class="main-logo">
           <img src="/src/imgs/svg/fair-main-logo.svg" alt="NYSF Logo">
         </div>
+
         <ion-grid>
           <ion-row>
             <ion-col @click="openTicketsWebsite">
@@ -322,11 +323,9 @@ ion-col {
     background-repeat: no-repeat;
     background-size: contain;
     z-index: -1;
-    /* Negative z-index to place it behind the background */
     pointer-events: none;
   }
 
-  /* Create another pseudo-element for the background image */
   &::after {
     content: '';
     position: absolute;
@@ -353,19 +352,19 @@ ion-col {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 45px;
-    position: relative; // Add this
-    z-index: 10; // Add this to ensure logo stays on top
+    margin-top: calc(var(--ion-safe-area-top, 0px) + 20px);
     margin-bottom: 5px;
+    position: relative;
+    z-index: 10;
 
     @media (max-height: 950px) {
       max-height: 13vh;
     }
 
     // 667px height
-    @media (max-height: 667px) {
-      margin-top: 40px;
-    }
+    // @media (max-height: 667px) {
+    //   margin-top: 40px;
+    // }
   }
 
   &-button {

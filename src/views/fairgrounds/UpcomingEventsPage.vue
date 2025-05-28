@@ -606,7 +606,8 @@ $horizontal-padding: 30px;
 
   .wrapper {
     background-color: #EBEDEF;
-    padding-top: 20px;
+    // padding-top: 20px;
+    padding-top: calc(var(--ion-safe-area-top, 0px) + 15px);
   }
 
     &__header {
