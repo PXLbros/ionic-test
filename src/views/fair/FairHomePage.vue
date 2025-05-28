@@ -1,6 +1,6 @@
 <template>
-  <ion-page id="main-content" class="main-content--fair-page">
-    <BaseNav
+  <FairLayout :show-header="false">
+    <!-- <BaseNav
       ref="hamburgerMenuBaseNav"
       type="fair"
       toolbarBackground="#098944"
@@ -10,9 +10,9 @@
       :headerVisible="isHeaderVisible"
       :showHamburgerToggle="false"
       :showOnScroll="false"
-    />
+    /> -->
 
-    <FairBottomNavigation @tabClick="onBottomNavTabClick" />
+    <!-- <FairBottomNavigation @tabClick="onBottomNavTabClick" /> -->
 
     <ion-content :fullscreen="true" :scroll-events="true" @ion-scroll="handleScroll($event)">
       <div class="main">
@@ -184,7 +184,7 @@ xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAA
         <SocialIcons type="fair" :social-data="dataStore.data.nysfairWebsite.social" />
       </div>
     </ion-content>
-  </ion-page>
+  </FairLayout>
 </template>
 
 <script setup lang="ts">
@@ -197,6 +197,7 @@ import FairBottomNavigation from '@/components/Tabs/FairBottomNavigation.vue';
 import fairLogo from '@/imgs/svg/fair-logo-light.svg';
 import appConfig from '@/config/app';
 import { useLogger } from '@/composables/useLogger';
+import FairLayout from '@/layouts/fair.vue';
 
 const logger = useLogger();
 const dataStore = useDataStore();

@@ -14,35 +14,32 @@
 
       <div v-if="dates" class="date-selector">
         <div class="date-selector__container">
-          <button
-            v-for="(date, index) in dates"
-            :key="index"
-            class="date-card"
-            :class="{ 'date-card--active': selectedDateIndex === index }"
-            @click="selectDate(index)"
-          >
-            <div class="date-card__day">{{ date.dayName || "Date Name" }}</div>
-            <div class="date-card__date">Day {{ date.day || "Date Day" }}</div>
+          <button v-for="(date, index) in dates" :key="index" class="date-card"
+            :class="{ 'date-card--active': selectedDateIndex === index }" @click="selectDate(index)">
+            <div class="date-card__day">Day {{ date.day }}, {{ date.dayName }}</div>
+            <div class="date-card__date">{{ date.dateOnly }}</div>
           </button>
         </div>
       </div>
 
       <div class="filter-section">
         <div class="filter-dropdown">
-          <button class="filter-btn" :class="{ 'filter-btn--active': showCategoryDropdown }" @click="toggleCategoryDropdown">
+          <button class="filter-btn" :class="{ 'filter-btn--active': showCategoryDropdown }"
+            @click="toggleCategoryDropdown">
             {{ selectedCategoryName }}
             <span>▼</span>
           </button>
           <div v-if="showCategoryDropdown" class="dropdown-content">
             <div @click="selectCategory('all')">All Categories</div>
-            <div v-for="category in availableCategoriesForSelectedDay" :key="category.id" @click="selectCategory(category.id)">
+            <div v-for="category in availableCategoriesForSelectedDay" :key="category.id"
+              @click="selectCategory(category.id)">
               {{ category.name }}
             </div>
           </div>
         </div>
       </div>
 
-       <div class="wrapper">
+      <div class="wrapper">
         <div class="favorites-link">
           <router-link :to="{ name: 'event-favorites' }">View All Favorites</router-link>
         </div>
@@ -53,11 +50,8 @@
         </div>
 
         <div v-else class="schedule-content">
-          <FairEventsList
-            :events="filteredEvents"
-            :categories="categories"
-            noEventsText="No events scheduled for this day"
-          />
+          <FairEventsList :events="filteredEvents" :categories="categories"
+            noEventsText="No events scheduled for this day" />
         </div>
       </div>
     </div>
@@ -81,7 +75,9 @@ const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 const categoriesData = computed(() => data.value?.nysfairWebsite?.event_categories ?? []);
 
 const findCurrentDayIndex = (dates: DateObject[]): number => {
-  if (!dates.length) return 0;
+  if (!dates.length) {
+    return 0;
+  }
 
   const now = Date.now();
   const today = convertToEasternTime(now).toDateString();
@@ -108,7 +104,9 @@ const selectedCategory = ref<string | number>('all');
 const showCategoryDropdown = ref(false);
 
 const dates = computed<DateObject[]>(() => {
-  if (!eventsData.value || !eventsData.value.length) return [];
+  if (!eventsData.value || !eventsData.value.length) {
+    return [];
+  }
 
   const allDates = eventsData.value.flatMap((event: Event) =>
     event.dates.map(date => ({
@@ -127,13 +125,12 @@ const dates = computed<DateObject[]>(() => {
       convertToEasternTime(date.timestamp).toDateString() === dateStr
     );
 
+    const dateObj = new Date(dateStr);
+
     return {
-      dayName: new Date(dateStr).toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric'
-      }),
-      day: index + 1,
+      dayName: dateObj.toLocaleDateString('en-US', { weekday: 'short' }), // e.g. Mon
+      dateOnly: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), // e.g. Apr 14
+      day: index + 1, // Day number starting from 1
       timestamp: matchingDate ? matchingDate.timestamp : 0,
     };
   });
@@ -329,125 +326,126 @@ const selectedCategoryName = computed(() => {
     padding: 0 25px;
   }
 }
-.date-selector {
-    padding: 0 20px;
-    margin-bottom: 20px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 
-    &__container {
-        display: flex;
-        gap: 6px;
-        padding: 0px 0px 0px 0px;
-        min-width: min-content;
-    }
+.date-selector {
+  padding: 0 20px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &__container {
+    display: flex;
+    gap: 6px;
+    padding: 0px 0px 0px 0px;
+    min-width: min-content;
+  }
 }
 
 .date-card {
-    background-color: #1F3667;
-    width: 32vw;
-    height: 9vh;
-    padding: 12px 25px;
-    border-radius: 15px;
-    text-align: center;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex: 1;
-    min-width: 120px;
+  background-color: #1F3667;
+  width: 32vw;
+  height: 9vh;
+  padding: 16px 25px 12px;
+  border-radius: 15px;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 120px;
+  color: #F1F1F1;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &--active {
+    background-color: #EE4623;
     color: #F1F1F1;
-    white-space: nowrap;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  }
 
-    &--active {
-        background-color: #EE4623;
-        color: #F1F1F1;
-    }
+  &__day {
+    font-size: 12px;
+    margin-bottom: 1px;
+    font-weight: 500;
+  }
 
-    &__day {
-        font-size: 12px;
-        margin-bottom: 1px;
-        font-weight: 500;
-    }
-
-    &__date {
-        font-weight: 400;
-        font-size: 28px;
-        font-family: 'lalezar', sans-serif;
-    }
+  &__date {
+    font-weight: 400;
+    font-size: 28px;
+    font-family: 'lalezar', sans-serif;
+  }
 }
 
 
 .filter-section {
-    padding: 0px 20px 10px 20px;
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    margin-bottom: 50px;
+  padding: 0px 20px 10px 20px;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: 50px;
 }
 
 // Filter dropdown styling to match MusicPage.vue
 .filter-dropdown {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-basis: 100%;
+
+  .filter-btn {
+    background-color: #1F3667;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 700;
     width: 100%;
-    position: relative;
+    color: #F1F1F1;
+    text-align: left;
     display: flex;
-    flex-basis: 100%;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease;
 
-    .filter-btn {
-        background-color: #1F3667;
-        border: none;
-        padding: 15px 20px;
-        border-radius: 12px;
-        font-size: 16px;
-        cursor: pointer;
-        font-weight: 700;
-        width: 100%;
-        color: #F1F1F1;
-        text-align: left;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    &.filter-btn--active {
+      span {
+        transform: rotate(180deg);
         transition: transform 0.3s ease;
-
-        &.filter-btn--active {
-            span {
-                transform: rotate(180deg);
-                transition: transform 0.3s ease;
-            }
-        }
-
-        span {
-          transform: rotate(0deg);
-          transition: transform 0.3s ease;
-          color: #F4E8AB;
-        }
+      }
     }
 
-    .dropdown-content {
-        position: absolute;
-        top: 110%;
-        left: 0;
-        width: 100%;
-        background-color: #F4E8AB;
-        border-radius: 12px;
-        box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.4);
-        z-index: 10;
-        max-height: 30vh;
-        overflow-y: auto;
-        padding: 10px;
-
-        div {
-            padding: 10px;
-            cursor: pointer;
-
-            &:hover {
-              background-color: #f3e59c;
-            }
-        }
+    span {
+      transform: rotate(0deg);
+      transition: transform 0.3s ease;
+      color: #F4E8AB;
     }
+  }
+
+  .dropdown-content {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    width: 100%;
+    background-color: #F4E8AB;
+    border-radius: 12px;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+    max-height: 30vh;
+    overflow-y: auto;
+    padding: 10px;
+
+    div {
+      padding: 10px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f3e59c;
+      }
+    }
+  }
 }
 
 .wrapper {
@@ -488,49 +486,49 @@ const selectedCategoryName = computed(() => {
 }
 
 .schedule-content {
-    padding: 5px 25px 0px 25px;
+  padding: 5px 25px 0px 25px;
 
-    .category-section {
-        margin-bottom: 20px;
+  .category-section {
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 10px;
+    border-radius: 5px;
+    border-bottom: 1px solid #EFF2F6;
+    cursor: pointer;
+    background-color: #F5F7FA;
+
+
+    h2 {
+      font-size: 18px;
+      margin: 0;
     }
+  }
 
-    .section-title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px 10px;
-        border-radius: 5px;
-        border-bottom: 1px solid #EFF2F6;
-        cursor: pointer;
-        background-color: #F5F7FA;
+  .section-icon {
+    transition: transform 0.3s ease;
 
-
-        h2 {
-            font-size: 18px;
-            margin: 0;
-        }
+    &--open {
+      transform: rotate(180deg);
     }
-
-    .section-icon {
-        transition: transform 0.3s ease;
-
-        &--open {
-            transform: rotate(180deg);
-        }
-    }
+  }
 }
 
 .loader-container {
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     justify-content: center;
-     padding: 20px;
-     min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  min-height: 200px;
 
-     p {
-         margin-top: 10px;
-     }
+  p {
+    margin-top: 10px;
+  }
 }
 
 .spinner {
@@ -546,33 +544,34 @@ const selectedCategoryName = computed(() => {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
 
 @keyframes pulse {
-    0% {
-        opacity: 1;
-    }
+  0% {
+    opacity: 1;
+  }
 
-    50% {
-        opacity: 0.5;
-    }
+  50% {
+    opacity: 0.5;
+  }
 
-    100% {
-        opacity: 1;
-    }
+  100% {
+    opacity: 1;
+  }
 }
 
 // hide the scrollbar
 .date-selector::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 </style>
 
 <style lang="scss">
-.events-list__no-events p {
+.schedule-content .events-list__no-events p {
   color: #fdd456;
   margin-top: 0;
   font-size: 0.85em;

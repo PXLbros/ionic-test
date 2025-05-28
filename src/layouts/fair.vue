@@ -4,7 +4,7 @@
       {{ props.loadingText }}
     </div>
 
-    <ion-header>
+    <ion-header v-if="props.showHeader">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button
@@ -15,20 +15,14 @@
           ></ion-back-button>
         </ion-buttons>
 
-        <div class="header-container">
-          <ion-title>{{ title }}</ion-title>
+        <div v-if="props.title" class="header-container">
+          <ion-title>{{ props.title }}</ion-title>
         </div>
-
-        <!-- Menu button on the right side if showMenuButton is true -->
-        <!-- <ion-buttons class="menu-button" slot="end" v-if="showMenuButton">
-          <ion-button @click="openMenu">
-            <HamburgerIcon class="menu-icon" />
-          </ion-button>
-        </ion-buttons> -->
       </ion-toolbar>
     </ion-header>
 
-    <div class="nav-wrapper" :class="{ 'is-open': isMenuOpen }" v-if="showMenuButton">
+    <!-- Hamburger Menu -->
+    <div class="nav-wrapper" :class="{ 'is-open': isMenuOpen }">
       <div
         class="nav-overlay"
         :class="{ 'is-visible': isMenuOpen }"
@@ -37,11 +31,6 @@
 
       <div class="nav-menu" :class="{ 'is-open': isMenuOpen }">
         <div class="nav-header">
-          <!-- <img
-            src="/src/imgs/svg/fair-logo-light.svg"
-            alt="NYSF Logo"
-            class="nav-logo"
-          > -->
           <button class="close-button" @click="closeMenu">
             <ion-icon :icon="closeCircleOutline"></ion-icon>
           </button>
@@ -49,7 +38,6 @@
 
         <nav class="nav-links">
           <div class="primary-links">
-            <!-- Regular navigation links -->
             <router-link
               v-for="route in mainNavLinks"
               :key="route.path"
@@ -103,7 +91,6 @@
     </ion-content>
 
     <FairBottomNavigation v-show="appStore.bottomBar.isVisible" @tabClick="onBottomNavTabClick" />
-    <!-- <FairgroundsBottomNavigation v-if="isFairgroundsRoute" v-show="appStore.bottomBar.isVisible" /> -->
 
     <ion-toast
       :isOpen="appStore.toast.isOpen"
@@ -132,16 +119,18 @@ const logger = useLogger();
 const route = useRoute();
 
 const props = withDefaults(defineProps<{
-  title: string;
+  title?: string;
   backButtonHref?: string;
   showMenuButton?: boolean;
   isLoading?: boolean;
   loadingText?: string;
+  showHeader?: boolean;
 }>(), {
   backButtonHref: '/fair',
   showMenuButton: false,
   isLoading: false,
   loadingText: 'Loading...',
+  showHeader: true,
 });
 
 const appStore = useAppStore();
@@ -216,9 +205,10 @@ const goBack = () => {
 const onBottomNavTabClick = ({ id }: { id: string }) => {
   switch (id) {
     case 'hamburgerMenu': {
+      document.body.style.overflow = 'hidden';
+
       // Open the hamburger menu
       isMenuOpen.value = true;
-      document.body.style.overflow = 'hidden';
 
       break;
     }
@@ -310,14 +300,15 @@ ion-back-button {
   top: -100%;
   left: 0;
   width: 100%;
-  height: 95vh;
+  height: 100%;
+  // height: 95vh;
   background: linear-gradient(180deg, #098944 0%, #098944 100%);
   transition: transform 0.3s ease;
   pointer-events: auto;
   overflow-y: auto;
   z-index: 10000;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
+  // border-bottom-left-radius: 15px;
+  // border-bottom-right-radius: 15px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 
   &.is-open {
