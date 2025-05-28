@@ -37,7 +37,7 @@
     "date-fns-tz": "^3.2.0",
     "dompurify": "^3.2.6",
     "firebase": "^11.4.0",
-    "ionicons": "^7.0.0",
+    "ionicons": "^8.0.8",
     "localforage": "^1.10.0",
     "mapbox-gl": "^3.5.2",
     "pinia": "^3.0.1",

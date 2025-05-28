@@ -317,10 +317,10 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], cur
 
 export function getMapIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
   const newMap = maps[currentMapIndex];
-  const isMasterMap = newMap.slug === 'master';
+  const isMainMap = newMap.slug === 'main';
   const defaultMapIcon = 'default-map-icon';
 
-  return isMasterMap
+  return isMainMap
     ? [
         'match',
         ['get', 'primaryMapSlug'],

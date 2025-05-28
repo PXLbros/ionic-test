@@ -8,7 +8,7 @@
 
         <div class="main__header-content">
           <h2 class="title">Daily Schedule</h2>
-          <p class="subtitle">Class ridiculus rhoncus ad suspendisse ridiculus malesuada; litora morbi</p>
+          <!-- <p class="subtitle">Class ridiculus rhoncus ad suspendisse ridiculus malesuada; litora morbi</p> -->
         </div>
       </div>
 
@@ -61,8 +61,11 @@
         </div>
 
         <div v-else class="schedule-content">
-          <FairEventsList :events="filteredEvents" :categories="categories"
-            noEventsText="No events scheduled for this day" />
+          <FairEventsList
+            :events="filteredEvents"
+            :categories="categories"
+            noEventsText="No events scheduled for this day"
+          />
         </div>
       </div>
     </div>
@@ -86,6 +89,7 @@ const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 const categoriesData = computed(() => data.value?.nysfairWebsite?.event_categories ?? []);
 
 const findCurrentDayIndex = (dates: DateObject[]): number => {
+  console.log('dates.length', dates.length, dates);
   if (!dates.length) {
     return 0;
   }
@@ -96,45 +100,66 @@ const findCurrentDayIndex = (dates: DateObject[]): number => {
   // Find today's index
   const todayIndex = dates.findIndex(date => {
     const dateStr = convertToEasternTime(date.timestamp).toDateString();
+
     return dateStr === today;
   });
 
-  if (todayIndex >= 0) return todayIndex;
+  if (todayIndex >= 0) {
+    return todayIndex;
+  }
 
   // If today not found, find next upcoming day
   const upcomingIndex = dates.findIndex(date => date.timestamp > now);
-  if (upcomingIndex >= 0) return upcomingIndex;
+
+  if (upcomingIndex >= 0) {
+    return upcomingIndex;
+  }
 
   // If no upcoming days, default to first day
   return 0;
 };
 
-const selectedDateIndex = ref(0);
+const selectedDateIndex = ref(-1);
 const isDateChanging = ref(false);
 const selectedCategory = ref<string | number>('all');
 const showCategoryDropdown = ref(false);
 
 const dates = computed<DateObject[]>(() => {
-  if (!eventsData.value || !eventsData.value.length) {
+  if (!eventsData.value?.length) {
     return [];
   }
 
   const allDates = eventsData.value.flatMap((event: Event) =>
     event.dates.map(date => ({
       timestamp: date.start_time_unix,
-      originalDate: date.start_time_date,
+      originalDate: date.start_time_date, // e.g. February 11, 2025
     }))
   );
 
   const sortedDates = [...allDates].sort((a, b) => a.timestamp - b.timestamp);
-  const uniqueDates = [...new Set(sortedDates.map(date =>
-    convertToEasternTime(date.timestamp).toDateString()
-  ))];
+
+  const uniqueDates = [
+    ...new Set(
+      sortedDates.map(date => {
+        console.log('date.timestamp', date, date.timestamp);
+
+        const convertedDate = convertToEasternTime(date.timestamp).toDateString();
+
+        console.log('convertedDate', convertedDate);
+
+        return convertedDate;
+      }),
+    ),
+  ];
 
   return uniqueDates.map((dateStr, index) => {
-    const matchingDate = sortedDates.find(date =>
-      convertToEasternTime(date.timestamp).toDateString() === dateStr
-    );
+    const matchingDate = sortedDates.find(date => {
+      const convertedDate = convertToEasternTime(date.timestamp).toDateString() === dateStr
+
+      console.log('convertingDate2', convertToEasternTime(date.timestamp).toDateString(), ' === ', dateStr);
+
+      return convertedDate;
+    });
 
     const dateObj = new Date(dateStr);
 
@@ -203,15 +228,23 @@ const filteredEvents = computed((): FormattedEvent[] => {
 });
 
 // Watch for dates to be populated
-watch(dates, (newDates) => {
-  if (newDates.length && selectedDateIndex.value === 0) {
-    // Set initial date index
-    selectedDateIndex.value = findCurrentDayIndex(newDates);
+watch(dates, (updatedDates) => {
+  if (updatedDates.length && selectedDateIndex.value === -1) {
+    // For example, if there are events from April 14 - 26, then do one of the following:
+    // - if the current date is on or before April 14, show the April 14 schedule to start.
+    // - if the current date is between April 14 and April 26, show the current date's schedule to start. Example, if today is April 16 and I open then app and go to Daily Schedule the page loads with April 16 selected by default.
+    // - if the current date is on or after April 26, show the April 26 schedule to start.
+
+    // // Set initial date index
+    // selectedDateIndex.value =
+
+    // console.log('Initial selected date index:', selectedDateIndex.value);
 
     // Scroll to the selected date after a short delay
     setTimeout(() => {
       const container = document.querySelector('.date-selector__container');
       const activeButton = container?.children[selectedDateIndex.value] as HTMLElement;
+
       if (activeButton) {
         activeButton.scrollIntoView({
           behavior: 'smooth',
@@ -293,7 +326,7 @@ const selectedCategoryName = computed(() => {
     padding: 25px 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     gap: 10px;
 

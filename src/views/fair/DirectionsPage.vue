@@ -7,7 +7,7 @@
 
       <div class="main__content">
         <div
-          v-if="directionsPageData.content"
+          v-if="sanitizedContent"
           v-html="sanitizedContent"
           class="main__content-text"
         ></div>
@@ -21,7 +21,6 @@ import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import appConfig from '@/config/app';
-import DOMPurify from 'dompurify';
 import { sanitizeHtml } from '@/utils/text';
 
 interface DirectionsPageData {

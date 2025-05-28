@@ -312,8 +312,6 @@ const monthsWithUpcomingEvents = computed(() => {
     });
   });
 
-  console.log('monthsSet', monthsSet);
-
   // Convert back to Date[] and sort
   return Array.from(monthsSet)
     .map(iso => new Date(iso))
