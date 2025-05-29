@@ -76,54 +76,56 @@
 import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 import { storeToRefs } from 'pinia';
-import { Category, DateObject, Event } from '@/types';
-import { convertToEasternTime } from '@/utils/time';
+import { Category, DateObject, Event, FormattedDateObject } from '@/types';
+// import { convertToEasternTime } from '@/utils/time';
 import { formatEvent, FormattedEvent } from '@/utils/event';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import appConfig from '@/config/app';
+import { isAfter, isBefore, isSameDay, startOfDay } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
 const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 const categoriesData = computed(() => data.value?.nysfairWebsite?.event_categories ?? []);
 
-const findCurrentDayIndex = (dates: DateObject[]): number => {
-  console.log('dates.length', dates.length, dates);
-  if (!dates.length) {
-    return 0;
-  }
+// const findCurrentDayIndex = (dates: DateObject[]): number => {
+//   console.log('dates.length', dates.length, dates);
+//   if (!dates.length) {
+//     return 0;
+//   }
 
-  const now = Date.now();
-  const today = convertToEasternTime(now).toDateString();
+//   const now = Date.now();
+//   const today = convertToEasternTime(now).toDateString();
 
-  // Find today's index
-  const todayIndex = dates.findIndex(date => {
-    const dateStr = convertToEasternTime(date.timestamp).toDateString();
+//   // Find today's index
+//   const todayIndex = dates.findIndex(date => {
+//     const dateStr = convertToEasternTime(date.timestamp).toDateString();
 
-    return dateStr === today;
-  });
+//     return dateStr === today;
+//   });
 
-  if (todayIndex >= 0) {
-    return todayIndex;
-  }
+//   if (todayIndex >= 0) {
+//     return todayIndex;
+//   }
 
-  // If today not found, find next upcoming day
-  const upcomingIndex = dates.findIndex(date => date.timestamp > now);
+//   // If today not found, find next upcoming day
+//   const upcomingIndex = dates.findIndex(date => date.timestamp > now);
 
-  if (upcomingIndex >= 0) {
-    return upcomingIndex;
-  }
+//   if (upcomingIndex >= 0) {
+//     return upcomingIndex;
+//   }
 
-  // If no upcoming days, default to first day
-  return 0;
-};
+//   // If no upcoming days, default to first day
+//   return 0;
+// };
 
 const selectedDateIndex = ref(-1);
 const isDateChanging = ref(false);
 const selectedCategory = ref<string | number>('all');
 const showCategoryDropdown = ref(false);
 
-const dates = computed<DateObject[]>(() => {
+const dates = computed<FormattedDateObject[]>(() => {
   if (!eventsData.value?.length) {
     return [];
   }
@@ -137,26 +139,32 @@ const dates = computed<DateObject[]>(() => {
 
   const sortedDates = [...allDates].sort((a, b) => a.timestamp - b.timestamp);
 
-  // Use start_time_date directly instead of converting timestamps
+  // Get unique dates
   const uniqueDates = [
     ...new Set(
       sortedDates.map(date => date.originalDate)
     ),
   ];
 
-  return uniqueDates.map((dateStr, index) => {
+  const formattedUniqueDates = uniqueDates.map((dateStr, index) => {
     const matchingDate = sortedDates.find(date => date.originalDate === dateStr);
 
     const dateObj = new Date(dateStr);
 
-    return {
+    const formattedDate = {
       dayName: dateObj.toLocaleDateString('en-US', { weekday: 'short' }), // e.g. Mon
       dateOnly: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), // e.g. Apr 14
       day: index + 1, // Day number starting from 1
       timestamp: matchingDate ? matchingDate.timestamp : 0,
       originalDate: dateStr,
     };
+
+    console.log(formattedDate.dateOnly);
+
+    return formattedDate;
   });
+
+  return formattedUniqueDates;
 });
 
 const categories = computed<Category[]>(() => {
@@ -226,19 +234,52 @@ const filteredEvents = computed((): FormattedEvent[] => {
 // Watch for dates to be populated
 watch(dates, (updatedDates) => {
   if (updatedDates.length && selectedDateIndex.value === -1) {
-    // For example, if there are events from April 14 - 26, then do one of the following:
-    // - if the current date is on or before April 14, show the April 14 schedule to start.
-    // - if the current date is between April 14 and April 26, show the current date's schedule to start. Example, if today is April 16 and I open then app and go to Daily Schedule the page loads with April 16 selected by default.
-    // - if the current date is on or after April 26, show the April 26 schedule to start.
+    // For example, if there are events from May 27 - 31, then do one of the following:
+    // - if the current date is on or before May 27, show the May 27 schedule to start.
+    // - if the current date is between May 27 and May 31, show the current date's schedule to start. Example, if today is May 16 and I open the app and go to Daily Schedule, the page loads with May 16 selected by default.
+    // - if the current date is on or after May 31, show the May 31 schedule to start.
 
-    const firstEventDate = updatedDates[0];
+    const now = new Date();
+    const localizedEasternTime = toZonedTime(now, appConfig.timezone);
+    const todayStart = startOfDay(localizedEasternTime);
 
-    console.log('firstEventDate', firstEventDate);
+    const firstEventDate = new Date(updatedDates[0].originalDate);
+    const lastEventDate = new Date(updatedDates[updatedDates.length - 1].originalDate);
 
-    // // Set initial date index
-    // selectedDateIndex.value =
+    const firstEventStart = startOfDay(firstEventDate);
+    const lastEventStart = startOfDay(lastEventDate);
 
-    // console.log('Initial selected date index:', selectedDateIndex.value);
+    let initialIndex = 0;
+
+    if (isBefore(todayStart, firstEventStart) || isSameDay(todayStart, firstEventStart)) {
+      // Current date is on or before first event date - show first event
+      initialIndex = 0;
+    } else if (isAfter(todayStart, lastEventStart) || isSameDay(todayStart, lastEventStart)) {
+      // Current date is on or after last event date - show last event
+      initialIndex = updatedDates.length - 1;
+    } else {
+      // Current date is between first and last event dates - find matching date
+      const todayIndex = updatedDates.findIndex(date => {
+        const eventDate = startOfDay(new Date(date.originalDate));
+        return isSameDay(todayStart, eventDate);
+      });
+
+      if (todayIndex >= 0) {
+        initialIndex = todayIndex;
+      } else {
+        // If exact match not found, find the next upcoming date
+        const nextIndex = updatedDates.findIndex(date => {
+          const eventDate = startOfDay(new Date(date.originalDate));
+          return isAfter(eventDate, todayStart);
+        });
+        initialIndex = nextIndex >= 0 ? nextIndex : 0;
+      }
+    }
+
+    selectedDateIndex.value = initialIndex;
+
+    console.log('Initial selected date index:', selectedDateIndex.value);
+    console.log('Selected date:', updatedDates[initialIndex]);
 
     // Scroll to the selected date after a short delay
     setTimeout(() => {

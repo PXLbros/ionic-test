@@ -44,6 +44,10 @@ export interface DateObject {
   timestamp: number;
 }
 
+export interface FormattedDateObject extends DateObject {
+  originalDate: string;
+}
+
 export interface NewsArticle {
   id: number;
   title: string;
@@ -52,9 +56,6 @@ export interface NewsArticle {
   created_at: string;
   image?: string; // Add the image property
 }
-
-
-// Map Types
 
 // Interfaces for our data
 export interface VendorProperties {
