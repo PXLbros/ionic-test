@@ -387,24 +387,48 @@ export function setupIconClickHandlers(
   };
 
   // Helper function to center the map on coordinates
-  const centerMapOnPoint = ({ coordinates, onDone }: { coordinates: [number, number]; onDone?: () => void }) => {
-    map.flyTo({
+  const flyToCoordinates = ({ coordinates, zoomLevel, onDone }: { coordinates: [number, number]; zoomLevel: number; onDone?: () => void }) => {
+    // map.flyTo({
+    //   center: coordinates,
+    //   zoom: zoomLevel,
+    //   essential: true,
+    // });
+
+    map.easeTo({
       center: coordinates,
-      zoom: 17,
-      essential: true,
+      zoom: zoomLevel,
+      duration: 500,
+      easing: (t: number) => t * (2 - t), // Ease-in-out
     });
 
     if (typeof onDone === 'function') {
       map.once('moveend', onDone);
     }
+
+    logger.debug('Flew to coordinates', {
+      'Coordinates': coordinates,
+      'Zoom Level': zoomLevel,
+    });
   };
 
   // Move event handler
   const handleMapMove = () => {
     if (activePopup) {
       const popupLngLat = activePopup.getLngLat();
+
       activePopup.setLngLat(popupLngLat); // Reposition the popup to stay anchored
     }
+  };
+
+  const getIconClickZoomLevel = (map: mapboxgl.Map): number => {
+    // // Determine the zoom level based on the map's current zoom
+    // const currentZoom = map.getZoom();
+    // const maxZoom = map.getMaxZoom();
+    // const zoomLevel = Math.max(17, maxZoom);
+    // // Ensure the zoom level is not greater than the map's max zoom
+    // return Math.min(zoomLevel, maxZoom);
+
+    return 17;
   };
 
   // Vendor icon click handler
@@ -415,9 +439,12 @@ export function setupIconClickHandlers(
     const coordinates = (feature.geometry as any).coordinates.slice() as [number, number];
     const { name, description } = feature.properties as any;
 
+    const newZoomLevel = getIconClickZoomLevel(map);
+
     // Center the map on the clicked point
-    centerMapOnPoint({
+    flyToCoordinates({
       coordinates,
+      zoomLevel: newZoomLevel,
       onDone: () => {
         // Create popup content
         const popupContent = `
@@ -460,9 +487,12 @@ export function setupIconClickHandlers(
       }
     }
 
+    const newZoomLevel = getIconClickZoomLevel(map);
+
     // Center the map on the clicked point
-    centerMapOnPoint({
+    flyToCoordinates({
       coordinates,
+      zoomLevel: newZoomLevel,
       onDone: () => {
         // Create popup content
         const popupContent = `

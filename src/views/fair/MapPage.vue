@@ -238,6 +238,7 @@ import { useDataStore } from '@/stores/data';
 import appConfig from '@/config/app';
 import { debounce } from '@/utils/time';
 import sponsorshipMicronSvg from '@/imgs/svg/sponsorship-micron.svg';
+import { checkWebPSupport } from '@/utils/image';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_ACCESS_TOKEN as string;
 
@@ -304,6 +305,8 @@ const opacityControlMinimized = ref(true); // Start minimized
 
 // Add: control for updating cluster settings on zoomend
 const updateClusterOnZoom = ref(true); // Default checked/enabled
+
+let isUserZoom = false;
 
 const clusterConfigByZoomRange = [
   {
@@ -1242,6 +1245,7 @@ function selectSuggestion(suggestion: SearchSuggestion) {
         // Check if the source is completely loaded
         if (e.sourceId === MapSource.PointsClustered && e.isSourceLoaded) {
           logger.info('Map source data loaded, focusing on suggestion');
+
           focusOnSuggestion(suggestion);
         } else {
           // If this event didn't indicate completion, wait for another one
@@ -1418,10 +1422,24 @@ function initMap() {
     currentZoomLevel.value = mapboxMap.getZoom();
   });
 
+  mapboxMap.on('zoomstart', (event: any) => {
+    // If originalEvent exists, it was a user interaction
+    isUserZoom = !!event.originalEvent;
+  });
+
   mapboxMap.on('zoomend', () => {
     const newZoomLevel = mapboxMap.getZoom();
 
+    if (isUserZoom) {
+      console.log('User-initiated zoom (e.g. mouse wheel)');
+    } else {
+      console.log('Programmatic zoom (e.g. map.flyTo)');
+    }
+
     if (currentZoomLevel.value === newZoomLevel) {
+      // Reset for next zoom interaction
+      isUserZoom = false;
+
       return;
     }
 
@@ -1470,6 +1488,9 @@ function initMap() {
       });
     }
   });
+
+  // Reset for next zoom interaction
+  isUserZoom = false;
 }
 
 function zoomMapToAvailablePoints() {
@@ -1534,46 +1555,6 @@ async function loadMapResources() {
   }
 }
 
-// // Load the map overlay image with proper promise handling
-// function loadMapOverlayImage(): Promise<void> {
-//   return new Promise((resolve, reject) => {
-//     const imageOverlayElement = new Image();
-
-//     imageOverlayElement.onload = () => {
-//       logger.info('Map overlay image loaded');
-//       // setupMapLayers();
-//       resolve();
-//     };
-
-//     imageOverlayElement.onerror = (error) => {
-//       logger.error('Failed to load map overlay image', error);
-//       reject(error);
-//     };
-
-//     // Set the source after setting up event handlers
-//     imageOverlayElement.src = '/icons/Map_Design-big-min.png';
-//   });
-// }
-
-function checkWebPSupport(): Promise<boolean> {
-  return new Promise((resolve) => {
-    const img = new Image();
-
-    img.onload = function() {
-      // If the image loads successfully, WebP is supported
-      resolve(true);
-    };
-
-    img.onerror = function() {
-      // If the image fails to load, WebP is not supported
-      resolve(false);
-    };
-
-    // Try to load a 1x1 pixel WebP image
-    img.src = '/icons/1x1.webp';
-  });
-}
-
 // Function to handle cluster clicks
 function handleClusterClick(e: mapboxgl.MapMouseEvent) {
   if (!mapboxMap || !e.point) return;
@@ -1626,27 +1607,8 @@ function setupMapLayers() {
     return;
   }
 
-  // const mapOverlayImageUrl = `/icons/map-overlay-3x.${isWebPSupported.value ? 'webp' : 'png'}`;
-  // const mapOverlayImageUrl = '/icons/Map_Design-big-min.png';
-
   try {
-    // 1. Add the map overlay image source
-    // mapboxMap.addSource(MapSource.ChevyCourtArea, {
-    //   type: 'image',
-    //   url: mapOverlayImageUrl,
-    //   coordinates: [
-    //     [-76.21532502658798, 43.055330160826315],   // Top left
-    //     [-76.23753721914531, 43.07114978353832],    // Top right
-    //     [-76.22037084830293, 43.08502388194864],    // Bottom right
-    //     [-76.19757700157899, 43.06982854755563]     // Bottom left
-    //   ]
-    // });
-
-    const nysfairWebsiteBaseUrl = import.meta.env.VITE_NYSFAIR_BASE_URL;
-
     const currentZoomLevel = mapboxMap.getZoom();
-
-    // console.log('Current zoom level:', currentZoomLevel);
 
     const { clusterRadius, clusterMinPoints, clusterClickZoomInAmount: newZoomInAmount } = getClusterConfig(currentZoomLevel);
 
@@ -1755,12 +1717,6 @@ function destroyMap() {
 
       // Remove cluster click handler
       mapboxMap.off('click', MapLayer.MapClusterIcon, handleClusterClick);
-
-      // Remove basic map event handlers
-      // mapboxMap.off('load');
-      // mapboxMap.off('style.load');
-      // mapboxMap.off('idle');
-      // mapboxMap.off('error');
 
       // Then remove the map
       mapboxMap.remove();
