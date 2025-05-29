@@ -15,6 +15,15 @@ const config: CapacitorConfig = {
     FirebaseAnalytics: {
       autoCollectionEnabled: true, // Enables automatic event tracking
     },
+    // SafeArea: {
+    //   enabled: true,
+    //   customColorsForSystemBars: true,
+    //   statusBarColor: '#000000',
+    //   statusBarContent: 'light',
+    //   navigationBarColor: '#000000',
+    //   navigationBarContent: 'light',
+    //   offset: 0,
+    // },
   },
 };
 

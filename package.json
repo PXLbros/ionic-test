@@ -11,9 +11,11 @@
     "lint:ts": "vue-tsc --noEmit",
     "app:build": "npx npm run build && npx cap copy && npx cap sync --inline",
     "ios:open": "npx cap open ios",
+    "android:build": "ionic capacitor build android --prod",
     "android:run": "npx npm run build && npx cap copy && npx cap sync --inline && $HOME/Downloads/android-studio/bin/studio.sh android &"
   },
   "dependencies": {
+    "@capacitor-community/safe-area": "^7.0.0-alpha.1",
     "@capacitor-firebase/analytics": "^7.0.0",
     "@capacitor/android": "^7.0.0",
     "@capacitor/app": "^7.0.0",
@@ -30,6 +32,7 @@
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
     "@sentry/capacitor": "^1.2.0",
+    "@sentry/vue": "^8.55.0",
     "@types/geojson": "^7946.0.16",
     "@types/mapbox-gl": "^3.1.0",
     "axios": "^1.7.7",

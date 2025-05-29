@@ -139,7 +139,7 @@ const dataStore = useDataStore();
     font-size: 18px;
     font-weight: 700;
     border-radius: 10px;
-    height: 9vh;
+    // height: 9vh;
 
     &:active {
       background-color: #1F3667;

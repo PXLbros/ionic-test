@@ -19,10 +19,10 @@
       <!-- Rest of your component remains the same -->
       <div class="main__content">
         <h2 class="main__content-title">{{ parkingPageData?.title }}</h2>
-        <p class="main__content-text">
+        <!-- <p class="main__content-text">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
           magna aliqua.
-        </p>
+        </p> -->
       </div>
 
       <div class="expandable-sections">
@@ -260,12 +260,12 @@ onMounted(() => {
   }
 
   &__content {
-    padding: 0px 20px 20px 20px;
+    padding: 0px 20px 0 20px;
 
     &-title {
       font-weight: 400;
       color: #343434;
-      margin: 0 0 5px 0;
+      margin: 0;
       line-height: 36px;
       letter-spacing: 0.5px;
     }
@@ -276,7 +276,7 @@ onMounted(() => {
       letter-spacing: 0.5px;
       color: #343434;
       font-weight: 400;
-      margin: 0;
+      margin: 5px 0 0 0;
     }
   }
 }

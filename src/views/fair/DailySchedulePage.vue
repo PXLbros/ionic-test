@@ -13,7 +13,7 @@
       </div>
 
       <div v-if="dates" class="date-selector">
-        <div class="date-selector__container">
+        <div class="date-selector__container" ref="dateSelectorContainer">
           <button
             v-for="(date, index) in dates"
             :key="index"
@@ -93,6 +93,9 @@ const isDateChanging = ref(false);
 const selectedCategory = ref<string | number>('all');
 const showCategoryDropdown = ref(false);
 
+// Add ref for date selector container
+const dateSelectorContainer = ref<HTMLElement>();
+
 const dates = computed<FormattedDateObject[]>(() => {
   if (!eventsData.value?.length) {
     return [];
@@ -126,8 +129,6 @@ const dates = computed<FormattedDateObject[]>(() => {
       timestamp: matchingDate ? matchingDate.timestamp : 0,
       originalDate: dateStr,
     };
-
-    console.log(formattedDate.dateOnly);
 
     return formattedDate;
   });
@@ -199,72 +200,6 @@ const filteredEvents = computed((): FormattedEvent[] => {
   return filtered;
 });
 
-// Watch for dates to be populated
-watch(dates, (updatedDates) => {
-  if (updatedDates.length && selectedDateIndex.value === -1) {
-    // For example, if there are events from May 27 - 31, then do one of the following:
-    // - if the current date is on or before May 27, show the May 27 schedule to start.
-    // - if the current date is between May 27 and May 31, show the current date's schedule to start. Example, if today is May 16 and I open the app and go to Daily Schedule, the page loads with May 16 selected by default.
-    // - if the current date is on or after May 31, show the May 31 schedule to start.
-
-    const now = new Date();
-    const localizedEasternTime = toZonedTime(now, appConfig.timezone);
-    const todayStart = startOfDay(localizedEasternTime);
-
-    const firstEventDate = new Date(updatedDates[0].originalDate);
-    const lastEventDate = new Date(updatedDates[updatedDates.length - 1].originalDate);
-
-    const firstEventStart = startOfDay(firstEventDate);
-    const lastEventStart = startOfDay(lastEventDate);
-
-    let initialIndex = 0;
-
-    if (isBefore(todayStart, firstEventStart) || isSameDay(todayStart, firstEventStart)) {
-      // Current date is on or before first event date - show first event
-      initialIndex = 0;
-    } else if (isAfter(todayStart, lastEventStart) || isSameDay(todayStart, lastEventStart)) {
-      // Current date is on or after last event date - show last event
-      initialIndex = updatedDates.length - 1;
-    } else {
-      // Current date is between first and last event dates - find matching date
-      const todayIndex = updatedDates.findIndex(date => {
-        const eventDate = startOfDay(new Date(date.originalDate));
-        return isSameDay(todayStart, eventDate);
-      });
-
-      if (todayIndex >= 0) {
-        initialIndex = todayIndex;
-      } else {
-        // If exact match not found, find the next upcoming date
-        const nextIndex = updatedDates.findIndex(date => {
-          const eventDate = startOfDay(new Date(date.originalDate));
-          return isAfter(eventDate, todayStart);
-        });
-        initialIndex = nextIndex >= 0 ? nextIndex : 0;
-      }
-    }
-
-    selectedDateIndex.value = initialIndex;
-
-    console.log('Initial selected date index:', selectedDateIndex.value);
-    console.log('Selected date:', updatedDates[initialIndex]);
-
-    // Scroll to the selected date after a short delay
-    setTimeout(() => {
-      const container = document.querySelector('.date-selector__container');
-      const activeButton = container?.children[selectedDateIndex.value] as HTMLElement;
-
-      if (activeButton) {
-        activeButton.scrollIntoView({
-          behavior: 'instant',
-          block: 'nearest',
-          inline: 'center'
-        });
-      }
-    }, 100);
-  }
-}, { immediate: true });
-
 const selectDate = (index: number): void => {
   isDateChanging.value = true;
   selectedDateIndex.value = index;
@@ -283,9 +218,7 @@ const selectDate = (index: number): void => {
     }
 
     // Add scroll behavior when selecting dates
-    const container = document.querySelector('.date-selector__container');
-
-    const activeButton = container?.children[index] as HTMLElement;
+    const activeButton = dateSelectorContainer.value?.children[index] as HTMLElement;
 
     if (activeButton) {
       activeButton.scrollIntoView({
@@ -322,6 +255,62 @@ const selectedCategoryName = computed(() => {
   }
 
   return category.name;
+});
+
+function scrollToDateSelector(index: number) {
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      const btn = dateSelectorContainer.value?.children[index] as HTMLElement | undefined;
+
+      btn?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
+    });
+  });
+}
+
+onMounted(async () => {
+  const now = new Date();
+  const localizedEasternTime = toZonedTime(now, appConfig.timezone);
+  const todayStart = startOfDay(localizedEasternTime);
+
+  const firstEventDate = new Date(dates.value[0].originalDate);
+  const lastEventDate = new Date(dates.value[dates.value.length - 1].originalDate);
+
+  const firstEventStart = startOfDay(firstEventDate);
+  const lastEventStart = startOfDay(lastEventDate);
+
+  let initialIndex = 0;
+
+  if (isBefore(todayStart, firstEventStart) || isSameDay(todayStart, firstEventStart)) {
+    // Current date is on or before first event date - show first event
+    initialIndex = 0;
+  } else if (isAfter(todayStart, lastEventStart) || isSameDay(todayStart, lastEventStart)) {
+    // Current date is on or after last event date - show last event
+    initialIndex = dates.value.length - 1;
+  } else {
+    // Current date is between first and last event dates - find matching date
+    const todayIndex = dates.value.findIndex(date => {
+      const eventDate = startOfDay(new Date(date.originalDate));
+      return isSameDay(todayStart, eventDate);
+    });
+
+    if (todayIndex >= 0) {
+      initialIndex = todayIndex;
+    } else {
+      // If exact match not found, find the next upcoming date
+      const nextIndex = dates.value.findIndex(date => {
+        const eventDate = startOfDay(new Date(date.originalDate));
+        return isAfter(eventDate, todayStart);
+      });
+
+      initialIndex = nextIndex >= 0 ? nextIndex : 0;
+    }
+  }
+
+  selectedDateIndex.value = initialIndex;
+
+  await nextTick();
+
+  scrollToDateSelector(initialIndex);
 });
 </script>
 
