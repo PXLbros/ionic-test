@@ -6,20 +6,20 @@
     <div v-if="event" class="main">
       <div class="event-details">
         <div class="event-image">
-          <img :src="getEventImage(event)" :alt="event.title">
+          <img :src="getEventImage(event)" alt="">
+
+          <FavoriteButton
+            v-if="dateDetails"
+            site="nysfairgrounds"
+            :event-id="event.id"
+            :date-details="dateDetails"
+            class="event-details__favorite-button"
+          />
         </div>
         <div class="event-datetime">
           {{ getEventTime(event) }}
         </div>
         <h1 class="event-title">{{ event.title }}</h1>
-        <!-- <div class="event-location">Location Name</div> -->
-
-        <FavoriteButton
-          v-if="dateDetails"
-          site="nysfairgrounds"
-          :event-id="event.id"
-          :date-details="dateDetails"
-        />
       </div>
 
       <div class="event-description" v-html="sanitizedEventBody"></div>
@@ -202,8 +202,16 @@ const sanitizedEventBody = computed(() => {
 }
 
 .event-details {
+  position: relative;
   margin-bottom: 24px;
   padding: 20px 20px 0px 20px;
+
+  &__favorite-button {
+    position: absolute;
+    top: 32px;
+    right: 27px;
+    z-index: 10;
+  }
 }
 
 .event-time {
@@ -211,7 +219,6 @@ const sanitizedEventBody = computed(() => {
   font-weight: 600;
   color: #0077C8;
   margin-bottom: 0px;
-
 }
 
 .event-title {
