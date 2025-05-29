@@ -77,7 +77,6 @@ import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 import { storeToRefs } from 'pinia';
 import { Category, DateObject, Event, FormattedDateObject } from '@/types';
-// import { convertToEasternTime } from '@/utils/time';
 import { formatEvent, FormattedEvent } from '@/utils/event';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import appConfig from '@/config/app';
@@ -88,37 +87,6 @@ const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
 const eventsData = computed(() => data.value?.nysfairWebsite?.events ?? []);
 const categoriesData = computed(() => data.value?.nysfairWebsite?.event_categories ?? []);
-
-// const findCurrentDayIndex = (dates: DateObject[]): number => {
-//   console.log('dates.length', dates.length, dates);
-//   if (!dates.length) {
-//     return 0;
-//   }
-
-//   const now = Date.now();
-//   const today = convertToEasternTime(now).toDateString();
-
-//   // Find today's index
-//   const todayIndex = dates.findIndex(date => {
-//     const dateStr = convertToEasternTime(date.timestamp).toDateString();
-
-//     return dateStr === today;
-//   });
-
-//   if (todayIndex >= 0) {
-//     return todayIndex;
-//   }
-
-//   // If today not found, find next upcoming day
-//   const upcomingIndex = dates.findIndex(date => date.timestamp > now);
-
-//   if (upcomingIndex >= 0) {
-//     return upcomingIndex;
-//   }
-
-//   // If no upcoming days, default to first day
-//   return 0;
-// };
 
 const selectedDateIndex = ref(-1);
 const isDateChanging = ref(false);
@@ -288,7 +256,7 @@ watch(dates, (updatedDates) => {
 
       if (activeButton) {
         activeButton.scrollIntoView({
-          behavior: 'smooth',
+          behavior: 'instant',
           block: 'nearest',
           inline: 'center'
         });
