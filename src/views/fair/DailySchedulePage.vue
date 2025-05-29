@@ -1,14 +1,17 @@
 <template>
   <FairLayout title="Schedule" :showMenuButton="true">
-    <div class="main">
+    <div class="main main--daily-schedule">
       <div class="main__header">
         <div class="main__header-img">
-          <PlaceholderIcon />
+          <img v-if="pageData?.featured_image" :src="pageData.featured_image" alt="" />
+
+          <!-- <PlaceholderIcon v-else /> -->
         </div>
 
         <div class="main__header-content">
           <h2 class="title">Daily Schedule</h2>
-          <!-- <p class="subtitle">Class ridiculus rhoncus ad suspendisse ridiculus malesuada; litora morbi</p> -->
+
+          <div v-if="descriptionHtml" v-html="descriptionHtml" class="main__content-description"></div>
         </div>
       </div>
 
@@ -76,12 +79,13 @@
 import FairLayout from '@/layouts/fair.vue';
 import { useDataStore } from '@/stores/data';
 import { storeToRefs } from 'pinia';
-import { Category, DateObject, Event, FormattedDateObject } from '@/types';
+import { Category, Event, FormattedDateObject } from '@/types';
 import { formatEvent, FormattedEvent } from '@/utils/event';
 import PlaceholderIcon from '@/components/Icons/PlaceholderIcon.vue';
 import appConfig from '@/config/app';
 import { isAfter, isBefore, isSameDay, startOfDay } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
+import { sanitizeHtml } from '@/utils/text';
 
 const dataStore = useDataStore();
 const { data, isLoading } = storeToRefs(dataStore);
@@ -95,6 +99,12 @@ const showCategoryDropdown = ref(false);
 
 // Add ref for date selector container
 const dateSelectorContainer = ref<HTMLElement>();
+
+const pageData = dataStore.data.nysfairWebsite.pages['your-visit/daily-schedules'];
+
+const descriptionHtml = computed(() => {
+  return pageData?.mobile_app_description ? sanitizeHtml({ html: pageData.mobile_app_description }) : '';
+});
 
 const dates = computed<FormattedDateObject[]>(() => {
   if (!eventsData.value?.length) {

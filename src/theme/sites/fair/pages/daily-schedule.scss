@@ -34,7 +34,7 @@
         margin-bottom: 0;
       }
 
-      .subtitle {
+      .description {
         font-size: 14px;
         font-weight: 500;
         line-height: 24px;
@@ -52,6 +52,9 @@
   }
 }
 
+  .description p {
+    display: none;
+  }
 .date-selector {
   padding: 0 20px;
   margin-bottom: 20px;

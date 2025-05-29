@@ -8,21 +8,21 @@
 
     <!-- Loading -->
     <div v-if="isLoadingUpdates" class="loading-content notification">
-      Loading Parking Updates...
+      Loading parking updates...
     </div>
 
     <div class="main">
       <div class="main__image">
-        <PlaceholderIcon />
+        <img v-if="pageData?.featured_image" :src="pageData.featured_image" alt="" />
+
+        <!-- <PlaceholderIcon v-else /> -->
       </div>
 
       <!-- Rest of your component remains the same -->
       <div class="main__content">
         <h2 class="main__content-title">{{ parkingPageData?.title }}</h2>
-        <!-- <p class="main__content-text">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-          magna aliqua.
-        </p> -->
+
+        <div v-if="descriptionHtml" v-html="descriptionHtml" class="main__content-description"></div>
       </div>
 
       <div class="expandable-sections">
@@ -93,9 +93,15 @@ if (pageData) {
   parkingPageData.value.content = pageData.content;
 }
 
+const descriptionHtml = computed(() => {
+  return pageData?.mobile_app_description ? sanitizeHtml({ html: pageData.mobile_app_description }) : '';
+});
+
 // Watch for changes in the content and parse it
 watch(() => parkingPageData.value.content, (newContent: string) => {
-  if (!newContent) return;
+  if (!newContent) {
+    return;
+  }
 
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = newContent;
@@ -250,13 +256,13 @@ onMounted(() => {
   &__image {
     margin: 20px;
     margin-bottom: 0px;
-    background-color: #EFF2F6;
+    // background-color: #EFF2F6;
     border-radius: 10px;
-    height: 25vh;
+    // height: 25vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 5px solid #F4E8AB;
+    // border: 5px solid #F4E8AB;
   }
 
   &__content {
