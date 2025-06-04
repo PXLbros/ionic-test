@@ -21,6 +21,7 @@ declare module 'vue' {
     FairKeepInTouchForm: typeof import('./components/FairKeepInTouchForm.vue')['default']
     FairLogo: typeof import('./components/FairLogo.vue')['default']
     FavoriteButton: typeof import('./components/FavoriteButton.vue')['default']
+    FerrisWheel: typeof import('./components/FerrisWheel.vue')['default']
     HamburgerIcon: typeof import('./components/Icons/HamburgerIcon.vue')['default']
     HeartIcon: typeof import('./components/Icons/HeartIcon.vue')['default']
     HomeIcon: typeof import('./components/Icons/HomeIcon.vue')['default']

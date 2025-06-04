@@ -1391,15 +1391,16 @@ function initMap() {
   // // Add navigation controls
   // mapboxMap.addControl(new mapboxgl.NavigationControl());
 
-  // mapboxMap.addControl(
-  //   new mapboxgl.GeolocateControl({
-  //     positionOptions: {
-  //       enableHighAccuracy: true,
-  //     },
-  //     trackUserLocation: true,
-  //     showUserHeading: true // Optional: shows a directional arrow
-  //   })
-  // );
+  // Add geolocate control to the map
+  mapboxMap.addControl(
+    new mapboxgl.GeolocateControl({
+      positionOptions: {
+        enableHighAccuracy: true,
+      },
+      trackUserLocation: true,
+      showUserHeading: true // Optional: shows a directional arrow
+    })
+  );
 
   // Set up map error handling
   mapboxMap.on('error', (error) => {

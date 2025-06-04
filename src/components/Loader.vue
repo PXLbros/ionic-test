@@ -6,6 +6,8 @@
       {{ formattedLoadingText }}
       <span class="dots"><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>
     </div>
+
+    <!-- <FerrisWheel /> -->
   </div>
 </template>
 
