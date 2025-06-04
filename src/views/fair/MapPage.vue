@@ -1588,6 +1588,29 @@ function handleClusterClick(e: mapboxgl.MapMouseEvent) {
 
   const source = mapboxMap.getSource(MapSource.PointsClustered) as mapboxgl.GeoJSONSource;
 
+  // Debug: Get all points in the cluster for logging
+  // source.getClusterLeaves(clusterId, Infinity, 0, (err, leaves) => {
+  //   if (err) {
+  //     console.error('Error getting cluster leaves:', err);
+  //   } else if (leaves) {
+  //     console.group('🔍 DEBUG: Cluster Contents');
+  //     console.log(`Cluster ID: ${clusterId}`);
+  //     console.log(`Total items in cluster: ${leaves.length}`);
+
+  //     leaves.forEach((leaf, index) => {
+  //       const coords = (leaf.geometry as Point).coordinates;
+  //       const props = leaf.properties;
+
+  //       console.log(`${index + 1}. ${props?.name || 'Unknown'}`);
+  //       console.log(`   Type: ${props?.type || 'Unknown'}`);
+  //       console.log(`   Coordinates: [${coords[0]}, ${coords[1]}]`);
+  //       console.log('---');
+  //     });
+
+  //     console.groupEnd();
+  //   }
+  // });
+
   source.getClusterExpansionZoom(clusterId, (err, zoom) => {
     if (typeof zoom !== 'number') {
       console.warn('Expansion zoom level is invalid:', zoom);

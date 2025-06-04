@@ -247,15 +247,15 @@ export async function loadCategoryIcons({
 
   // Wait for all icons to load (using Promise.allSettled to handle failures gracefully)
   const results = await Promise.allSettled(loadPromises);
-  
+
   // Count fulfilled vs rejected promises
   const fulfilledCount = results.filter(result => result.status === 'fulfilled').length;
   const rejectedCount = results.filter(result => result.status === 'rejected').length;
-  
+
   const numLoadErrors = loadErrors.length || 0;
   const numDefaultIcons = defaultIcons.length;
   const totalIconsAttempted = numCategoryIcons + numDefaultIcons;
-  
+
   // Enhanced error logging with detailed information
   if (numLoadErrors > 0) {
     const failedIcons = loadErrors.map(error => {
@@ -266,7 +266,7 @@ export async function loadCategoryIcons({
       }
       return { error: error };
     });
-    
+
     if (numLoadErrors === numCategoryIcons && numCategoryIcons > 0) {
       // All category icons failed, but don't throw - let the map render with defaults
       logger.error('All category icons failed to load - map will use default icons', {
@@ -279,7 +279,7 @@ export async function loadCategoryIcons({
       });
     } else {
       const numLoadedCategoryIcons = numCategoryIcons - numLoadErrors;
-      
+
       logger.warn('Some icons failed to load', {
         'Total Category Icons': numCategoryIcons,
         'Loaded Category Icons': numLoadedCategoryIcons,
@@ -296,13 +296,13 @@ export async function loadCategoryIcons({
       'Total Icons': totalIconsAttempted
     });
   }
-  
+
   // Only throw an error if failOnIconError is true AND we have errors
   if (config.failOnIconError && numLoadErrors > 0) {
     const errorMessage = `Failed to load ${numLoadErrors} out of ${totalIconsAttempted} icons`;
-    logger.error('Icon loading failed with failOnIconError=true:', { 
+    logger.error('Icon loading failed with failOnIconError=true:', {
       errorMessage,
-      'Failed Icons': loadErrors 
+      'Failed Icons': loadErrors
     });
     throw new Error(errorMessage);
   }
@@ -310,12 +310,12 @@ export async function loadCategoryIcons({
 
 export function getMapClusterIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
   const defaultClusterIcon = 'default-map-cluster-icon';
-  
+
   // Safety check for valid maps array
   if (!maps || !Array.isArray(maps) || maps.length === 0) {
     return defaultClusterIcon;
   }
-  
+
   return [
     'match',
     currentMapIndex,
@@ -365,19 +365,19 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], cur
 
 export function getMapIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
   const defaultMapIcon = 'default-map-icon';
-  
+
   // Safety check for valid maps array and index
   if (!maps || !Array.isArray(maps) || currentMapIndex < 0 || currentMapIndex >= maps.length) {
     return defaultMapIcon;
   }
-  
+
   const newMap = maps[currentMapIndex];
-  
+
   // Safety check for valid map object
   if (!newMap || typeof newMap !== 'object' || !newMap.slug) {
     return defaultMapIcon;
   }
-  
+
   const isMainMap = newMap.slug === 'main';
 
   return isMainMap
@@ -493,14 +493,14 @@ export function setupIconClickHandlers(
   };
 
   const getIconClickZoomLevel = (map: mapboxgl.Map): number => {
-    // // Determine the zoom level based on the map's current zoom
-    // const currentZoom = map.getZoom();
-    // const maxZoom = map.getMaxZoom();
-    // const zoomLevel = Math.max(17, maxZoom);
-    // // Ensure the zoom level is not greater than the map's max zoom
-    // return Math.min(zoomLevel, maxZoom);
+    const currentZoom = map.getZoom();
+    const defaultClickZoomLevel = 17;
 
-    return 17;
+    if (currentZoom > defaultClickZoomLevel) {
+      return currentZoom;
+    } else {
+      return defaultClickZoomLevel;
+    }
   };
 
   // Vendor icon click handler
