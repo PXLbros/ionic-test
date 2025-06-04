@@ -249,7 +249,7 @@ const DEFAULT_MAP_BEARING = 222; // In degrees
 const DEFAULT_MAP_NAME = 'food-beverage';
 
 const MAP_MIN_ZOOM = 13;
-const MAP_MAX_ZOOM = 19;
+const MAP_MAX_ZOOM = 18;
 
 const DEFAULT_MAP_CLUSTER_RADIUS = 23;
 const DEFAULT_MAP_CLUSTER_MIN_POINTS = 3;

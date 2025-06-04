@@ -56,11 +56,10 @@ const defaultCategoryIconLoadingConfig: CategoryIconLoadingConfig = {
 /**
  * Loads category icons for the map
  * @param map Mapbox map instance
- * @param serviceCategories Array of service categories
- * @param vendorCategories Array of vendor categories
+ * @param maps Array of map configurations
  * @param config Configuration for icon loading behavior
- * @returns Promise that resolves when all icons are loaded
- * @throws Error if failOnIconError is true and any icon fails to load
+ * @returns Promise that resolves when icon loading is complete (regardless of individual failures)
+ * @throws Error only if failOnIconError is true and any icon fails to load
  */
 export async function loadCategoryIcons({
   map,
@@ -235,50 +234,99 @@ export async function loadCategoryIcons({
   });
 
   // Load default icons
-  // loadPromises.push(loadImage('/icons/default-category.png', 'default-vendor-icon'));
-  // loadPromises.push(loadImage('/icons/default-category.png', 'default-service-icon'));
+  const defaultIcons = [
+    { url: '/icons/default-map-cluster-icon.png', id: 'default-map-cluster-icon' },
+    { url: '/icons/default-map-icon.png', id: 'default-map-icon' }
+  ];
 
-  loadPromises.push(loadImage('/icons/default-map-cluster-icon.png', 'default-map-cluster-icon'));
-  loadPromises.push(loadImage('/icons/default-map-icon.png', 'default-map-icon'));
+  defaultIcons.forEach(({ url, id }) => {
+    loadPromises.push(loadImage(url, id));
+  });
 
   const numCategoryIcons = categoryIconMap.size;
 
-  // Wait for all icons to load
-  try {
-    await Promise.all(loadPromises);
-
-    const numLoadErrors = loadErrors.length || 0;
-    const allFailed = numLoadErrors === numCategoryIcons;
-
-    if (allFailed) {
-      throw new Error(`Failed to load all ${numCategoryIcons} category icons`);
-    } else if (numLoadErrors > 0) {
-      const numLoadedCategoryIcons = numCategoryIcons - numLoadErrors;
-
-      logger.warn('Some category icons failed to load', {
-        'Total Count': numCategoryIcons,
-        'Loaded Count': numLoadedCategoryIcons,
-        'Failed Count': numLoadErrors,
+  // Wait for all icons to load (using Promise.allSettled to handle failures gracefully)
+  const results = await Promise.allSettled(loadPromises);
+  
+  // Count fulfilled vs rejected promises
+  const fulfilledCount = results.filter(result => result.status === 'fulfilled').length;
+  const rejectedCount = results.filter(result => result.status === 'rejected').length;
+  
+  const numLoadErrors = loadErrors.length || 0;
+  const numDefaultIcons = defaultIcons.length;
+  const totalIconsAttempted = numCategoryIcons + numDefaultIcons;
+  
+  // Enhanced error logging with detailed information
+  if (numLoadErrors > 0) {
+    const failedIcons = loadErrors.map(error => {
+      // Extract icon ID and URL from error message for better reporting
+      const match = error.match(/Failed to load icon ([^\s]+) from URL ([^:]+)/);
+      if (match) {
+        return { iconId: match[1], url: match[2], error: error };
+      }
+      return { error: error };
+    });
+    
+    if (numLoadErrors === numCategoryIcons && numCategoryIcons > 0) {
+      // All category icons failed, but don't throw - let the map render with defaults
+      logger.error('All category icons failed to load - map will use default icons', {
+        'Total Category Icons': numCategoryIcons,
+        'Failed Category Icons': numLoadErrors,
+        'Default Icons Status': rejectedCount > fulfilledCount ? 'Some default icons also failed' : 'Default icons loaded successfully',
+        'Failed Icons': failedIcons,
+        'Total Promises Fulfilled': fulfilledCount,
+        'Total Promises Rejected': rejectedCount
       });
     } else {
-      logger.info('Category icons loaded successfully', {
-        'Count': numCategoryIcons,
+      const numLoadedCategoryIcons = numCategoryIcons - numLoadErrors;
+      
+      logger.warn('Some icons failed to load', {
+        'Total Category Icons': numCategoryIcons,
+        'Loaded Category Icons': numLoadedCategoryIcons,
+        'Failed Category Icons': numLoadErrors,
+        'Failed Icons': failedIcons,
+        'Total Promises Fulfilled': fulfilledCount,
+        'Total Promises Rejected': rejectedCount
       });
     }
-  } catch (error) {
-    // This will only be reached if failOnIconError is true
-    logger.error('Icon loading failed:', error);
-
-    throw new Error(`Failed to load map icons: ${error instanceof Error ? error.message : String(error)}`);
+  } else {
+    logger.info('All icons loaded successfully', {
+      'Category Icons': numCategoryIcons,
+      'Default Icons': numDefaultIcons,
+      'Total Icons': totalIconsAttempted
+    });
+  }
+  
+  // Only throw an error if failOnIconError is true AND we have errors
+  if (config.failOnIconError && numLoadErrors > 0) {
+    const errorMessage = `Failed to load ${numLoadErrors} out of ${totalIconsAttempted} icons`;
+    logger.error('Icon loading failed with failOnIconError=true:', { 
+      errorMessage,
+      'Failed Icons': loadErrors 
+    });
+    throw new Error(errorMessage);
   }
 }
 
 export function getMapClusterIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
+  const defaultClusterIcon = 'default-map-cluster-icon';
+  
+  // Safety check for valid maps array
+  if (!maps || !Array.isArray(maps) || maps.length === 0) {
+    return defaultClusterIcon;
+  }
+  
   return [
     'match',
     currentMapIndex,
-    ...maps.flatMap((map, index) => [index, `map-cluster-icon-${map.slug}`]),
-    'default-map-cluster-icon'
+    ...maps.flatMap((map, index) => {
+      // Safety check for valid map object with slug
+      if (!map || typeof map !== 'object' || !map.slug) {
+        return [];
+      }
+      return [index, `map-cluster-icon-${map.slug}`];
+    }),
+    defaultClusterIcon
   ];
 }
 
@@ -316,21 +364,45 @@ export function addMapClusterIconLayer(mapboxMap: mapboxgl.Map, maps: any[], cur
 }
 
 export function getMapIconImageExpression({ maps, currentMapIndex }: { maps: any[], currentMapIndex: number }): DataDrivenPropertyValueSpecification<string> {
-  const newMap = maps[currentMapIndex];
-  const isMainMap = newMap.slug === 'main';
   const defaultMapIcon = 'default-map-icon';
+  
+  // Safety check for valid maps array and index
+  if (!maps || !Array.isArray(maps) || currentMapIndex < 0 || currentMapIndex >= maps.length) {
+    return defaultMapIcon;
+  }
+  
+  const newMap = maps[currentMapIndex];
+  
+  // Safety check for valid map object
+  if (!newMap || typeof newMap !== 'object' || !newMap.slug) {
+    return defaultMapIcon;
+  }
+  
+  const isMainMap = newMap.slug === 'main';
 
   return isMainMap
     ? [
         'match',
         ['get', 'primaryMapSlug'],
-        ...maps.flatMap((map) => [map.slug, `map-icon-${map.slug}`]),
+        ...maps.flatMap((map) => {
+          // Safety check for valid map object with slug
+          if (!map || typeof map !== 'object' || !map.slug) {
+            return [];
+          }
+          return [map.slug, `map-icon-${map.slug}`];
+        }),
         defaultMapIcon,
       ]
     : [
         'match',
         currentMapIndex,
-        ...maps.flatMap((map, index) => [index, `map-icon-${map.slug}`]),
+        ...maps.flatMap((map, index) => {
+          // Safety check for valid map object with slug
+          if (!map || typeof map !== 'object' || !map.slug) {
+            return [];
+          }
+          return [index, `map-icon-${map.slug}`];
+        }),
         defaultMapIcon,
       ];
 }
