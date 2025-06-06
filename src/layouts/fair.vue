@@ -1,6 +1,5 @@
 <template>
   <ion-page id="layout">
-    <div id="debug-overlay"></div>
     <div v-if="props.isLoading" class="layout-loader">
       {{ props.loadingText }}
     </div>

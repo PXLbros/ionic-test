@@ -1495,6 +1495,10 @@ function initMap() {
     appStore.hideSubLoader();
   });
 
+  mapboxMap.on('source.error', (error) => {
+    logger.error(error);
+  });
+
   mapboxMap.on('resize', () => {
     logger.debug('Map resized', {
       width: mapContainer.value?.offsetWidth,
@@ -1763,11 +1767,13 @@ function setupMapLayers() {
     mapClusterMinPoints.value = clusterMinPoints;
     clusterClickZoomInAmount.value = newZoomInAmount;
 
+    const nysfairWebsiteBaseUrl = import.meta.env.VITE_NYSFAIR_WEBSITE_BASE_URL;
+
     mapboxMap.addSource(MapSource.ChevyCourtArea, {
       type: 'raster',
       tiles: [
-        '/map-tiles/{z}/{x}/{y}.png',
-        // `${nysfairWebsiteBaseUrl}/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png`,
+        // '/map-tiles/{z}/{x}/{y}.png',
+        `${nysfairWebsiteBaseUrl}/serve-asset.php?asset=map-tiles/{z}/{x}/{y}.png`,
       ],
       tileSize: 512,
       // scheme: 'tms',

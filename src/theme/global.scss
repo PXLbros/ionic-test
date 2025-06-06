@@ -99,17 +99,6 @@ p {
   }
 }
 
-// use var(--safe-area-inset-top); to create a debug overlay using <div id="debug-overlay"></div>
-#debug-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: var(--safe-area-inset-top);
-  background-color: rgba(255, 0, 0, 0.5);
-  z-index: 99999999;
-}
-
 .main__content-description p {
   margin: 1rem 0;
 }

@@ -353,7 +353,7 @@ ion-col {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: calc(var(--ion-safe-area-top, 0px) + 25px);
+    margin-top: calc(var(--ion-safe-area-top, 0px) + 15px);
     margin-bottom: 5px;
     position: relative;
     z-index: 10;
