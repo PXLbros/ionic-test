@@ -497,13 +497,19 @@ function performMapSelection(mapData: ServiceMap) {
     // Request map update
     updateMapForSelectedType();
 
-    // Add a small delay before zooming to ensure map source has updated
+    // Listen for source data to be ready instead of using arbitrary timeout
     // This prevents race conditions between source update and fitBounds
-    setTimeout(() => {
-      zoomMapToAvailablePoints();
+    const handleSourceData = (e: mapboxgl.MapSourceDataEvent) => {
+      if (e.sourceId === MapSource.PointsClustered && e.isSourceLoaded) {
+        zoomMapToAvailablePoints();
+        isSelectingMap.value = false;
 
-      isSelectingMap.value = false;
-    }, 100);
+        // Remove the event listener after use
+        mapboxMap.off('sourcedata', handleSourceData);
+      }
+    };
+
+    mapboxMap.on('sourcedata', handleSourceData);
 
   } catch (error) {
     logger.error('Error in map selection:', error);
