@@ -1,4 +1,5 @@
 import { Logger, type ILogObjMeta } from 'tslog';
+import * as Sentry from '@sentry/capacitor';
 
 export const LogLevel = {
   SILLY: 0,
@@ -73,11 +74,25 @@ export class CustomLogger<LogObj extends Record<string, unknown>> extends Logger
       // Log the raw error separately
       console.error(secondArg);
 
+      // Send error to Sentry if it's an Error object
+      if (secondArg instanceof Error) {
+        if (Sentry && typeof Sentry.captureException === 'function') {
+          Sentry.captureException(secondArg);
+        }
+      }
+
       return result;
     } else {
       // If only the error is provided
       const error = firstArg;
       console.error(error);
+
+      // Send error to Sentry if it's an Error object
+      if (error instanceof Error) {
+        if (Sentry && typeof Sentry.captureException === 'function') {
+          Sentry.captureException(error);
+        }
+      }
 
       return undefined;
     }

@@ -272,6 +272,10 @@ const currentMapSlug = ref<string | null>(null);
 const searchQuery = ref('');
 const searchDebounceTimeout = ref<number | null>(null);
 
+// Add debouncing for map selection to prevent rapid successive calls
+const mapSelectionTimeout = ref<ReturnType<typeof setTimeout> | null>(null);
+const isSelectingMap = ref(false);
+
 const searchWrapperElement = ref<HTMLElement | null>(null);
 
 // Add new refs for filters modal
@@ -442,33 +446,70 @@ function closeDropdownOnOutsideClick(event: MouseEvent) {
 
 // Select a map type using slug instead of ID
 function selectMap(mapData: ServiceMap) {
-  // Store previous map slug for comparison
-  const previousMapSlug = currentMapSlug.value;
-
-  // Update current map slug and close dropdown
-  currentMapSlug.value = mapData.slug;
-  showMapDropdown.value = false;
-
-  // Reset search and filters
-  searchQuery.value = '';
-  clearCategoryFilters();
-
-  // Check if this is a significant map change
-  const isDifferentMap = previousMapSlug !== mapData.slug;
-
-  if (isDifferentMap) {
-    logger.info('Switching map', {
-      'Slug': mapData.slug,
-      'Name': mapData.name,
-      'Type': mapData.type,
-    });
+  // Prevent rapid successive map selections
+  if (isSelectingMap.value) {
+    logger.info('Map selection already in progress, ignoring');
+    return;
   }
 
-  // Request map update
-  updateMapForSelectedType();
+  // Clear any existing timeout
+  if (mapSelectionTimeout.value) {
+    clearTimeout(mapSelectionTimeout.value);
+  }
 
-  // After updating the map, zoom to available points
-  zoomMapToAvailablePoints();
+  // Set debounce timeout to prevent rapid selections
+  mapSelectionTimeout.value = setTimeout(() => {
+    performMapSelection(mapData);
+  }, 150);
+}
+
+// Actual map selection logic separated for cleaner debouncing
+function performMapSelection(mapData: ServiceMap) {
+  if (isSelectingMap.value) {
+    return;
+  }
+
+  try {
+    isSelectingMap.value = true;
+
+    // Store previous map slug for comparison
+    const previousMapSlug = currentMapSlug.value;
+
+    // Update current map slug and close dropdown
+    currentMapSlug.value = mapData.slug;
+    showMapDropdown.value = false;
+
+    // Reset search and filters
+    searchQuery.value = '';
+    clearCategoryFilters();
+
+    // Check if this is a significant map change
+    const isDifferentMap = previousMapSlug !== mapData.slug;
+
+    if (isDifferentMap) {
+      logger.info('Switching map', {
+        'Slug': mapData.slug,
+        'Name': mapData.name,
+        'Type': mapData.type,
+      });
+    }
+
+    // Request map update
+    updateMapForSelectedType();
+
+    // Add a small delay before zooming to ensure map source has updated
+    // This prevents race conditions between source update and fitBounds
+    setTimeout(() => {
+      zoomMapToAvailablePoints();
+
+      isSelectingMap.value = false;
+    }, 100);
+
+  } catch (error) {
+    logger.error('Error in map selection:', error);
+
+    isSelectingMap.value = false;
+  }
 }
 
 // Toggle filters panel
@@ -1040,20 +1081,57 @@ function buildServiceGeoJSONCollection(): FeatureCollection<Point, ServiceProper
 
 // Build GeoJSON for both vendors and services
 function buildCombinedGeoJSONCollection(): FeatureCollection<Point, VendorProperties | ServiceProperties> {
-  const vendorGeoJSON = buildVendorGeoJSONCollection();
-  const serviceGeoJSON = buildServiceGeoJSONCollection();
+  try {
+    const vendorGeoJSON = buildVendorGeoJSONCollection();
+    const serviceGeoJSON = buildServiceGeoJSONCollection();
 
-  logger.info('Re-built combined map JSON', {
-    'Vendors': vendorGeoJSON.features.length,
-    'Services': serviceGeoJSON.features.length,
-  });
+    logger.info('Re-built combined map JSON', {
+      'Vendors': vendorGeoJSON.features.length,
+      'Services': serviceGeoJSON.features.length,
+    });
 
-  const combinedFeatures = [...vendorGeoJSON.features, ...serviceGeoJSON.features];
+    // Filter out any invalid features before combining
+    const validVendorFeatures = vendorGeoJSON.features.filter(feature =>
+      feature.geometry &&
+      feature.geometry.type === 'Point' &&
+      Array.isArray(feature.geometry.coordinates) &&
+      feature.geometry.coordinates.length === 2 &&
+      typeof feature.geometry.coordinates[0] === 'number' &&
+      typeof feature.geometry.coordinates[1] === 'number'
+    );
 
-  return {
-    type: 'FeatureCollection' as const,
-    features: combinedFeatures,
-  };
+    const validServiceFeatures = serviceGeoJSON.features.filter(feature =>
+      feature.geometry &&
+      feature.geometry.type === 'Point' &&
+      Array.isArray(feature.geometry.coordinates) &&
+      feature.geometry.coordinates.length === 2 &&
+      typeof feature.geometry.coordinates[0] === 'number' &&
+      typeof feature.geometry.coordinates[1] === 'number'
+    );
+
+    const combinedFeatures = [...validVendorFeatures, ...validServiceFeatures];
+
+    if (validVendorFeatures.length !== vendorGeoJSON.features.length || validServiceFeatures.length !== serviceGeoJSON.features.length) {
+      logger.warn('Filtered out invalid features', {
+        'Original Vendors': vendorGeoJSON.features.length,
+        'Valid Vendors': validVendorFeatures.length,
+        'Original Services': serviceGeoJSON.features.length,
+        'Valid Services': validServiceFeatures.length,
+      });
+    }
+
+    return {
+      type: 'FeatureCollection' as const,
+      features: combinedFeatures,
+    };
+  } catch (error) {
+    logger.error('Error building combined GeoJSON collection:', error);
+    // Return empty collection as fallback
+    return {
+      type: 'FeatureCollection' as const,
+      features: [],
+    };
+  }
 }
 
 // Get service category name by ID
@@ -1513,6 +1591,7 @@ function zoomMapToAvailablePoints() {
   const filteredGeoJson = buildCombinedGeoJSONCollection();
 
   if (!filteredGeoJson.features.length) {
+    logger.warn('No features available to zoom to');
     return;
   }
 
@@ -1529,17 +1608,45 @@ function zoomMapToAvailablePoints() {
     }
   });
 
-  // Only fit if there are at least two points (otherwise mapbox will zoom too far)
+  // Only fit if bounds are valid and not empty
   if (bounds.isEmpty()) {
-    logger.warn('No valid points to fit bounds');
+    logger.warn('No valid points to fit bounds - using default position');
+    // Fallback to default position instead of crashing
+    try {
+      mapboxMap.flyTo({
+        center: DEFAULT_MAP_POSITION,
+        zoom: DEFAULT_MAP_ZOOM,
+        bearing: DEFAULT_MAP_BEARING,
+        duration: 800
+      });
+    } catch (error) {
+      logger.error('Error flying to default position:', error);
+    }
+    return;
   }
 
-  mapboxMap.fitBounds(bounds, {
-    padding: 20,
-    maxZoom: MAP_MAX_ZOOM,
-    duration: 800,
-    bearing: DEFAULT_MAP_BEARING,
-  });
+  // Add error handling around fitBounds
+  try {
+    mapboxMap.fitBounds(bounds, {
+      padding: 20,
+      maxZoom: MAP_MAX_ZOOM,
+      duration: 800,
+      bearing: DEFAULT_MAP_BEARING,
+    });
+  } catch (error) {
+    logger.error('Error fitting bounds:', error);
+    // Fallback to default position if fitBounds fails
+    try {
+      mapboxMap.flyTo({
+        center: DEFAULT_MAP_POSITION,
+        zoom: DEFAULT_MAP_ZOOM,
+        bearing: DEFAULT_MAP_BEARING,
+        duration: 800
+      });
+    } catch (fallbackError) {
+      logger.error('Error in fallback flyTo:', fallbackError);
+    }
+  }
 }
 
 // Load map resources in the proper sequence
@@ -1854,6 +1961,11 @@ onUnmounted(() => {
   // Clean up debounce timeout
   if (searchDebounceTimeout.value) {
     clearTimeout(searchDebounceTimeout.value);
+  }
+
+  // Clean up map selection timeout
+  if (mapSelectionTimeout.value) {
+    clearTimeout(mapSelectionTimeout.value);
   }
 
   // Clean up event listener

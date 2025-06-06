@@ -1,13 +1,15 @@
 import { AxiosError } from 'axios';
 import { useDataStore } from '@/stores/data';
-import * as Sentry from '@sentry/capacitor';
+// import * as Sentry from '@sentry/capacitor';
 import { Preferences } from '@capacitor/preferences';
 import { Site } from '@/types';
 import { useStrapiApi } from '@/composables/useStrapiApi';
+import { useLogger } from '@/composables/useLogger';
 
 export const fetchData = async () => {
   const dataStore = useDataStore();
   const strapiApi = useStrapiApi();
+  const logger = useLogger();
 
   try {
     dataStore.isLoading = true;
@@ -53,14 +55,14 @@ export const fetchData = async () => {
       errors
     });
   } catch (error) {
-    console.error('Error fetching data:', error);
+    logger.error(error);
 
     dataStore.setLoadError({ error });
 
     // Report error to Sentry
-    if (Sentry && typeof Sentry.captureException === 'function') {
-      Sentry.captureException(error);
-    }
+    // if (Sentry && typeof Sentry.captureException === 'function') {
+    //   Sentry.captureException(error);
+    // }
   } finally {
     dataStore.isLoading = false;
     dataStore.isInitiallyLoading = false;
